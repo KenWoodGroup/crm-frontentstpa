@@ -52,7 +52,7 @@ export default function Login() {
       const { data } = base_data
 
       const { access_token, refresh_token } = data?.tokens || {};
-      const { id, role } = data?.newUser
+      const { id, role, location_id } = data?.newUser
 
       Cookies.set("token", access_token);
       Cookies.set("refresh_token", refresh_token);
@@ -84,7 +84,7 @@ export default function Login() {
 
       Cookies.set("nesw", roleMap[role] || "");
       Cookies.set('us_nesw', id);
-
+      Cookies.set('ul_nesw', location_id);
       // Alert("Muvaffaqiyatli", "success");
       notify.success("Login muvaffaqiyatli!")
       // navigate('/');

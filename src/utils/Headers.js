@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export const BASE_URL = "http://45.92.173.175:2025";
+export const BASE_URL = "https://test.edu-devosoft.uz";
 
 export const $api = axios.create({
     baseURL: `${BASE_URL}/api`,

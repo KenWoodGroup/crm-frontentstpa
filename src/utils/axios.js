@@ -1,4 +1,4 @@
 import axios from 'axios'
-axios.defaults.baseURL = 'http://45.92.173.175:2025'
+axios.defaults.baseURL = 'https://test.edu-devosoft.uz'
 
 export default axios
