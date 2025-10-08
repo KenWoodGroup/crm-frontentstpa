@@ -142,16 +142,16 @@ export default function Register() {
         )
     }
     return (
-        <main className="regis-root max-w-225 mx-auto my-0 px-40 py-10">
+        <main className="regis-root max-w-[1100px] mx-auto my-0 px-[160px] py-[40px]">
             <div className="text-center mb-10">
-                <div className="regis-logo inline-block bg-[var(--regis-bg)] text-[#fff] font-semibold text-[26px] w-15 h-15 rounded-full leading-[60px] mb-2.5">KW</div>
+                <div className="regis-logo inline-block bg-[var(--regis-bg)] text-[#fff] font-semibold text-[26px] w-[60px] h-[60px] rounded-full leading-[60px] mb-[10px]">KW</div>
                 <div>
                     <h1 className="m-0 text-[22px] text-[#222]">Kenwood Group</h1>
                     <p className="text-[#777] text-[14px]">Ombor nazorati va inventarizatsiya platformasi</p>
                 </div>
             </div>
 
-            <form className="regis-form bg-[#fff] rounded-[16px] shadow-[0_0_15px_rgba(0,0,0,0.08)] p-7.5 [@media(max-width:370px)]:p-3" onSubmit={handleSubmit} noValidate>
+            <form className="regis-form bg-[#fff] rounded-[16px] shadow-[0_0_15px_rgba(0,0,0,0.08)] p-[30px] [@media(max-width:370px)]:p-[12px]" onSubmit={handleSubmit} noValidate>
                 <div className="regis-grid grid grid-cols-2 gap-y-6 gap-x-10">
                     <div>
                         <label className="regis-label">Kompaniya nomi</label>

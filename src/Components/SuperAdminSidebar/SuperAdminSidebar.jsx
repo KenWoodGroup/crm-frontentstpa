@@ -69,7 +69,7 @@ const SuperAdminSidebar = ({ links = [], onToggle, role }) => {
                             to={path}
                             className={({ isActive }) =>
                                 clsx(
-                                    "flex items-center gap-3 p-3 rounded-xl text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all",
+                                    "flex items-center gap-3 p-3 rounded-xl text-[rgb(2, 2, 59)] hover:bg-blue-50 hover:text-blue-600 transition-all",
                                     isActive && "bg-blue-100 text-blue-700 font-semibold"
                                 )
                             }
@@ -89,7 +89,7 @@ const SuperAdminSidebar = ({ links = [], onToggle, role }) => {
 
                 {/* Footer */}
                 <div className="p-3 border-t border-gray-100">
-                    <button className="flex items-center gap-3 p-3 w-full rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-600 transition">
+                    <button className="flex items-center gap-3 p-3 w-full rounded-xl text-[rgb(2, 2, 59)] hover:bg-red-100 hover:text-red-700 transition">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="w-5 h-5"

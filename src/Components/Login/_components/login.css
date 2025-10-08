@@ -18,6 +18,7 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), var(--login-card));
   box-shadow: var(--login-shadow);
   animation: login-card-appear 380ms var(--login-transition) both;
+  /* max-width: 520px; */
 }
 
 .login-logo {
