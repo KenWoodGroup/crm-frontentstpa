@@ -9,6 +9,7 @@ import { notify } from "../../utils/toast";
 import Spinner from "../../Components/UI/spinner/Spinner";
 
 
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,10 +31,9 @@ export default function Login() {
     return "";
   };
 
-  const handleForgot = () => {
-    // qulay UX: modal yoki alohida sahifa chaqirilishi mumkin; hozir demo
-    alert("Parolni tiklash: sizga email orqali ko'rsatmalar yuboriladi (demo).");
-  };
+  // const handleForgot = () => {
+  //   alert("Parolni tiklash: sizga email orqali ko'rsatmalar yuboriladi (demo).");
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,7 +102,7 @@ export default function Login() {
 
   return (
     <div className="login-page flex items-center justify-center px-9 py-20 ">
-      <div className="login-card w-full max-w-130 rounded-[14px] p-[28px] border border-[#e6eef2]">
+      <div className="login-card w-full max-w-[520px] rounded-[14px] p-[28px] border border-[#e6eef2]">
         <div className="flex gap-3.5 items-center mb-4.5">
           <div className="login-logo shadow-[0_8px_24px_rgba(19, 102, 214, 0.12)] w-16 h-16 rounded-[16px] flex items-center justify-center text-[#fff] font-bold text-[20px]" aria-hidden="true">KW</div>
           <div className="flex flex-col gap-0.5">
@@ -178,7 +178,7 @@ export default function Login() {
                 <button type="button" className="bg-[rgba(19, 102, 214, 0.06)] px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium">Ro'yhatdan o'tish</button>
               </NavLink>
               <NavLink to={"/forgot-password"}>
-                <button type="button" className="login-forgot bg-[rgba(19, 102, 214, 0.06)] px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium" onClick={handleForgot} disabled={loading}>
+                <button type="button" className="login-forgot bg-[rgba(19, 102, 214, 0.06)] px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium" disabled={loading}>
                   Parolni unutdingizmi?
                 </button>
               </NavLink>
