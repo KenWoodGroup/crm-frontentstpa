@@ -65,8 +65,8 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                     : "bg-white backdrop-blur-md border-gray-200"
                 }`}
             style={{
-                width: sidebarOpen ? "calc(99% - 320px)" : "91%",
-                left: sidebarOpen ? "320px" : "120px",
+                width: sidebarOpen ? "calc(99% - 300px)" : "91%",
+                left: sidebarOpen ? "310px" : "120px",
             }}
         >
             {/* Левая часть - кнопка меню */}
