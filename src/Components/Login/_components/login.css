@@ -1,0 +1,202 @@
+/* Center container */
+:root {
+  --login-shadow: 0 10px 35px rgba(14, 21, 38, 0.12);
+  --login-card: #ffffff;
+  --login-transition: 220ms cubic-bezier(.2, .9, .3, 1);
+  --login-primary: #1366d6;
+  --login-accent: #0fb2b8;
+  --login-muted: #6b7280;
+}
+
+
+.login-page {
+  min-height: 100vh;
+}
+
+/* Card */
+.login-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), var(--login-card));
+  box-shadow: var(--login-shadow);
+  animation: login-card-appear 380ms var(--login-transition) both;
+}
+
+.login-logo {
+  background: linear-gradient(135deg, var(--login-primary), var(--login-accent));
+}
+
+/*  */
+
+/* Form */
+
+.login-error {
+  background: linear-gradient(90deg, rgba(255, 241, 241, 0.95), #fff7f7);
+}
+
+/* Fields */
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login-label {
+  font-size: 13px;
+  color: var(--login-muted);
+}
+
+/* Input base */
+.login-input {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #7dd6ea;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(250, 250, 250, 0.9));
+  font-size: 15px;
+  outline: none;
+  transition: box-shadow var(--login-transition), border-color var(--login-transition), transform var(--login-transition);
+}
+
+/* Input focus */
+.login-input:focus {
+  border-color: var(--login-primary);
+  box-shadow: 0 8px 30px rgba(19, 102, 214, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Input group to hold icon */
+
+
+.login-input-with-icon {
+  padding-right: 44px;
+  width: 100%;
+}
+
+/* Toggle icon button (inside input) */
+.login-toggle-icon {
+  transition: background var(--login-transition), transform var(--login-transition);
+}
+
+.login-toggle-icon:focus {
+  outline: none;
+  box-shadow: 0 6px 18px rgba(19, 102, 214, 0.09);
+}
+
+@media (hover:hover) {
+  .login-toggle-icon:hover {
+    background: rgba(7, 16, 51, 0.04);
+    transform: translateY(-2px);
+    color: var(--login-primary);
+  }
+}
+
+/* Forgot password row (convenient pill/link) */
+
+.login-forgot {
+  transition: background var(--login-transition), transform var(--login-transition);
+}
+
+.login-forgot:active {
+  transform: translateY(0);
+}
+
+@media (hover:hover) {
+  .login-forgot:hover {
+    background: rgba(19, 102, 214, 0.09);
+    transform: translateY(-2px);
+  }
+}
+
+/* Actions and Full-width primary button */
+
+.login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: transform var(--login-transition), box-shadow var(--login-transition), opacity var(--login-transition);
+}
+
+.login-primary {
+  background: linear-gradient(90deg, var(--login-primary), var(--login-accent));
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(19, 102, 214, 0.12);
+  width: 100%;
+}
+
+.login-full {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 16px;
+}
+
+.login-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.login-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-top-color: rgba(255, 255, 255, 0.92);
+  animation: login-spin 800ms linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.login-btn-text {
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Footer */
+
+
+/* Animations */
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes login-card-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.997);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width:480px) {
+  .login-page {
+    padding: 15px;
+  }
+  .login-card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .login-logo {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+    border-radius: 10px;
+    min-width: 50px;
+  }
+
+  .login-actions {
+    flex-direction: column;
+  }
+}

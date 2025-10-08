@@ -1,0 +1,258 @@
+:root {
+    --regis-text-color: rgb(2, 2, 59);
+    --regis-bg: rgb(5, 5, 36);
+}
+
+/* .regis-root {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: "Inter", sans-serif;
+} */
+
+/* .regis-brand {
+    text-align: center;
+    margin-bottom: 40px;
+} */
+
+/* .regis-logo {
+    display: inline-block;
+    background: var(--regis-bg);
+    color: #fff;
+    font-weight: bold;
+    font-size: 26px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    line-height: 60px;
+    margin-bottom: 10px;
+} */
+
+/* .regis-brand h1 {
+    margin: 0;
+    font-size: 22px;
+    color: #222;
+} */
+
+/* .regis-muted {
+    color: #777;
+    font-size: 14px;
+} */
+
+/* === FORM === */
+/* .regis-form {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+} */
+
+/* .regis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px 40px;
+} */
+
+@media (max-width: 768px) {
+    .regis-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.regis-label {
+    display: block;
+    font-weight: 600;
+    margin: 8px 0 6px;
+    color: var(--regis-text-color);
+}
+
+.regis-form input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border 0.2s ease;
+}
+
+.regis-form input:focus {
+    border-color: #0077ff;
+    outline: none;
+}
+
+.regis-error {
+    color: #e63946;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.regis-footer {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.regis-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.regis-checkbox input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.regis-link {
+    color: #0077ff;
+    text-decoration: none;
+}
+
+.regis-link:hover {
+    text-decoration: underline;
+}
+.footer-regis {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+.regis-btn {
+    background: #0077ff;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.2s;
+    font-weight: 600;
+}
+
+.footer-regis a button {
+    color: #0077ff;
+    border: 2px solid #0077ff;
+    padding: 10px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+.footer-regis a button:hover {
+    background: #f0f8ff;
+}
+
+.regis-btn:hover {
+    background: #005fcc;
+}
+
+/* === Activity type === */
+.regis-activity {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.regis-activity-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.regis-activity-btn {
+    padding: 6px 24px;
+    border: 1px solid var(--regis-bg);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    color: var(--regis-bg);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+
+
+.regis-activity-btn:hover {
+    background: #f0f8ff;
+}
+
+.regis-activity-btn.active {
+    background: var(--regis-bg);
+    color: #fff;
+    border: 1px solid var(--regis-bg);
+}
+
+.oferta-section {
+    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.15);
+}
+.oferta-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+}
+.oferta-container h1 {
+    margin-bottom: 20px;
+    color: var(--regis-text-color);
+}
+.oferta-container p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+.oferta-container button {
+    background: #0077ff;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background 0.2s;
+}   
+.oferta-container button:hover {
+    background: #005fcc;
+}
+.oferta-container span {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.2s;
+}
+
+@media (max-width: 880px) {
+    .regis-root {
+        padding: 60px;
+    }
+}
+@media (max-width: 600px) {
+    .footer-regis {
+        flex-direction: column;
+    }
+}
+@media (max-width: 480px) {
+    .regis-root {
+        padding: 40px 20px;
+    }
+}
+@media (max-width: 360px) {
+    .regis-root {
+        padding: 30px 16px;
+    }
+    .regis-activity-options {
+        flex-direction: column;
+    }
+}
