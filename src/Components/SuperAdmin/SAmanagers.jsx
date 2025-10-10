@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { notify } from "../../utils/toast"; // Toastify helper
 import { Confirm } from "../../utils/Alert"; // Swal Confirm helper
-// import {user} from "../../utils/Controllers/users"
+import {user} from "../../utils/Controllers/users"
 
 const SAmanagers = () => {
   const [managers, setManagers] = useState([]);
@@ -18,7 +18,7 @@ const SAmanagers = () => {
   const fetchManagers = async () => {
     try {
       setLoading(true);
-      const res = await user.GetAll();
+      const res = await user.getAdmins();
       console.log(res);
       
       setManagers(res.data || []);

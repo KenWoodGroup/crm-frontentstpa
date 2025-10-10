@@ -16,7 +16,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
       .swal2-backdrop-show {
           z-index: 99998 !important;
       }
-    `;
+    `
         document.head.appendChild(styleElement);
     }
 })();
