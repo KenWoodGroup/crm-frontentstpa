@@ -32,7 +32,7 @@ $api.interceptors.response.use(
 
             try {
                 const refreshToken = Cookies.get('refresh_token'); // здесь нужен refresh_token!
-                const userId = Cookies.get('user_id');
+                const userId = Cookies.get('us_nesw');
 
                 if (!refreshToken || !userId) {
                     throw new Error('Refresh token yoki user ID topilmadi');
@@ -60,7 +60,8 @@ $api.interceptors.response.use(
                 // window.location.href = '/login';
                 Cookies.remove('token');
                 Cookies.remove('refresh_token');
-                Cookies.remove('user_id');
+                Cookies.remove('us_nesw');
+                Cookies.remove('nesw');
                 window.location.href = '/login';
                 // useNavigate('/login');
                 return Promise.reject(refreshError);

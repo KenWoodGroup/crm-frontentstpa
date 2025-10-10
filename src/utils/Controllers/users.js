@@ -12,16 +12,20 @@ class user {
         const response = await $api.get(`/user/${id}`)
         return response;
     }
+    static getAdmins = async () => {
+        const response = await $api.get(`/user/admin`)
+        return response;
+    }
     static GetPagination = async (page) => {
         const response = await $api.get(`/user/page?page=${page}`)
         return response;
     }
     static GetLocationUsers = async (locationId) => {
-        const response = await $api.get(`/user/${locationId}`)
+        const response = await $api.get(`/user/locationId/${locationId}`)
         return response;
     }
     static Delete = async (id) => {
-        const response = await $api.delete(`/user/${id}`)
+        const response = await $api.delete(`/user/${id}`);
         return response;
     }
 }
