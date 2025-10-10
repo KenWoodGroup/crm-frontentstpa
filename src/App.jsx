@@ -23,6 +23,8 @@ import MainLayout from "./layouts/MainLayout";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ForgotPassword from "./Components/ResetPassword/ForgotPassword";
+import WarehouseLayout from "./layouts/WarehouseLayout";
+import { warehouseRoutes } from "./routes/warehouseRoutes";
 // import ProductList from "../features/products/ProductList";
 // import Cart from "../features/cart/Cart";
 // import AdminOrders from "../features/orders/AdminOrders";
@@ -66,6 +68,17 @@ function App() {
             // </ProtectedUsersRoute>
           }>
             {userRoutes.map((r) => {
+              return (
+                <Route key={r.name} path={r.path} element={r.element} />
+              )
+            })}
+          </Route>
+          <Route element={
+            // <ProtectedUsersRoute>
+            <WarehouseLayout />
+            // </ProtectedUsersRoute>
+          }>
+            {warehouseRoutes?.map((r) => {
               return (
                 <Route key={r.name} path={r.path} element={r.element} />
               )

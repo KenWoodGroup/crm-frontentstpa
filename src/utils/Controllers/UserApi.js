@@ -6,7 +6,7 @@ class UserApi {
         return response;
     }
     static UserGet = async (data) => {
-        const response = await $api.get(`/user/${data?.id}/page?page=${data?.page}`)
+        const response = await $api.get(`/user/locationId/${data?.id}`)
         return response;
     }
     static UserDelete = async (id) => {

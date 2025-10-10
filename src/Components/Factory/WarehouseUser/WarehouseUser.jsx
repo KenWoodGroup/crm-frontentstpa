@@ -11,24 +11,19 @@ import WarehouseUserDelete from "./_components/WarehouseUserDelete";
 import WarehouseUserEdit from "./_components/WarehouseUserEdit";
 
 export default function WarehouseUser() {
-    const { id } = useParams(); 
+    const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalCount, setTotalCount] = useState(0);
 
-    const GetUsers = async (pageNumber = 1) => {
+
+    const GetUsers = async () => {
         setLoading(true);
         try {
-            const response = await UserApi.UserGet({ id, page: pageNumber });
-            const records = response.data?.data?.records || [];
-            const pagination = response.data?.data?.pagination || {};
+            const response = await UserApi.UserGet({ id });
+            const records = response.data || [];
 
             setUsers(records);
-            setPage(Number(pagination.currentPage) || pageNumber);
-            setTotalPages(Number(pagination.total_pages) || 1);
-            setTotalCount(Number(pagination.total_count) || records.length);
+
         } catch (error) {
             console.log(error);
             Alert("Xatolik yuz berdi ❌", "error");
@@ -38,7 +33,7 @@ export default function WarehouseUser() {
     };
 
     useEffect(() => {
-        GetUsers(page);
+        GetUsers();
     }, [id]);
 
     if (loading) return <Loading />;
@@ -47,7 +42,7 @@ export default function WarehouseUser() {
         <div className="">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold text-gray-800">Ombor foydalanuvchilari</h1>
-                <WarehouseUserCreate refresh={() => GetUsers(page)} />
+                <WarehouseUserCreate refresh={() => GetUsers()} />
             </div>
             {users?.length > 0 ? (
                 <>
@@ -79,29 +74,6 @@ export default function WarehouseUser() {
                             </Card>
                         ))}
                     </div>
-
-                    {/* Pagination только если больше 15 пользователей */}
-                    {totalCount > 15 && (
-                        <div className="flex justify-center mt-6 gap-4">
-                            <Button
-                                onClick={() => GetUsers(page - 1)}
-                                disabled={page <= 1}
-                                className="flex items-center gap-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                            >
-                                <ChevronLeft size={18} /> Prev
-                            </Button>
-                            <span className="flex items-center px-2">
-                                Page {page} / {totalPages}
-                            </span>
-                            <Button
-                                onClick={() => GetUsers(page + 1)}
-                                disabled={page >= totalPages}
-                                className="flex items-center gap-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                            >
-                                Next <ChevronRight size={18} />
-                            </Button>
-                        </div>
-                    )}
                 </>
             ) : (
                 <EmptyData text={'Xodim mavjud emas'} />

@@ -62,6 +62,7 @@ export default function Login() {
         admin: "AutngergUID",
         factory: "SefwfmgrUID",
         company: "SefwfmgrUID",
+        warehouse: "SesdsdfmgrUID",
       };
       const roleLinks = [
         {
@@ -74,17 +75,22 @@ export default function Login() {
         },
         {
           role: "factory",
-          vektor: "/factory"
+          vektor: "/factory/dashboard"
         },
         {
           role: "company",
           vektor: "/factory"
+        },
+        {
+          role: "warehouse",
+          vektor: "/warehouse/dashboard"
         }
       ]
 
       Cookies.set("nesw", roleMap[role] || "");
       Cookies.set('us_nesw', id);
       Cookies.set('ul_nesw', location_id);
+      Cookies.set('usd_nesw', data?.newUser?.location?.parent_id);
       // Alert("Muvaffaqiyatli", "success");
       notify.success("Login muvaffaqiyatli!")
       // navigate('/');

@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Card, Typography } from "@material-tailwind/react";
 
-export default function FactorySidebar({ open }) {
+export default function WarehouseSidebar({ open }) {
     const [role] = useState("admin");
     const location = useLocation();
 
@@ -13,7 +13,7 @@ export default function FactorySidebar({ open }) {
                 {
                     id: 1,
                     title: "Bosh sahifa",
-                    path: "/factory/dashboard",
+                    path: "/warehouse/dashboard",
                     icon: (
                         <svg
                             className="w-6 h-6"
@@ -32,21 +32,14 @@ export default function FactorySidebar({ open }) {
                 },
                 {
                     id: 1,
-                    title: "Warehouse",
-                    path: "/factory/warehouse",
-                    icon: (
-                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M0 488V171.3c0-26.2 15.9-49.7 40.2-59.4L308.1 4.8c7.6-3.1 16.1-3.1 23.8 0l267.9 107.1c24.3 9.7 40.2 33.3 40.2 59.4V488c0 13.3-10.7 24-24 24h-48c-13.3 0-24-10.7-24-24V224c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32v264c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24m488 24H152c-13.3 0-24-10.7-24-24v-56h384v56c0 13.3-10.7 24-24 24M128 400v-64h384v64zm0-96v-80h384v80z"></path></svg>
-                    ),
-                },
-                {
-                    id: 1,
                     title: "Product",
-                    path: "/factory/product",
+                    path: "/warehouse/product",
                     icon: (
-                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 2048 2048"><path fill="currentColor" d="M896 1537V936L256 616v880l544 273l-31 127l-641-320V472L960 57l832 415v270q-70 11-128 45V616l-640 320v473zM754 302l584 334l247-124l-625-313zm206 523l240-120l-584-334l-281 141zm888 71q42 0 78 15t64 41t42 63t16 79q0 39-15 76t-43 65l-717 717l-377 94l94-377l717-716q29-29 65-43t76-14m51 249q21-21 21-51q0-31-20-50t-52-20q-14 0-27 4t-23 15l-692 692l-34 135l135-34z"></path></svg>
+                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 48 48"><g fill="none" stroke="currentColor" strokeLinejoin="round" strokeWidth={4}><path d="M44 14L24 4L4 14v20l20 10l20-10z"></path><path strokeLinecap="round" d="m4 14l20 10m0 20V24m20-10L24 24M34 9L14 19"></path></g></svg>
                     ),
                 },
 
+                
             ],
         },
     ];

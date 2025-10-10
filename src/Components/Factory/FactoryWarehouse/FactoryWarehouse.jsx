@@ -90,14 +90,14 @@ export default function FactoryWarehouse() {
                                 <span>{w.phone}</span>
                             </div>
                             <div className="flex flex-col md:flex-row gap-3">
-                                <NavLink to={`/warehouse/user/${w?.id}`} className="flex-1">
+                                <NavLink to={`/factory/warehouse/user/${w?.id}`} className="flex-1">
                                     <Button className="w-full flex items-center justify-center gap-2">
                                         <User size={18} />
                                         Users
                                     </Button>
                                 </NavLink>
 
-                                <NavLink to={`/warehouse/${w?.id}`} className="flex-1">
+                                <NavLink to={`/factory/warehouse/${w?.id}`} className="flex-1">
                                     <Button className="w-full flex items-center justify-center gap-2">
                                         <Building2 size={18} />
                                         Detail
