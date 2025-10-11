@@ -9,6 +9,7 @@ import WarehouseDelete from "./_components/WarehouseDelete";
 import WarehouseEdit from "./_components/WarehouseEdit";
 import { Button } from "@material-tailwind/react";
 import { NavLink } from "react-router-dom";
+import EmptyData from "../../UI/NoData/EmptyData";
 
 
 export default function FactoryWarehouse() {
@@ -56,78 +57,82 @@ export default function FactoryWarehouse() {
                 </h1>
                 <WarehouseCreate refresh={() => GetAll(page)} />
             </div>
-
-            {/* Warehouse Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {warehouses.map((w) => (
-                    <div key={w.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 hover:shadow-md transition">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-3 bg-gray-100 rounded-xl">
-                                    <Building2 className="w-6 h-6 text-gray-700" />
+            {warehouses?.length > 0 ? (
+                <>
+                    {/* Warehouse Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {warehouses.map((w) => (
+                            <div key={w.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 hover:shadow-md transition">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-3 bg-gray-100 rounded-xl">
+                                            <Building2 className="w-6 h-6 text-gray-700" />
+                                        </div>
+                                        <h2 className="text-xl font-semibold text-gray-800">{w.name}</h2>
+                                    </div>
+                                    <div className="flex items-center gap-[10px]">
+                                        <WarehouseEdit refresh={() => GetAll(page)} warehouse={w} />
+                                        <WarehouseDelete refresh={() => GetAll(page)} warehouseId={w?.id} />
+                                    </div>
                                 </div>
-                                <h2 className="text-xl font-semibold text-gray-800">{w.name}</h2>
-                            </div>
-                            <div className="flex items-center gap-[10px]">
-                                <WarehouseEdit refresh={() => GetAll(page)} warehouse={w} />
-                                <WarehouseDelete refresh={() => GetAll(page)} warehouseId={w?.id} />
-                            </div>
-                        </div>
 
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-gray-700">
-                                <Mail className="w-5 h-5 text-gray-500" />
-                                <span>{w.users?.[0]?.email || "—"}</span>
-                            </div>
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-gray-700">
+                                        <Mail className="w-5 h-5 text-gray-500" />
+                                        <span>{w.users?.[0]?.email || "—"}</span>
+                                    </div>
 
-                            <div className="flex items-center gap-2 text-gray-700">
-                                <MapPin className="w-5 h-5 text-gray-500" />
-                                <span>{w.address}</span>
-                            </div>
+                                    <div className="flex items-center gap-2 text-gray-700">
+                                        <MapPin className="w-5 h-5 text-gray-500" />
+                                        <span>{w.address}</span>
+                                    </div>
 
-                            <div className="flex items-center gap-2 text-gray-700">
-                                <Phone className="w-5 h-5 text-gray-500" />
-                                <span>{w.phone}</span>
-                            </div>
-                            <div className="flex flex-col md:flex-row gap-3">
-                                <NavLink to={`/factory/warehouse/user/${w?.id}`} className="flex-1">
-                                    <Button className="w-full flex items-center justify-center gap-2">
-                                        <User size={18} />
-                                        Users
-                                    </Button>
-                                </NavLink>
+                                    <div className="flex items-center gap-2 text-gray-700">
+                                        <Phone className="w-5 h-5 text-gray-500" />
+                                        <span>{w.phone}</span>
+                                    </div>
+                                    <div className="flex flex-col md:flex-row gap-3">
+                                        <NavLink to={`/factory/warehouse/user/${w?.id}`} className="flex-1">
+                                            <Button className="w-full flex items-center justify-center gap-2">
+                                                <User size={18} />
+                                                Users
+                                            </Button>
+                                        </NavLink>
 
-                                <NavLink to={`/factory/warehouse/${w?.id}`} className="flex-1">
-                                    <Button className="w-full flex items-center justify-center gap-2">
-                                        <Building2 size={18} />
-                                        Detail
-                                    </Button>
-                                </NavLink>
+                                        <NavLink to={`/factory/warehouse/${w?.id}`} className="flex-1">
+                                            <Button className="w-full flex items-center justify-center gap-2">
+                                                <Building2 size={18} />
+                                                Detail
+                                            </Button>
+                                        </NavLink>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                ))}
-            </div>
-
-            {/* Pagination только если больше 15 записей */}
-            {totalCount > 15 && (
-                <div className="flex justify-center mt-6 gap-4">
-                    <button
-                        onClick={() => GetAll(page - 1)}
-                        disabled={page <= 1}
-                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <span className="flex items-center px-2"> {page} / {totalPages}</span>
-                    <button
-                        onClick={() => GetAll(page + 1)}
-                        disabled={page >= totalPages}
-                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-                </div>
+                    {/* Pagination только если больше 15 записей */}
+                    {totalCount > 15 && (
+                        <div className="flex justify-center mt-6 gap-4">
+                            <button
+                                onClick={() => GetAll(page - 1)}
+                                disabled={page <= 1}
+                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <span className="flex items-center px-2"> {page} / {totalPages}</span>
+                            <button
+                                onClick={() => GetAll(page + 1)}
+                                disabled={page >= totalPages}
+                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    )}
+                </>
+            ) : (
+                <EmptyData text={'Ombor mavjud emas'} />
             )}
         </div>
     );

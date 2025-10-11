@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "../Headers";
+import { $api, BASE_URL } from "../Headers";
 class locationInfo {
     static Post = async (data) => {
         const response = await axios.post(`${BASE_URL}/api/location-info`, data)
@@ -17,6 +17,12 @@ class locationInfo {
         const response = await axios.delete(`${BASE_URL}/api/location-info/${id}`)
         return response;
     }
+
+    static GetBarcode = async (id) => {
+        const response = await $api.get(`/location-info/barcode/${id}`)
+        return response;
+    }
+
 }
 
 export { locationInfo };

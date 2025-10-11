@@ -1,5 +1,7 @@
+import FactoryAnalitik from "../Components/Factory/FactoryAnalitik/FactoryAnalitik";
 import FactoryDashboard from "../Components/Factory/FactoryDashboard/FactoryDashboard";
 import FactoryProduct from "../Components/Factory/FactoryProduct/FactoryProduct";
+import FactoryReport from "../Components/Factory/FactoryReport/FactoryReport";
 import FactoryWarehouse from "../Components/Factory/FactoryWarehouse/FactoryWarehouse";
 import WarehouseDetail from "../Components/Factory/WarehouseDetail/WarehouseDetail";
 import WarehouseUser from "../Components/Factory/WarehouseUser/WarehouseUser";
@@ -35,5 +37,15 @@ export const userRoutes = [
     path: "factory/product",
     name: 'Product create',
     element: <FactoryProduct />
+  },
+  {
+    path: "factory/report",
+    name: 'Factory report',
+    element: <FactoryReport />
+  },
+  {
+    path: "factory/produt-analiz",
+    name: 'Factory analiz',
+    element: <FactoryAnalitik />
   }
 ]

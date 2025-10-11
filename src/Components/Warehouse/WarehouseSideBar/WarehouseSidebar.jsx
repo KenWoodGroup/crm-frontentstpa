@@ -39,11 +39,10 @@ export default function WarehouseSidebar({ open }) {
                     ),
                 },
 
-                
+
             ],
         },
     ];
-
     return (
         <Card
             className={`h-[95%] fixed top-[15px] left-[15px] z-50 shadow-xl bg-white/30 backdrop-blur-md border border-white/20 px-4 py-6 overflow-y-auto transition-all duration-500

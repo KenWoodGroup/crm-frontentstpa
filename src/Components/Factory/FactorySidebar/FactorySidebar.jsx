@@ -46,6 +46,22 @@ export default function FactorySidebar({ open }) {
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 2048 2048"><path fill="currentColor" d="M896 1537V936L256 616v880l544 273l-31 127l-641-320V472L960 57l832 415v270q-70 11-128 45V616l-640 320v473zM754 302l584 334l247-124l-625-313zm206 523l240-120l-584-334l-281 141zm888 71q42 0 78 15t64 41t42 63t16 79q0 39-15 76t-43 65l-717 717l-377 94l94-377l717-716q29-29 65-43t76-14m51 249q21-21 21-51q0-31-20-50t-52-20q-14 0-27 4t-23 15l-692 692l-34 135l135-34z"></path></svg>
                     ),
                 },
+                {
+                    id: 1,
+                    title: "Hisobot",
+                    path: "/factory/report",
+                    icon: (
+                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 512 512"><path fill="currentColor" d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64v336c0 44.2 35.8 80 80 80h400c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l89.4-89.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"></path></svg>
+                    ),
+                },
+                {
+                    id: 1,
+                    title: "Tovar analizi",
+                    path: "/factory/produt-analiz",
+                    icon: (
+                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 24 24"><path fill="currentColor" d="M13 1.045V11h9.955A11 11 0 0 0 13 1.045"></path><path fill="currentColor" d="M11 1.045V13h11.955C22.45 18.607 17.738 23 12 23C5.925 23 1 18.075 1 12C1 6.262 5.394 1.55 11 1.045"></path></svg>
+                    ),
+                },
 
             ],
         },

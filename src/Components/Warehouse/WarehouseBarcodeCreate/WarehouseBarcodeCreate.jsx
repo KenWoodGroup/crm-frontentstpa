@@ -9,6 +9,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { ProductApi } from "../../../utils/Controllers/ProductAPi";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
+import WarehouseBarcodeModal from "./_components/WarehouseBarcodeCreateModal";
 
 export default function WarehouseBarcodeCreate() {
     const [miniCategories, setMiniCategories] = useState([]);
@@ -67,7 +68,7 @@ export default function WarehouseBarcodeCreate() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen ">
             <div className=" mx-auto">
                 <Typography
                     variant="h2"
@@ -106,7 +107,7 @@ export default function WarehouseBarcodeCreate() {
                                                 {productsData[category.id].map((product) => (
                                                     <div
                                                         key={product.id}
-                                                        className="px-3 py-[20px] bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition"
+                                                        className="px-3 py-[10px] bg-white border flex items-center justify-between border-gray-200 rounded-lg shadow-sm hover:shadow transition"
                                                     >
                                                         <Typography
                                                             variant="small"
@@ -114,6 +115,7 @@ export default function WarehouseBarcodeCreate() {
                                                         >
                                                             {product.name}
                                                         </Typography>
+                                                        <WarehouseBarcodeModal productId={product?.id} />
                                                     </div>
                                                 ))}
                                             </div>
