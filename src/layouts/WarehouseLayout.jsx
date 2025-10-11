@@ -1,23 +1,39 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "../Components/UI/Sidebar/Sidebar";
-import AdminHeader from "../Components/UI/Header/AdminHeader";
+import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
 import { useState } from "react";
-import FactorySidebar from "../Components/Factory/FactorySidebar/FactorySidebar";
-import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
+import { LayoutDashboard, Package, PackagePlus, Settings } from "lucide-react";
 
 export default function WarehouseLayout() {
-    const [active, setActive] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(
+        sessionStorage.getItem("sidebar") === "true"
+    );
+    const links = [
+        {
+            id: 1,
+            label: "Home Page",
+            path: "/warehouse/dashboard",
+            icon: LayoutDashboard
+        },
+        {
+            id: 2,
+            label: "Products",
+            path: "/warehouse/product",
+            icon: Package
+        },
+        {
+            id: 3,
+            label: "Income",
+            path: "/warehouse/income",
+            icon: PackagePlus
+        },
+        { path: "/warehouse/settings", label: "Settings", icon: Settings },
+
+    ]
     return (
-        <div className="flex w-full overflow-hidden bg-[#FAFAFA] relative">
-            <WarehouseSidebar open={active} onClose={() => setActive(false)} />
-            <div
-                className={`mt-[110px] pb-[30px] px-[15px] min-h-screen transition-all duration-300`}
-                style={{
-                    marginLeft: !active ? "300px" : "110px",
-                    width: !active ? "calc(100% - 320px)" : "100%",
-                }}
-            >
-                <AdminHeader active={() => setActive(!active)} sidebarOpen={!active} />
+        <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"
+            }`} >
+            <SuperAdminSidebar links={links} role={"Ombor Manager"} onToggle={setSidebarOpen} />
+            <div className="p-6">
                 <Outlet />
             </div>
         </div>

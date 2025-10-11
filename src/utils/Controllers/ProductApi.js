@@ -22,11 +22,11 @@ class ProductApi {
     static GetMiniCategoryById = async (id) => {
         const response = await $api.get(`/subcategories/factory-products/${id}`)
         return response;
-    }
+    }; 
     static GetProductBySubCategory = async (id) => {
         const response = await $api.get(`/products/subcategoryId/${id}`)
         return response;
-    }
+    };
 }
 
 export { ProductApi }
