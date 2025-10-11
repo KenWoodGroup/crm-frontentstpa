@@ -87,9 +87,28 @@ export default function Register() {
                 if (base_data.status === 201) {
                     try {
                         const readyLocationInfo = {
-                            location_id: base_data.data.location.id,
-                            key: "bank, stir, account_number, terms_accepted",
-                            value: form.bank + ", " + form.stir + ", " + form.accountNumber + ", " + form.termsAccepted,
+                            list:[
+                                {
+                                    location_id: base_data.data.location.id,
+                                    key:"bank",
+                                    value: form.bank,
+                                },
+                                {
+                                    location_id: base_data.data.location.id,
+                                    key:"stir",
+                                    value: form.stir,
+                                },
+                                {
+                                    location_id: base_data.data.location.id,
+                                    key:"account_number",
+                                    value: form.accountNumber,
+                                },
+                                {
+                                    location_id: base_data.data.location.id,
+                                    key:"terms_accepted",
+                                    value: String(form.termsAccepted),
+                                }
+                            ],
                         }
                         console.log("rli", readyLocationInfo);
 

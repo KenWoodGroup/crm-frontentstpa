@@ -79,7 +79,7 @@ export default function Login() {
         },
         {
           role: "company",
-          vektor: "/factory"
+          vektor: "/factory/dashboard"
         },
         {
           role: "warehouse",
