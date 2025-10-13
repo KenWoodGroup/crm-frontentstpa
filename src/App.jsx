@@ -5,11 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { managerRoutes, supperAdminRoutes } from "./routes/adminRoutes";
 import { userRoutes } from "./routes/userRoutes";
 
-// Layout
-// import Footer from "../components/layout/Footer";
-
-// Sahifalar
-// import Dashboard from "../pages/Dashboard";
 import Login from "./Components/Login/Login";
 import ErrorPage from "./Components/ErrorPage/ErrorPage";
 import ProtectedRoute from "./Components/ProtectedRoute";
@@ -25,9 +20,8 @@ import "react-toastify/dist/ReactToastify.css";
 import ForgotPassword from "./Components/ResetPassword/ForgotPassword";
 import WarehouseLayout from "./layouts/WarehouseLayout";
 import { warehouseRoutes } from "./routes/warehouseRoutes";
-// import ProductList from "../features/products/ProductList";
-// import Cart from "../features/cart/Cart";
-// import AdminOrders from "../features/orders/AdminOrders";
+import DilerLayout from "./layouts/DilerLayout";
+import { dilertoutes } from "./routes/dilerRoutes";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -79,6 +73,17 @@ function App() {
             // </ProtectedUsersRoute>
           }>
             {warehouseRoutes?.map((r) => {
+              return (
+                <Route key={r.name} path={r.path} element={r.element} />
+              )
+            })}
+          </Route>
+          <Route element={
+            // <ProtectedUsersRoute>
+            <DilerLayout />
+            // </ProtectedUsersRoute>
+          }>
+            {dilertoutes?.map((r) => {
               return (
                 <Route key={r.name} path={r.path} element={r.element} />
               )

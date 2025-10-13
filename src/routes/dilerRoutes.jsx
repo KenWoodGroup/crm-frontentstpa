@@ -1,22 +1,20 @@
 
-import { patch } from "@mui/material";
 import WarehouseBarcodeCreate from "../Components/Warehouse/WarehouseBarcodeCreate/WarehouseBarcodeCreate";
-import WarehouseDashboard from "../Components/Warehouse/WarehouseDashboard/WarehouseDashboard";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
-import WarehouseProdcut from "../Components/Warehouse/WarehouseProduct";
-import WareHouseIncomeFull from "../Components/Warehouse/WareHouseIncome/WareHouseIncomeFull";
 import WarehouseProdcut from "../Components/Warehouse/WarehouseProdcut/WarehouseProduct";
 import WarehouseDiler from "../Components/Warehouse/WarehouseDiler/WarehouseDiler";
-export const warehouseRoutes = [
+import DilerDashboard from "../Components/Diler/DilerDashboard/DilerDashboard";
+import DilerStock from "../Components/Diler/DilerStock/DilerStock";
+export const dilertoutes = [
     {
-        path: "/warehouse/dashboard",
-        name: "Warehouse Dashboard",
-        element: <WarehouseDashboard />
+        path: "/diler/dashboard",
+        name: "Diler Dashboard",
+        element: <DilerDashboard />
     },
     {
-        path: "/warehouse/product",
-        name: "Warehouse Product",
-        element: <WarehouseProdcut />
+        path: "/diler/product",
+        name: "Diler Product",
+        element: <DilerStock />
     },
     {
         path: "/warehouse/barcode/create",
@@ -26,7 +24,7 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/income",
         name: "Warehouse income",
-        element: <WareHouseIncomeFull/>
+        element: <WareHouseIncome />
     },
     {
         path: "/warehouse/dilers",
