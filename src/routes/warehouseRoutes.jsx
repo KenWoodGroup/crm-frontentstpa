@@ -3,6 +3,8 @@ import { patch } from "@mui/material";
 import WarehouseBarcodeCreate from "../Components/Warehouse/WarehouseBarcodeCreate/WarehouseBarcodeCreate";
 import WarehouseDashboard from "../Components/Warehouse/WarehouseDashboard/WarehouseDashboard";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
+import WarehouseProdcut from "../Components/Warehouse/WarehouseProduct";
+import WareHouseIncomeFull from "../Components/Warehouse/WareHouseIncome/WareHouseIncomeFull";
 import WarehouseProdcut from "../Components/Warehouse/WarehouseProdcut/WarehouseProduct";
 import WarehouseDiler from "../Components/Warehouse/WarehouseDiler/WarehouseDiler";
 export const warehouseRoutes = [
@@ -24,7 +26,7 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/income",
         name: "Warehouse income",
-        element: <WareHouseIncome />
+        element: <WareHouseIncomeFull/>
     },
     {
         path: "/warehouse/dilers",
