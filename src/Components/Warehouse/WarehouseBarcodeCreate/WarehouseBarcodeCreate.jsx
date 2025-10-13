@@ -11,6 +11,7 @@ import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseBarcodeModal from "./_components/WarehouseBarcodeCreateModal";
 
+
 export default function WarehouseBarcodeCreate() {
     const [miniCategories, setMiniCategories] = useState([]);
     const [openAccordions, setOpenAccordions] = useState([]);
@@ -33,7 +34,11 @@ export default function WarehouseBarcodeCreate() {
 
     const GetProductBySubCategory = async (subCategoryId) => {
         try {
-            const response = await ProductApi?.GetProductBySubCategory(subCategoryId);
+            const data = {
+                subcategory_id: subCategoryId,
+                location_id: Cookies?.get('ul_nesw')
+            }
+            const response = await ProductApi?.GetProductByLocationIdBySubCategory(data)
             setProductsData((prev) => ({
                 ...prev,
                 [subCategoryId]: response?.data || [],
@@ -115,7 +120,8 @@ export default function WarehouseBarcodeCreate() {
                                                         >
                                                             {product.name}
                                                         </Typography>
-                                                        <WarehouseBarcodeModal productId={product?.id} />
+                                                        <WarehouseBarcodeModal refresh={() => GetProductBySubCategory(category.id)}
+                                                            data={product} productId={product?.id} />
                                                     </div>
                                                 ))}
                                             </div>

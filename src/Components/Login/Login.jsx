@@ -84,6 +84,10 @@ export default function Login() {
         {
           role: "warehouse",
           vektor: "/warehouse/dashboard"
+        },
+        {
+          role: "dealer",
+          vektor: "/diler/dashboard"
         }
       ]
 
