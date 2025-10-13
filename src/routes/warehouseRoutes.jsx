@@ -4,6 +4,7 @@ import WarehouseBarcodeCreate from "../Components/Warehouse/WarehouseBarcodeCrea
 import WarehouseDashboard from "../Components/Warehouse/WarehouseDashboard/WarehouseDashboard";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
 import WarehouseProdcut from "../Components/Warehouse/WarehouseProduct";
+import WareHouseIncomeFull from "../Components/Warehouse/WareHouseIncome/WareHouseIncomeFull";
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",
@@ -23,7 +24,7 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/income",
         name: "Warehouse income",
-        element: <WareHouseIncome />
+        element: <WareHouseIncomeFull/>
     },
     {
         path: "/warehouse/settings",

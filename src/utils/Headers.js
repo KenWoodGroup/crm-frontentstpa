@@ -39,7 +39,7 @@ $api.interceptors.response.use(
                 }
 
                 // Отправляем запрос на обновление токена
-                const response = await axios.post(`${BASE_URL}/auth/refresh`, {
+                const response = await axios.post(`${BASE_URL}/api/auth/refresh`, {
                     refreshToken: refreshToken,
                     userId: userId,
                 });
