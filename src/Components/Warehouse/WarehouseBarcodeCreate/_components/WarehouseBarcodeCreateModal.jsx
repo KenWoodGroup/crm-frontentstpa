@@ -273,7 +273,6 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
             minute: "2-digit"
         });
     };
-
     return (
         <div>
             <Button
