@@ -29,6 +29,7 @@ import FolderOpenMessage from "../../UI/NoData/FolderOpen";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
+// Hello world
 
 export default function WareHouseIncomeFull() {
     const userLId = Cookies.get("ul_nesw");
