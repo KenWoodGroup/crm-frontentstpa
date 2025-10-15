@@ -1,9 +1,10 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Card, Typography } from "@material-tailwind/react";
+import Cookies from "js-cookie";
 
-export default function FactorySidebar({ open }) {
-    const [role] = useState("admin");
+export default function FactorySidebar({ onClose, active, open }) {
+    const navigate = useNavigate();
     const location = useLocation();
 
     const groupedMenuItems = [
@@ -31,7 +32,7 @@ export default function FactorySidebar({ open }) {
                     ),
                 },
                 {
-                    id: 1,
+                    id: 2,
                     title: "Warehouse",
                     path: "/factory/warehouse",
                     icon: (
@@ -39,15 +40,15 @@ export default function FactorySidebar({ open }) {
                     ),
                 },
                 {
-                    id: 1,
-                    title: "Product",
+                    id: 3,
+                    title: "Ishlab chiqarish",
                     path: "/factory/product",
                     icon: (
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 2048 2048"><path fill="currentColor" d="M896 1537V936L256 616v880l544 273l-31 127l-641-320V472L960 57l832 415v270q-70 11-128 45V616l-640 320v473zM754 302l584 334l247-124l-625-313zm206 523l240-120l-584-334l-281 141zm888 71q42 0 78 15t64 41t42 63t16 79q0 39-15 76t-43 65l-717 717l-377 94l94-377l717-716q29-29 65-43t76-14m51 249q21-21 21-51q0-31-20-50t-52-20q-14 0-27 4t-23 15l-692 692l-34 135l135-34z"></path></svg>
                     ),
                 },
                 {
-                    id: 1,
+                    id: 4,
                     title: "Hisobot",
                     path: "/factory/report",
                     icon: (
@@ -55,59 +56,105 @@ export default function FactorySidebar({ open }) {
                     ),
                 },
                 {
-                    id: 1,
+                    id: 5,
                     title: "Tovar analizi",
                     path: "/factory/produt-analiz",
                     icon: (
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 24 24"><path fill="currentColor" d="M13 1.045V11h9.955A11 11 0 0 0 13 1.045"></path><path fill="currentColor" d="M11 1.045V13h11.955C22.45 18.607 17.738 23 12 23C5.925 23 1 18.075 1 12C1 6.262 5.394 1.55 11 1.045"></path></svg>
                     ),
                 },
-
+                {
+                    id: 6,
+                    title: "Sozlamalar",
+                    path: "/factory/settings",
+                    icon: (
+                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={12} height={12} viewBox="0 0 24 24"><path fill="currentColor" d="M10.825 22q-.675 0-1.162-.45t-.588-1.1L8.85 18.8q-.325-.125-.612-.3t-.563-.375l-1.55.65q-.625.275-1.25.05t-.975-.8l-1.175-2.05q-.35-.575-.2-1.225t.675-1.075l1.325-1Q4.5 12.5 4.5 12.337v-.675q0-.162.025-.337l-1.325-1Q2.675 9.9 2.525 9.25t.2-1.225L3.9 5.975q.35-.575.975-.8t1.25.05l1.55.65q.275-.2.575-.375t.6-.3l.225-1.65q.1-.65.588-1.1T10.825 2h2.35q.675 0 1.163.45t.587 1.1l.225 1.65q.325.125.613.3t.562.375l1.55-.65q.625-.275 1.25-.05t.975.8l1.175 2.05q.35.575.2 1.225t-.675 1.075l-1.325 1q.025.175.025.338v.674q0 .163-.05.338l1.325 1q.525.425.675 1.075t-.2 1.225l-1.2 2.05q-.35.575-.975.8t-1.25-.05l-1.5-.65q-.275.2-.575.375t-.6.3l-.225 1.65q-.1.65-.587 1.1t-1.163.45zm1.225-6.5q1.45 0 2.475-1.025T15.55 12t-1.025-2.475T12.05 8.5q-1.475 0-2.488 1.025T8.55 12t1.013 2.475T12.05 15.5"></path></svg>
+                    ),
+                },
             ],
         },
     ];
 
+    const handleLogout = () => {
+        Object.keys(Cookies.get()).forEach((cookie) => Cookies.remove(cookie));
+        navigate("/login");
+    };
+
     return (
         <Card
-            className={`h-[95%] fixed top-[15px] left-[15px] z-50 shadow-xl bg-white/30 backdrop-blur-md border border-white/20 px-4 py-6 overflow-y-auto transition-all duration-500
+            className={`h-[95%] fixed top-[15px] left-[15px] z-50 shadow-xl bg-white/30 backdrop-blur-md border border-white/20 px-4 py-6 overflow-y-auto flex flex-col justify-between transition-all duration-500
         ${open ? "w-[100px]" : "w-[280px]"}`}
         >
-            <div className="flex items-center justify-center mb-6">
+            <div>
+                {/* Кнопка открытия/закрытия */}
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+
+                    </div>
+                    <button
+                        onClick={active}
+                        className="p-2 rounded-lg hover:bg-white/40 transition"
+                        title="Toggle sidebar"
+                    >
+                        {!open ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        )}
+                    </button>
+                </div>
+
+                {/* Меню */}
+                <div className="flex flex-col gap-6">
+                    {groupedMenuItems.map((group) => (
+                        <div key={group.section}>
+                            {!open && (
+                                <Typography
+                                    variant="small"
+                                    color="gray"
+                                    className="mb-2 uppercase font-medium text-xs tracking-widest"
+                                >
+                                    {group.section}
+                                </Typography>
+                            )}
+                            <div className="flex flex-col gap-2">
+                                {group.items.map((item) => (
+                                    <NavLink
+                                        key={item.id}
+                                        to={item.path}
+                                        className={({ isActive }) =>
+                                            `flex items-center ${open && "justify-center"} gap-3 w-full px-4 py-3 rounded-lg transition-all duration-300
+                                            ${isActive
+                                                ? "bg-white/80 text-[#4DA057] font-semibold shadow-md"
+                                                : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3]"
+                                            }`
+                                        }
+                                    >
+                                        <span className="w-6 h-6">{item.icon}</span>
+                                        {!open && <span className="text-sm">{item.title}</span>}
+                                    </NavLink>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            {/* Меню */}
-            <div className="flex flex-col gap-6">
-                {groupedMenuItems.map((group) => (
-                    <div key={group.section}>
-                        {!open && (
-                            <Typography
-                                variant="small"
-                                color="gray"
-                                className="mb-2 uppercase font-medium text-xs tracking-widest"
-                            >
-                                {group.section}
-                            </Typography>
-                        )}
-                        <div className="flex flex-col gap-2">
-                            {group.items.map((item) => (
-                                <NavLink
-                                    key={item.id}
-                                    to={item.path}
-                                    className={({ isActive }) =>
-                                        `flex items-center ${open && 'justify-center'} gap-3 w-full px-4 py-3 rounded-lg transition-all duration-300
-                      ${isActive
-                                            ? "bg-white/80 text-[#4DA057] font-semibold shadow-md"
-                                            : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3]"
-                                        }`
-                                    }
-                                >
-                                    <span className="w-6 h-6">{item.icon}</span>
-                                    {!open && <span className="text-sm">{item.title}</span>}
-                                </NavLink>
-                            ))}
-                        </div>
-                    </div>
-                ))}
+            {/* Logout */}
+            <div className="mt-6">
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-red-600 hover:bg-red-100 transition-all"
+                >
+                    <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path fill="currentColor" d="M377.9 105.9c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 221H192c-17.7 0-32 14.3-32 32s14.3 32 32 32h210.7l-70.1 69.8c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3zM96 64h128c17.7 0 32-14.3 32-32S241.7 0 224 0H96C43 0 0 43 0 96v320c0 53 43 96 96 96h128c17.7 0 32-14.3 32-32s-14.3-32-32-32H96c-17.6 0-32-14.4-32-32V96c0-17.6 14.4-32 32-32z" />
+                    </svg>
+                    {!open && <span>Logout</span>}
+                </button>
             </div>
         </Card>
     );

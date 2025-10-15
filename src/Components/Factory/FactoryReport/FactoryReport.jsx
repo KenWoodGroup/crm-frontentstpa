@@ -165,24 +165,29 @@ export default function FactoryReport() {
                                 onClick={() => setSelectedStorage(storage)}
                             >
                                 <CardBody>
-                                    <div className="flex justify-between items-start mb-4">
+                                    <div className="flex justify-between items-start ">
                                         <div>
                                             <Typography variant="h6" className="text-black font-bold">
                                                 {storage.name}
                                             </Typography>
-                                            <Typography variant="small" className="text-gray-600">
-                                                {storage.productCount.toLocaleString()} / {storage.capacity.toLocaleString()} dona
-                                            </Typography>
                                         </div>
+                                    </div>
+                                    <div className="flex justify-between items-start ">
                                         <Typography variant="h6" className="text-black font-bold">
-                                            {Math.round(calculateStorageUsage(storage))}%
+                                            Umumiy hisob:
+                                        </Typography>
+                                        <Typography variant="h6" className="text-black font-bold">
+                                            5000 000 so`m
                                         </Typography>
                                     </div>
-                                    <Progress
-                                        value={calculateStorageUsage(storage)}
-                                        color="gray"
-                                        className="bg-gray-200"
-                                    />
+                                    <div className="flex justify-between items-start ">
+                                        <Typography variant="h6" className="text-black font-bold">
+                                            Mahsulotalr:
+                                        </Typography>
+                                        <Typography variant="h6" className="text-black font-bold">
+                                            20 000
+                                        </Typography>
+                                    </div>
                                 </CardBody>
                             </Card>
                         ))}
@@ -239,22 +244,6 @@ export default function FactoryReport() {
                                                     {Math.round((dealer.productsSold / (dealer.productsSold + dealer.productCount)) * 100)}%
                                                 </Typography>
                                             </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <Typography variant="small" className="text-gray-600">
-                                                    Sotuv samaradorligi
-                                                </Typography>
-                                                <Typography variant="small" className="text-black font-bold">
-                                                    {Math.round((dealer.productsSold / (dealer.productsSold + dealer.productCount)) * 100)}%
-                                                </Typography>
-                                            </div>
-                                            <Progress
-                                                value={(dealer.productsSold / (dealer.productsSold + dealer.productCount)) * 100}
-                                                color="gray"
-                                                className="bg-gray-200"
-                                            />
                                         </div>
                                     </CardBody>
                                 </Card>

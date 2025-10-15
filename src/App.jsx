@@ -22,6 +22,7 @@ import WarehouseLayout from "./layouts/WarehouseLayout";
 import { warehouseRoutes } from "./routes/warehouseRoutes";
 import DilerLayout from "./layouts/DilerLayout";
 import { dilertoutes } from "./routes/dilerRoutes";
+import AppLayout from "./layouts/AppLayout";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -31,76 +32,67 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route element={
-            <ProtectedRoute>
-              <SuperAdminLayout />
-            </ProtectedRoute>
-          }>
-            {supperAdminRoutes.map((r) => {
-              return (
-                <Route key={r.name} path={r.path} element={r.element} />
-              )
-            })}
+          <Route path="/" element={<AppLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route element={
+              <ProtectedRoute>
+                <SuperAdminLayout />
+              </ProtectedRoute>
+            }>
+              {supperAdminRoutes.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              // <ProtectedAdminsRoute>
+              <AdminLayout />
+              // </ProtectedAdminsRoute>
+            }>
+              {managerRoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              // <ProtectedUsersRoute>
+              <MainLayout />
+              // </ProtectedUsersRoute>
+            }>
+              {userRoutes.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              // <ProtectedUsersRoute>
+              <WarehouseLayout />
+              // </ProtectedUsersRoute>
+            }>
+              {warehouseRoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              // <ProtectedUsersRoute>
+              <DilerLayout />
+              // </ProtectedUsersRoute>
+            }>
+              {dilertoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route path="*" element={<ErrorPage />} />
           </Route>
-          <Route element={
-            // <ProtectedAdminsRoute>
-            <AdminLayout />
-            // </ProtectedAdminsRoute>
-          }>
-            {managerRoutes?.map((r) => {
-              return (
-                <Route key={r.name} path={r.path} element={r.element} />
-              )
-            })}
-          </Route>
-          <Route element={
-            // <ProtectedUsersRoute>
-            <MainLayout />
-            // </ProtectedUsersRoute>
-          }>
-            {userRoutes.map((r) => {
-              return (
-                <Route key={r.name} path={r.path} element={r.element} />
-              )
-            })}
-          </Route>
-          <Route element={
-            // <ProtectedUsersRoute>
-            <WarehouseLayout />
-            // </ProtectedUsersRoute>
-          }>
-            {warehouseRoutes?.map((r) => {
-              return (
-                <Route key={r.name} path={r.path} element={r.element} />
-              )
-            })}
-          </Route>
-          <Route element={
-            // <ProtectedUsersRoute>
-            <DilerLayout />
-            // </ProtectedUsersRoute>
-          }>
-            {dilertoutes?.map((r) => {
-              return (
-                <Route key={r.name} path={r.path} element={r.element} />
-              )
-            })}
-          </Route>
-          {/* <Route element={
-            <ProtectedRoute>
-              <HomePages/>
-           </ProtectedRoute>
-          }> 
-            <Route path="/" element={
-                <HomePage/>
-            } />
-            <Route path="/qwerty" element={<Qwerty/>} />
-          </Route> */}
-
-          <Route path="*" element={<ErrorPage />} />
         </Routes>
 
       </Router>
