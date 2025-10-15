@@ -5,6 +5,10 @@ import WarehouseProdcut from "../Components/Warehouse/WarehouseProdcut/Warehouse
 import WarehouseDiler from "../Components/Warehouse/WarehouseDiler/WarehouseDiler";
 import DilerDashboard from "../Components/Diler/DilerDashboard/DilerDashboard";
 import DilerStock from "../Components/Diler/DilerStock/DilerStock";
+import DilerNotification from "../Components/Diler/DilerNotofication/DilerNotification";
+import DilerNotificationDetail from "../Components/Diler/DilerNotificationDetail/DilerNotificationDetail";
+import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
+import DilerFinance from "../Components/Diler/DilerFinance/DilerFinance";
 export const dilertoutes = [
     {
         path: "/diler/dashboard",
@@ -17,23 +21,23 @@ export const dilertoutes = [
         element: <DilerStock />
     },
     {
-        path: "/warehouse/barcode/create",
-        name: "Warehouse barcode create",
-        element: <WarehouseBarcodeCreate />
+        path: "/diler/notification",
+        name: "Diler notification",
+        element: <DilerNotification />
     },
     {
-        path: "/warehouse/income",
-        name: "Warehouse income",
-        element: <WareHouseIncome />
+        path: "/diler/notification/:id",
+        name: "Diler notification",
+        element: <DilerNotificationDetail />
     },
     {
-        path: "/warehouse/dilers",
-        name: "Warehouse Diler",
-        element: <WarehouseDiler />
+        path: "/diler/settings",
+        name: "Diler settings",
+        element: <FactorySettings />
     },
     {
-        path: "/warehouse/settings",
-        name: "Warehouse settings",
-        element: <div>Warehouse settings</div>
+        path: "/diler/finance",
+        name: "Diler settings",
+        element: <DilerFinance />
     }
 ];

@@ -130,7 +130,7 @@ export default function FactoryProduct() {
         <div className="min-h-screen">
 
             {/* Фиксированный глазок в правом верхнем углу */}
-            <div className="fixed top-[100px] right-4 z-50">
+            <div className="fixed top-[20px] right-4 z-50">
                 <div className="relative">
                     <IconButton
                         color="blue"
@@ -149,7 +149,7 @@ export default function FactoryProduct() {
             </div>
 
             <div className="mx-auto">
-                <Typography variant="h2" className="mb-8 text-gray-900 font-bold text-center">
+                <Typography variant="h2" className="mb-8 text-gray-900 font-bold">
                     Mahsulotlar katalogi
                 </Typography>
                 

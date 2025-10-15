@@ -46,6 +46,6 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/settings",
         name: "Warehouse settings",
-        element: <div>Warehouse settings</div>
+        element: <FactorySettings />
     }
 ];

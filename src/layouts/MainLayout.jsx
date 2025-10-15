@@ -7,16 +7,15 @@ import FactorySidebar from "../Components/Factory/FactorySidebar/FactorySidebar"
 export default function MainLayout() {
     const [active, setActive] = useState(false); // true = открыт сайдбар
     return (
-        <div className="flex w-full overflow-hidden bg-[#FAFAFA] relative">
-            <FactorySidebar open={active} onClose={() => setActive(false)} />
+        <div className="flex hello w-full overflow-hidden bg-[#FAFAFA] relative">
+            <FactorySidebar open={active} onClose={() => setActive(false)} active={() => setActive(!active)} />
             <div
-                className={`mt-[110px] pb-[30px] px-[15px] min-h-screen transition-all duration-300`}
+                className={`mt-[30px] pb-[30px] px-[15px] min-h-screen transition-all duration-300`}
                 style={{
                     marginLeft: !active ? "300px" : "110px",
                     width: !active ? "calc(100% - 320px)" : "100%",
                 }}
             >
-                <AdminHeader active={() => setActive(!active)} sidebarOpen={!active} />
                 <Outlet />
             </div>
         </div>

@@ -18,6 +18,15 @@ export default function FactoryAnalitik() {
         { id: 10, name: "Fax Machine", soldCount: 150, revenue: 45000, monthlySales: 12, decline: 72.1 }
     ];
 
+
+    const deadStockProducts = [
+        { id: 11, name: "Old Keyboard", quantity: 500, monthsInStock: 14 },
+        { id: 12, name: "CRT Monitor", quantity: 120, monthsInStock: 20 },
+        { id: 13, name: "DVD Player", quantity: 350, monthsInStock: 18 },
+        { id: 14, name: "Old Router", quantity: 260, monthsInStock: 10 },
+        { id: 15, name: "Printer Cartridge", quantity: 90, monthsInStock: 22 },
+    ];
+
     const inventoryStats = {
         totalProducts: 156000,
         soldProducts: 125000,
@@ -113,47 +122,6 @@ export default function FactoryAnalitik() {
                     </CardBody>
                 </Card>
             </div>
-
-            {/* Sotuv progressi */}
-            <Card className="bg-white shadow-lg border border-gray-200 mb-8">
-                <CardBody>
-                    <Typography variant="h5" className="text-gray-900 font-bold mb-6">
-                        Sotuv Ko'rsatkichlari
-                    </Typography>
-                    <div className="space-y-6">
-                        <div>
-                            <div className="flex justify-between mb-2">
-                                <Typography variant="small" className="text-gray-600">
-                                    Sotilgan mahsulotlar
-                                </Typography>
-                                <Typography variant="small" className="text-gray-900 font-bold">
-                                    {inventoryStats.soldProducts.toLocaleString()} ({inventoryStats.sellThroughRate}%)
-                                </Typography>
-                            </div>
-                            <Progress
-                                value={inventoryStats.sellThroughRate}
-                                color=""
-                                className="bg-gray-200"
-                            />
-                        </div>
-                        <div>
-                            <div className="flex justify-between mb-2">
-                                <Typography variant="small" className="text-gray-600">
-                                    Qolgan mahsulotlar
-                                </Typography>
-                                <Typography variant="small" className="text-gray-900 font-bold">
-                                    {inventoryStats.remainingProducts.toLocaleString()} ({100 - inventoryStats.sellThroughRate}%)
-                                </Typography>
-                            </div>
-                            <Progress
-                                value={100 - inventoryStats.sellThroughRate}
-                                color=""
-                                className="bg-gray-200"
-                            />
-                        </div>
-                    </div>
-                </CardBody>
-            </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Top 5 sotiladigan mahsulotlar */}
@@ -297,42 +265,31 @@ export default function FactoryAnalitik() {
                         ))}
                     </div>
                 </div>
+
+
             </div>
+            <div className="mt-12">
+                <Typography variant="h3" className="text-gray-900 font-bold mb-8 flex items-center gap-2">
+                    Sotilmayotgan Mahsulotlar
+                </Typography>
 
-            {/* Qo'shimcha statistikalar */}
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-white shadow-lg border border-gray-200">
-                    <CardBody className="text-center">
-                        <Typography variant="h6" className="text-gray-600 mb-2">
-                            O'rtacha oylik daromad
-                        </Typography>
-                        <Typography variant="h4" className="text-gray-900 font-bold">
-                            ${inventoryStats.monthlyRevenue.toLocaleString()}
-                        </Typography>
-                    </CardBody>
-                </Card>
-
-                <Card className="bg-white shadow-lg border border-gray-200">
-                    <CardBody className="text-center">
-                        <Typography variant="h6" className="text-gray-600 mb-2">
-                            Sotuv samaradorligi
-                        </Typography>
-                        <Typography variant="h4" className="text-green-600 font-bold">
-                            {inventoryStats.sellThroughRate}%
-                        </Typography>
-                    </CardBody>
-                </Card>
-
-                <Card className="bg-white shadow-lg border border-gray-200">
-                    <CardBody className="text-center">
-                        <Typography variant="h6" className="text-gray-600 mb-2">
-                            O'rtacha mahsulot narxi
-                        </Typography>
-                        <Typography variant="h4" className="text-blue-600 font-bold">
-                            ${Math.round(inventoryStats.totalRevenue / inventoryStats.soldProducts)}
-                        </Typography>
-                    </CardBody>
-                </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {deadStockProducts.map((product) => (
+                        <Card key={product.id} className="bg-white text-black hover:bg-gray-100 transition-all shadow-lg">
+                            <CardBody>
+                                <div className="flex items-center justify-between mb-3">
+                                    <Typography variant="h5" className="font-bold">{product.name}</Typography>
+                                    <Typography variant="small" className="text-gray-900">
+                                        {product.monthsInStock} oy omborda
+                                    </Typography>
+                                </div>
+                                <Typography variant="paragraph" className="text-black mb-3">
+                                    {product.quantity.toLocaleString()} dona omborda qolgan
+                                </Typography>
+                            </CardBody>
+                        </Card>
+                    ))}
+                </div>
             </div>
         </div>
     );
