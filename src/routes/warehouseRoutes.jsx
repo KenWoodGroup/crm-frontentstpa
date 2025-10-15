@@ -2,11 +2,11 @@
 import { patch } from "@mui/material";
 import WarehouseBarcodeCreate from "../Components/Warehouse/WarehouseBarcodeCreate/WarehouseBarcodeCreate";
 import WarehouseDashboard from "../Components/Warehouse/WarehouseDashboard/WarehouseDashboard";
-import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
-import WarehouseProdcut from "../Components/Warehouse/WarehouseProduct";
-import WareHouseIncomeFull from "../Components/Warehouse/WareHouseIncome/WareHouseIncomeFull";
 import WarehouseProdcut from "../Components/Warehouse/WarehouseProdcut/WarehouseProduct";
 import WarehouseDiler from "../Components/Warehouse/WarehouseDiler/WarehouseDiler";
+import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
+import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
+import WareHouseDisposal from "../Components/Warehouse/WareHouseDisposal/WareHouseDisposal";
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",
@@ -24,9 +24,19 @@ export const warehouseRoutes = [
         element: <WarehouseBarcodeCreate />
     },
     {
-        path: "/warehouse/income",
-        name: "Warehouse income",
-        element: <WareHouseIncomeFull/>
+        path: "/warehouse/stockin",
+        name: "Warehouse stock in",
+        element: <WareHouseIncome/>
+    },
+    {
+        path:"/warehouse/stockout",
+        name:"Warehouse stock out",
+        element:<WareHouseOutcome/>
+    },
+    {
+        path:"/warehouse/disposal",
+        name:"Warehouse Disposal",
+        element:<WareHouseDisposal/>
     },
     {
         path: "/warehouse/dilers",

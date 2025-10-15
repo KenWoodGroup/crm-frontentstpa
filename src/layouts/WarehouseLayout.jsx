@@ -1,7 +1,8 @@
 import { Outlet } from "react-router-dom";
 import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
 import { useState } from "react";
-import { LayoutDashboard, Package, PackagePlus, Settings, User } from "lucide-react";
+import { LayoutDashboard, Package, PackagePlus, PackageMinus, Recycle, Settings, User } from "lucide-react";
+import { patch } from "@mui/material";
 
 export default function WarehouseLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(
@@ -22,12 +23,24 @@ export default function WarehouseLayout() {
         },
         {
             id: 3,
-            label: "Income",
-            path: "/warehouse/income",
+            label: "Kirim",
+            path: "/warehouse/stockin",
             icon: PackagePlus
         },
         {
-            id: 3,
+            id:4,
+            label:"Chiqim",
+            path:"/warehouse/stockout",
+            icon:PackageMinus,
+        },
+        {
+            id:5,
+            label:"Chiqindi",
+            path:"/warehouse/disposal",
+            icon:Recycle
+        },
+        {
+            id: 5,
             label: "Dilers",
             path: "/warehouse/dilers",
             icon: User
