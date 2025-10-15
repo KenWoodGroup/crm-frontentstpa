@@ -93,7 +93,7 @@ function mixReducer(state, action) {
 }
 
 /* ---------- Main component ---------- */
-export default function WareHouseIncome() {
+export default function WareHouseOutcome() {
     // user / location
     const userLId = Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
@@ -226,9 +226,9 @@ export default function WareHouseIncome() {
         try {
             setCreateInvoiceLoading(true)
             const payload = {
-                type: "transfer_incoming",
-                sender_id: selectedLocation === "other" ? null : selectedLocation,
-                receiver_id: userLId,
+                type: "transfer",
+                sender_id: userLId ,
+                receiver_id: selectedLocation === "other" ? null : selectedLocation,
                 created_by: createdBy,
                 status: "approved"
                 // Do not force 'approved' from client side - server should decide.
@@ -237,7 +237,11 @@ export default function WareHouseIncome() {
 
             // robust id extraction
             const invoice_id =
-                res?.data?.location?.id
+                res?.data?.id ||
+                res?.data?.location?.id ||
+                res?.data?.invoice?.id ||
+                res?.data?.location_id ||
+                res?.data?.invoice_id;
 
             if (res?.status === 200 || res?.status === 201) {
                 if (!invoice_id) {
@@ -326,10 +330,7 @@ export default function WareHouseIncome() {
             let res = await Stock.getByBarcode(code);
             if (res?.status === 200 || res?.status === 201) {
                 // add item (normalize inside add)
-                res.data.map((item)=>{
-
-                    addItemToMixData(item);
-                })
+                addItemToMixData(res.data);
                 setBarcodeInput("");
             } else {
                 notify.error("Barcode bo'yicha mahsulot topilmadi");
@@ -692,7 +693,7 @@ export default function WareHouseIncome() {
 
     return (
         <section className="relative w-full min-h-screen bg-white overflow-hidden">
-            <div className="fixed text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
+            <div className="fixed top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
                 Warehouse Income
             </div>
 
@@ -772,7 +773,8 @@ export default function WareHouseIncome() {
                                 ) : (
                                     <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
                                         <option value="">Jo'natuvchini tanlang</option>
-                                        {locations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
+                                        {locations.filter((item) => String(item.id) !== String(userLId)).map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
+                                        <option value="other">Tashqi (Other)</option>
                                     </select>
                                 )}
 
@@ -782,7 +784,7 @@ export default function WareHouseIncome() {
                             </div>
 
                             <div className="ml-auto">
-                                <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
+                                <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-black text-white rounded hover:opacity-95`} aria-label="Start invoice">
                                     {
                                         !createInvoiceLoading ?
                                             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -903,7 +905,7 @@ export default function WareHouseIncome() {
                                                     <input type="number" min={0} step="any" value={it.price} onChange={(e) => updatePrice(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
                                                 </td>
                                                 <td className="p-2 align-top w-[120px]">
-                                                    <input type="number"  step="1" value={it.quantity} onChange={(e) => updateQuantity(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
+                                                    <input type="number" min={0} step="1" value={it.quantity} onChange={(e) => updateQuantity(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
                                                 </td>
                                                 <td className="p-2 align-top">
                                                     {(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}
@@ -947,8 +949,7 @@ export default function WareHouseIncome() {
                                             setSelectedLocation("");
                                             setOtherLocationName("");
                                             setInvoiceMeta((p) => ({ ...p, total: 0 }));
-                                            setSearchResults([]);
-                                            setSearchQuery("");
+                                            setSearchResults([])
                                         }}
                                             className={`flex items-center gap-2 px-4 py-2 rounded bg-[rgb(25_118_210)] text-white`}>
                                             <PlusCircle size={16} />
