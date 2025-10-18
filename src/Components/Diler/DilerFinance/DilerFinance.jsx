@@ -121,6 +121,7 @@ export default function DilerFinance() {
                                     <BarChart
                                         data={finance.warehouseStats}
                                         barGap={4}
+                                 
                                         margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
                                     >
                                         <XAxis dataKey="name" stroke="#555" tick={{ fontSize: 12 }} />

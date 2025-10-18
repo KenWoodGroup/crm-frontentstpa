@@ -23,17 +23,19 @@ export default function FactoryWarehouse() {
 
     const GetAll = async (pageNumber = 1) => {
         if (!parent_id) return Alert("Parent ID topilmadi", "error");
-
         setLoading(true);
         try {
             const response = await WarehouseApi.WarehouseGetAll({ id: parent_id, page: pageNumber });
             const records = response.data?.data?.records || [];
             const pagination = response.data?.data?.pagination || {};
 
-            setWarehouses(records);
+            // 🔥 Исключаем склады с type === "other" или type === "disposal"
+            const filtered = records.filter(w => w.type !== "other" && w.type !== "disposal");
+
+            setWarehouses(filtered);
             setTotalPages(Number(pagination.total_pages) || 1);
             setPage(Number(pagination.currentPage) || pageNumber);
-            setTotalCount(Number(pagination.total_count) || records.length);
+            setTotalCount(Number(pagination.total_count) || filtered.length);
         } catch (error) {
             console.log(error);
             Alert("Xatolik yuz berdi ❌", "error");

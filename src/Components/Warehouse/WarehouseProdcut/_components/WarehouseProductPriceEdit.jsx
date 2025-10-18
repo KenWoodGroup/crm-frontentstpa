@@ -15,7 +15,6 @@ export default function WarehouseEdit({ data }) {
     const [open, setOpen] = useState(false);
     const [price, setPrice] = useState(formatNumber(data?.price || 0));
 
-    console.log(data)
 
     const handleOpen = () => setOpen(!open);
 
@@ -33,7 +32,7 @@ export default function WarehouseEdit({ data }) {
                 id: data?.id,
                 form: form,
             });
-            
+
             handleOpen();
             Alert("Narx muvaffaqiyatli o‘zgartirildi", "success");
         } catch (error) {

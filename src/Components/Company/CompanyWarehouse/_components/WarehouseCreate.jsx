@@ -11,11 +11,11 @@ import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 
-export default function WarehouseDilerCreate({ refresh }) {
+export default function WarehouseCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
-        type: "dealer",
+        type: "warehouse",
         name: "",
         full_name: "",
         address: "",
@@ -81,7 +81,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-black text-white normal-case hover:bg-gray-800"
             >
-                + Yangi Diler
+                + Yangi Ombor
             </Button>
 
             <Dialog
@@ -90,7 +90,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                 className="bg-white text-gray-900 rounded-xl"
             >
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200">
-                    Diler maʼlumotlari
+                    Ombor maʼlumotlari
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input

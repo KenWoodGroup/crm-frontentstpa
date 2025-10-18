@@ -8,56 +8,81 @@ import EmptyData from "../../UI/NoData/EmptyData";
 import WarehouseEdit from "./_components/WarehouseProductPriceEdit";
 import { formatNumber } from "../../../utils/Helpers/Formater";
 import { io } from "socket.io-client";
+import { Info } from "lucide-react";
 
 export default function WarehouseProduct() {
     const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    const locationId = Cookies?.get("ul_nesw"); // из cookie
+    const locationId = Cookies?.get("ul_nesw");
 
-    const GetAllProduct = async (page = 1) => {
-        setLoading(true);
+    // 🔹 Получаем данные
+    const GetAllProduct = async (pageNum = 1, append = false) => {
+        if (pageNum === 1) {
+            setLoading(true);
+        } else {
+            setLoadingMore(true);
+        }
+
         try {
             const response = await Stock.StockGetByLocationId({
                 id: locationId,
-                page: page,
+                page: pageNum,
             });
-            setTotalPages(Number(response?.data?.pagination?.total_pages || 1));
-            setProducts(response?.data?.data?.records || []);
+
+            const newProducts = response?.data?.data?.records || [];
+            const total = Number(response?.data?.data?.pagination?.total_pages || 0);
+
+            setTotalPages(total);
+
+            if (append) {
+                // Добавляем новые данные в конец (сохраняем старые)
+                setProducts((prev) => [...prev, ...newProducts]);
+            } else {
+                // Первая загрузка - заменяем все данные
+                setProducts(newProducts);
+            }
         } catch (error) {
             console.log("Mahsulotlarni olishda xatolik:", error);
         } finally {
             setLoading(false);
+            setLoadingMore(false);
         }
     };
 
+    // 🔁 Первичная загрузка + сокет
     useEffect(() => {
-        GetAllProduct(page);
-
         if (!locationId) return;
+        GetAllProduct(1);
 
         const socket = io("https://test.edu-devosoft.uz", {
             path: "/socket.io",
             transports: ["websocket"],
         });
 
-        // 🔊 Присоединяемся к комнате для конкретного location
         socket.emit("joinLocation", locationId);
 
-        // 📡 Слушаем обновления склада
         socket.on("stockUpdate", (data) => {
-            console.log("Stock yangilandi:", data);
             if (data.location_id === locationId) {
-                GetAllProduct(page); // 🔁 Обновляем данные
+                // При обновлении через сокет перезагружаем все с первой страницы
+                GetAllProduct(1);
             }
         });
 
-        return () => {
-            socket.disconnect();
-        };
-    }, [page, locationId]);
+        return () => socket.disconnect();
+    }, [locationId]);
+
+    // 🔁 Подгрузка следующей страницы
+    const loadNextPage = () => {
+        const nextPage = page + 1;
+        if (nextPage <= totalPages) {
+            setPage(nextPage);
+            GetAllProduct(nextPage, true);
+        }
+    };
 
     if (loading && products.length === 0) {
         return <Loading />;
@@ -83,51 +108,79 @@ export default function WarehouseProduct() {
                                 <tr className="bg-gray-100">
                                     <th className="p-4 font-semibold text-gray-700">№</th>
                                     <th className="p-4 font-semibold text-gray-700">Mahsulot nomi</th>
+                                    <th className="p-4 font-semibold text-gray-700">Partiya</th>
                                     <th className="p-4 font-semibold text-gray-700">Narxi</th>
                                     <th className="p-4 font-semibold text-gray-700">Soni</th>
                                     <th className="p-4 font-semibold text-gray-700">Barcode</th>
-                                    <th className="p-4 font-semibold text-gray-700 text-center">
-                                        Amallar
-                                    </th>
+                                    <th className="p-4 font-semibold text-gray-700">Sana</th>
+                                    <th className="p-4 font-semibold text-gray-700 text-center">Amallar</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {products.map((item, index) => (
-                                    <tr
-                                        key={item.id}
-                                        className="border-b hover:bg-gray-50 transition"
-                                    >
-                                        <td className="p-4 text-gray-700">{index + 1}</td>
-                                        <td className="p-4 text-gray-900 font-medium">
-                                            {item.product?.name}
-                                        </td>
-                                        <td className="p-4 text-gray-700">
-                                            {item.price
-                                                ? `${formatNumber(item.price)} so‘m`
-                                                : "—"}
-                                        </td>
-                                        <td className="p-4 text-gray-700">{item.quantity}</td>
-                                        <td className="p-4 text-gray-700">{item.barcode}</td>
-                                        <td className="p-4 text-center">
-                                            <WarehouseEdit data={item} />
-                                        </td>
-                                    </tr>
-                                ))}
+                                {products.map((item, index) => {
+                                    const date = item.product?.createdAt;
+                                    const formattedDate = date
+                                        ? new Date(date).toLocaleDateString("uz-UZ")
+                                        : null;
+
+                                    return (
+                                        <tr
+                                            key={`${item.id}-${index}`}
+                                            className="border-b hover:bg-gray-50 transition"
+                                        >
+                                            <td className="p-4 text-gray-700">
+                                                {index + 1}
+                                            </td>
+                                            <td className="p-4 text-gray-900 font-medium">
+                                                {item.product?.name}
+                                            </td>
+                                            <td className="p-4 text-gray-700">
+                                                {item.batch || (
+                                                    <span className="flex items-center gap-1 text-gray-500">
+                                                        <Info size={16} />
+                                                        <span>—</span>
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="p-4 text-gray-700">
+                                                {item.price
+                                                    ? `${formatNumber(item.price)} so‘m`
+                                                    : "—"}
+                                            </td>
+                                            <td className="p-4 text-gray-700">{item.quantity}</td>
+                                            <td className="p-4 text-gray-700">{item.barcode}</td>
+                                            <td className="p-4 text-gray-700">
+                                                {formattedDate ? (
+                                                    formattedDate
+                                                ) : (
+                                                    <span className="flex items-center gap-1 text-gray-500">
+                                                        <Info size={16} />
+                                                        <span>Дата отсутствует</span>
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                <WarehouseEdit data={item} />
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </Card>
 
+                    {/* 🔹 Кнопка подгрузки (только если есть следующая страница) */}
                     {page < totalPages && (
                         <div className="flex justify-center mt-6">
                             <Button
                                 color="gray"
                                 variant="outlined"
                                 size="sm"
-                                onClick={() => setPage((prev) => prev + 1)}
-                                disabled={loading}
+                                onClick={loadNextPage}
+                                disabled={loadingMore}
                                 className="rounded-full border-gray-400 text-gray-800 hover:bg-gray-100"
                             >
-                                {loading ? "Yuklanmoqda..." : "Yana ko‘rish"}
+                                {loadingMore ? "Yuklanmoqda..." : "Yana ko‘rish"}
                             </Button>
                         </div>
                     )}

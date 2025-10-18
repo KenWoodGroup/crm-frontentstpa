@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Button,
     Dialog,
@@ -7,23 +7,35 @@ import {
     DialogFooter,
     Input,
 } from "@material-tailwind/react";
-import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
+import Edit from "../../../UI/Icons/Edit";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 
-export default function WarehouseDilerCreate({ refresh }) {
+export default function CompanyWarehouseEdit({ warehouse, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [warehouseId, setWarehouseId] = useState(""); // сюда передаём id для редактирования
     const [data, setData] = useState({
-        type: "dealer",
+        type: "warehouse",
         name: "",
-        full_name: "",
         address: "",
         phone: "",
         email: "",
-        parent_id: Cookies.get('ul_nesw'),
         password: "",
     });
+
+    useEffect(() => {
+        if (warehouse) {
+            setData({
+                type: warehouse.type || "warehouse",
+                name: warehouse.name || "",
+                address: warehouse.address || "",
+                phone: warehouse.phone || "",
+                email: warehouse.users?.[0]?.email || "",
+            });
+            setWarehouseId(warehouse?.id)
+        }
+    }, [warehouse]);
 
     const handleOpen = () => setOpen(!open);
 
@@ -35,41 +47,28 @@ export default function WarehouseDilerCreate({ refresh }) {
     const validateFields = () => {
         if (!data.name.trim())
             return Alert("Iltimos, ombor nomini kiriting ❗", "warning");
-        if (!data.full_name.trim())
-            return Alert("Iltimos, to‘liq ismni kiriting ❗", "warning");
         if (!data.address.trim())
             return Alert("Iltimos, manzilni kiriting ❗", "warning");
         if (!data.phone.trim())
             return Alert("Iltimos, telefon raqam kiriting ❗", "warning");
         if (!data.email.trim())
             return Alert("Iltimos, email kiriting ❗", "warning");
-        if (!data.password.trim())
-            return Alert("Iltimos, parolni kiriting ❗", "warning");
         return true;
     };
 
-    const CreateWarehouse = async () => {
+    const EditWarehouse = async () => {
         if (validateFields() !== true) return;
 
         try {
             setLoading(true);
-            const res = await WarehouseApi.CreateWarehouse(data);
 
-            Alert("Ombor muvaffaqiyatli yaratildi ", "success");
+            await WarehouseApi.WarehouseEdit(data, warehouseId);
+            Alert("Ombor muvaffaqiyatli yangilandi ", "success");
             setOpen(false);
-            setData({
-                type: "warehouse",
-                name: "",
-                full_name: "",
-                address: "",
-                phone: "",
-                email: "",
-                password: "",
-            });
-            refresh()
+            refresh();
         } catch (error) {
-            console.error("Xatolik:", error);
-            Alert(`Xatolik yuz berdi ${error?.response?.data?.message}`, "error");
+            console.error(error);
+            Alert(`Xatolik yuz berdi ${error?.response?.data?.message || ""}`, "error");
         } finally {
             setLoading(false);
         }
@@ -79,9 +78,9 @@ export default function WarehouseDilerCreate({ refresh }) {
         <>
             <Button
                 onClick={handleOpen}
-                className="bg-black text-white normal-case hover:bg-gray-800"
+                className="bg-yellow-600 text-white hover:bg-yellow-700 normal-case p-[8px]"
             >
-                + Yangi Diler
+                <Edit size={20} />
             </Button>
 
             <Dialog
@@ -90,7 +89,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                 className="bg-white text-gray-900 rounded-xl"
             >
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200">
-                    Diler maʼlumotlari
+                    Ombor maʼlumotlarini tahrirlash
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
@@ -98,13 +97,6 @@ export default function WarehouseDilerCreate({ refresh }) {
                         color="gray"
                         name="name"
                         value={data.name}
-                        onChange={handleChange}
-                    />
-                    <Input
-                        label="To‘liq ism"
-                        color="gray"
-                        name="full_name"
-                        value={data.full_name}
                         onChange={handleChange}
                     />
                     <Input
@@ -128,14 +120,6 @@ export default function WarehouseDilerCreate({ refresh }) {
                         value={data.email}
                         onChange={handleChange}
                     />
-                    <Input
-                        label="Parol"
-                        color="gray"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        onChange={handleChange}
-                    />
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
@@ -148,9 +132,9 @@ export default function WarehouseDilerCreate({ refresh }) {
                         Bekor qilish
                     </Button>
                     <Button
-                        className={`bg-black text-white normal-case hover:bg-gray-800 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
+                        className={`bg-blue-600 text-white normal-case hover:bg-blue-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
                             }`}
-                        onClick={CreateWarehouse}
+                        onClick={EditWarehouse}
                         disabled={loading}
                     >
                         {loading ? (

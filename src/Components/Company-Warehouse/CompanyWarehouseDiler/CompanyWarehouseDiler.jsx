@@ -1,18 +1,20 @@
 import { Building2, User, MapPin, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+// import WarehouseCreate from "./_components/WarehouseCreate";
 import { WarehouseApi } from "../../../utils/Controllers/WarehouseApi";
 import { Alert } from "../../../utils/Alert";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
+
 import { Button } from "@material-tailwind/react";
 import { NavLink } from "react-router-dom";
 import EmptyData from "../../UI/NoData/EmptyData";
-import WarehouseDilerCreate from "./_components/WarehouseDilerCreate";
-import WarehouseDilerDelete from "./_components/WarehouseDilerDelete";
-import WarehouseDilerEdit from "./_components/WarehouseDilerEdit";
+import CompanyWarehouseDilerCreate from "./_components/CompanyWarehouseDilerCreate";
+import CompanyWarehouseEdit from "./_components/CompanyWarehouseEdit";
+import CompanyWarehouseDilerDelete from "./_components/CompanyWarehouseDilerDelete";
 
 
-export default function WarehouseDiler() {
+export default function CompanyWarehouseDiler() {
     const [loading, setLoading] = useState(true);
     const [warehouses, setWarehouses] = useState([]);
     const [page, setPage] = useState(1);
@@ -23,17 +25,16 @@ export default function WarehouseDiler() {
 
     const GetAll = async (pageNumber = 1) => {
         if (!parent_id) return Alert("Parent ID topilmadi", "error");
-
         setLoading(true);
         try {
             const response = await WarehouseApi.WarehouseGetAll({ id: parent_id, page: pageNumber });
             const records = response.data?.data?.records || [];
             const pagination = response.data?.data?.pagination || {};
-
-            setWarehouses(records);
+            const filtered = records.filter(w => w.type !== "other" && w.type !== "disposal");
+            setWarehouses(filtered);
             setTotalPages(Number(pagination.total_pages) || 1);
             setPage(Number(pagination.currentPage) || pageNumber);
-            setTotalCount(Number(pagination.total_count) || records.length);
+            setTotalCount(Number(pagination.total_count) || filtered.length);
         } catch (error) {
             console.log(error);
             Alert("Xatolik yuz berdi ❌", "error");
@@ -41,6 +42,8 @@ export default function WarehouseDiler() {
             setLoading(false);
         }
     };
+
+
 
     useEffect(() => {
         GetAll(page);
@@ -53,13 +56,12 @@ export default function WarehouseDiler() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-semibold text-gray-800">
-                    Diler Maʼlumotlari
+                    Qurilish nuqtalari Maʼlumotlari
                 </h1>
-                <WarehouseDilerCreate refresh={() => GetAll(page)} />
+                <CompanyWarehouseDilerCreate refresh={() => GetAll(page)} />
             </div>
             {warehouses?.length > 0 ? (
                 <>
-                    {/* Warehouse Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {warehouses.map((w) => (
                             <div key={w.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 hover:shadow-md transition">
@@ -71,8 +73,8 @@ export default function WarehouseDiler() {
                                         <h2 className="text-xl font-semibold text-gray-800">{w.name}</h2>
                                     </div>
                                     <div className="flex items-center gap-[10px]">
-                                        <WarehouseDilerEdit refresh={() => GetAll(page)} diler={w} />
-                                        <WarehouseDilerDelete refresh={() => GetAll(page)} dilerId={w?.id} />
+                                        <CompanyWarehouseEdit refresh={() => GetAll(page)} warehouse={w} />
+                                        <CompanyWarehouseDilerDelete refresh={() => GetAll(page)} warehouseId={w?.id} />
                                     </div>
                                 </div>
 
@@ -92,14 +94,13 @@ export default function WarehouseDiler() {
                                         <span>{w.phone}</span>
                                     </div>
                                     {/* <div className="flex flex-col md:flex-row gap-3">
-                                        <NavLink to={`/factory/warehouse/user/${w?.id}`} className="flex-1">
+                                        <NavLink to={`/company/warehouse/user/${w?.id}`} className="flex-1">
                                             <Button className="w-full flex items-center justify-center gap-2">
                                                 <User size={18} />
                                                 Users
                                             </Button>
                                         </NavLink>
-
-                                        <NavLink to={`/factory/warehouse/${w?.id}`} className="flex-1">
+                                        <NavLink to={`/company/warehouse/${w?.id}`} className="flex-1">
                                             <Button className="w-full flex items-center justify-center gap-2">
                                                 <Building2 size={18} />
                                                 Detail
@@ -132,7 +133,7 @@ export default function WarehouseDiler() {
                     )}
                 </>
             ) : (
-                <EmptyData text={'Diler mavjud emas'} />
+                <EmptyData text={'Qurilish nuqtasi mavjud emas'} />
             )}
         </div>
     );

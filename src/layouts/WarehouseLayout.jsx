@@ -28,16 +28,16 @@ export default function WarehouseLayout() {
             icon: PackagePlus
         },
         {
-            id:4,
-            label:"Chiqim",
-            path:"/warehouse/stockout",
-            icon:PackageMinus,
+            id: 4,
+            label: "Chiqim",
+            path: "/warehouse/stockout",
+            icon: PackageMinus,
         },
         {
-            id:5,
-            label:"Chiqindi",
-            path:"/warehouse/disposal",
-            icon:Recycle
+            id: 5,
+            label: "Chiqindi",
+            path: "/warehouse/disposal",
+            icon: Recycle
         },
         {
             id: 5,
