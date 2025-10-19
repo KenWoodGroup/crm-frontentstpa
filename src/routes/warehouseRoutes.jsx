@@ -8,6 +8,7 @@ import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIn
 import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
 import WareHouseDisposal from "../Components/Warehouse/WareHouseDisposal/WareHouseDisposal";
 import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/SettingsWareHouse";
+import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",

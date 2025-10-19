@@ -3,6 +3,9 @@ import {
     CardHeader,
     CardBody,
     Typography,
+    Select,
+    Option,
+    Button,
 } from "@material-tailwind/react";
 import {
     PieChart,
@@ -15,8 +18,29 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
+import {
+    Warehouse,
+    Users,
+    Package,
+    DollarSign,
+    BanknoteArrowDown,
+    BanknoteArrowUp,
+    Trash
+} from "lucide-react";
+import { Statistik } from "../../../utils/Controllers/Statistik";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import WarehouseMonyChart from "../../Factory/FactoryDashboard/_components/WarehouseMonyChart";
+import WarehouseProduct from "../../Factory/FactoryDashboard/_components/WarehouseProduct";
 
 export default function WarehouseDashboard() {
+    const locationId = Cookies.get("ul_nesw");
+    const currentDate = new Date();
+    const [year, setYear] = useState(currentDate.getFullYear());
+    const [month, setMonth] = useState(String(currentDate.getMonth() + 1).padStart(2, "0"));
+    const [productSum, setProductSum] = useState([]);
+    const [productCount, setProductCount] = useState([]);
+
     const data = [
         { name: "Televizorlar", quantity: 120 },
         { name: "Noutbuklar", quantity: 80 },
@@ -24,126 +48,155 @@ export default function WarehouseDashboard() {
         { name: "Muzlatkichlar", quantity: 45 },
         { name: "Pechlar", quantity: 60 },
     ];
+    const [CardData, setCardData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const COLORS = ["#1C1C1C", "#3F3F3F", "#6B6B6B", "#A1A1A1", "#D4D4D4"];
 
-    const totalItems = data.reduce((acc, item) => acc + item.quantity, 0);
-    const topProduct = data.reduce((max, item) =>
-        item.quantity > max.quantity ? item : max
-    );
+
+
+
+    const fetchAllData = async () => {
+        setLoading(true);
+        try {
+            const [card, sum, count, product, diler] = await Promise.all([
+                Statistik.GetStatistik(locationId),
+                Statistik.GetStatistikProductSum({ id: locationId, year, month }),
+                Statistik.GetStatistikProductCount({ id: locationId, year, month }),
+            ]);
+            setCardData(card?.data);
+            setProductCount(count?.data || []);
+            setProductSum(product?.data || []);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAllData()
+    }, [])
+
+
+    const stats = [
+        {
+            title: "Dilerlar",
+            value: CardData ? CardData.countDealer : "...",
+            icon: <Users className="w-6 h-6 text-green-600" />,
+        },
+        {
+            title: "Mahsulotlar",
+            value: CardData ? CardData.countProduct : "...",
+            icon: <Package className="w-6 h-6 text-purple-600" />,
+        },
+        {
+            title: "Umumiy Qiymat",
+            value: CardData ? `${CardData.sumProduct.toLocaleString()} so'm` : "...",
+            icon: <DollarSign className="w-6 h-6 text-yellow-600" />,
+        },
+        {
+            title: "Kirim (joriy oy uchun)",
+            value: CardData ? `${CardData.transferIn.toLocaleString()} so'm` : "...",
+            icon: <BanknoteArrowDown className="w-6 h-6 text-green-600" />,
+        },
+        {
+            title: "Chiqim (joriy oy uchun)",
+            value: CardData ? `${CardData.transferOut.toLocaleString()} so'm` : "...",
+            icon: <BanknoteArrowUp className="w-6 h-6 text-red-600" />,
+        },
+        {
+            title: "Sotuv (joriy oy uchun)",
+            value: CardData ? `${CardData.income.toLocaleString()} so'm` : "...",
+            icon: <DollarSign className="w-6 h-6 text-green-600" />,
+        },
+        {
+            title: "Utilizatsiya (joriy oy uchun)",
+            value: CardData ? `${CardData.sumDisposal.toLocaleString()} so'm` : "...",
+            icon: <Trash className="w-6 h-6 text-red-600" />,
+        },
+    ];
 
     return (
         <div className=" text-black min-h-screen transition-all duration-300">
             <Typography variant="h4" className="mb-6 font-semibold ">
-                Ombor Paneli
+                Ombor Dashboard
             </Typography>
 
-            {/* Statistika kartalar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <Card className="shadow-sm bg-white border border-gray-200 hover:shadow-md transition">
-                    <CardBody>
-                        <Typography variant="h6" className="text-gray-800">
-                            Umumiy mahsulotlar soni
-                        </Typography>
-                        <Typography variant="h3" className="mt-2 font-bold text-gray-900">
-                            {totalItems}
-                        </Typography>
-                    </CardBody>
-                </Card>
-
-                <Card className="shadow-sm bg-white border border-gray-200 hover:shadow-md transition">
-                    <CardBody>
-                        <Typography variant="h6" className="text-gray-800">
-                            Eng ko‘p mavjud mahsulot
-                        </Typography>
-                        <Typography variant="h4" className="mt-2 font-bold text-gray-900">
-                            {topProduct.name}
-                        </Typography>
-                    </CardBody>
-                </Card>
-
-                <Card className="shadow-sm bg-white border border-gray-200 hover:shadow-md transition">
-                    <CardBody>
-                        <Typography variant="h6" className="text-gray-800">
-                            Mahsulot turlari
-                        </Typography>
-                        <Typography variant="h3" className="mt-2 font-bold text-gray-900">
-                            {data.length}
-                        </Typography>
-                    </CardBody>
-                </Card>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+                {stats.map((item, index) => (
+                    <Card
+                        key={index}
+                        className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    >
+                        <CardBody className="flex items-center gap-4 p-6">
+                            <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl shadow-sm">
+                                {item.icon}
+                            </div>
+                            <div>
+                                <Typography className="text-sm text-gray-600 font-medium mb-1">
+                                    {item.title}
+                                </Typography>
+                                <Typography variant="h5" className="font-bold text-gray-900">
+                                    {item.value}
+                                </Typography>
+                            </div>
+                        </CardBody>
+                    </Card>
+                ))}
             </div>
+            <Card className="mb-[20px]">
+                <CardBody className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex gap-4 w-full sm:w-auto">
+                        <Select
+                            label="Yilni tanlang"
+                            value={year.toString()}
+                            onChange={(val) => setYear(val)}
+                        >
+                            {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
+                                <Option key={y} value={y.toString()}>
+                                    {y}
+                                </Option>
+                            ))}
+                        </Select>
 
-            {/* Diagrammalar */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Pie Chart */}
-                <Card className="shadow-sm bg-white border border-gray-200">
-                    <CardHeader floated={false} shadow={false} className="bg-transparent">
-                        <Typography variant="h6" className="text-gray-800">
-                            Mahsulotlar ulushi (Pie Chart)
-                        </Typography>
-                    </CardHeader>
-                    <CardBody className="flex justify-center items-center h-[350px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={data}
-                                    dataKey="quantity"
-                                    nameKey="name"
-                                    outerRadius={110}
-                                    fill="#8884d8"
-                                    label={({ name }) => name}
-                                >
-                                    {data.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={COLORS[index % COLORS.length]}
-                                        />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: "#FFFFFF",
-                                        border: "1px solid #E5E7EB",
-                                        color: "#111111",
-                                        borderRadius: "8px",
-                                    }}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </CardBody>
-                </Card>
+                        <Select
+                            label="Oyni tanlang"
+                            value={month}
+                            onChange={(val) => setMonth(val)}
+                        >
+                            {[
+                                { id: "01", name: "Yanvar" },
+                                { id: "02", name: "Fevral" },
+                                { id: "03", name: "Mart" },
+                                { id: "04", name: "Aprel" },
+                                { id: "05", name: "May" },
+                                { id: "06", name: "Iyun" },
+                                { id: "07", name: "Iyul" },
+                                { id: "08", name: "Avgust" },
+                                { id: "09", name: "Sentabr" },
+                                { id: "10", name: "Oktabr" },
+                                { id: "11", name: "Noyabr" },
+                                { id: "12", name: "Dekabr" },
+                            ].map((m) => (
+                                <Option key={m.id} value={m.id}>
+                                    {m.name}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
 
-                {/* Bar Chart */}
-                <Card className="shadow-sm bg-white border border-gray-200">
-                    <CardHeader floated={false} shadow={false} className="bg-transparent">
-                        <Typography variant="h6" className="text-gray-800">
-                            Mahsulot soni (Bar Chart)
-                        </Typography>
-                    </CardHeader>
-                    <CardBody className="h-[350px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={data}>
-                                <XAxis dataKey="name" tick={{ fill: "#111" }} />
-                                <YAxis tick={{ fill: "#111" }} />
-                                <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: "#FFFFFF",
-                                        border: "1px solid #E5E7EB",
-                                        color: "#111111",
-                                        borderRadius: "8px",
-                                    }}
-                                />
-                                <Bar dataKey="quantity" fill="#111111" radius={[6, 6, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </CardBody>
-                </Card>
-            </div>
-
-            {/* Footer */}
-            <div className="mt-8 text-center text-sm text-gray-600">
-                <p>© 2025 Ombor tizimi. Barcha huquqlar himoyalangan.</p>
+                    <Button
+                        color="green"
+                        className="px-6"
+                        onClick={fetchAllData}
+                    >
+                        Filtrlash
+                    </Button>
+                </CardBody>
+            </Card>
+            <div className="grid lg:grid-cols-2 gap-8 mb-10">
+                <WarehouseMonyChart data={productSum} />
+                <WarehouseProduct data={productCount} />
             </div>
         </div>
     );

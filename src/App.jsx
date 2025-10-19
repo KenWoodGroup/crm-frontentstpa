@@ -23,6 +23,12 @@ import { warehouseRoutes } from "./routes/warehouseRoutes";
 import DilerLayout from "./layouts/DilerLayout";
 import { dilertoutes } from "./routes/dilerRoutes";
 import AppLayout from "./layouts/AppLayout";
+import CompanyLayout from "./layouts/CompanyLayout";
+import { companyRoutes } from "./routes/companyRoutes";
+import CompanyWarehouseLayout from "./layouts/CompanyWarehouseLayout";
+import { companyWarehouseRoutes } from "./routes/companyWarehouseRoutes";
+import CompanyDilerLayout from "./layouts/CompanyDilerLayout";
+import { companyDiler } from "./routes/companyDilerRoutes";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -86,6 +92,39 @@ function App() {
               // </ProtectedUsersRoute>
             }>
               {dilertoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              // <ProtectedUsersRoute>
+              <CompanyLayout />
+              // </ProtectedUsersRoute>
+            }>
+              {companyRoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              // <ProtectedUsersRoute>
+              <CompanyWarehouseLayout />
+              // </ProtectedUsersRoute>
+            }>
+              {companyWarehouseRoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              // <ProtectedUsersRoute>
+              <CompanyDilerLayout />
+              // </ProtectedUsersRoute>
+            }>
+              {companyDiler?.map((r) => {
                 return (
                   <Route key={r.name} path={r.path} element={r.element} />
                 )

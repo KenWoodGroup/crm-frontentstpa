@@ -28,6 +28,7 @@ export default function DilerDashboard() {
         { oy: "Iyul", summa: 7500000 },
         { oy: "Avg", summa: 8900000 },
         { oy: "Sen", summa: 10300000 },
+        
     ]);
 
     const [barData] = useState([

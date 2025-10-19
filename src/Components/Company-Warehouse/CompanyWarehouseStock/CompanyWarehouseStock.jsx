@@ -9,7 +9,7 @@ import { formatNumber } from "../../../utils/Helpers/Formater";
 import { io } from "socket.io-client";
 import { Info } from "lucide-react";
 
-export default function DilerStock() {
+export default function CompanyWarehouseStock() {
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [products, setProducts] = useState([]);
@@ -74,7 +74,6 @@ export default function DilerStock() {
         return () => socket.disconnect();
     }, [locationId]);
 
-    // 🔁 Подгрузка следующей страницы
     const loadNextPage = () => {
         const nextPage = page + 1;
         if (nextPage <= totalPages) {

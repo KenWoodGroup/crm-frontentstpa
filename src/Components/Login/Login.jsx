@@ -49,10 +49,9 @@ export default function Login() {
       const base_data = await Auth.Login({ email, password });
       console.log(base_data);
 
-      const { data } = base_data
-
+      const { data } = base_data;
       const { access_token, refresh_token } = data?.tokens || {};
-      const { id, role, location_id } = data?.newUser
+      const { id, role, location_id } = data?.newUser;
 
       Cookies.set("token", access_token);
       Cookies.set("refresh_token", refresh_token);
@@ -63,48 +62,47 @@ export default function Login() {
         factory: "SefwfmgrUID",
         company: "SefwfmgrUID",
         warehouse: "SesdsdfmgrUID",
+        dealer: "SwedsdfmgrUID",
       };
+
       const roleLinks = [
-        {
-          role: "super_admin",
-          vektor: "/"
-        },
-        {
-          role: "admin",
-          vektor: "/admin"
-        },
-        {
-          role: "factory",
-          vektor: "/factory/dashboard"
-        },
-        {
-          role: "company",
-          vektor: "/factory/dashboard"
-        },
-        {
-          role: "warehouse",
-          vektor: "/warehouse/dashboard"
-        },
-        {
-          role: "dealer",
-          vektor: "/diler/dashboard"
-        }
-      ]
+        { role: "super_admin", vektor: "/" },
+        { role: "admin", vektor: "/admin" },
+        { role: "factory", vektor: "/factory/dashboard" },
+        { role: "warehouse", vektor: "/warehouse/dashboard" },
+        { role: "dealer", vektor: "/diler/dashboard" },
+        { role: "company", vektor: "/company/dashboard" },
+      ];
 
       Cookies.set("nesw", roleMap[role] || "");
-      Cookies.set('us_nesw', id);
-      Cookies.set('ul_nesw', location_id);
-      Cookies.set('usd_nesw', data?.newUser?.location?.parent_id);
-      // Alert("Muvaffaqiyatli", "success");
-      notify.success("Login muvaffaqiyatli!")
-      // navigate('/');
-      const vektor_obj = roleLinks.find((item) => item.role === role);
-      navigate(vektor_obj?.vektor);
+      Cookies.set("us_nesw", id);
+      Cookies.set("ul_nesw", location_id);
+      Cookies.set("usd_nesw", data?.newUser?.location?.parent_id);
+
+      notify.success("Login muvaffaqiyatli!");
+
+      if (
+        data?.newUser?.location?.parent?.type === "company" &&
+        data?.newUser?.role === "warehouse"
+      ) {
+        navigate("/company-warehouse/dashboard");
+      } else if (data?.newUser?.location?.parent?.type === "company" &&
+        data?.newUser?.role === "dealer") {
+            
+      }
+      else {
+        const vektor_obj = roleLinks.find((item) => item.role === role);
+        navigate(vektor_obj?.vektor || "/");
+      }
       if (base_data?.status === 401) {
         console.log(base_data?.message || "Email yoki Parol xato");
       }
     } catch (err) {
-      setError(err?.message === "Request failed with status code 401" ? "Email yoki Parol xato" : "Tizim xatosi yuz berdi.");
+      setError(
+        err?.message === "Request failed with status code 401"
+          ? "Email yoki Parol xato"
+          : "Tizim xatosi yuz berdi."
+      );
     } finally {
       setLoading(false);
     }
