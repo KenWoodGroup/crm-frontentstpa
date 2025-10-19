@@ -1,12 +1,27 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
 import { useState } from "react";
-import { LayoutDashboard, Package, ChartCandlestick, Settings, Bell } from "lucide-react";
+import {
+    LayoutDashboard, Package, ChartCandlestick, Settings, Bell, PackagePlus,
+    PackageMinus,
+    Recycle,
+} from "lucide-react";
+
+import { DealerProvider, useDealer } from "../context/DealerContext";
+import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
+import useConfirmNavigation from "../hooks/useConfirmNavigation";
 
 export default function DilerLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(
         sessionStorage.getItem("sidebar") === "true"
     );
+    // simple detection: agar path stockout ni o'z ichiga olsa => out, aks holda in
+    const mode = location.pathname.includes("/diler/stockout")
+        ? "out"
+        : location.pathname.includes("/diler/disposal")
+            ? "dis"
+            : "in";
+
     const links = [
         {
 
@@ -23,12 +38,30 @@ export default function DilerLayout() {
         },
         {
             id: 3,
+            label: "Kirim",
+            path: "/diler/stockin",
+            icon:PackagePlus,
+        },
+        {
+            id:4,
+            label:"Outgoing",
+            path:"/diler/stockout",
+            icon:PackageMinus,
+        },
+        {
+            id:5,
+            label:"Chiqindi",
+            path:"diler/disposal",
+            icon:Recycle,
+        },
+        {
+            id: 6,
             label: "Notification",
             path: "/diler/notification",
             icon: Bell
         },
         {
-            id: 3,
+            id: 7,
             label: "Hisobot",
             path: "/diler/finance",
             icon: ChartCandlestick
@@ -41,8 +74,36 @@ export default function DilerLayout() {
             }`} >
             <SuperAdminSidebar links={links} role={"Diler"} onToggle={setSidebarOpen} />
             <div className="p-6">
-                <Outlet />
+                <DealerProvider mode={mode}>
+                    <InnerGuard>
+                        <Outlet />
+                    </InnerGuard>
+                </DealerProvider>
             </div>
         </div>
+    );
+}
+
+function InnerGuard({ children }) {
+    const location = useLocation(); // optional, saqlab qoldik agar kerak bo'lsa
+    const { mode, isDirty, saveSuccess, resetMode } = useDealer();
+
+    // modalni ko'rsatish sharti: joriy mode da saqlanmagan o'zgarishlar mavjud va hali saveSuccess bo'lmagan
+    const shouldPrompt = Boolean(isDirty?.[mode] && !saveSuccess?.[mode]);
+
+    const { showModal, handleConfirm, handleCancel } = useConfirmNavigation({
+        when: shouldPrompt,
+        clearAll: () => resetMode(mode) // confirm qilinsa joriy mode dagi state tozalanadi
+    });
+
+    return (
+        <>
+            {children}
+            <ConfirmModalNav
+                open={showModal}
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+            />
+        </>
     );
 }

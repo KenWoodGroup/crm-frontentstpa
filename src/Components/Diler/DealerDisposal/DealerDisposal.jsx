@@ -21,13 +21,13 @@ import { notify } from "../../../utils/toast";
 import { ProductApi } from "../../../utils/Controllers/ProductAPi";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
-import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
+import SelectBatchModal from "../../Warehouse/WareHouseModals/SelectBatchModal";
 import FolderOpenMessage from "../../UI/NoData/FolderOpen";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
-import { useWarehouse } from "../../../context/WarehouseContext";
+import { useDealer } from "../../../context/DealerContext";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -42,7 +42,7 @@ function useDebounce(value, delay) {
     return debounced;
 }
 
-export default function WareHouseDisposal() {
+export default function DealerDisposal() {
     // user / location
     const userLId = Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
@@ -67,7 +67,7 @@ export default function WareHouseDisposal() {
         setIsDirty,
         saveSuccess,
         setSaveSuccess,
-    } = useWarehouse();
+    } = useDealer();
 
     // local UI
     const [sidebarMode, setSidebarMode] = useState(0);
@@ -137,7 +137,7 @@ export default function WareHouseDisposal() {
     const fetchLocations = async () => {
         try {
             setLocationsLoading(true);
-            const res = await location.getAllGroupLocations(userLId);
+            const res = await location.getAllGroupLocations(Cookies.get("usd_nesw"));
             if (res?.status === 200 || res?.status === 201) {
                 setLocations(res.data || []);
                 // find disposal location automatically
