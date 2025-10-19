@@ -1,7 +1,6 @@
-// WareHouseIncome.jsx
-import React, { useEffect, useRef, useState, useReducer, useMemo, useCallback } from "react";
+// src/Components/Warehouse/WareHousePages/WareHouseOutcome.jsx
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Cookies from "js-cookie";
-import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, VerticalAlign } from "docx";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import {
@@ -17,25 +16,26 @@ import {
     Barcode as BarcodeIcon,
     Eraser,
     MinusCircle,
-    PlusCircle,
-    CheckSquare,
-    CheckCircle
+    CheckSquare
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
-import { ProductApi } from "../../../utils/Controllers/ProductApi";
+// import { ProductApi } from "../../../utils/Controllers/ProductApi";
+import { ProductApi } from "../../../utils/Controllers/ProductAPi";
 import { Spinner } from "@material-tailwind/react";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
+import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
 import FolderOpenMessage from "../../UI/NoData/FolderOpen";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
-// Utility: generate simple unique id (no external dep)
+import { useWarehouse } from "../../../context/WarehouseContext";
+
+// small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
-/* ---------- Hooks (local) ---------- */
-// Debounce hook (ms)
+// debounce hook
 function useDebounce(value, delay) {
     const [debounced, setDebounced] = useState(value);
     useEffect(() => {
@@ -45,62 +45,36 @@ function useDebounce(value, delay) {
     return debounced;
 }
 
-/* ---------- mixData reducer ---------- */
-function mixReducer(state, action) {
-    switch (action.type) {
-        case "SET":
-            return action.payload || [];
-        case "RESET":
-            return [];
-        case "ADD": {
-            const item = action.payload;
-            const idx = state.findIndex(
-                (p) =>
-                    (p.product_id && item.product_id && String(p.product_id) === String(item.product_id)) ||
-                    (p.barcode && item.barcode && String(p.barcode) === String(item.barcode))
-            );
-            if (idx !== -1) {
-                const copy = [...state];
-                copy[idx] = {
-                    ...copy[idx],
-                    quantity: Number(copy[idx].quantity || 0) + Number(item.quantity || 1),
-                    price: item.price ?? copy[idx].price ?? 0,
-                };
-                return copy;
-            } else {
-                const newItem = {
-                    id: item.id || generateId(),
-                    barcode: item.barcode || "",
-                    stock_id: item.stock_id || null,
-                    location_id: item.location_id || null,
-                    price: Number(item.price || 0),
-                    product: item.product || { id: item.product_id, name: item.name || "" },
-                    product_id: item.product_id || null,
-                    quantity: Number(item.quantity || 1),
-                };
-                return [...state, newItem];
-            }
-        }
-        case "UPDATE_QTY":
-            return state.map((it, i) => (i === action.index ? { ...it, quantity: Math.max(0, Number(action.value || 0)) } : it));
-        case "UPDATE_PRICE":
-            return state.map((it, i) => (i === action.index ? { ...it, price: Math.max(0, Number(action.value || 0)) } : it));
-        case "REMOVE":
-            return state.filter((_, i) => i !== action.index);
-        default:
-            return state;
-    }
-}
-
-/* ---------- Main component ---------- */
 export default function WareHouseOutcome() {
     // user / location
     const userLId = Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
 
-    // Sidebar state
-    const [sidebarMode, setSidebarMode] = useState(0); // 0=closed,1=25%,2=33.3%
-    const [viewMode, setViewMode] = useState("category"); // 'category'|'product'
+    // context (per-mode)
+    const {
+        mode, // should be "out" from WarehouseLayout
+        mixData,
+        addItem,
+        updateQty,
+        updatePrice,
+        removeItem,
+        resetAll,
+        resetMode,
+        invoiceStarted,
+        setInvoiceStarted,
+        invoiceId,
+        setInvoiceId,
+        invoiceMeta,
+        setInvoiceMeta,
+        isDirty,
+        setIsDirty,
+        saveSuccess,
+        setSaveSuccess,
+    } = useWarehouse();
+
+    // local UI
+    const [sidebarMode, setSidebarMode] = useState(0);
+    const [viewMode, setViewMode] = useState("category");
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [groupLoading, setGroupLoading] = useState(false);
     const [productLoading, setProductLoading] = useState(false);
@@ -113,31 +87,20 @@ export default function WareHouseOutcome() {
         return "w-1/3";
     };
     const toggleSidebar = () => {
-        if (!invoiceStarted) {
-            notify.info("Kategoriyalar orqali tovarlarni kiritish panelini ochish uchun Kirimni Boshlang");
-            return
+        if (!invoiceStarted?.[mode]) {
+            notify.info("Kategoriyalar panelini ochish uchun Chiqimni boshlang");
+            return;
         }
         setSidebarMode((p) => (p + 1) % 3);
-    }
+    };
     const isWide = sidebarMode === 2;
     const isMedium = sidebarMode === 1;
 
-    // Main content states
     const [locations, setLocations] = useState([]);
     const [locationsLoading, setLocationsLoading] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState("");
     const [otherLocationName, setOtherLocationName] = useState("");
-    const [invoiceStarted, setInvoiceStarted] = useState(false);
-    const [invoiceId, setInvoiceId] = useState(null);
     const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
-
-    // invoice meta
-    const [invoiceMeta, setInvoiceMeta] = useState({
-        sender: null,
-        receiver: "Me",
-        time: new Date().toLocaleString(),
-        total: 0,
-    });
 
     // search & barcode
     const [searchQuery, setSearchQuery] = useState("");
@@ -150,18 +113,17 @@ export default function WareHouseOutcome() {
     const [barcodeLoading, setBarcodeLoading] = useState(false);
     const barcodeRef = useRef(null);
 
-    // mixData — unified invoice items via reducer
-    const [mixData, dispatchMix] = useReducer(mixReducer, []);
-    const [saving, setSaving] = useState(false);
-    const [saveSuccess, setSaveSuccess] = useState(false);
+    const [batchModalOpen, setBatchModalOpen] = useState(false);
+    const [batchProducts, setBatchProducts] = useState([]);
 
-    // Modal states + refs for print & focus management
+    // modal / print / saving local
     const [modalOpen, setModalOpen] = useState(false);
-    const modalContentRef = useRef(null); // for print
+    const modalContentRef = useRef(null);
     const [printing, setPrinting] = useState(false);
+    const [saving, setSaving] = useState(false);
     const lastFocusedRef = useRef(null);
 
-    // ---------- Fetch categories ----------
+    // fetch categories & locations
     const fetchCategories = async () => {
         try {
             setGroupLoading(true);
@@ -176,7 +138,6 @@ export default function WareHouseOutcome() {
         }
     };
 
-    // ---------- Fetch locations ----------
     const fetchLocations = async () => {
         try {
             setLocationsLoading(true);
@@ -195,18 +156,19 @@ export default function WareHouseOutcome() {
         fetchLocations();
     }, []);
 
-    // keep invoice receiver current when locations load
+    // update invoiceMeta receiver for outgoing: receiver is selectedLocation, sender is current location
     useEffect(() => {
-        const name = getLocationNameById(userLId) || "Me";
-        setInvoiceMeta((p) => ({ ...p, receiver: name }));
-    }, [locations, userLId]);
+        const senderName = getLocationNameById(userLId) || "Me";
+        setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: senderName });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [locations]);
 
-    // ---------- Sidebar: get products by category ----------
     const handleCategoryClick = async (catId) => {
         setSelectedCategory(catId);
         setViewMode("product");
         try {
             setProductLoading(true);
+            // for outgoing, we fetch stocks of current location (we will take from this location)
             const res = await Stock.getLocationStocksByChildId(userLId, catId);
             if (res?.status === 200) setProducts(res.data || []);
             else setProducts(res?.data || []);
@@ -217,46 +179,43 @@ export default function WareHouseOutcome() {
         }
     };
 
-    // ---------- Start invoice (create) ----------
+    // start outgoing invoice
     const startInvoice = async () => {
+        // for outgoing: user selects receiver (where items go)
         if (!selectedLocation) {
-            notify.error("Iltimos, jo'natuvchini tanlang");
+            notify.error("Iltimos, qabul qiluvchini tanlang");
             return;
         }
         try {
-            setCreateInvoiceLoading(true)
+            setCreateInvoiceLoading(true);
+            const otherId = locations?.find((item)=> item.type === "other")?.id
             const payload = {
-                type: "transfer",
-                sender_id: userLId ,
-                receiver_id: selectedLocation === "other" ? null : selectedLocation,
                 created_by: createdBy,
-                status: "approved"
-                // Do not force 'approved' from client side - server should decide.
+                receiver_id: selectedLocation === "other"  ? otherId : selectedLocation,
+                // receiver_name: selectedLocation === "other" ? otherLocationName || "tashqi" : getLocationNameById(selectedLocation),
+                sender_id: userLId, // outgoing: sender is current location
+                // sender_name:getLocationNameById(userLId),
+                type: selectedLocation === "other" ? "outgoing" :  "transfer_outgoing",
+                status: "approved",
             };
             const res = await InvoicesApi.CreateInvoice(payload);
-
-            // robust id extraction
-            const invoice_id =
-                res?.data?.id ||
-                res?.data?.location?.id ||
-                res?.data?.invoice?.id ||
-                res?.data?.location_id ||
-                res?.data?.invoice_id;
+            const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
 
             if (res?.status === 200 || res?.status === 201) {
                 if (!invoice_id) {
                     notify.error("Server invoice id qaytarmadi");
                     throw new Error("Invoice id topilmadi");
                 }
-                setInvoiceId(invoice_id);
-                setInvoiceStarted(true);
-                setInvoiceMeta((p) => ({ ...p, sender: getLocationNameById(selectedLocation), receiver: getLocationNameById(userLId) || "Me" }));
-                notify.success("Kirim boshlandi");
+                setInvoiceId(mode, invoice_id);
+                setInvoiceStarted(mode, true);
+                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(userLId), receiver: selectedLocation !== "other" ? getLocationNameById(selectedLocation) : (otherLocationName || "Other") });
+                setIsDirty(mode, false);
+                notify.success("Chiqim boshlandi");
             } else {
                 throw new Error("Invoice yaratishda xato");
             }
         } catch (err) {
-            notify.error("Kirimni boshlashda xato: " + (err?.message || err));
+            notify.error("Chiqimni boshlashda xato: " + (err?.message || err));
         } finally {
             setCreateInvoiceLoading(false);
         }
@@ -269,7 +228,7 @@ export default function WareHouseOutcome() {
         return f ? f.name || f.address || "Location" : "";
     }
 
-    // ---------- Search products ----------
+    // search
     useEffect(() => {
         const doSearch = async () => {
             if (!debouncedSearch?.trim()) {
@@ -278,10 +237,7 @@ export default function WareHouseOutcome() {
             }
             try {
                 setSearchLoading(true);
-                const data = {
-                    locationId: userLId,
-                    search: debouncedSearch.trim(),
-                };
+                const data = { locationId: userLId, search: debouncedSearch.trim() };
                 const res = await Stock.getLocationStocksBySearch({ data });
                 if (res?.status === 200 || res?.status === 201) setSearchResults(res.data || []);
             } catch (err) {
@@ -293,47 +249,61 @@ export default function WareHouseOutcome() {
         doSearch();
     }, [debouncedSearch, userLId]);
 
-    // ---------- Barcode (debounced) ----------
+    // barcode
     const handleClickOutside = useCallback((e) => {
         if (barcodeRef.current && !barcodeRef.current.contains(e.target)) {
             setBarcodeEnabled(false);
         }
     }, []);
     useEffect(() => {
-        if (barcodeEnabled && barcodeRef.current) {
-            barcodeRef.current.focus();
-        }
+        if (barcodeEnabled && barcodeRef.current) barcodeRef.current.focus();
     }, [barcodeEnabled]);
 
-    // 2️⃣ Agar foydalanuvchi inputdan chiqsa, rejim o‘chadi
     useEffect(() => {
-
-        if (barcodeEnabled) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
+        if (barcodeEnabled) document.addEventListener("mousedown", handleClickOutside);
+        else document.removeEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
     }, [barcodeEnabled, handleClickOutside]);
+
     useEffect(() => {
         const val = debouncedBarcode?.replace?.(/\D/g, "") || "";
         if (!barcodeEnabled || !val) return;
-        if (val.length === 13) {
-            fetchByBarcode(val);
-        }
+        if (val.length === 13) fetchByBarcode(val);
     }, [debouncedBarcode, barcodeEnabled]);
 
+    const addItemToMixDataByBatchModal = (item) => {
+        addItemToMixData(item);
+        notify.success(item.product.name + " qo'shildi");
+    };
+
     const fetchByBarcode = async (code) => {
+        const barcodeMode = localStorage.getItem("barcodeMode");
         try {
             setBarcodeLoading(true);
             let res = await Stock.getByBarcode(code);
             if (res?.status === 200 || res?.status === 201) {
-                // add item (normalize inside add)
-                addItemToMixData(res.data);
-                setBarcodeInput("");
+                const data = res.data;
+                if (!data || data.length === 0) {
+                    notify.error("Barcode bo'yicha mahsulot topilmadi");
+                } else if (data.length === 1) {
+                    const readyData = data[0];
+                    addItemToMixData(readyData);
+                    notify.success(readyData.product.name + " qo'shildi");
+                    setBarcodeInput("");
+                } else {
+                    if (barcodeMode === "auto") {
+                        const lastBatch = data[0];
+                        addItemToMixData(lastBatch);
+                        notify.success(lastBatch.product.name + " qo'shildi");
+                        setBarcodeInput("");
+                    } else {
+                        setBatchProducts(data);
+                        setBarcodeInput("");
+                        setBatchModalOpen(true);
+                    }
+                }
             } else {
-                notify.error("Barcode bo'yicha mahsulot topilmadi");
+                notify.error("Barcode topishda xatolik");
             }
         } catch (err) {
             notify.error("Barcode xatosi: " + (err?.message || err));
@@ -342,69 +312,74 @@ export default function WareHouseOutcome() {
         }
     };
 
-    // ---------- Normalize & add to mixData ----------
+    // normalize (ensure stock_quantity available for outgoing)
     function normalizeIncomingItem(raw) {
-        const productObj = raw.product || raw.product_data || {};
+        const productObj = raw.product || {};
         return {
-            id: raw.id || raw.stock_id || generateId(),
-            barcode: raw.barcode || productObj.barcode || raw.code || "",
-            stock_id: raw.id || raw.stock_id || null,
-            location: raw.location || raw.location_data || null,
-            location_id: raw.location?.id || raw.location_id || null,
-            price: Number(raw.price ?? productObj.price ?? 0),
+            id: raw.id || generateId(),
+            barcode: raw.barcode || "",
+            stock_id: raw.id || null,
+            location_id: raw.location_id || null,
+            price: Number(raw.price) || 0,
             product: productObj,
-            product_id: raw.product_id || productObj.id || null,
+            product_id: raw.product.id || null,
             quantity: Number(raw.quantity ?? 1) || 1,
-            name: raw.name || productObj.name || "",
+            name: raw.product.name || "",
+            batch: raw.batch ?? null,
+            // is_new_batch: false, // not used in outgoing but keep field
             raw,
+            origin_price: Number(raw.price ?? 0),
+            stock_quantity: raw.quantity ?? undefined,
         };
     }
 
     function addItemToMixData(raw) {
         const item = normalizeIncomingItem(raw);
-        dispatchMix({ type: "ADD", payload: item });
+        const res = addItem(item);
+        if (res && res.ok === false) notify.error(res.message || "Item qo'shilmadi");
     }
 
-    // ---------- recalcTotal via useMemo ----------
+    /// // ---------- recalcTotal ----------
     const total = useMemo(() => {
-        return mixData.reduce((s, it) => s + Number(it.price || 0) * Number(it.quantity || 0), 0);
+        const safeNum = (v) =>
+            v === "" || v == null || isNaN(Number(v)) ? 0 : Number(v);
+        return mixData.reduce(
+            (sum, it) => sum + safeNum(it.price) * safeNum(it.quantity),
+            0
+        );
     }, [mixData]);
 
-    useEffect(() => {
-        setInvoiceMeta((p) => ({ ...p, total }));
-    }, [total]);
+    // handlers
+    const onSidebarProductClick = (prodStock) => addItemToMixData(prodStock);
+    const onSelectSearchResult = (r) => addItemToMixData(r);
 
-    // ---------- Click handlers ----------
-    const onSidebarProductClick = (prodStock) => {
-        addItemToMixData(prodStock);
-    };
-    const onSelectSearchResult = (r) => {
-        addItemToMixData(r);
-    };
-
-    // ---------- Table handlers ----------
-    function updateQuantity(index, value) {
-        dispatchMix({ type: "UPDATE_QTY", index, value });
+    function handleUpdateQuantity(index, value) {
+        if (value === "" || Number(value) > 0 || value === "0") {
+            updateQty(index, value); // provider will clamp based on stock_quantity
+        }
     }
-    function updatePrice(index, value) {
-        dispatchMix({ type: "UPDATE_PRICE", index, value });
+    function handleUpdatePrice(index, value) {
+        if (value === "" || Number(value) >= 0) {
+            updatePrice(index, value);
+            // outgoing: do NOT create new batch on price change
+        }
     }
-    function removeItem(index) {
-        dispatchMix({ type: "REMOVE", index });
+    function handleRemoveItem(index) {
+        removeItem(index);
     }
 
-    // ---------- Save invoice items (returns boolean) ----------
+    // save items
     const saveInvoiceItems = async () => {
-        if (!invoiceId) {
+        const currentInvoiceId = invoiceId?.[mode];
+        if (!currentInvoiceId) {
             notify.error("Invoice ID mavjud emas");
             return false;
         }
-        if (mixData.length === 0) {
+        if (!mixData || mixData.length === 0) {
             notify.error("Hech qanday mahsulot qo'shilmagan");
             return false;
         }
 
-        // Validation: ensure qty and price non-negative and something to save
         const invalid = mixData.some((it) => Number(it.quantity) <= 0);
         if (invalid) {
             notify.error("Barcha mahsulotlar uchun miqdor 0 dan katta bo‘lishi kerak");
@@ -415,19 +390,21 @@ export default function WareHouseOutcome() {
             setSaving(true);
             const payload = {
                 list: mixData.map((it) => ({
-                    invoice_id: invoiceId,
+                    invoice_id: currentInvoiceId,
                     product_id: it.product_id || null,
                     quantity: Number(it.quantity || 0),
                     price: Number(it.price || 0),
                     barcode: it.barcode || "",
-                    is_new_batch:false
+                    is_new_batch: false,
+                    batch: it.batch
                 })),
             };
 
             const res = await InvoiceItems.createInvoiceItems(payload);
 
             if (res?.status === 200 || res?.status === 201) {
-                setSaveSuccess(true);
+                setSaveSuccess(mode, true);
+                setIsDirty(mode, false);
                 notify.success("Saqlash muvaffaqiyatli");
                 return true;
             } else {
@@ -441,176 +418,41 @@ export default function WareHouseOutcome() {
         }
     };
 
-    // ---------- Download invoice (docx/xlsx) ----------
-    const downloadInvoice = async (type = "docx") => {
-        if (!invoiceStarted) {
-            notify.error("Invoice hali boshlanmagan");
-            return;
-        }
-        const sanitize = (s = "") =>
-            String(s)
-                .replace(/\s+/g, "_")
-                .replace(/[^a-zA-Z0-9_\-\.]/g, "")
-                .substring(0, 80);
-
-        const senderName = invoiceMeta.sender || "Sender";
-        const receiverName = invoiceMeta.receiver || "Receiver";
-        const totalStr = (Number(invoiceMeta.total || 0)).toLocaleString?.() ?? String(invoiceMeta.total || 0);
-        const baseName = `${sanitize(senderName)}_to_${sanitize(receiverName)}_${sanitize(totalStr)}_kirim`;
-
-        const headers = ["#", "Nomi", "Barcode", "Narx", "Miqdor", "Jami"];
-        const rows = mixData.map((it, idx) => {
-            const name = it.product?.name || it.product?.title || it.name || "—";
-            const barcode = it.barcode || "";
-            const price = Number(it.price || 0);
-            const qty = Number(it.quantity || 0);
-            const lineTotal = price * qty;
-            return {
-                idx: idx + 1,
-                name,
-                barcode,
-                price,
-                qty,
-                lineTotal,
-            };
-        });
-
-        try {
-            if (type === "docx") {
-                const doc = new Document({
-                    sections: [
-                        {
-                            properties: {},
-                            children: [
-                                new Paragraph({
-                                    children: [new TextRun({ text: "KIRIM HUJJATI", bold: true, size: 36 })],
-                                    heading: HeadingLevel.HEADING_1,
-                                    alignment: AlignmentType.CENTER,
-                                    spacing: { after: 200 },
-                                }),
-                                new Paragraph({ children: [new TextRun({ text: `Jo'natuvchi: `, bold: true }), new TextRun({ text: `${senderName}` })] }),
-                                new Paragraph({ children: [new TextRun({ text: `Qabul qiluvchi: `, bold: true }), new TextRun({ text: `${receiverName}` })] }),
-                                new Paragraph({ children: [new TextRun({ text: `Vaqt: `, bold: true }), new TextRun({ text: `${invoiceMeta.time || new Date().toLocaleString()}` })] }),
-                                new Paragraph({ children: [new TextRun({ text: `Umumiy: `, bold: true }), new TextRun({ text: `${totalStr} сум` })], spacing: { after: 300 } }),
-
-                                (() => {
-                                    const tableRows = [];
-                                    const headerCells = headers.map((h) =>
-                                        new TableCell({
-                                            width: { size: 1000, type: WidthType.DXA },
-                                            verticalAlign: VerticalAlign.CENTER,
-                                            children: [
-                                                new Paragraph({
-                                                    children: [new TextRun({ text: h, bold: true })],
-                                                    alignment: AlignmentType.CENTER,
-                                                }),
-                                            ],
-                                            margins: { top: 100, bottom: 100 },
-                                        })
-                                    );
-                                    tableRows.push(new TableRow({ children: headerCells }));
-                                    rows.forEach((r) => {
-                                        const cells = [
-                                            new TableCell({ children: [new Paragraph(String(r.idx))] }),
-                                            new TableCell({ children: [new Paragraph(r.name)] }),
-                                            new TableCell({ children: [new Paragraph(r.barcode || "")] }),
-                                            new TableCell({ children: [new Paragraph(String(r.price))] }),
-                                            new TableCell({ children: [new Paragraph(String(r.qty))] }),
-                                            new TableCell({ children: [new Paragraph(String(r.lineTotal))] }),
-                                        ];
-                                        tableRows.push(new TableRow({ children: cells }));
-                                    });
-                                    const totalCells = [
-                                        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: " ", })] }),], columnSpan: 4 }),
-                                        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Jami", bold: true })], alignment: AlignmentType.RIGHT })] }),
-                                        new TableCell({ children: [new Paragraph(String(Number(invoiceMeta.total || 0)))] }),
-                                    ];
-                                    tableRows.push(new TableRow({ children: totalCells }));
-                                    return new Table({ rows: tableRows, width: { size: 100, type: WidthType.PERCENTAGE } });
-                                })(),
-
-                                new Paragraph({ children: [], spacing: { before: 300 } }),
-                                new Paragraph({ children: [new TextRun({ text: "\n\nJo'natuvchi imzo: ______________________", })] }),
-                                new Paragraph({ children: [new TextRun({ text: "Qabul qiluvchi imzo: ______________________", })] }),
-                            ],
-                        },
-                    ],
-                });
-
-                const blob = await Packer.toBlob(doc);
-                saveAs(blob, `${baseName}.docx`);
-                notify.success(".docx fayl generatsiya qilindi");
-            } else {
-                const aoa = [];
-                aoa.push(["Kirim hujjati"]);
-                aoa.push([]);
-                aoa.push(["Jo'natuvchi", senderName, "", "Qabul qiluvchi", receiverName]);
-                aoa.push(["Vaqt", invoiceMeta.time || new Date().toLocaleString()]);
-                aoa.push(["Umumiy", totalStr]);
-                aoa.push([]);
-                aoa.push(headers);
-                rows.forEach((r) => {
-                    aoa.push([r.idx, r.name, r.barcode, r.price, r.qty, r.lineTotal]);
-                });
-                aoa.push([]);
-                aoa.push(["", "", "", "Jami", "", Number(invoiceMeta.total || 0)]);
-                const ws = XLSX.utils.aoa_to_sheet(aoa);
-                const max_length = (arr) =>
-                    arr.reduce((m, v) => Math.max(m, String(v || "").length), 0);
-                const cols = [
-                    { wch: Math.max(4, max_length(aoa.map((r) => r[0]))) },
-                    { wch: Math.max(10, max_length(aoa.map((r) => r[1]))) },
-                    { wch: Math.max(8, max_length(aoa.map((r) => r[2]))) },
-                    { wch: Math.max(8, max_length(aoa.map((r) => r[3]))) },
-                    { wch: Math.max(6, max_length(aoa.map((r) => r[4]))) },
-                    { wch: Math.max(8, max_length(aoa.map((r) => r[5]))) },
-                ];
-                ws["!cols"] = cols;
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Kirim");
-                const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-                const blob = new Blob([wbout], { type: "application/octet-stream" });
-                saveAs(blob, `${baseName}.xlsx`);
-                notify.success(".xlsx fayl generatsiya qilindi");
-            }
-        } catch (err) {
-            console.error("Download xatosi:", err);
-            notify.error("Fayl generatsiya qilishda xatolik: " + (err?.message || err));
-        }
-    };
-
-    // realtime time update (only when invoice started)
+    // modal actions (time update only when invoice started)
     useEffect(() => {
-        if (!invoiceStarted) return;
+        if (!invoiceStarted?.[mode]) return;
         const t = setInterval(() => {
-            setInvoiceMeta((p) => ({ ...p, time: new Date().toLocaleString() }));
+            setInvoiceMeta(mode, { ...invoiceMeta?.[mode], time: new Date().toLocaleString() });
         }, 1000);
         return () => clearInterval(t);
-    }, [invoiceStarted]);
+    }, [invoiceStarted?.[mode]]); // eslint-disable-line
 
-    // ---------- Modal handlers (focus trap + ESC) ----------
     useEffect(() => {
         const onKey = (e) => {
-            if (e.key === "Escape" && modalOpen) {
-                closeModal();
-            }
+            if (e.key === "Escape" && modalOpen) closeModal();
         };
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
     }, [modalOpen]);
 
     const openModal = () => {
-        if (!invoiceStarted) {
+        if (!invoiceStarted?.[mode]) {
             notify.error("Invoice hali boshlanmagan");
             return;
-        } else if (mixData.length === 0) {
+        } else if (!mixData || mixData.length === 0) {
             notify.error("Hech qanday mahsulot qo'shilmagan");
+            return;
+        }
+        const value_spaces = mixData.filter((item) => item.price === "" || (item.quantity === "" || item.quantity === 0));
+        if (value_spaces.length > 0) {
+            value_spaces.forEach((err) => {
+                notify.warning(err.product?.name + " tovar uchun " + (err.price === "" ? "Narx kiriting" : "Miqdor kiriting"));
+            });
             return;
         }
         lastFocusedRef.current = document.activeElement;
         setModalOpen(true);
         setTimeout(() => {
-            // focus first focusable element in modal
             const el = modalContentRef.current?.querySelector("button, [href], input, select, textarea, [tabindex]");
             if (el) el.focus();
         }, 100);
@@ -619,20 +461,19 @@ export default function WareHouseOutcome() {
     const closeModal = () => {
         setModalOpen(false);
         setTimeout(() => {
-            try {
-                lastFocusedRef.current?.focus?.();
-            } catch (err) { /* ignore */ }
+            try { lastFocusedRef.current?.focus?.(); } catch (e) { }
         }, 50);
     };
 
     const handleModalSave = async () => {
         const ok = await saveInvoiceItems();
         if (ok) {
+            resetAllBaseForNewInvoice();
             setModalOpen(false);
         }
     };
 
-    // ---------- Print: recommended approach (open new window with content) ----------
+    // print
     const handlePrint = async () => {
         if (!modalContentRef.current) {
             notify.warning("print content yo'q");
@@ -656,45 +497,39 @@ export default function WareHouseOutcome() {
                 h1 { text-align: center; font-size: 18px; margin-bottom: 6px; }
                 .meta { margin-bottom: 12px; }
                 .meta div { margin-bottom: 4px; }
-                @media print {
-                  body { -webkit-print-color-adjust: exact; }
-                }
+                @media print { body { -webkit-print-color-adjust: exact; } }
               </style>
             `;
             printWindow.document.open();
-            printWindow.document.write(`<html><head><title>KIRIM HUJJATI</title>${style}</head><body>${content}</body></html>`);
+            printWindow.document.write(`<html><head><title>CHIQQIM HUJJATI</title>${style}</head><body>${content}</body></html>`);
             printWindow.document.close();
-            // ensure fonts/images render
             printWindow.onload = () => {
                 printWindow.focus();
                 printWindow.print();
-                // do not auto-close — user may want to save; but closing is optional:
-                // setTimeout(() => printWindow.close(), 500);
                 setPrinting(false);
             };
-            // fallback in case onload doesn't fire
-            setTimeout(() => {
-                try {
-                    printWindow.focus();
-                    printWindow.print();
-                } catch (e) { /* ignore */ }
-                setPrinting(false);
-            }, 1500);
+            setTimeout(() => { try { printWindow.focus(); printWindow.print(); } catch (e) { } setPrinting(false); }, 1500);
         } catch (err) {
             notify.error("Print xatosi: " + (err?.message || err));
             setPrinting(false);
         }
     };
 
-    // ---------- UI ----------
-
-    // small responsive helper classes for tablet-friendly touch targets
     const touchBtn = "min-h-[44px] px-4 py-3";
+
+    function resetAllBaseForNewInvoice() {
+        resetAll();
+        setSelectedLocation("");
+        setOtherLocationName("");
+        setSearchResults([]);
+        setSearchQuery("");
+        setSidebarMode(0);
+    }
 
     return (
         <section className="relative w-full min-h-screen bg-white overflow-hidden">
-            <div className="fixed top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
-                Warehouse Income
+            <div className="fixed text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
+                Warehouse Outcome <a href="/login" className="ml-4 text-sm text-gray-700">Login</a>
             </div>
 
             {/* Sidebar */}
@@ -719,6 +554,7 @@ export default function WareHouseOutcome() {
                         </div>
                     )}
                 </div>
+
                 {(isMedium || isWide) && (
                     <div className={`overflow-y-auto p-3 grid gap-3 overflow-x-scroll grid-cols-[repeat(auto-fill,minmax(auto,1fr))]`}>
                         {viewMode === "category" ? (
@@ -744,7 +580,7 @@ export default function WareHouseOutcome() {
                         ) : (
                             <FolderOpenMessage text={"Iltimos, mahsulotlarni ko‘rish uchun kategoriya tanlang."} icon={<FolderOpen className="w-10 h-10 mb-3 text-gray-400" />} />
                         ) : (
-                            products.map((prod) => (
+                            products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod) => (
                                 <button key={prod.id || prod.stock_id || prod.product?.id || generateId()} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
                                     <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-3 min-w-[180px] transition">
                                         <div className="p-1 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
@@ -752,7 +588,13 @@ export default function WareHouseOutcome() {
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                                             </svg>
                                         </div>
-                                        <span className="text-gray-800 font-medium whitespace-nowrap">{prod.product?.name || prod.name || "No name"}</span>
+                                        <div>
+                                            <span className="text-gray-900 font-medium whitespace-nowrap">{prod.product?.name || prod.name || "No name"}</span>
+                                            <div className="flex items-center justify-center gap-2 text-gray-800 font-medium whitespace-nowrap">
+                                                <span>Partiya: {prod.batch === null ? "Default" : prod.batch}</span>
+                                                <span>Shtrix: {prod.barcode || "undefined"}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </button>
                             ))
@@ -765,16 +607,18 @@ export default function WareHouseOutcome() {
             <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
                 <div className="bg-gray-100 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
                     {/* HEAD */}
-                    {!invoiceStarted ? (
+                    {!invoiceStarted?.[mode] ? (
                         <div className="h-[65px] bg-white rounded-lg flex items-center gap-4 px-3 shadow-sm">
                             <div className="flex items-center gap-2">
                                 {locationsLoading ? (
                                     <div className="flex items-center gap-2"><Spinner /> Loading...</div>
                                 ) : (
-                                    <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                        <option value="">Jo'natuvchini tanlang</option>
-                                        {locations.filter((item) => String(item.id) !== String(userLId)).map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
-                                        <option value="other">Tashqi (Other)</option>
+                                    <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Receiver location">
+                                        <option value="">{/* outgoing placeholder */}Qabul qiluvchini tanlang</option>
+                                        {locations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
+                                        <option  value="other">
+                                            {locations.find((item) => item.type === "other")?.name}
+                                        </option>
                                     </select>
                                 )}
 
@@ -784,14 +628,14 @@ export default function WareHouseOutcome() {
                             </div>
 
                             <div className="ml-auto">
-                                <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-black text-white rounded hover:opacity-95`} aria-label="Start invoice">
+                                <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
                                     {
                                         !createInvoiceLoading ?
                                             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                                             </svg> :
-                                            <Spinner/>
+                                            <Spinner />
                                     }
-                                    Kirimni boshlash
+                                    Chiqimni boshlash
                                 </button>
                             </div>
                         </div>
@@ -827,24 +671,24 @@ export default function WareHouseOutcome() {
                     )}
 
                     {/* Invoice info & body */}
-                    {invoiceStarted && (
+                    {invoiceStarted?.[mode] && (
                         <>
                             <div className="bg-white rounded-lg p-3 shadow-sm flex items-center gap-6">
                                 <div>
                                     <div className="text-xs text-gray-500">Jo'natuvchi</div>
-                                    <div className="font-medium">{invoiceMeta.sender || "—"}</div>
+                                    <div className="font-medium">{invoiceMeta?.[mode]?.sender || getLocationNameById(userLId)}</div>
                                 </div>
                                 <div>
                                     <div className="text-xs text-gray-500">Qabul qiluvchi</div>
-                                    <div className="font-medium">{invoiceMeta.receiver}</div>
+                                    <div className="font-medium">{invoiceMeta?.[mode]?.receiver}</div>
                                 </div>
                                 <div>
                                     <div className="text-xs text-gray-500">Vaqt</div>
-                                    <div className="font-medium">{invoiceMeta.time}</div>
+                                    <div className="font-medium">{invoiceMeta?.[mode]?.time}</div>
                                 </div>
                                 <div className="ml-auto text-right">
                                     <div className="text-xs text-gray-500">Umumiy qiymat</div>
-                                    <div className="font-semibold text-lg">{invoiceMeta.total?.toLocaleString?.() ?? invoiceMeta.total} сум</div>
+                                    <div className="font-semibold text-lg">{Number(total || 0).toLocaleString()} сум</div>
                                 </div>
                             </div>
 
@@ -869,10 +713,13 @@ export default function WareHouseOutcome() {
                                     <div className="text-gray-500">Natija topilmadi</div>
                                 ) : (
                                     <div className="flex gap-3 flex-wrap">
-                                        {searchResults.map((r) => (
+                                        {searchResults.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((r) => (
                                             <button key={r.id || r.stock_id || generateId()} onClick={() => onSelectSearchResult(r)} className="bg-white border rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px]">
                                                 <div className="text-sm font-medium">{r.product?.name || r.name}</div>
-                                                <div className="text-xs text-gray-400">{r.barcode || ""}</div>
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <div className="text-xs text-gray-600">Shtrix: {r.barcode || ""}</div>
+                                                    <div className="text-xs text-gray-600">Partiya: {r.batch === null ? "Default" : r.batch}</div>
+                                                </div>
                                             </button>
                                         ))}
                                     </div>
@@ -884,86 +731,65 @@ export default function WareHouseOutcome() {
                                     <thead className="text-left text-xs text-gray-500 border-b">
                                         <tr>
                                             <th className="p-2">#</th>
+                                            <th>Partiya</th>
                                             <th className="p-2">Nomi</th>
                                             <th className="p-2">Narx</th>
                                             <th className="p-2">Miqdor</th>
+                                            <th className="p-2">Omborda</th>
+                                            <th className="p-2">Birlik</th>
                                             <th className="p-2">Jami</th>
                                             <th className="p-2">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {mixData.length === 0 ? (
-                                            <tr><td colSpan={6} className="p-4 text-center text-gray-400">Mahsulotlar mavjud emas</td></tr>
-                                        ) : mixData.map((it, idx) => (
-                                            <tr key={it.id || idx} className="border-b">
-                                                <td className="p-2 align-top">{idx + 1}</td>
-                                                <td className="p-2 align-top">
-                                                    <div className="font-medium">{it.product?.name || it.name || "—"}</div>
-                                                    <div className="text-xs text-gray-400">{it.barcode}</div>
-                                                </td>
-                                                <td className="p-2 align-top w-[140px]">
-                                                    <input type="number" min={0} step="any" value={it.price} onChange={(e) => updatePrice(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
-                                                </td>
-                                                <td className="p-2 align-top w-[120px]">
-                                                    <input type="number" min={0} step="1" value={it.quantity} onChange={(e) => updateQuantity(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
-                                                </td>
-                                                <td className="p-2 align-top">
-                                                    {(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}
-                                                </td>
-                                                <td className="p-2 align-top">
-                                                    <button
-                                                        onClick={() => removeItem(idx)}
-                                                        className="p-2 text-gray-800 hover:text-red-500 active:scale-90 transition-all duration-200"
-                                                        title="Remove row"
-                                                        aria-label={`Remove item ${idx + 1}`}
-                                                    >
-                                                        <MinusCircle size={22} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {(!mixData || mixData.length === 0) ? (
+                                            <tr><td colSpan={8} className="p-4 text-center text-gray-400">Mahsulotlar mavjud emas</td></tr>
+                                        ) : mixData.map((it, idx) => {
+                                            const stockAvail = Number(it.stock_quantity ?? Infinity);
+                                            const qty = Number(it.quantity ?? 0);
+                                            const qtyError = Number.isFinite(stockAvail) && qty > stockAvail;
+                                            return (
+                                                <tr key={it.id || idx} className="border-b">
+                                                    <td className="p-2 align-center">{idx + 1}</td>
+                                                    <td className="p-2 align-center">
+                                                        {/* no is_new_batch UI for outgoing */}
+                                                        <div className="text-[14px] text-gray-700">{it.batch ?? "Default"}</div>
+                                                    </td>
+                                                    <td className="p-2 align-top">
+                                                        <div className="font-medium">{it.product?.name || it.name || "—"}</div>
+                                                        <div className="text-xs text-gray-500">{it.barcode}</div>
+                                                    </td>
+                                                    <td className="p-2 align-center w-[140px]">
+                                                        <input type="number" step="any" value={it.price ?? ""} onChange={(e) => handleUpdatePrice(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
+                                                    </td>
+                                                    <td className="p-2 align-center w-[120px]">
+                                                        <input type="number" step="any" value={it.quantity} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
+                                                    </td>
+                                                    <td className="p-2 aligin-center text-green-900">
+                                                        {Number.isFinite(stockAvail) && <div> {stockAvail}</div>}
+                                                    </td>
+                                                    <td className="p-2 align-center w-[120px]">{it.product?.unit || "-"}</td>
+                                                    <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
+                                                    <td className="p-2 align-center">
+                                                        <div className="flex gap-2 items-center">
+                                                            <button onClick={() => handleRemoveItem(idx)} className="p-2 text-gray-800 hover:text-red-500 active:scale-90 transition-all duration-200" title="Remove row" aria-label={`Remove item ${idx + 1}`}>
+                                                                <MinusCircle size={22} />
+                                                            </button>
+                                                            {qtyError && <div className="text-xs text-red-600">Miqdor ombordagi ({stockAvail}) dan oshdi</div>}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
 
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
-                                    {saveSuccess ?
-                                        <button className={`${touchBtn} flex items-center gap-2 bg-[rgb(68,210,25)] text-white text-[16px] rounded hover:opacity-95`}>
-                                            <CheckCircle size={22} />
-                                            Yakunlandi
-                                        </button> :
-                                        <button onClick={openModal} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white text-[16px] rounded hover:opacity-95`}>
-                                            <CheckSquare size={22} />
-                                            Yakunlash
-                                        </button>
-                                    }
-
-                                    {saveSuccess && (
-                                        <button onClick={() => {
-                                            // reset flow
-                                            setInvoiceStarted(false);
-                                            setInvoiceId(null);
-                                            dispatchMix({ type: "RESET" });
-                                            setSaveSuccess(false);
-                                            setSelectedLocation("");
-                                            setOtherLocationName("");
-                                            setInvoiceMeta((p) => ({ ...p, total: 0 }));
-                                            setSearchResults([])
-                                        }}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded bg-[rgb(25_118_210)] text-white`}>
-                                            <PlusCircle size={16} />
-                                            Yangi kirimni boshlash
-                                        </button>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center gap-2 ml-auto">
-                                    <button onClick={() => downloadInvoice("docx")} className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded hover:bg-gray-300" aria-label="Download docx">
-                                        <Download size={14} /> Download .docx
-                                    </button>
-                                    <button onClick={() => downloadInvoice("excel")} className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded hover:bg-gray-300" aria-label="Download xlsx">
-                                        <Download size={14} /> Download .xlsx
+                                    <button onClick={openModal} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white text-[16px] rounded hover:opacity-95`}>
+                                        <CheckSquare size={22} />
+                                        Yakunlash
                                     </button>
                                 </div>
                             </div>
@@ -972,19 +798,18 @@ export default function WareHouseOutcome() {
                 </div>
             </div>
 
-            {/* ---------- Modal (centered, A4 preview) ---------- */}
+            {/* Modal */}
             {modalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
                     <div className="bg-white rounded shadow-lg w-[210mm] max-w-full max-h-[95vh] overflow-auto p-6" aria-live="polite">
                         <div id="modal_window" ref={modalContentRef}>
-                            {/* A4 preview content */}
                             <div style={{ width: "100%", boxSizing: "border-box" }}>
-                                <h1 id="modal-title" className="text-center text-lg font-bold">KIRIM HUJJATI</h1>
+                                <h1 id="modal-title" className="text-center text-lg font-bold">CHIQQIM HUJJATI</h1>
                                 <div className="meta">
-                                    <div><strong>Jo'natuvchi:</strong> {invoiceMeta.sender || "—"}</div>
-                                    <div><strong>Qabul qiluvchi:</strong> {invoiceMeta.receiver || "—"}</div>
-                                    <div><strong>Vaqt:</strong> {invoiceMeta.time || new Date().toLocaleString()}</div>
-                                    <div><strong>Umumiy:</strong> {Number(invoiceMeta.total || 0).toLocaleString()} сум</div>
+                                    <div><strong>Jo'natuvchi:</strong> {invoiceMeta?.[mode]?.sender || getLocationNameById(userLId)}</div>
+                                    <div><strong>Qabul qiluvchi:</strong> {invoiceMeta?.[mode]?.receiver || "—"}</div>
+                                    <div><strong>Vaqt:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
+                                    <div><strong>Umumiy:</strong> {Number(total || 0).toLocaleString()} сум</div>
                                 </div>
 
                                 <div className="overflow-x-auto">
@@ -1012,7 +837,7 @@ export default function WareHouseOutcome() {
                                             ))}
                                             <tr>
                                                 <td colSpan={5} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>Jami</td>
-                                                <td style={{ border: "1px solid #333", padding: 6 }}>{Number(invoiceMeta.total || 0).toLocaleString()}</td>
+                                                <td style={{ border: "1px solid #333", padding: 6 }}>{Number(total || 0).toLocaleString()}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1025,7 +850,6 @@ export default function WareHouseOutcome() {
                             </div>
                         </div>
 
-                        {/* Modal actions */}
                         <div className="mt-4 flex justify-end gap-2">
                             <button onClick={closeModal} className="px-4 py-2 rounded border hover:bg-gray-100">Cancel</button>
                             <button onClick={handleModalSave} disabled={saving} className="px-4 py-2 rounded bg-black text-white disabled:opacity-60">
@@ -1038,6 +862,13 @@ export default function WareHouseOutcome() {
                     </div>
                 </div>
             )}
+
+            <SelectBatchModal
+                isOpen={batchModalOpen}
+                onClose={() => setBatchModalOpen(false)}
+                products={batchProducts}
+                addItemToMixData={addItemToMixDataByBatchModal}
+            />
         </section>
     );
 }

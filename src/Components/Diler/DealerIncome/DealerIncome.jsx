@@ -1,4 +1,4 @@
-// WareHouseIncome.jsx
+// src/Components/Warehouse/WareHousePages/WareHouseIncome.jsx
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Cookies from "js-cookie";
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, VerticalAlign } from "docx";
@@ -22,17 +22,18 @@ import {
     CheckCircle
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
-import { ProductApi } from "../../../utils/Controllers/ProductApi";
+// import { ProductApi } from "../../../utils/Controllers/ProductApi";
+import { ProductApi } from "../../../utils/Controllers/ProductAPi";
 import { Spinner } from "@material-tailwind/react";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
-import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
+import SelectBatchModal from "../../Warehouse/WareHouseModals/SelectBatchModal";
 import FolderOpenMessage from "../../UI/NoData/FolderOpen";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
-import { useWarehouse } from "../../../context/WarehouseContext";
+import { useDealer } from "../../../context/DealerContext";
 import { NavLink } from "react-router-dom";
 
 // Utility: generate simple unique id (no external dep)
@@ -49,14 +50,15 @@ function useDebounce(value, delay) {
     return debounced;
 }
 
-/* ---------- Main component ---------- */
-export default function WareHouseIncomeFull() {
+/* ---------- Component ---------- */
+export default function DealerIncome() {
     // user / location
     const userLId = Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
 
-    // Context (shared state)
+    // Context (per-mode provider)
     const {
+        mode, // 'in' or 'out' provided by WarehouseLayout -> WarehouseProvider
         mixData,
         addItem,
         updateQty,
@@ -64,19 +66,20 @@ export default function WareHouseIncomeFull() {
         updateBatch,
         removeItem,
         resetAll,
-        invoiceStarted,
-        setInvoiceStarted,
-        invoiceId,
-        setInvoiceId,
-        invoiceMeta,
-        setInvoiceMeta,
-        isDirty,
-        setIsDirty,
-        saveSuccess,
-        setSaveSuccess
-    } = useWarehouse();
+        resetMode,
+        invoiceStarted, // object { in, out }
+        setInvoiceStarted, // fn (mode, value)
+        invoiceId, // object { in, out }
+        setInvoiceId, // fn (mode, value)
+        invoiceMeta, // object { in: {...}, out: {...} }
+        setInvoiceMeta, // fn (mode, value)
+        isDirty, // object { in, out }
+        setIsDirty, // fn (mode, value)
+        saveSuccess, // object { in, out }
+        setSaveSuccess, // fn (mode, value)
+    } = useDealer();
 
-    // Sidebar state (local UI)
+    // Local UI state
     const [sidebarMode, setSidebarMode] = useState(0); // 0=closed,1=25%,2=33.3%
     const [viewMode, setViewMode] = useState("category"); // 'category'|'product'
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -91,7 +94,8 @@ export default function WareHouseIncomeFull() {
         return "w-1/3";
     };
     const toggleSidebar = () => {
-        if (!invoiceStarted) {
+        // require invoice started for opening product/category panel
+        if (!invoiceStarted?.[mode]) {
             notify.info("Kategoriyalar orqali tovarlarni kiritish panelini ochish uchun Kirimni Boshlang");
             return;
         }
@@ -127,6 +131,7 @@ export default function WareHouseIncomeFull() {
     const [printing, setPrinting] = useState(false);
     const [saving, setSaving] = useState(false); // local saving indicator for UI
     const lastFocusedRef = useRef(null);
+    const [error, setError] = useState(null);
 
     // ---------- Fetch categories ----------
     const fetchCategories = async () => {
@@ -147,7 +152,7 @@ export default function WareHouseIncomeFull() {
     const fetchLocations = async () => {
         try {
             setLocationsLoading(true);
-            const res = await location.getAllGroupLocations(userLId);
+            const res = await location.getAllGroupLocations(Cookies.get("usd_nesw"));
             if (res?.status === 200 || res?.status === 201) setLocations(res.data || []);
             else setLocations(res || []);
         } catch (err) {
@@ -165,8 +170,10 @@ export default function WareHouseIncomeFull() {
     // keep invoice receiver current when locations load (use context setter)
     useEffect(() => {
         const name = getLocationNameById(userLId) || "Me";
-        setInvoiceMeta((p) => ({ ...p, receiver: name }));
-    }, [locations, userLId, setInvoiceMeta]);
+        // setInvoiceMeta expects (mode, value)
+        setInvoiceMeta(mode, { ...invoiceMeta?.[mode], receiver: name });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [locations, userLId]);
 
     // ---------- Sidebar: get products by category ----------
     const handleCategoryClick = async (catId) => {
@@ -186,6 +193,7 @@ export default function WareHouseIncomeFull() {
 
     // ---------- Start invoice (create) ----------
     const startInvoice = async () => {
+        // For incoming (this component), type is transfer_incoming
         if (!selectedLocation) {
             notify.error("Iltimos, jo'natuvchini tanlang");
             return;
@@ -193,15 +201,15 @@ export default function WareHouseIncomeFull() {
         try {
             setCreateInvoiceLoading(true);
             const payload = {
-                type: "transfer_incoming",
+                type: mode === "in" ? "transfer_incoming" : "transfer_outgoing",
                 sender_id: selectedLocation === "other" ? null : selectedLocation,
                 receiver_id: userLId,
                 created_by: createdBy,
-                status: "approved"
+                status: "approved",
             };
             const res = await InvoicesApi.CreateInvoice(payload);
 
-            // robust id extraction — keep original approach but fallback to common fields
+            // robust id extraction
             const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
 
             if (res?.status === 200 || res?.status === 201) {
@@ -209,17 +217,17 @@ export default function WareHouseIncomeFull() {
                     notify.error("Server invoice id qaytarmadi");
                     throw new Error("Invoice id topilmadi");
                 }
-                setInvoiceId(invoice_id);
-                setInvoiceStarted(true);
-                setInvoiceMeta((p) => ({ ...p, sender: getLocationNameById(selectedLocation), receiver: getLocationNameById(userLId) || "Me" }));
+                setInvoiceId(mode, invoice_id);
+                setInvoiceStarted(mode, true);
+                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(selectedLocation), receiver: getLocationNameById(userLId) || "Me" });
                 // mark dirty false initially (we just created invoice)
-                setIsDirty?.(false);
-                notify.success("Kirim boshlandi");
+                setIsDirty(mode, false);
+                notify.success(mode === "in" ? "Kirim boshlandi" : "Chiqim boshlandi");
             } else {
                 throw new Error("Invoice yaratishda xato");
             }
         } catch (err) {
-            notify.error("Kirimni boshlashda xato: " + (err?.message || err));
+            notify.error(`${mode === "in" ? "Kirim" : "Chiqim"}ni boshlashda xato: ` + (err?.message || err));
         } finally {
             setCreateInvoiceLoading(false);
         }
@@ -287,39 +295,39 @@ export default function WareHouseIncomeFull() {
 
     const addItemToMixDataByBatchModal = (item) => {
         addItemToMixData(item);
-        notify.success(item.product.name + " qo'shildi")
-    }
+        notify.success(item.product.name + " qo'shildi");
+    };
+
     const fetchByBarcode = async (code) => {
         const barcodeMode = localStorage.getItem("barcodeMode");
         try {
             setBarcodeLoading(true);
             let res = await Stock.getByBarcode(code);
             if (res?.status === 200 || res?.status === 201) {
-                // add item (normalize inside add)
-                let data = res.data
-                if (data.length === 1) {
-                    // data.map((item) => {
-                    //     addItemToMixData(item);
-                    //     notify.success(item.product.name + " qo'shildi");
-                    // });
+                const data = res.data;
+                if (!data || data.length === 0) {
+                    notify.error("Barcode bo'yicha mahsulot topilmadi");
+                } else if (data.length === 1) {
                     const readyData = data[0];
                     addItemToMixData(readyData);
-                    notify.success(readyData.product.name + " qo'shildi")
+                    notify.success(readyData.product.name + " qo'shildi");
                     setBarcodeInput("");
-                } else if (data.length > 1) {
+                } else {
                     if (barcodeMode === "auto") {
-                        let lastBatch = data[0];
+                        const lastBatch = data[0];
                         addItemToMixData(lastBatch);
-                        notify.success(lastBatch.product.name + " qo'shildi")
+                        notify.success(lastBatch.product.name + " qo'shildi");
                         setBarcodeInput("");
                     } else if (barcodeMode === "modal") {
                         setBatchProducts(data);
                         setBarcodeInput("");
                         setBatchModalOpen(true);
+                    } else {
+                        // default show modal
+                        setBatchProducts(data);
+                        setBarcodeInput("");
+                        setBatchModalOpen(true);
                     }
-                }
-                else {
-                    notify.error("Barcode bo'yicha mahsulot topilmadi");
                 }
             } else {
                 notify.error("Barcode topishda xatolik");
@@ -345,24 +353,33 @@ export default function WareHouseIncomeFull() {
             product_id: raw.product_id || productObj.id || null,
             quantity: Number(raw.quantity ?? 1) || 1,
             name: raw.name || productObj.name || "",
-            batch: raw.batch || null,
+            batch: raw.batch ?? null,
             is_new_batch: false,
             raw,
-            origin_price: Number(raw.price ?? productObj.price ?? 0)
+            origin_price: Number(raw.price ?? productObj.price ?? 0),
+            stock_quantity: raw.stock_quantity ?? (raw.stock ? Number(raw.stock.quantity || 0) : undefined),
         };
-    };
+    }
 
     function addItemToMixData(raw) {
         const item = normalizeIncomingItem(raw);
-        addItem(item);
+        // addItem in provider will respect mode (incoming allows new batch; outgoing validates existence)
+        const res = addItem(item); // provider default mode = provided mode at creation
+        if (res && res.ok === false) {
+            notify.error(res.message || "Item qo'shilmadi");
+        }
     }
 
-    // ---------- recalcTotal ----------
-    // NOTE: total is recalculated inside WarehouseContext (per your context code).
-    // If you prefer a local memo (for UI rendering), use invoiceMeta from context.
-    const total = invoiceMeta?.total ?? useMemo(() => {
-        return mixData.reduce((s, it) => s + Number(it.price || 0) * Number(it.quantity || 0), 0);
-    }, [mixData, invoiceMeta]);
+    // // ---------- recalcTotal ----------
+    const total = useMemo(() => {
+        const safeNum = (v) =>
+            v === "" || v == null || isNaN(Number(v)) ? 0 : Number(v);
+        return mixData.reduce(
+            (sum, it) => sum + safeNum(it.price) * safeNum(it.quantity),
+            0
+        );
+    }, [mixData]);
+
 
     // ---------- Click handlers ----------
     const onSidebarProductClick = (prodStock) => {
@@ -375,14 +392,15 @@ export default function WareHouseIncomeFull() {
     // ---------- Table handlers ---------- (use context helpers)
     function handleUpdateQuantity(index, value) {
         if (value === "" || Number(value) > 0 || value === "0") {
-            updateQty(index, value);
+            updateQty(index, value); // provider will clamp for outgoing
         }
     }
     function handleUpdatePrice(index, value, org_price) {
-        if (value === "" || Number(value) >= 1) {
+        if (value === "" || Number(value) >= 0) {
             updatePrice(index, value);
             if (Number(value) !== +org_price) {
-                updateBatch(index, true);
+                // For incoming: create new batch flag; outgoing doesn't use it
+                if (mode === "in") updateBatch(index, true);
             }
         }
     }
@@ -398,11 +416,12 @@ export default function WareHouseIncomeFull() {
 
     // ---------- Save invoice items (returns boolean) ----------
     const saveInvoiceItems = async () => {
-        if (!invoiceId) {
+        const currentInvoiceId = invoiceId?.[mode];
+        if (!currentInvoiceId) {
             notify.error("Invoice ID mavjud emas");
             return false;
         }
-        if (mixData.length === 0) {
+        if (!mixData || mixData.length === 0) {
             notify.error("Hech qanday mahsulot qo'shilmagan");
             return false;
         }
@@ -418,20 +437,20 @@ export default function WareHouseIncomeFull() {
             setSaving(true);
             const payload = {
                 list: mixData.map((it) => ({
-                    invoice_id: invoiceId,
+                    invoice_id: currentInvoiceId,
                     product_id: it.product_id || null,
                     quantity: Number(it.quantity || 0),
                     price: Number(it.price || 0),
                     barcode: it.barcode || "",
-                    is_new_batch: it.is_new_batch
+                    is_new_batch: !!it.is_new_batch
                 })),
             };
 
             const res = await InvoiceItems.createInvoiceItems(payload);
 
             if (res?.status === 200 || res?.status === 201) {
-                setSaveSuccess(true);
-                setIsDirty(false);
+                setSaveSuccess(mode, true);
+                setIsDirty(mode, false);
                 notify.success("Saqlash muvaffaqiyatli");
                 return true;
             } else {
@@ -445,154 +464,15 @@ export default function WareHouseIncomeFull() {
         }
     };
 
-    // ---------- Download invoice (docx/xlsx) ----------
-    // const downloadInvoice = async (type = "docx") => {
-    //     if (!invoiceStarted) {
-    //         notify.error("Invoice hali boshlanmagan");
-    //         return;
-    //     }
-    //     const sanitize = (s = "") =>
-    //         String(s)
-    //             .replace(/\s+/g, "_")
-    //             .replace(/[^a-zA-Z0-9_\-\.]/g, "")
-    //             .substring(0, 80);
-
-    //     const senderName = invoiceMeta.sender || "Sender";
-    //     const receiverName = invoiceMeta.receiver || "Receiver";
-    //     const totalStr = (Number(invoiceMeta.total || 0)).toLocaleString?.() ?? String(invoiceMeta.total || 0);
-    //     const baseName = `${sanitize(senderName)}_to_${sanitize(receiverName)}_${sanitize(totalStr)}_kirim`;
-
-    //     const headers = ["#", "Nomi", "Barcode", "Narx", "Miqdor", "Jami"];
-    //     const rows = mixData.map((it, idx) => {
-    //         const name = it.product?.name || it.product?.title || it.name || "—";
-    //         const barcode = it.barcode || "";
-    //         const price = Number(it.price || 0);
-    //         const qty = Number(it.quantity || 0);
-    //         const lineTotal = price * qty;
-    //         return {
-    //             idx: idx + 1,
-    //             name,
-    //             barcode,
-    //             price,
-    //             qty,
-    //             lineTotal,
-    //         };
-    //     });
-
-    //     try {
-    //         if (type === "docx") {
-    //             const doc = new Document({
-    //                 sections: [
-    //                     {
-    //                         properties: {},
-    //                         children: [
-    //                             new Paragraph({
-    //                                 children: [new TextRun({ text: "KIRIM HUJJATI", bold: true, size: 36 })],
-    //                                 heading: HeadingLevel.HEADING_1,
-    //                                 alignment: AlignmentType.CENTER,
-    //                                 spacing: { after: 200 },
-    //                             }),
-    //                             new Paragraph({ children: [new TextRun({ text: `Jo'natuvchi: `, bold: true }), new TextRun({ text: `${senderName}` })] }),
-    //                             new Paragraph({ children: [new TextRun({ text: `Qabul qiluvchi: `, bold: true }), new TextRun({ text: `${receiverName}` })] }),
-    //                             new Paragraph({ children: [new TextRun({ text: `Vaqt: `, bold: true }), new TextRun({ text: `${invoiceMeta.time || new Date().toLocaleString()}` })] }),
-    //                             new Paragraph({ children: [new TextRun({ text: `Umumiy: `, bold: true }), new TextRun({ text: `${totalStr} сум` })], spacing: { after: 300 } }),
-
-    //                             (() => {
-    //                                 const tableRows = [];
-    //                                 const headerCells = headers.map((h) =>
-    //                                     new TableCell({
-    //                                         width: { size: 1000, type: WidthType.DXA },
-    //                                         verticalAlign: VerticalAlign.CENTER,
-    //                                         children: [
-    //                                             new Paragraph({
-    //                                                 children: [new TextRun({ text: h, bold: true })],
-    //                                                 alignment: AlignmentType.CENTER,
-    //                                             }),
-    //                                         ],
-    //                                         margins: { top: 100, bottom: 100 },
-    //                                     })
-    //                                 );
-    //                                 tableRows.push(new TableRow({ children: headerCells }));
-    //                                 rows.forEach((r) => {
-    //                                     const cells = [
-    //                                         new TableCell({ children: [new Paragraph(String(r.idx))] }),
-    //                                         new TableCell({ children: [new Paragraph(r.name)] }),
-    //                                         new TableCell({ children: [new Paragraph(r.barcode || "")] }),
-    //                                         new TableCell({ children: [new Paragraph(String(r.price))] }),
-    //                                         new TableCell({ children: [new Paragraph(String(r.qty))] }),
-    //                                         new TableCell({ children: [new Paragraph(String(r.lineTotal))] }),
-    //                                     ];
-    //                                     tableRows.push(new TableRow({ children: cells }));
-    //                                 });
-    //                                 const totalCells = [
-    //                                     new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: " ", })] }),], columnSpan: 4 }),
-    //                                     new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Jami", bold: true })], alignment: AlignmentType.RIGHT })] }),
-    //                                     new TableCell({ children: [new Paragraph(String(Number(invoiceMeta.total || 0)))] }),
-    //                                 ];
-    //                                 tableRows.push(new TableRow({ children: totalCells }));
-    //                                 return new Table({ rows: tableRows, width: { size: 100, type: WidthType.PERCENTAGE } });
-    //                             })(),
-
-    //                             new Paragraph({ children: [], spacing: { before: 300 } }),
-    //                             new Paragraph({ children: [new TextRun({ text: "\n\nJo'natuvchi imzo: ______________________", })] }),
-    //                             new Paragraph({ children: [new TextRun({ text: "Qabul qiluvchi imzo: ______________________", })] }),
-    //                         ],
-    //                     },
-    //                 ],
-    //             });
-
-    //             const blob = await Packer.toBlob(doc);
-    //             saveAs(blob, `${baseName}.docx`);
-    //             notify.success(".docx fayl generatsiya qilindi");
-    //         } else {
-    //             const aoa = [];
-    //             aoa.push(["Kirim hujjati"]);
-    //             aoa.push([]);
-    //             aoa.push(["Jo'natuvchi", senderName, "", "Qabul qiluvchi", receiverName]);
-    //             aoa.push(["Vaqt", invoiceMeta.time || new Date().toLocaleString()]);
-    //             aoa.push(["Umumiy", totalStr]);
-    //             aoa.push([]);
-    //             aoa.push(headers);
-    //             rows.forEach((r) => {
-    //                 aoa.push([r.idx, r.name, r.barcode, r.price, r.qty, r.lineTotal]);
-    //             });
-    //             aoa.push([]);
-    //             aoa.push(["", "", "", "Jami", "", Number(invoiceMeta.total || 0)]);
-    //             const ws = XLSX.utils.aoa_to_sheet(aoa);
-    //             const max_length = (arr) =>
-    //                 arr.reduce((m, v) => Math.max(m, String(v || "").length), 0);
-    //             const cols = [
-    //                 { wch: Math.max(4, max_length(aoa.map((r) => r[0]))) },
-    //                 { wch: Math.max(10, max_length(aoa.map((r) => r[1]))) },
-    //                 { wch: Math.max(8, max_length(aoa.map((r) => r[2]))) },
-    //                 { wch: Math.max(8, max_length(aoa.map((r) => r[3]))) },
-    //                 { wch: Math.max(6, max_length(aoa.map((r) => r[4]))) },
-    //                 { wch: Math.max(8, max_length(aoa.map((r) => r[5]))) },
-    //             ];
-    //             ws["!cols"] = cols;
-    //             const wb = XLSX.utils.book_new();
-    //             XLSX.utils.book_append_sheet(wb, ws, "Kirim");
-    //             const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    //             const blob = new Blob([wbout], { type: "application/octet-stream" });
-    //             saveAs(blob, `${baseName}.xlsx`);
-    //             notify.success(".xlsx fayl generatsiya qilindi");
-    //         }
-    //     } catch (err) {
-    //         console.error("Download xatosi:", err);
-    //         notify.error("Fayl generatsiya qilishda xatolik: " + (err?.message || err));
-    //     }
-    // };
-
-    // realtime time update (only when invoice started) — use context setter
+    // ---------- Modal open/close and actions ----------
     useEffect(() => {
-        if (!invoiceStarted) return;
+        if (!invoiceStarted?.[mode]) return;
         const t = setInterval(() => {
-            setInvoiceMeta((p) => ({ ...p, time: new Date().toLocaleString() }));
+            setInvoiceMeta(mode, { ...invoiceMeta?.[mode], time: new Date().toLocaleString() });
         }, 1000);
         return () => clearInterval(t);
-    }, [invoiceStarted, setInvoiceMeta]);
+    }, [invoiceStarted?.[mode]]); // eslint-disable-line
 
-    // ---------- Modal handlers (focus trap + ESC) ----------
     useEffect(() => {
         const onKey = (e) => {
             if (e.key === "Escape" && modalOpen) {
@@ -604,24 +484,23 @@ export default function WareHouseIncomeFull() {
     }, [modalOpen]);
 
     const openModal = () => {
-        if (!invoiceStarted) {
+        if (!invoiceStarted?.[mode]) {
             notify.error("Invoice hali boshlanmagan");
             return;
-        } else if (mixData.length === 0) {
+        } else if (!mixData || mixData.length === 0) {
             notify.error("Hech qanday mahsulot qo'shilmagan");
             return;
         }
         const value_spaces = mixData.filter((item) => item.price === "" || (item.quantity === "" || item.quantity === 0));
         if (value_spaces.length > 0) {
-            value_spaces.map((err) => {
-                return notify.warning(err.product.name + " tovar uchun " + (err.price === "" ? "Narx kiritng" : "Miqdor kiritng"))
+            value_spaces.forEach((err) => {
+                notify.warning(err.product?.name + " tovar uchun " + (err.price === "" ? "Narx kiriting" : "Miqdor kiriting"));
             });
             return;
         }
         lastFocusedRef.current = document.activeElement;
         setModalOpen(true);
         setTimeout(() => {
-            // focus first focusable element in modal
             const el = modalContentRef.current?.querySelector("button, [href], input, select, textarea, [tabindex]");
             if (el) el.focus();
         }, 100);
@@ -639,12 +518,13 @@ export default function WareHouseIncomeFull() {
     const handleModalSave = async () => {
         const ok = await saveInvoiceItems();
         if (ok) {
+            // reset all to prepare for a new invoice
             resetAllBaseForNewInvoice();
             setModalOpen(false);
         }
     };
 
-    // ---------- Print: recommended approach (open new window with content) ----------
+    // ---------- Print ----------
     const handlePrint = async () => {
         if (!modalContentRef.current) {
             notify.warning("print content yo'q");
@@ -674,15 +554,13 @@ export default function WareHouseIncomeFull() {
               </style>
             `;
             printWindow.document.open();
-            printWindow.document.write(`<html><head><title>KIRIM HUJJATI</title>${style}</head><body>${content}</body></html>`);
+            printWindow.document.write(`<html><head><title>${mode === "in" ? "KIRIM HUJJATI" : "CHIQQIM HUJJATI"}</title>${style}</head><body>${content}</body></html>`);
             printWindow.document.close();
-            // ensure fonts/images render
             printWindow.onload = () => {
                 printWindow.focus();
                 printWindow.print();
                 setPrinting(false);
             };
-            // fallback in case onload doesn't fire
             setTimeout(() => {
                 try {
                     printWindow.focus();
@@ -696,12 +574,12 @@ export default function WareHouseIncomeFull() {
         }
     };
 
-    // ---------- UI ----------
+    // ---------- Utilities ----------
     const touchBtn = "min-h-[44px] px-4 py-3";
 
-    // --------- Restrart Invoices after Succes saved Last
+    // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
-        resetAll();
+        resetAll(); // resets both modes per provider
         setSelectedLocation("");
         setOtherLocationName("");
         setSearchResults([]);
@@ -709,10 +587,12 @@ export default function WareHouseIncomeFull() {
         setSidebarMode(0);
     }
 
+    // ---------- UI ----------
+
     return (
         <section className="relative w-full min-h-screen bg-white overflow-hidden">
             <div className="fixed text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
-                Warehouse Income <a href="/login">Login</a>
+                {mode === "in" ? "Warehouse Income" : "Warehouse Outcome"} <a href="/login" className="ml-4 text-sm text-gray-700">Login</a>
             </div>
 
             {/* Sidebar */}
@@ -737,6 +617,7 @@ export default function WareHouseIncomeFull() {
                         </div>
                     )}
                 </div>
+
                 {(isMedium || isWide) && (
                     <div className={`overflow-y-auto p-3 grid gap-3 overflow-x-scroll grid-cols-[repeat(auto-fill,minmax(auto,1fr))]`}>
                         {viewMode === "category" ? (
@@ -762,7 +643,7 @@ export default function WareHouseIncomeFull() {
                         ) : (
                             <FolderOpenMessage text={"Iltimos, mahsulotlarni ko‘rish uchun kategoriya tanlang."} icon={<FolderOpen className="w-10 h-10 mb-3 text-gray-400" />} />
                         ) : (
-                            products.sort((a, b) => a.product.name.localeCompare(b.product.name, undefined, { numeric: true, sensitivity: 'base' })).map((prod) => (
+                            products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod) => (
                                 <button key={prod.id || prod.stock_id || prod.product?.id || generateId()} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
                                     <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-3 min-w-[180px] transition">
                                         <div className="p-1 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
@@ -789,14 +670,14 @@ export default function WareHouseIncomeFull() {
             <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
                 <div className="bg-gray-100 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
                     {/* HEAD */}
-                    {!invoiceStarted ? (
+                    {!invoiceStarted?.[mode] ? (
                         <div className="h-[65px] bg-white rounded-lg flex items-center gap-4 px-3 shadow-sm">
                             <div className="flex items-center gap-2">
                                 {locationsLoading ? (
                                     <div className="flex items-center gap-2"><Spinner /> Loading...</div>
                                 ) : (
                                     <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                        <option value="">Jo'natuvchini tanlang</option>
+                                        <option value="">{mode === "in" ? "Jo'natuvchini tanlang" : "Jo'natuvchini tanlang"}</option>
                                         {locations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
                                     </select>
                                 )}
@@ -814,7 +695,7 @@ export default function WareHouseIncomeFull() {
                                             </svg> :
                                             <Spinner />
                                     }
-                                    Kirimni boshlash
+                                    {mode === "in" ? "Kirimni boshlash" : "Chiqimni boshlash"}
                                 </button>
                             </div>
                         </div>
@@ -850,24 +731,24 @@ export default function WareHouseIncomeFull() {
                     )}
 
                     {/* Invoice info & body */}
-                    {invoiceStarted && (
+                    {invoiceStarted?.[mode] && (
                         <>
                             <div className="bg-white rounded-lg p-3 shadow-sm flex items-center gap-6">
                                 <div>
-                                    <div className="text-xs text-gray-500">Jo'natuvchi</div>
-                                    <div className="font-medium">{invoiceMeta.sender || "—"}</div>
+                                    <div className="text-xs text-gray-500">{mode === "in" ? "Jo'natuvchi" : "Jo'natuvchi"}</div>
+                                    <div className="font-medium">{invoiceMeta?.[mode]?.sender || "—"}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-gray-500">Qabul qiluvchi</div>
-                                    <div className="font-medium">{invoiceMeta.receiver}</div>
+                                    <div className="text-xs text-gray-500">{mode === "in" ? "Qabul qiluvchi" : "Qabul qiluvchi"}</div>
+                                    <div className="font-medium">{invoiceMeta?.[mode]?.receiver}</div>
                                 </div>
                                 <div>
                                     <div className="text-xs text-gray-500">Vaqt</div>
-                                    <div className="font-medium">{invoiceMeta.time}</div>
+                                    <div className="font-medium">{invoiceMeta?.[mode]?.time}</div>
                                 </div>
                                 <div className="ml-auto text-right">
                                     <div className="text-xs text-gray-500">Umumiy qiymat</div>
-                                    <div className="font-semibold text-lg">{Number(invoiceMeta.total || 0).toLocaleString()} сум</div>
+                                    <div className="font-semibold text-lg">{(total || 0).toLocaleString()} сум</div>
                                 </div>
                             </div>
 
@@ -892,7 +773,7 @@ export default function WareHouseIncomeFull() {
                                     <div className="text-gray-500">Natija topilmadi</div>
                                 ) : (
                                     <div className="flex gap-3 flex-wrap">
-                                        {searchResults.sort((a, b) => a.product.name.localeCompare(b.product.name, undefined, { numeric: true, sensitivity: 'base' })).map((r) => (
+                                        {searchResults.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((r) => (
                                             <button key={r.id || r.stock_id || generateId()} onClick={() => onSelectSearchResult(r)} className="bg-white border rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px]">
                                                 <div className="text-sm font-medium">{r.product?.name || r.name}</div>
                                                 <div className="flex items-center justify-center gap-3">
@@ -920,48 +801,64 @@ export default function WareHouseIncomeFull() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {mixData.length === 0 ? (
-                                            <tr><td colSpan={7} className="p-4 text-center text-gray-400">Mahsulotlar mavjud emas</td></tr>
-                                        ) : mixData.map((it, idx) => (
-                                            <tr key={it.id || idx} className="border-b">
-                                                <td className="p-2 align-center">{idx + 1}</td>
-                                                <td>
-                                                    <input checked={!!it.is_new_batch} onChange={(e) => updateBatchNew(idx, e.target.checked, it.price, it.origin_price)} type="checkbox" name="is_new_batch" />
-                                                </td>
-                                                <td className="p-2 align-top">
-                                                    <div className="font-medium">{it.product?.name || it.name || "—"}</div>
-                                                    <div className="text-xs text-gray-500">{it.barcode}</div>
-                                                    <div className="text-xs text-gray-500 flex">Partiya:
-                                                        {it.is_new_batch ?
-                                                            (<div className="tex-xs text-blue-gray-700 ">Yangi Partiya</div>) :
-                                                            (it.batch === null ? "Default" : it.batch)
-                                                        }
-                                                    </div>
-                                                </td>
-                                                <td className="p-2 align-center w-[140px]">
-                                                    <input type="number" step="any" value={it.price} onChange={(e) => handleUpdatePrice(idx, e.target.value, it.origin_price)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
-                                                </td>
-                                                <td className="p-2 align-center w-[120px]">
-                                                    <input type="number" step="1" value={it.quantity} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
-                                                </td>
-                                                <td className="p-2 align-center w-[120px] ">
-                                                    {it.product.unit}
-                                                </td>
-                                                <td className="p-2 align-center">
-                                                    {(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}
-                                                </td>
-                                                <td className="p-2 align-center">
-                                                    <button
-                                                        onClick={() => handleRemoveItem(idx)}
-                                                        className="p-2 text-gray-800 hover:text-red-500 active:scale-90 transition-all duration-200"
-                                                        title="Remove row"
-                                                        aria-label={`Remove item ${idx + 1}`}
-                                                    >
-                                                        <MinusCircle size={22} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {(!mixData || mixData.length === 0) ? (
+                                            <tr><td colSpan={8} className="p-4 text-center text-gray-400">Mahsulotlar mavjud emas</td></tr>
+                                        ) : mixData.map((it, idx) => {
+                                            // compute stock available if provided
+                                            const stockAvail = Number(it.stock_quantity ?? it.stock?.quantity ?? Infinity);
+                                            const qty = Number(it.quantity ?? 0);
+                                            const qtyError = (mode === "out") && Number.isFinite(stockAvail) && qty > stockAvail;
+                                            return (
+                                                <tr key={it.id || idx} className="border-b">
+                                                    <td className="p-2 align-center">{idx + 1}</td>
+                                                    <td>
+                                                        {/* is_new_batch only relevant for incoming */}
+                                                        {mode === "in" ? (
+                                                            <input checked={!!it.is_new_batch} onChange={(e) => updateBatchNew(idx, e.target.checked, it.price, it.origin_price)} type="checkbox" name="is_new_batch" />
+                                                        ) : (
+                                                            <span className="text-xs text-gray-400">—</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="p-2 align-top">
+                                                        <div className="font-medium">{it.product?.name || it.name || "—"}</div>
+                                                        <div className="text-xs text-gray-500">{it.barcode}</div>
+                                                        <div className="text-xs text-gray-500 flex">Partiya:
+                                                            {mode === "in" ? (
+                                                                it.is_new_batch ? (<div className="tex-xs text-blue-gray-700 ">Yangi Partiya</div>) : (it.batch === null ? "Default" : it.batch)
+                                                            ) : (
+                                                                (it.batch === null ? "Default" : it.batch)
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-2 align-center w-[140px]">
+                                                        <input type="number" step="any" value={it.price ?? ""} onChange={(e) => handleUpdatePrice(idx, e.target.value, it.origin_price)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
+                                                    </td>
+                                                    <td className="p-2 align-center w-[120px]">
+                                                        <input type="number" step="1" min={0} max={mode === "out" ? (Number.isFinite(stockAvail) ? stockAvail : undefined) : undefined} value={it.quantity === 0 ? "0" : (it.quantity ?? "")} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
+                                                        {mode === "out" && Number.isFinite(stockAvail) && <div className="text-xs text-gray-500">Omborda: {stockAvail}</div>}
+                                                    </td>
+                                                    <td className="p-2 align-center w-[120px] ">
+                                                        {it.product?.unit || "-"}
+                                                    </td>
+                                                    <td className="p-2 align-center">
+                                                        {(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}
+                                                    </td>
+                                                    <td className="p-2 align-center">
+                                                        <div className="flex gap-2 items-center">
+                                                            <button
+                                                                onClick={() => handleRemoveItem(idx)}
+                                                                className="p-2 text-gray-800 hover:text-red-500 active:scale-90 transition-all duration-200"
+                                                                title="Remove row"
+                                                                aria-label={`Remove item ${idx + 1}`}
+                                                            >
+                                                                <MinusCircle size={22} />
+                                                            </button>
+                                                            {qtyError && <div className="text-xs text-red-600">Miqdor ombordagi ({stockAvail}) dan oshdi</div>}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -972,35 +869,7 @@ export default function WareHouseIncomeFull() {
                                         <CheckSquare size={22} />
                                         Yakunlash
                                     </button>
-                                    {/* {saveSuccess ?
-                                        <button className={`${touchBtn} flex items-center gap-2 bg-[rgb(68,210,25)] text-white text-[16px] rounded hover:opacity-95`}>
-                                            <CheckCircle size={22} />
-                                            Yakunlandi
-                                        </button> :
-                                        <button onClick={openModal} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white text-[16px] rounded hover:opacity-95`}>
-                                            <CheckSquare size={22} />
-                                            Yakunlash
-                                        </button>
-                                    }
-
-                                    {saveSuccess && (
-                                        <button
-                                            onClick={() => resetAllBaseForNewInvoice()}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded bg-[rgb(25_118_210)] text-white`}>
-                                            <PlusCircle size={16} />
-                                            Yangi kirimni boshlash
-                                        </button>
-                                    )} */}
                                 </div>
-
-                                {/* <div className="flex items-center gap-2 ml-auto">
-                                    <button onClick={() => downloadInvoice("docx")} className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded hover:bg-gray-300" aria-label="Download docx">
-                                        <Download size={14} /> Download .docx
-                                    </button>
-                                    <button onClick={() => downloadInvoice("excel")} className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded hover:bg-gray-300" aria-label="Download xlsx">
-                                        <Download size={14} /> Download .xlsx
-                                    </button>
-                                </div> */}
                             </div>
                         </>
                     )}
@@ -1014,12 +883,12 @@ export default function WareHouseIncomeFull() {
                         <div id="modal_window" ref={modalContentRef}>
                             {/* A4 preview content */}
                             <div style={{ width: "100%", boxSizing: "border-box" }}>
-                                <h1 id="modal-title" className="text-center text-lg font-bold">KIRIM HUJJATI</h1>
+                                <h1 id="modal-title" className="text-center text-lg font-bold">{mode === "in" ? "KIRIM HUJJATI" : "CHIQQIM HUJJATI"}</h1>
                                 <div className="meta">
-                                    <div><strong>Jo'natuvchi:</strong> {invoiceMeta.sender || "—"}</div>
-                                    <div><strong>Qabul qiluvchi:</strong> {invoiceMeta.receiver || "—"}</div>
-                                    <div><strong>Vaqt:</strong> {invoiceMeta.time || new Date().toLocaleString()}</div>
-                                    <div><strong>Umumiy:</strong> {Number(invoiceMeta.total || 0).toLocaleString()} сум</div>
+                                    <div><strong>{mode === "in" ? "Jo'natuvchi:" : "Jo'natuvchi:"}</strong> {invoiceMeta?.[mode]?.sender || "—"}</div>
+                                    <div><strong>{mode === "in" ? "Qabul qiluvchi:" : "Qabul qiluvchi:"}</strong> {invoiceMeta?.[mode]?.receiver || "—"}</div>
+                                    <div><strong>Vaqt:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
+                                    <div><strong>Umumiy:</strong> {(total || 0).toLocaleString()} сум</div>
                                 </div>
 
                                 <div className="overflow-x-auto">
@@ -1047,7 +916,7 @@ export default function WareHouseIncomeFull() {
                                             ))}
                                             <tr>
                                                 <td colSpan={5} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>Jami</td>
-                                                <td style={{ border: "1px solid #333", padding: 6 }}>{Number(invoiceMeta.total || 0).toLocaleString()}</td>
+                                                <td style={{ border: "1px solid #333", padding: 6 }}>{Number(total || 0).toLocaleString()}</td>
                                             </tr>
                                         </tbody>
                                     </table>
