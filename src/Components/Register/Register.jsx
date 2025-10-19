@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./_components/Register.css";
+import "./_components/register.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { notify } from "../../utils/toast";
 import Spinner from "../../Components/UI/spinner/Spinner";
