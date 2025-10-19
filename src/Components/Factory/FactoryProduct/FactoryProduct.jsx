@@ -14,7 +14,7 @@ import {
     IconButton
 } from "@material-tailwind/react"
 import { EyeIcon, XMarkIcon } from "@heroicons/react/24/outline"
-import { ProductApi } from "../../../utils/Controllers/ProductAPi"
+import { ProductApi } from "../../../utils/Controllers/ProductApi"
 import FactoryProductModal from "./_component/FactoryProductModal"
 import Cookies from "js-cookie";
 
