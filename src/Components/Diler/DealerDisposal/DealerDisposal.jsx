@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 // import { ProductApi } from "../../../utils/Controllers/ProductApi";
-import { ProductApi } from "../../../utils/Controllers/ProductAPi";
+import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
 import SelectBatchModal from "../../Warehouse/WareHouseModals/SelectBatchModal";

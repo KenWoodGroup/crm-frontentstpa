@@ -6,7 +6,7 @@ import {
     Typography,
 } from "@material-tailwind/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { ProductApi } from "../../../utils/Controllers/ProductAPi";
+import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseBarcodeModal from "./_components/WarehouseBarcodeCreateModal";
