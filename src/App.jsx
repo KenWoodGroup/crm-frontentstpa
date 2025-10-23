@@ -2,17 +2,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { managerRoutes, supperAdminRoutes } from "./routes/adminRoutes";
+import { supperAdminRoutes } from "./routes/adminRoutes";
 import { userRoutes } from "./routes/userRoutes";
 
 import Login from "./Components/Login/Login";
 import ErrorPage from "./Components/ErrorPage/ErrorPage";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import Register from "./Components/Register/Register";
-import AdminLayout from "./layouts/AdminLayout";
 import SuperAdminLayout from "./layouts/SuperAdminLayout";
-// import ProtectedAdminsRoute from "../features/auth/ProtectedAdminsRoute";
-// import ProtectedUsersRoute from "../features/auth/ProtectedUserRoute";
 import MainLayout from "./layouts/MainLayout";
 
 import { ToastContainer } from "react-toastify";
@@ -29,6 +26,8 @@ import CompanyWarehouseLayout from "./layouts/CompanyWarehouseLayout";
 import { companyWarehouseRoutes } from "./routes/companyWarehouseRoutes";
 import CompanyDilerLayout from "./layouts/CompanyDilerLayout";
 import { companyDiler } from "./routes/companyDilerRoutes";
+import ManagerLayout from "./layouts/ManagerLayout";
+import { managerRoutes } from "./routes/managerRoutes";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -55,7 +54,7 @@ function App() {
             </Route>
             <Route element={
               // <ProtectedAdminsRoute>
-              <AdminLayout />
+              <ManagerLayout />
               // </ProtectedAdminsRoute>
             }>
               {managerRoutes?.map((r) => {
