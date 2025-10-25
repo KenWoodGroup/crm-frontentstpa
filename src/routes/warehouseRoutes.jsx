@@ -9,6 +9,8 @@ import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouse
 import WareHouseDisposal from "../Components/Warehouse/WareHouseDisposal/WareHouseDisposal";
 import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/SettingsWareHouse";
 import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
+import { elements } from "chart.js";
+import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",
@@ -39,6 +41,16 @@ export const warehouseRoutes = [
         path:"/warehouse/disposal",
         name:"Warehouse Disposal",
         element:<WareHouseDisposal/>
+    },
+    {
+        path:"\"/warehouse/history\"",
+        name:"warehouse history",
+        element:<WarehouseInvoiceHistory/>
+    },
+    {
+        path:"\"/warehouse/history/:invoiceId\"",
+        name:"warehouse detail history by id",
+        element:<WarehouseInvoiceHistory/>
     },
     {
         path: "/warehouse/dilers",

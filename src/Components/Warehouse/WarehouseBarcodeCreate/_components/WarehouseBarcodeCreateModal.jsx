@@ -22,7 +22,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
         product_id: productId,
         location_id: Cookies?.get("ul_nesw"),
         quantity: 0,
-        price: 0,
+        purchase_price: 0,
         barcode: "",
     });
     const [isSaved, setIsSaved] = useState(false);
@@ -45,7 +45,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                 product_id: productId,
                 location_id: Cookies?.get("ul_nesw"),
                 quantity: Number(data.quantity) || 0,
-                price: Number(data.price) || 0,
+                purchase_price: Number(data.purchase_price) || 0,
                 barcode: data.barcode,
             });
             setIsSaved(true);
@@ -62,7 +62,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
             product_id: productId,
             location_id: Cookies?.get("ul_nesw"),
             quantity: 0,
-            price: 0,
+            purchase_price: 0,
             barcode: "",
         });
         setIsSaved(false);
@@ -139,7 +139,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                 await Stock.EditStock({ form, id: data?.stock_id });
                 Alert("Barcode muvaffaqiyatli yangilandi", "success");
                 setEditMode(false);
-                refresh()
+                refresh()   
             } else {
                 await Stock.CreateBarcode(form);
                 Alert("Muvaffaqiyatli yaratildi", "success");

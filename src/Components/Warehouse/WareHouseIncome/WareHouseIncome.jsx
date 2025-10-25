@@ -19,7 +19,8 @@ import {
     MinusCircle,
     PlusCircle,
     CheckSquare,
-    CheckCircle
+    CheckCircle,
+    Truck, Undo2, Trash2
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
@@ -78,7 +79,7 @@ export default function WareHouseIncome() {
         setSaveSuccess, // fn (mode, value)
     } = useWarehouse();
 
-    
+
     // Local UI state
     const [sidebarMode, setSidebarMode] = useState(0); // 0=closed,1=25%,2=33.3%
     const [viewMode, setViewMode] = useState("category"); // 'category'|'product'
@@ -110,6 +111,10 @@ export default function WareHouseIncome() {
     const [selectedLocation, setSelectedLocation] = useState("");
     const [otherLocationName, setOtherLocationName] = useState("");
     const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
+
+    const [selected, setSelected] = useState("transfer_in");
+    const [sendToTrash, setSendToTrash] = useState(false);
+    const operationLocations = (selected === "transfer_in" ? locations?.filter((loc) => loc.type === "factory" || loc.type === "warehouse") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client")) || []
 
     // search & barcode (local UI)
     const [searchQuery, setSearchQuery] = useState("");
@@ -181,7 +186,7 @@ export default function WareHouseIncome() {
         setViewMode("product");
         try {
             setProductLoading(true);
-            const res = await Stock.getLocationStocksByChildId(userLId, catId);
+            const res = await Stock.getLocationStocksByChildId(userLId, catId, invoiceMeta?.[mode]?.operation_type);
             if (res?.status === 200) setProducts(res.data || []);
             else setProducts(res?.data || []);
         } catch (err) {
@@ -198,14 +203,15 @@ export default function WareHouseIncome() {
             notify.error("Iltimos, jo'natuvchini tanlang");
             return;
         }
+        const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : "transfer_in"
         try {
             setCreateInvoiceLoading(true);
             const payload = {
-                type: mode === "in" ? "transfer_incoming" : "transfer_outgoing",
+                type: operation_type,
                 sender_id: selectedLocation === "other" ? null : selectedLocation,
                 receiver_id: userLId,
                 created_by: createdBy,
-                status: "approved",
+                status: "received",
             };
             const res = await InvoicesApi.CreateInvoice(payload);
 
@@ -217,12 +223,19 @@ export default function WareHouseIncome() {
                     notify.error("Server invoice id qaytarmadi");
                     throw new Error("Invoice id topilmadi");
                 }
+                setSidebarMode(1)
                 setInvoiceId(mode, invoice_id);
                 setInvoiceStarted(mode, true);
-                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(selectedLocation), receiver: getLocationNameById(userLId) || "Me" });
+                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(selectedLocation), receiver: getLocationNameById(userLId), operation_type });
                 // mark dirty false initially (we just created invoice)
-                setIsDirty(mode, false);
-                notify.success(mode === "in" ? "Kirim boshlandi" : "Chiqim boshlandi");
+                setIsDirty(mode, true);
+                if (operation_type === "transfer_in") {
+                    notify.success("Операция перемещения успешно начата");
+                } else if (operation_type === "return_in") {
+                    notify.success("Операция возврата успешно начата");
+                } else if (operation_type === "return_dis") {
+                    notify.success("Возврат направлен на утилизацию");
+                }
             } else {
                 throw new Error("Invoice yaratishda xato");
             }
@@ -252,6 +265,8 @@ export default function WareHouseIncome() {
                 const data = {
                     locationId: userLId,
                     search: debouncedSearch.trim(),
+                    fac_id: Cookies.get("usd_nesw"),
+                    operation_type: invoiceMeta?.[mode]?.operation_type
                 };
                 const res = await Stock.getLocationStocksBySearch({ data });
                 if (res?.status === 200 || res?.status === 201) setSearchResults(res.data || []);
@@ -341,34 +356,32 @@ export default function WareHouseIncome() {
 
     // ---------- Normalize & add to mixData (uses context addItem) ----------
     function normalizeIncomingItem(raw) {
-        const productObj = raw.product || raw.product_data || {};
+        const productObj = raw.product || undefined;
+        const is_raw_stock = productObj !== undefined
         return {
-            id: raw.id || raw.stock_id || generateId(),
-            barcode: raw.barcode || productObj.barcode || raw.code || "",
-            stock_id: raw.id || raw.stock_id || null,
-            location: raw.location || raw.location_data || null,
-            location_id: raw.location?.id || raw.location_id || null,
-            price: Number(raw.price ?? productObj.price ?? 0),
-            product: productObj,
-            product_id: raw.product_id || productObj.id || null,
-            quantity: Number(raw.quantity ?? 1) || 1,
-            name: raw.name || productObj.name || "",
-            batch: raw.batch ?? null,
+            is_raw_stock: productObj === undefined ? true : false,
             is_new_batch: false,
-            raw,
-            origin_price: Number(raw.price ?? productObj.price ?? 0),
-            stock_quantity: raw.stock_quantity ?? (raw.stock ? Number(raw.stock.quantity || 0) : undefined),
+            name: is_raw_stock ? productObj.name : raw.name || "-",
+            price: invoiceMeta?.[mode]?.operation_type === "transfer_in" ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
+            origin_price: invoiceMeta?.[mode]?.operation_type === "transfer_in" ? Number(raw.purchase_price || 0) : Number(raw.sale_price || 0),
+            quantity: 1,
+            unit: is_raw_stock ? productObj.unit : raw.unit || "-",
+            product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
+            barcode: raw.barcode || null,
+            batch: raw.batch ?? null,
         };
-    }
+    };
 
     function addItemToMixData(raw) {
         const item = normalizeIncomingItem(raw);
         // addItem in provider will respect mode (incoming allows new batch; outgoing validates existence)
         const res = addItem(item); // provider default mode = provided mode at creation
+        console.log(item);
+
         if (res && res.ok === false) {
             notify.error(res.message || "Item qo'shilmadi");
         }
-    }
+    };
 
     // // ---------- recalcTotal ----------
     const total = useMemo(() => {
@@ -436,15 +449,23 @@ export default function WareHouseIncome() {
         try {
             setSaving(true);
             const payload = {
-                list: mixData.map((it) => ({
-                    invoice_id: currentInvoiceId,
-                    product_id: it.product_id || null,
-                    quantity: Number(it.quantity || 0),
-                    price: Number(it.price || 0),
-                    barcode: it.barcode || "",
-                    is_new_batch: !!it.is_new_batch
-                })),
+                list: mixData.map((it) => {
+                    const item = {
+                        invoice_id: currentInvoiceId,
+                        product_id: it.product_id || null,
+                        quantity: Number(it.quantity || 0),
+                        price: Number(it.price || 0),
+                        barcode: it.barcode || "",
+                        is_new_batch: it.is_new_batch,
+                        batch: it.batch
+                    }
+                    if (it.is_new_batch) {
+                        delete it.batch
+                    }
+                    return item
+                }),
             };
+
 
             const res = await InvoiceItems.createInvoiceItems(payload);
 
@@ -592,125 +613,187 @@ export default function WareHouseIncome() {
     return (
         <section className="relative w-full min-h-screen bg-white overflow-hidden">
             <div className="fixed text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
-                {mode === "in" ? "Warehouse Income" : "Warehouse Outcome"} <a href="/login" className="ml-4 text-sm text-gray-700">Login</a>
+                Приём — поступления на склад <a href="/login" className="ml-4 text-sm text-gray-700">Login</a>
             </div>
 
             {/* Sidebar */}
-            <div
-                className={`absolute z-20 left-0 top-[68px] ${getSidebarWidth()} h-[calc(100vh-68px)] bg-gray-50 shadow-lg transition-all duration-500 ease-in-out flex flex-col`}
-            >
-                <div className="flex items-center justify-between p-2 border-b border-gray-200">
-                    <button onClick={toggleSidebar} className="p-2 hover:bg-gray-200 rounded-xl transition" title="O‘lchamni o‘zgartirish" aria-label="Toggle sidebar size">
-                        {sidebarMode === 0 ? <ChevronRight size={22} /> : sidebarMode === 1 ? <ChevronsRight size={22} /> : <ChevronLeft size={22} />}
-                    </button>
+            {invoiceStarted?.in &&
+                <div
+                    className={`absolute z-20 left-0 top-[68px] ${getSidebarWidth()} h-[calc(100vh-68px)] bg-gray-50 shadow-lg transition-all duration-500 ease-in-out flex flex-col`}
+                >
+                    <div className="flex items-center justify-between p-2 border-b border-gray-200">
+                        <button onClick={toggleSidebar} className="p-2 hover:bg-gray-200 rounded-xl transition" title="O‘lchamni o‘zgartirish" aria-label="Toggle sidebar size">
+                            {sidebarMode === 0 ? <ChevronRight size={22} /> : sidebarMode === 1 ? <ChevronsRight size={22} /> : <ChevronLeft size={22} />}
+                        </button>
+
+                        {(isMedium || isWide) && (
+                            <div className="flex gap-2">
+                                <button onClick={() => setViewMode("category")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "category" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "category"}>
+                                    <Tags size={18} />
+                                    {isWide && <span className="text-sm">Категория</span>}
+                                </button>
+                                <button onClick={() => setViewMode("product")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "product" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "product"}>
+                                    <Package size={18} />
+                                    {isWide && <span className="text-sm">Товар</span>}
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     {(isMedium || isWide) && (
-                        <div className="flex gap-2">
-                            <button onClick={() => setViewMode("category")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "category" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "category"}>
-                                <Tags size={18} />
-                                {isWide && <span className="text-sm">Category</span>}
-                            </button>
-                            <button onClick={() => setViewMode("product")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "product" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "product"}>
-                                <Package size={18} />
-                                {isWide && <span className="text-sm">Product</span>}
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {(isMedium || isWide) && (
-                    <div className={`overflow-y-auto p-3 grid gap-3 overflow-x-scroll grid-cols-[repeat(auto-fill,minmax(auto,1fr))]`}>
-                        {viewMode === "category" ? (
-                            groupLoading ? (
+                        <div className={`overflow-y-auto p-3 grid gap-3 overflow-x-scroll grid-cols-[repeat(auto-fill,minmax(auto,1fr))]`}>
+                            {viewMode === "category" ? (
+                                groupLoading ? (
+                                    <p className="p-4 text-center text-gray-400 flex items-center justify-center gap-2">
+                                        <Spinner /> Yuklanmoqda...
+                                    </p>
+                                ) : categories.length === 0 ? (
+                                    <div className="text-gray-500 p-3">Hech qanday kategoriya topilmadi.</div>
+                                ) : (
+                                    categories.map((cat) => (
+                                        <button key={cat.id} onClick={() => handleCategoryClick(cat.id)} className={`cursor-pointer border rounded-xl shadow-sm hover:shadow-md p-3 text-left ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"}`}>
+                                            <div className="text-sm font-medium">{cat.name}</div>
+                                        </button>
+                                    ))
+                                )
+                            ) : productLoading ? (
                                 <p className="p-4 text-center text-gray-400 flex items-center justify-center gap-2">
                                     <Spinner /> Yuklanmoqda...
                                 </p>
-                            ) : categories.length === 0 ? (
-                                <div className="text-gray-500 p-3">Hech qanday kategoriya topilmadi.</div>
+                            ) : products.length === 0 ? selectedCategory ? (
+                                <FreeData text={"Tanlangan kategoriyada mahsulot topilmadi"} icon={<PackageSearch className="w-10 h-10 mb-3 text-gray-400" />} />
                             ) : (
-                                categories.map((cat) => (
-                                    <button key={cat.id} onClick={() => handleCategoryClick(cat.id)} className={`cursor-pointer border rounded-xl shadow-sm hover:shadow-md p-3 text-left ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"}`}>
-                                        <div className="text-sm font-medium">{cat.name}</div>
-                                    </button>
-                                ))
-                            )
-                        ) : productLoading ? (
-                            <p className="p-4 text-center text-gray-400 flex items-center justify-center gap-2">
-                                <Spinner /> Yuklanmoqda...
-                            </p>
-                        ) : products.length === 0 ? selectedCategory ? (
-                            <FreeData text={"Tanlangan kategoriyada mahsulot topilmadi"} icon={<PackageSearch className="w-10 h-10 mb-3 text-gray-400" />} />
-                        ) : (
-                            <FolderOpenMessage text={"Iltimos, mahsulotlarni ko‘rish uchun kategoriya tanlang."} icon={<FolderOpen className="w-10 h-10 mb-3 text-gray-400" />} />
-                        ) : (
-                            products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod) => (
-                                <button key={prod.id || prod.stock_id || prod.product?.id || generateId()} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
-                                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-3 min-w-[180px] transition">
-                                        <div className="p-1 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-900 font-medium whitespace-nowrap">{prod.product?.name || prod.name || "No name"}</span>
-                                            <div className="flex items-center justify-center gap-2 text-gray-800 font-medium whitespace-nowrap">
-                                                <span>Partiya: {prod.batch === null ? "Default" : prod.batch}</span>
-                                                <span>Shtrix: {prod.barcode || "undefined"}</span>
+                                <FolderOpenMessage text={"Iltimos, mahsulotlarni ko‘rish uchun kategoriya tanlang."} icon={<FolderOpen className="w-10 h-10 mb-3 text-gray-400" />} />
+                            ) : (
+                                products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod, index) => (
+                                    <button key={index} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
+                                        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-3 min-w-[180px] transition">
+                                            <div className="p-1 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-900 font-medium whitespace-nowrap">{prod.product?.name || prod.name || "No name"}</span>
+                                                <div className="flex items-center justify-center gap-2 text-gray-800 font-medium whitespace-nowrap">
+                                                    <span>Partiya: {prod.batch === null ? "Default" : prod.batch}</span>
+                                                    <span>Shtrix: {prod.barcode || "undefined"}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </button>
-                            ))
-                        )}
-                    </div>
-                )}
-            </div>
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </div>
+            }
 
             {/* Main content */}
             <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
                 <div className="bg-gray-100 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (
-                        <div className="h-[65px] bg-white rounded-lg flex items-center gap-4 px-3 shadow-sm">
-                            <div className="flex items-center gap-2">
-                                {locationsLoading ? (
-                                    <div className="flex items-center gap-2"><Spinner /> Loading...</div>
-                                ) : (
-                                    <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                        <option value="">{mode === "in" ? "Jo'natuvchini tanlang" : "Jo'natuvchini tanlang"}</option>
-                                        {locations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
-                                    </select>
-                                )}
+                        <div>
+                            {/* Operation selection */}
+                            <div className="flex flex-col gap-4 mb-4">
+                                {/* Transfer_in */}
+                                <button
+                                    onClick={() => {
+                                        setSelected("transfer_in");
+                                        setSendToTrash(false);
+                                    }}
+                                    className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200 ${selected === "transfer_in"
+                                        ? "bg-blue-50 border-blue-500 text-blue-700 shadow"
+                                        : "border-gray-300 hover:border-blue-300 text-gray-700"
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Truck size={22} />
+                                        <span className="text-lg font-medium">Перемещение на склад</span>
+                                    </div>
 
-                                {selectedLocation === "other" && (
-                                    <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
-                                )}
-                            </div>
-
-                            <div className="ml-auto">
-                                <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
-                                    {
-                                        !createInvoiceLoading ?
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                            </svg> :
-                                            <Spinner />
-                                    }
-                                    {mode === "in" ? "Kirimni boshlash" : "Chiqimni boshlash"}
                                 </button>
+
+                                {/* Return_in */}
+                                <div
+                                    className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200 ${selected === "return_in"
+                                        ? "bg-green-50 border-green-500 text-green-700 shadow"
+                                        : "border-gray-300 hover:border-green-300 text-gray-700"
+                                        }`}
+                                >
+                                    <div
+                                        onClick={() => setSelected("return_in")}
+                                        className="flex items-center justify-between cursor-pointer"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Undo2 size={22} />
+                                            <span className="text-lg font-medium">Принять возврат</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Checkbox for return_dis */}
+                                    {selected === "return_in" && (
+                                        <label className="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer">
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <Trash2 size={18} />
+                                                <span>Направить на утилизацию</span>
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                checked={sendToTrash}
+                                                onChange={(e) => setSendToTrash(e.target.checked)}
+                                                className="w-5 h-5 accent-red-500"
+                                            />
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="h-[65px] bg-white rounded-lg flex items-center gap-4 px-3 shadow-sm">
+                                <div className="flex items-center gap-2">
+                                    {locationsLoading ? (
+                                        <div className="flex items-center gap-2"><Spinner /> Loading...</div>
+                                    ) : (
+                                        <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
+                                            <option value="">Укажите отправителя</option>
+                                            {operationLocations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
+                                        </select>
+                                    )
+                                    }
+
+                                    {selectedLocation === "other" && (
+                                        <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
+                                    )}
+                                </div>
+
+                                <div className="ml-auto">
+                                    <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
+                                        {
+                                            !createInvoiceLoading ?
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                                </svg> :
+                                                <Spinner />
+                                        }
+                                        {selected === "transfer_in" && "Начать Принять перемещение"}
+                                        {(selected === "return_in" && sendToTrash === false) && "Начать Принять возврат"}
+                                        {(selected === "return_in" && sendToTrash === true) && "Начать Утилизация возврата"}
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
                     ) : (
                         <div className="h-[65px] bg-white rounded-lg flex items-center gap-3 px-3 shadow-sm">
                             <div className="flex items-center gap-2">
                                 <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Mahsulot nomi bilan qidirish..." className="border rounded px-3 py-2 w-[420px]" aria-label="Search products by name" />
                                 <button onClick={() => setSearchQuery((s) => s.trim())} className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 hover:bg-gray-300" aria-label="Search">
-                                    <SearchIcon size={16} /> Qidirish
+                                    <SearchIcon size={16} /> Поиск
                                 </button>
                             </div>
 
                             <div className="ml-auto flex items-center gap-2">
                                 <button onClick={() => { setBarcodeEnabled((s) => !s); setBarcodeInput(""); }} className={`flex items-center gap-2 px-3 py-2 rounded ${barcodeEnabled ? "bg-green-600 text-white animate-[pulse_1.5s_infinite]" : "bg-gray-200 text-gray-800"}`} aria-pressed={barcodeEnabled} aria-label="Toggle barcode input">
-                                    <BarcodeIcon size={16} /> Barcode
+                                    <BarcodeIcon size={16} /> Штрихкод
                                 </button>
                                 {barcodeEnabled && (
                                     <div className="flex items-center gap-2">
@@ -735,26 +818,26 @@ export default function WareHouseIncome() {
                         <>
                             <div className="bg-white rounded-lg p-3 shadow-sm flex items-center gap-6">
                                 <div>
-                                    <div className="text-xs text-gray-500">{mode === "in" ? "Jo'natuvchi" : "Jo'natuvchi"}</div>
+                                    <div className="text-xs text-gray-500">Отправитель</div>
                                     <div className="font-medium">{invoiceMeta?.[mode]?.sender || "—"}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-gray-500">{mode === "in" ? "Qabul qiluvchi" : "Qabul qiluvchi"}</div>
+                                    <div className="text-xs text-gray-500">Получатель</div>
                                     <div className="font-medium">{invoiceMeta?.[mode]?.receiver}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-gray-500">Vaqt</div>
+                                    <div className="text-xs text-gray-500">Время</div>
                                     <div className="font-medium">{invoiceMeta?.[mode]?.time}</div>
                                 </div>
                                 <div className="ml-auto text-right">
-                                    <div className="text-xs text-gray-500">Umumiy qiymat</div>
+                                    <div className="text-xs text-gray-500">Общая стоимость</div>
                                     <div className="font-semibold text-lg">{(total || 0).toLocaleString()} сум</div>
                                 </div>
                             </div>
 
                             <div className="bg-white rounded-lg p-3 shadow-sm">
                                 <div className="text-sm font-medium mb-2 flex items-center justify-between">
-                                    <h4>Qidiruv natijalari</h4>
+                                    <h4>Результаты поиска</h4>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => setSearchResults([])}
@@ -768,17 +851,17 @@ export default function WareHouseIncome() {
                                     </div>
                                 </div>
                                 {searchLoading ? (
-                                    <div className="p-4 flex items-center gap-2"><Spinner /> Qidirilmoqda...</div>
+                                    <div className="p-4 flex items-center gap-2"><Spinner /> Поиск...</div>
                                 ) : searchResults.length === 0 ? (
-                                    <div className="text-gray-500">Natija topilmadi</div>
+                                    <div className="text-gray-500">Ничего не найдено</div>
                                 ) : (
                                     <div className="flex gap-3 flex-wrap">
                                         {searchResults.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((r) => (
                                             <button key={r.id || r.stock_id || generateId()} onClick={() => onSelectSearchResult(r)} className="bg-white border rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px]">
                                                 <div className="text-sm font-medium">{r.product?.name || r.name}</div>
                                                 <div className="flex items-center justify-center gap-3">
-                                                    <div className="text-xs text-gray-600">Shtrix: {r.barcode || ""}</div>
-                                                    <div className="text-xs text-gray-600">Partiya: {r.batch === null ? "Default" : r.batch}</div>
+                                                    <div className="text-xs text-gray-600">Штрих: {r.barcode || ""}</div>
+                                                    <div className="text-xs text-gray-600">Партия: {r.batch === null ? "Default" : r.batch}</div>
                                                 </div>
                                             </button>
                                         ))}
@@ -791,13 +874,13 @@ export default function WareHouseIncome() {
                                     <thead className="text-left text-xs text-gray-500 border-b">
                                         <tr>
                                             <th className="p-2">#</th>
-                                            <th>Partiya</th>
-                                            <th className="p-2">Nomi</th>
-                                            <th className="p-2">Narx</th>
-                                            <th className="p-2">Miqdor</th>
-                                            <th className="p-2">Birlik</th>
-                                            <th className="p-2">Jami</th>
-                                            <th className="p-2">Action</th>
+                                            <th>Партия</th>
+                                            <th className="p-2">Наименование</th>
+                                            <th className="p-2">Цена</th>
+                                            <th className="p-2">Количество</th>
+                                            <th className="p-2">Ед. изм.</th>
+                                            <th className="p-2">Итого</th>
+                                            <th className="p-2">Убрать</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -820,11 +903,11 @@ export default function WareHouseIncome() {
                                                         )}
                                                     </td>
                                                     <td className="p-2 align-top">
-                                                        <div className="font-medium">{it.product?.name || it.name || "—"}</div>
+                                                        <div className="font-medium">{it?.name || "—"}</div>
                                                         <div className="text-xs text-gray-500">{it.barcode}</div>
-                                                        <div className="text-xs text-gray-500 flex">Partiya:
+                                                        <div className="text-xs text-gray-500 flex">Партия:
                                                             {mode === "in" ? (
-                                                                it.is_new_batch ? (<div className="tex-xs text-blue-gray-700 ">Yangi Partiya</div>) : (it.batch === null ? "Default" : it.batch)
+                                                                it.is_new_batch ? (<div className="tex-xs text-blue-gray-700 ">Новая партия</div>) : (it.batch === null ? "Default" : it.batch)
                                                             ) : (
                                                                 (it.batch === null ? "Default" : it.batch)
                                                             )}
@@ -835,10 +918,9 @@ export default function WareHouseIncome() {
                                                     </td>
                                                     <td className="p-2 align-center w-[120px]">
                                                         <input type="number" step="1" min={0} max={mode === "out" ? (Number.isFinite(stockAvail) ? stockAvail : undefined) : undefined} value={it.quantity === 0 ? "0" : (it.quantity ?? "")} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
-                                                        {mode === "out" && Number.isFinite(stockAvail) && <div className="text-xs text-gray-500">Omborda: {stockAvail}</div>}
                                                     </td>
                                                     <td className="p-2 align-center w-[120px] ">
-                                                        {it.product?.unit || "-"}
+                                                        {it?.unit || "-"}
                                                     </td>
                                                     <td className="p-2 align-center">
                                                         {(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}
@@ -867,7 +949,7 @@ export default function WareHouseIncome() {
                                 <div className="flex items-center gap-2">
                                     <button onClick={openModal} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white text-[16px] rounded hover:opacity-95`}>
                                         <CheckSquare size={22} />
-                                        Yakunlash
+                                        Завершить
                                     </button>
                                 </div>
                             </div>
@@ -883,12 +965,19 @@ export default function WareHouseIncome() {
                         <div id="modal_window" ref={modalContentRef}>
                             {/* A4 preview content */}
                             <div style={{ width: "100%", boxSizing: "border-box" }}>
-                                <h1 id="modal-title" className="text-center text-lg font-bold">{mode === "in" ? "KIRIM HUJJATI" : "CHIQQIM HUJJATI"}</h1>
+                                <h1 id="modal-title" className="text-center text-lg font-bold">
+                                    {invoiceMeta?.[mode]?.operation_type === "transfer_in" ?
+                                        "Документ перемещения на склад" :
+                                        invoiceMeta?.[mode]?.operation_type === "return_in" ?
+                                            "Документ приёма возврата" :
+                                            "Документ приёма возврата с утилизацией"
+                                    }
+                                </h1>
                                 <div className="meta">
-                                    <div><strong>{mode === "in" ? "Jo'natuvchi:" : "Jo'natuvchi:"}</strong> {invoiceMeta?.[mode]?.sender || "—"}</div>
-                                    <div><strong>{mode === "in" ? "Qabul qiluvchi:" : "Qabul qiluvchi:"}</strong> {invoiceMeta?.[mode]?.receiver || "—"}</div>
-                                    <div><strong>Vaqt:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
-                                    <div><strong>Umumiy:</strong> {(total || 0).toLocaleString()} сум</div>
+                                    <div><strong>Отправитель:</strong> {invoiceMeta?.[mode]?.sender || "—"}</div>
+                                    <div><strong>Получатель:</strong> {invoiceMeta?.[mode]?.receiver || "—"}</div>
+                                    <div><strong>Время:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
+                                    <div><strong>Общая стоимость:</strong> {(total || 0).toLocaleString()} сум</div>
                                 </div>
 
                                 <div className="overflow-x-auto">
@@ -896,18 +985,18 @@ export default function WareHouseIncome() {
                                         <thead>
                                             <tr>
                                                 <th style={{ border: "1px solid #333", padding: 6 }}>#</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>Nomi</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>Barcode</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>Narx</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>Miqdor</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>Jami</th>
+                                                <th style={{ border: "1px solid #333", padding: 6 }}>Наименование</th>
+                                                <th style={{ border: "1px solid #333", padding: 6 }}>Штрихкод</th>
+                                                <th style={{ border: "1px solid #333", padding: 6 }}>Цена</th>
+                                                <th style={{ border: "1px solid #333", padding: 6 }}>Количество</th>
+                                                <th style={{ border: "1px solid #333", padding: 6 }}>Итого</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {mixData.map((it, idx) => (
                                                 <tr key={it.id || idx}>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{idx + 1}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{it.product?.name || "—"}</td>
+                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{it?.name || "—"}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{it.barcode || ""}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.price || 0).toLocaleString()}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.quantity || 0)}</td>
@@ -923,20 +1012,20 @@ export default function WareHouseIncome() {
                                 </div>
 
                                 <div style={{ marginTop: 20 }}>
-                                    <div>Jo'natuvchi imzo: ______________________</div>
-                                    <div style={{ marginTop: 8 }}>Qabul qiluvchi imzo: ______________________</div>
+                                    <div>Подпись отправителя:: ______________________</div>
+                                    <div style={{ marginTop: 8 }}>Подпись получателя:: ______________________</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Modal actions */}
                         <div className="mt-4 flex justify-end gap-2">
-                            <button onClick={closeModal} className="px-4 py-2 rounded border hover:bg-gray-100">Cancel</button>
+                            <button onClick={closeModal} className="px-4 py-2 rounded border hover:bg-gray-100">Отмена</button>
                             <button onClick={handleModalSave} disabled={saving} className="px-4 py-2 rounded bg-black text-white disabled:opacity-60">
-                                {saving ? <Spinner size="sm" /> : "Save"}
+                                {saving ? <Spinner size="sm" /> : "Сохранить"}
                             </button>
                             <button onClick={handlePrint} disabled={printing} className="px-4 py-2 rounded border hover:bg-gray-100">
-                                {printing ? <Spinner size="sm" /> : "Print"}
+                                {printing ? <Spinner size="sm" /> : "Печать"}
                             </button>
                         </div>
                     </div>

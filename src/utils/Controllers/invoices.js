@@ -18,6 +18,9 @@ class InvoicesApi {
         const response = await $api.get(`/invoices/location/${location_id}/page?page=${page}`)
         return response;
     }
+    static GetFilteredInvoices = async ({data}) => {
+        const response = await $api.get(`/invoices/filter`)
+    }
     static DeleteInvoice = async (id) => {
         const response = await $api.delete(`/invoices/${id}`)
         return response;

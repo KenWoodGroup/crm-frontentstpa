@@ -18,9 +18,9 @@ class ProductApi {
     static GetAllProduct = async (page) => {
         const response = await $api.get(`/products/page?page=${page}`)
         return response;
-    }
+    }   
     static GetMiniCategoryById = async (id) => {
-        const response = await $api.get(`/subcategories/factory-products/${id}`)
+        const response = await $api.get(`/subcategories/products/${id}`)
         return response;
     };
     static GetProductBySubCategory = async (id) => {

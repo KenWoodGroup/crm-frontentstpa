@@ -31,7 +31,7 @@ export default function FactoryProductModal({
             const dataToSend = {
                 list: selectedProducts.map((product) => ({
                     location_id: location_id,
-                    key: "factoryProducts",
+                    key: "products",
                     value: product.id,
                 })),
             };

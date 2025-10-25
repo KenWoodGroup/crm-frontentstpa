@@ -21,7 +21,7 @@ import {
 import { notify } from "../../../utils/toast";
 // import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
-import { Spinner } from "@material-tailwind/react";
+import Spinner from "../../UI/spinner/Spinner";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
 import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
@@ -31,6 +31,7 @@ import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
 import { useWarehouse } from "../../../context/WarehouseContext";
+import OutgoingPanel from "./sectionsWhO/OutgoingPanel";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -96,11 +97,14 @@ export default function WareHouseOutcome() {
     const isWide = sidebarMode === 2;
     const isMedium = sidebarMode === 1;
 
-    const [locations, setLocations] = useState([]);
+    const [locations, setLocations] = useState([{ id: 0, name: "Loading" }]);
     const [locationsLoading, setLocationsLoading] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState("");
     const [otherLocationName, setOtherLocationName] = useState("");
     const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
+
+    const [operationType, setOperationType] = useState("outgoing");
+    const [operationStatus, setOperationStatus] = useState("draft");
 
     // search & barcode
     const [searchQuery, setSearchQuery] = useState("");
@@ -166,10 +170,11 @@ export default function WareHouseOutcome() {
     const handleCategoryClick = async (catId) => {
         setSelectedCategory(catId);
         setViewMode("product");
+        const type = invoiceMeta?.[mode]?.operation_type
         try {
             setProductLoading(true);
             // for outgoing, we fetch stocks of current location (we will take from this location)
-            const res = await Stock.getLocationStocksByChildId(userLId, catId);
+            const res = await Stock.getLocationStocksByChildId(userLId, catId, type);
             if (res?.status === 200) setProducts(res.data || []);
             else setProducts(res?.data || []);
         } catch (err) {
@@ -183,20 +188,19 @@ export default function WareHouseOutcome() {
     const startInvoice = async () => {
         // for outgoing: user selects receiver (where items go)
         if (!selectedLocation) {
-            notify.error("Iltimos, qabul qiluvchini tanlang");
+            notify.warning("Iltimos, qabul qiluvchini tanlang");
             return;
         }
         try {
             setCreateInvoiceLoading(true);
-            const otherId = locations?.find((item)=> item.type === "other")?.id
             const payload = {
-                created_by: createdBy,
-                receiver_id: selectedLocation === "other"  ? otherId : selectedLocation,
-                // receiver_name: selectedLocation === "other" ? otherLocationName || "tashqi" : getLocationNameById(selectedLocation),
+                type: operationType,
                 sender_id: userLId, // outgoing: sender is current location
-                // sender_name:getLocationNameById(userLId),
-                type: selectedLocation === "other" ? "outgoing" :  "transfer_outgoing",
-                status: "approved",
+                receiver_id: selectedLocation,
+                created_by: createdBy,
+                status: operationStatus,
+                receiver_name: getLocationNameById(selectedLocation),
+                sender_name: getLocationNameById(userLId),
             };
             const res = await InvoicesApi.CreateInvoice(payload);
             const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
@@ -208,8 +212,8 @@ export default function WareHouseOutcome() {
                 }
                 setInvoiceId(mode, invoice_id);
                 setInvoiceStarted(mode, true);
-                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(userLId), receiver: selectedLocation !== "other" ? getLocationNameById(selectedLocation) : (otherLocationName || "Other") });
-                setIsDirty(mode, false);
+                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(userLId), receiver: selectedLocation !== "other" ? getLocationNameById(selectedLocation) : (otherLocationName || "Other"), operation_type: operationType });
+                setIsDirty(mode, true);
                 notify.success("Chiqim boshlandi");
             } else {
                 throw new Error("Invoice yaratishda xato");
@@ -226,7 +230,7 @@ export default function WareHouseOutcome() {
         if (id === "other") return otherLocationName || "Other";
         const f = locations.find((l) => String(l.id) === String(id));
         return f ? f.name || f.address || "Location" : "";
-    }
+    };
 
     // search
     useEffect(() => {
@@ -237,7 +241,7 @@ export default function WareHouseOutcome() {
             }
             try {
                 setSearchLoading(true);
-                const data = { locationId: userLId, search: debouncedSearch.trim() };
+                const data = { locationId: userLId, search: debouncedSearch.trim(), fac_id: Cookies.get("usd_nesw"), operation_type: invoiceMeta?.[mode]?.operation_type };
                 const res = await Stock.getLocationStocksBySearch({ data });
                 if (res?.status === 200 || res?.status === 201) setSearchResults(res.data || []);
             } catch (err) {
@@ -314,22 +318,20 @@ export default function WareHouseOutcome() {
 
     // normalize (ensure stock_quantity available for outgoing)
     function normalizeIncomingItem(raw) {
-        const productObj = raw.product || {};
+        const productObj = raw.product || undefined;
+        const is_raw_stock = productObj !== undefined
         return {
-            id: raw.id || generateId(),
-            barcode: raw.barcode || "",
-            stock_id: raw.id || null,
-            location_id: raw.location_id || null,
-            price: Number(raw.price) || 0,
-            product: productObj,
-            product_id: raw.product.id || null,
-            quantity: Number(raw.quantity ?? 1) || 1,
-            name: raw.product.name || "",
+            is_raw_stock: productObj === undefined ? true : false,
+            is_new_batch: false,
+            name: is_raw_stock ? productObj.name : raw.name || "-",
+            price: invoiceMeta?.[mode]?.operation_type === "transfer_out" ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
+            origin_price: invoiceMeta?.[mode]?.operation_type === "transfer_out" ? Number(raw.purchase_price || 0) : Number(raw.sale_price || 0),
+            quantity: 1,
+            unit: is_raw_stock ? productObj.unit : raw.unit || "-",
+            product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
+            barcode: raw.barcode || null,
             batch: raw.batch ?? null,
-            // is_new_batch: false, // not used in outgoing but keep field
-            raw,
-            origin_price: Number(raw.price ?? 0),
-            stock_quantity: raw.quantity ?? undefined,
+            fixed_quantity:raw.fixed_quantity
         };
     }
 
@@ -337,7 +339,7 @@ export default function WareHouseOutcome() {
         const item = normalizeIncomingItem(raw);
         const res = addItem(item);
         if (res && res.ok === false) notify.error(res.message || "Item qo'shilmadi");
-    }
+    };
 
     /// // ---------- recalcTotal ----------
     const total = useMemo(() => {
@@ -363,6 +365,8 @@ export default function WareHouseOutcome() {
             updatePrice(index, value);
             // outgoing: do NOT create new batch on price change
         }
+        console.log("ok");
+        
     }
     function handleRemoveItem(index) {
         removeItem(index);
@@ -580,8 +584,8 @@ export default function WareHouseOutcome() {
                         ) : (
                             <FolderOpenMessage text={"Iltimos, mahsulotlarni ko‘rish uchun kategoriya tanlang."} icon={<FolderOpen className="w-10 h-10 mb-3 text-gray-400" />} />
                         ) : (
-                            products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod) => (
-                                <button key={prod.id || prod.stock_id || prod.product?.id || generateId()} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
+                            products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod, index) => (
+                                <button key={index} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
                                     <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-3 min-w-[180px] transition">
                                         <div className="p-1 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -608,37 +612,15 @@ export default function WareHouseOutcome() {
                 <div className="bg-gray-100 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (
-                        <div className="h-[65px] bg-white rounded-lg flex items-center gap-4 px-3 shadow-sm">
-                            <div className="flex items-center gap-2">
-                                {locationsLoading ? (
-                                    <div className="flex items-center gap-2"><Spinner /> Loading...</div>
-                                ) : (
-                                    <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Receiver location">
-                                        <option value="">{/* outgoing placeholder */}Qabul qiluvchini tanlang</option>
-                                        {locations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
-                                        <option  value="other">
-                                            {locations.find((item) => item.type === "other")?.name}
-                                        </option>
-                                    </select>
-                                )}
-
-                                {selectedLocation === "other" && (
-                                    <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
-                                )}
-                            </div>
-
-                            <div className="ml-auto">
-                                <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
-                                    {
-                                        !createInvoiceLoading ?
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                            </svg> :
-                                            <Spinner />
-                                    }
-                                    Chiqimni boshlash
-                                </button>
-                            </div>
-                        </div>
+                        <OutgoingPanel
+                            receiverLocations={locationsLoading ? [{ id: 0, name: "loading..." }] : locations?.filter((item) => item.id !== userLId)}
+                            isLoading={createInvoiceLoading}
+                            selectOprType={setOperationType}
+                            selectStatus={setOperationStatus}
+                            selectReceiver={setSelectedLocation}
+                            startOperation={startInvoice}
+                            selectedReceiver={selectedLocation}
+                        />
                     ) : (
                         <div className="h-[65px] bg-white rounded-lg flex items-center gap-3 px-3 shadow-sm">
                             <div className="flex items-center gap-2">
@@ -756,11 +738,11 @@ export default function WareHouseOutcome() {
                                                         <div className="text-[14px] text-gray-700">{it.batch ?? "Default"}</div>
                                                     </td>
                                                     <td className="p-2 align-top">
-                                                        <div className="font-medium">{it.product?.name || it.name || "—"}</div>
+                                                        <div className="font-medium">{it.name || "—"}</div>
                                                         <div className="text-xs text-gray-500">{it.barcode}</div>
                                                     </td>
                                                     <td className="p-2 align-center w-[140px]">
-                                                        <input type="number" step="any" value={it.price ?? ""} onChange={(e) => handleUpdatePrice(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
+                                                        <input type="number" step="any" value={it.price ?? ""} onChange={(e) => handleUpdatePrice(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it?.name || idx + 1}`} />
                                                     </td>
                                                     <td className="p-2 align-center w-[120px]">
                                                         <input type="number" step="any" value={it.quantity} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
@@ -768,7 +750,7 @@ export default function WareHouseOutcome() {
                                                     <td className="p-2 aligin-center text-green-900">
                                                         {Number.isFinite(stockAvail) && <div> {stockAvail}</div>}
                                                     </td>
-                                                    <td className="p-2 align-center w-[120px]">{it.product?.unit || "-"}</td>
+                                                    <td className="p-2 align-center w-[120px]">{it?.unit || "-"}</td>
                                                     <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
                                                     <td className="p-2 align-center">
                                                         <div className="flex gap-2 items-center">

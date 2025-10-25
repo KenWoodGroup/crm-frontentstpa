@@ -18,9 +18,9 @@ function mixReducer(state, action) {
             const idx = state.findIndex(
                 (p) =>
                     (p.product_id && item.product_id && String(p.product_id) === String(item.product_id)) &&
-                    ((p.batch && item.batch && String(p.batch) === String(item.batch)) || (p.batch === null && item.batch === null))
+                    ((p.batch && item.batch && String(p.batch) === String(item.batch) && !p.is_new_batch) || (p.batch === null && item.batch === null && !p.is_new_batch))
             );
-            if (idx !== -1) {
+            if (idx !== -1) {                
                 const copy = [...state];
                 copy[idx] = {
                     ...copy[idx],
@@ -29,20 +29,20 @@ function mixReducer(state, action) {
                 return copy;
             } else {
                 const newItem = {
-                    id: item.id || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`,
-                    barcode: item.barcode || "",
-                    stock_id: item.id || null,
-                    location_id: item.location_id || null,
+                    is_raw_stock: item.is_raw_stock,
+                    name: item.name,
                     price: Number(item.price) || 0,
-                    product: item.product || {},
-                    product_id: item.product_id || null,
-                    quantity: 1,
-                    batch: item.batch || null,
                     // is_new_batch may be used only by income UI; keep optional
                     is_new_batch: item.is_new_batch || false,
-                    origin_price: Number(item.price || 0),
+                    origin_price: Number(item.origin_price) || 0,
+                    quantity: item.quantity,
+                    unit:item.unit || "-",
+                    product_id: item.product_id || null,
+                    barcode: item.barcode || null,
+                    batch: item.batch || null,
                     // stock_quantity — UI/server passed mayida mavjud bo'lsa saqlaymiz (outgoing validation uchun)
                     stock_quantity: item.stock_quantity ?? null,
+                    fixed_qty:item.fixed_qty ?? true
                 };
                 return [...state, newItem];
             }
@@ -72,9 +72,9 @@ export function WarehouseProvider({ children, mode = "in" }) {
     const [isDirty, setIsDirty] = useState({ in: false, out: false, dis: false });
     const [saveSuccess, setSaveSuccess] = useState({ in: false, out: false, dis: false });
     const [invoiceMeta, setInvoiceMeta] = useState({
-        in: { sender: null, receiver: "Me", time: new Date().toLocaleString() },
-        out: { sender: "Me", receiver: null, time: new Date().toLocaleString() },
-        dis: { sender: "Me", receiver: "Disposal", time: new Date().toLocaleString() },
+        in: { sender: null, receiver: "Me", operation_type: null, time: new Date().toLocaleString() },
+        out: { sender: "Me", receiver: null, operation_type: null, time: new Date().toLocaleString() },
+        dis: { sender: "Me", receiver: "Disposal", operation_type: null, time: new Date().toLocaleString() },
     });
 
     const [invoiceStarted, setInvoiceStartedRaw] = useState({ in: false, out: false, dis: false });
@@ -94,7 +94,7 @@ export function WarehouseProvider({ children, mode = "in" }) {
         if (m === "out") {
             // outgoing: do not create new batch if not present in stock (caller should provide correct batch or server id)
             // try to find matching in current mixOut
-            const idxExisting = mixOut.findIndex(p => p.product.id && item.product.id && String(p.product.id) === String(item.product.id) && ((p.batch && item.batch && String(p.batch) === String(item.batch)) || (p.batch === null && item.batch === null)));
+            const idxExisting = mixOut.findIndex(p => p.product_id && item.product_id && String(p.product_id) === String(item.product_id) && ((p.batch && item.batch && String(p.batch) === String(item.batch)) || (p.batch === null && item.batch === null)));
             // If not existing in mixOut, we still might allow adding if server-stock exists (caller should provide stock_quantity)
             const avail = item.quantity ?? null;
             if (idxExisting === -1 && (avail === null || avail <= 0)) {
@@ -206,16 +206,16 @@ export function WarehouseProvider({ children, mode = "in" }) {
     const resetAll = () => {
         dispatchIn({ type: "RESET" });
         dispatchOut({ type: "RESET" });
-        dispatchDis({type:"RESET"});
-        setInvoiceStartedRaw({ in: false, out: false, dis:false });
-        setInvoiceIdRaw({ in: null, out: null, dis:null });
+        dispatchDis({ type: "RESET" });
+        setInvoiceStartedRaw({ in: false, out: false, dis: false });
+        setInvoiceIdRaw({ in: null, out: null, dis: null });
         setInvoiceMeta({
-            in: { sender: null, receiver: "Me", time: new Date().toLocaleString() },
-            out: { sender: "Me", receiver: null, time: new Date().toLocaleString() },
-            dis: { sender: "Me", receiver: null, time: new Date().toLocaleString() }
+            in: { sender: null, receiver: "Me", time: new Date().toLocaleString(), operation_type:null },
+            out: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type:null },
+            dis: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type:null }
         });
-        setIsDirty({ in: false, out: false, dis:false });
-        setSaveSuccess({ in: false, out: false, dis:false });
+        setIsDirty({ in: false, out: false, dis: false });
+        setSaveSuccess({ in: false, out: false, dis: false });
     };
 
     // expose a unified API but with per-mode internals
