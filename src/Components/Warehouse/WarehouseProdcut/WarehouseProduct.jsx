@@ -109,7 +109,8 @@ export default function WarehouseProduct() {
                                     <th className="p-4 font-semibold text-gray-700">№</th>
                                     <th className="p-4 font-semibold text-gray-700">Mahsulot nomi</th>
                                     <th className="p-4 font-semibold text-gray-700">Partiya</th>
-                                    <th className="p-4 font-semibold text-gray-700">Narxi</th>
+                                    <th className="p-4 font-semibold text-gray-700">Sotuv narxi</th>
+                                    <th className="p-4 font-semibold text-gray-700">Tan narxi</th>
                                     <th className="p-4 font-semibold text-gray-700">Soni</th>
                                     <th className="p-4 font-semibold text-gray-700">Barcode</th>
                                     <th className="p-4 font-semibold text-gray-700">Sana</th>
@@ -143,8 +144,13 @@ export default function WarehouseProduct() {
                                                 )}
                                             </td>
                                             <td className="p-4 text-gray-700">
-                                                {item.price
-                                                    ? `${formatNumber(item.price)} so‘m`
+                                                {item.sale_price
+                                                    ? `${formatNumber(item.sale_price)} so‘m`
+                                                    : "—"}
+                                            </td>
+                                            <td className="p-4 text-gray-700">
+                                                {item.purchase_price
+                                                    ? `${formatNumber(item.purchase_price)} so‘m`
                                                     : "—"}
                                             </td>
                                             <td className="p-4 text-gray-700">{item.quantity}</td>

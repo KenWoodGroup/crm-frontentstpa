@@ -11,21 +11,21 @@ import {
 import { Stock } from "../../../../utils/Controllers/Stock";
 import { Alert } from "../../../../utils/Alert";
 import { formatNumber, unformatNumber } from "../../../../utils/Helpers/Formater";
-export default function WarehouseEdit({ data }) {
-    const [open, setOpen] = useState(false);
-    const [price, setPrice] = useState(formatNumber(data?.price || 0));
 
+export default function WarehouseEdit({ data }) {
+
+    const [open, setOpen] = useState(false);
+    const [price, setPrice] = useState(formatNumber(data?.sale_price || 0));
 
     const handleOpen = () => setOpen(!open);
 
     const handleSave = async () => {
         try {
             const form = {
-                product_id: data.product_id,
-                location_id: data.location_id,
-                quantity: Number(data.quantity),
-                sale_price: unformatNumber(price),
+                // старые данные
+                fixed_quantity: data.fixed_quantity,
                 barcode: data.barcode,
+                sale_price: unformatNumber(price),
             };
 
             const response = await Stock.EditStock({
@@ -42,8 +42,8 @@ export default function WarehouseEdit({ data }) {
     };
 
     const handleChange = (e) => {
-        const rawValue = e.target.value.replace(/\s/g, ""); // убираем пробелы во время ввода
-        if (!/^\d*$/.test(rawValue)) return; // запрещаем ввод нецифровых символов
+        const rawValue = e.target.value.replace(/\s/g, "");
+        if (!/^\d*$/.test(rawValue)) return;
         setPrice(formatNumber(rawValue));
     };
 
