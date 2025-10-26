@@ -137,7 +137,7 @@ export default function WareHouseDisposal() {
     const fetchLocations = async () => {
         try {
             setLocationsLoading(true);
-            const res = await location.getAllGroupLocations(userLId);
+            const res = await location.getAllGroupLocations(Cookies?.get(`usd_nesw`));
             if (res?.status === 200 || res?.status === 201) {
                 setLocations(res.data || []);
                 // find disposal location automatically
