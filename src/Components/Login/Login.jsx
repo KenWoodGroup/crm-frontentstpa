@@ -67,7 +67,7 @@ export default function Login() {
 
       const roleLinks = [
         { role: "super_admin", vektor: "/" },
-        { role: "admin", vektor: "/admin" },
+        { role: "admin", vektor: "/manager/dashboard" },
         { role: "factory", vektor: "/factory/dashboard" },
         { role: "warehouse", vektor: "/warehouse/dashboard" },
         { role: "dealer", vektor: "/diler/dashboard" },
@@ -88,7 +88,7 @@ export default function Login() {
         navigate("/company-warehouse/dashboard");
       } else if (data?.newUser?.location?.parent?.type === "company" &&
         data?.newUser?.role === "dealer") {
-            
+
       }
       else {
         const vektor_obj = roleLinks.find((item) => item.role === role);

@@ -19,9 +19,3 @@ export const supperAdminRoutes = [
     }
 ];
 
-export const managerRoutes = [
-    {
-        path: "/admin",
-        name: "admins",
-    }
-]

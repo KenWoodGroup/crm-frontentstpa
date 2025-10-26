@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@material-tailwind/react";
-import Swal from "sweetalert2";
-import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Tooltip, IconButton } from "@material-tailwind/react";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
+import { Clients } from "../../../../utils/Controllers/Clients";
+import { Staff } from "../../../../utils/Controllers/Staff";
 
-export default function WarehouseDilerDelete({ dilerId, refresh }) {
+export default function WarehouseSupplierDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
     const handleDelete = async () => {
         try {
             setLoading(true);
-            await WarehouseApi.WarehouseDelete(dilerId);
+            await Staff.DeleteStaff(id);
             Alert("Muvaffaqiyatli o‘chirildi ", "success");
             refresh();
             setOpen(false);
@@ -28,19 +28,23 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
 
     return (
         <>
-            <Button
-                onClick={handleOpen}
-                className="bg-red-600 text-white hover:bg-red-700 normal-case p-[8px]"
-            >
-                <Delete size={20} />
-            </Button>
+            <Tooltip content="Удалить">
+                <IconButton
+                    onClick={handleOpen}
+
+                    variant="text"
+                    color="red"
+                >
+                    <Delete size={20} />
+                </IconButton>
+            </Tooltip>
 
             <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl">
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200">
-                    Omborni o‘chirish
+                    Удаления поствшика
                 </DialogHeader>
                 <DialogBody divider className="text-gray-700">
-                    Siz haqiqatdan ham bu omborni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
+                    Вы действительно хотите удалить поствшика ?
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
@@ -50,7 +54,7 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
                         className="mr-2"
                         disabled={loading}
                     >
-                        Bekor qilish
+                        Отменить
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -79,7 +83,7 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "O‘chirish"
+                            "Удалить"
                         )}
                     </Button>
                 </DialogFooter>

@@ -11,6 +11,14 @@ import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/Setting
 import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
 import { elements } from "chart.js";
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
+import WarehousePayment from "../Components/Warehouse/WarehousePayment/WarehousePayment";
+import WarehouseSverka from "../Components/Warehouse/WarehouseSverka/WarehouseSverka";
+import WarehouseDebtor from "../Components/Warehouse/WarehouseDebtor/WarehouseDebtor";
+import WarehouseExpenses from "../Components/Warehouse/WarehouseExpenses/WarehouseExpenses";
+import WarehouseClients from "../Components/Warehouse/WarehouseClients/WarehouseClients";
+import WarehouseClientDetail from "../Components/Warehouse/WarehouseClientDetail/WarehouseClientDetail";
+import WarehouseCash from "../Components/Warehouse/WarehouseCash/WarehouseCash";
+import WarehouseSupplier from "../Components/Warehouse/WarehouseSupplier/WarehouseSupplier";
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",
@@ -30,17 +38,17 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/stockin",
         name: "Warehouse stock in",
-        element: <WareHouseIncome/>
+        element: <WareHouseIncome />
     },
     {
-        path:"/warehouse/stockout",
-        name:"Warehouse stock out",
-        element:<WareHouseOutcome/>
+        path: "/warehouse/stockout",
+        name: "Warehouse stock out",
+        element: <WareHouseOutcome />
     },
     {
-        path:"/warehouse/disposal",
-        name:"Warehouse Disposal",
-        element:<WareHouseDisposal/>
+        path: "/warehouse/disposal",
+        name: "Warehouse Disposal",
+        element: <WareHouseDisposal />
     },
     {
         path:"/warehouse/history",
@@ -60,6 +68,46 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/settings",
         name: "Warehouse settings",
-        element: <SettingsWareHouse/>
+        element: <SettingsWareHouse />
+    },
+    {
+        path: "/warehouse/payment",
+        name: "Warehouse payment",
+        element: <WarehousePayment />
+    },
+    {
+        path: "/warehouse/revisen",
+        name: "Warehouse sverka",
+        element: <WarehouseSverka />
+    },
+    {
+        path: "/warehouse/debtor",
+        name: "Warehouse Debtor",
+        element: <WarehouseDebtor />
+    },
+    {
+        path: "/warehouse/expenses",
+        name: "Warehouse expenses",
+        element: <WarehouseExpenses />
+    },
+    {
+        path: "/warehouse/clients",
+        name: "Warehouse Clients",
+        element: <WarehouseClients />
+    },
+    {
+        path: "/warehouse/client/:id",
+        name: "Warehouse Client detail",
+        element: <WarehouseClientDetail />
+    },
+    {
+        path: "/warehouse/kassa",
+        name: "Warehouse Kassa",
+        element: <WarehouseCash />
+    },
+    {
+        path: "/warehouse/supplier",
+        name: "Warehouse Supplier",
+        element: <WarehouseSupplier />
     }
 ];
