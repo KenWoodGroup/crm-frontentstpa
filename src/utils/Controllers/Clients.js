@@ -7,7 +7,7 @@ class Clients {
         return response;
     }
     static GetClients = async (data) => {
-        const response = await $api.get(`/locations/type/${data?.type}/${data?.search}/page?page=${data?.page}`)
+        const response = await $api.get(`/locations/type/${data?.location_id}/${data?.type}/${data?.search}/page?page=${data?.page}`)
         return response;
     }
     static DeleteClient = async (id) => {

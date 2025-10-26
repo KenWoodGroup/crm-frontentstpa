@@ -19,7 +19,7 @@ export default function WarehouseClientsCreate({ refresh }) {
         name: "",
         address: "",
         phone: "+998",
-        parent_id: Cookies.get(`usd_nesw`),
+        parent_id: Cookies.get(`ul_nesw`),
     });
 
     const handleOpen = () => setOpen(!open);
