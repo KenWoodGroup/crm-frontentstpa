@@ -20,7 +20,7 @@ function mixReducer(state, action) {
                     (p.product_id && item.product_id && String(p.product_id) === String(item.product_id)) &&
                     ((p.batch && item.batch && String(p.batch) === String(item.batch) && !p.is_new_batch) || (p.batch === null && item.batch === null && !p.is_new_batch))
             );
-            if (idx !== -1) {                
+            if (idx !== -1) {
                 const copy = [...state];
                 copy[idx] = {
                     ...copy[idx],
@@ -36,13 +36,14 @@ function mixReducer(state, action) {
                     is_new_batch: item.is_new_batch || false,
                     origin_price: Number(item.origin_price) || 0,
                     quantity: item.quantity,
-                    unit:item.unit || "-",
+                    unit: item.unit || "-",
                     product_id: item.product_id || null,
                     barcode: item.barcode || null,
                     batch: item.batch || null,
                     // stock_quantity — UI/server passed mayida mavjud bo'lsa saqlaymiz (outgoing validation uchun)
                     stock_quantity: item.stock_quantity ?? null,
-                    fixed_qty:item.fixed_qty ?? true
+                    fixed_qty: item.fixed_qty ?? true,
+                    discount: item.discount || 0
                 };
                 return [...state, newItem];
             }
@@ -53,6 +54,9 @@ function mixReducer(state, action) {
             return state.map((it, i) => (i === action.index ? { ...it, price: Math.max(0, Number(action.value)) || "" } : it));
         case "UPDATE_BATCH":
             return state.map((it, i) => (i === action.index ? { ...it, is_new_batch: action.value || false } : it))
+        case "UPDATE_DISCOUNT":
+            return state.map((it, i) => (i === action.index ? { ...it, discount: Math.max(0, Number(action.value)) || "" } : it))
+
         case "REMOVE":
             return state.filter((_, i) => i !== action.index);
         default:
@@ -188,6 +192,11 @@ export function WarehouseProvider({ children, mode = "in" }) {
         getDispatch(m)({ type: "UPDATE_BATCH", index, value });
         setIsDirty(prev => ({ ...prev, [m]: true }));
     };
+    const updateDiscount = (index, value, m = mode) => {
+        const parsed = value === "" ? "" : Math.max(0, Number(value));
+        getDispatch(m)({ type: "UPDATE_DISCOUNT", index, value: parsed });
+        setIsDirty(prev => ({ ...prev, [m]: true }));
+    }
 
     const removeItem = (index, m = mode) => {
         getDispatch(m)({ type: "REMOVE", index });
@@ -210,9 +219,9 @@ export function WarehouseProvider({ children, mode = "in" }) {
         setInvoiceStartedRaw({ in: false, out: false, dis: false });
         setInvoiceIdRaw({ in: null, out: null, dis: null });
         setInvoiceMeta({
-            in: { sender: null, receiver: "Me", time: new Date().toLocaleString(), operation_type:null },
-            out: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type:null },
-            dis: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type:null }
+            in: { sender: null, receiver: "Me", time: new Date().toLocaleString(), operation_type: null },
+            out: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type: null },
+            dis: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type: null }
         });
         setIsDirty({ in: false, out: false, dis: false });
         setSaveSuccess({ in: false, out: false, dis: false });
@@ -230,6 +239,7 @@ export function WarehouseProvider({ children, mode = "in" }) {
         updateQty,
         updatePrice,
         updateBatch,
+        updateDiscount,
         removeItem,
         resetMode,
         resetAll,

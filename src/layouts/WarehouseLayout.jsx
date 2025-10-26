@@ -35,7 +35,7 @@ export default function WarehouseLayout() {
         { id: 3, label: "Приём", path: "/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: "Отгрузки", path: "/warehouse/stockout", icon: PackageMinus },
         { id: 5, label: "Chiqindi", path: "/warehouse/disposal", icon: Recycle },
-        { id: 6, label: "Операции Склада", path: "\"/warehouse/history\"", icon: Move },
+        { id: 6, label: "Операции Склада", path: "/warehouse/history", icon: Move },
         { id: 6, label: "Dilers", path: "/warehouse/dilers", icon: User },
         { id: 7, label: "Settings", path: "/warehouse/settings", icon: Settings },
     ];

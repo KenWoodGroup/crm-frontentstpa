@@ -3,12 +3,12 @@ import { motion } from "framer-motion";
 import Select from "react-select";
 import Spinner from "../../../UI/spinner/Spinner";
 
-const OutgoingPanel = ({receiverLocations, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver}) => {
+const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver }) => {
     const [operationType, setOperationType] = useState("outgoing");
     const [status, setStatus] = useState("draft");
     // const [receiver, setReceiver] = useState(null);
 
-    const changeOprType = (value)=> {
+    const changeOprType = (value) => {
         setOperationType(value)
         selectOprType(value)
     };
@@ -18,7 +18,7 @@ const OutgoingPanel = ({receiverLocations, isLoading, selectOprType, selectStatu
         selectStatus(value)
     };
 
-    const changeReceiver = (value) =>{
+    const changeReceiver = (value) => {
         // setReceiver(value);
         selectReceiver(value)
     }
@@ -46,11 +46,16 @@ const OutgoingPanel = ({receiverLocations, isLoading, selectOprType, selectStatu
         { value: "received", label: "Получено" },
     ];
 
-    const receiverOptions = receiverLocations?.map((loc) => ({    
-            value:loc.id,
-            label:loc.name,
-            type:loc.type
-        })
+    const receiverOptions = receiverLocations?.map((loc) => ({
+        value: loc.id,
+        label: loc.name,
+        type: loc.type
+    })
+    )
+    const staffOptions = staffs?.map((loc) => ({
+        value: loc.id,
+        label: loc.full_name,
+    })
     )
     // const receiverOptions = [
     //     { value: "client_1", label: "Клиент: ООО «Молпродукт»" },
@@ -118,8 +123,21 @@ const OutgoingPanel = ({receiverLocations, isLoading, selectOprType, selectStatu
                                 ? r.type === "client" || r.type === "dealer"
                                 : r.type === "warehouse"
                         )}
-                        value={receiverOptions?.find((loc)=> loc.value === selectReceiver)}
+                        value={receiverOptions?.find((loc) => loc.value === selectReceiver)}
                         onChange={opt => changeReceiver(opt.value)}
+                        isSearchable
+                        placeholder="Выберите..."
+                        className="text-sm"
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Driver:
+                    </label>
+                    <Select
+                        options={staffOptions}
+                        value={staffOptions?.find((loc) => loc.value === selectedStaff)}
+                        onChange={opt => selectStaff(opt.value)}
                         isSearchable
                         placeholder="Выберите получателя..."
                         className="text-sm"
@@ -143,7 +161,7 @@ const OutgoingPanel = ({receiverLocations, isLoading, selectOprType, selectStatu
                         className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-5 rounded-xl transition-all flex gap-2 items-center"
                         onClick={startOperation}
                     >
-                        {isLoading && <Spinner/>}
+                        {isLoading && <Spinner />}
                         Начать операцию
                     </motion.button>
                 </div>

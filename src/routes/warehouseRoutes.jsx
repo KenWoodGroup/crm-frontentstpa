@@ -43,12 +43,12 @@ export const warehouseRoutes = [
         element:<WareHouseDisposal/>
     },
     {
-        path:"\"/warehouse/history\"",
+        path:"/warehouse/history",
         name:"warehouse history",
         element:<WarehouseInvoiceHistory/>
     },
     {
-        path:"\"/warehouse/history/:invoiceId\"",
+        path:"/warehouse/history/:invoiceId",
         name:"warehouse detail history by id",
         element:<WarehouseInvoiceHistory/>
     },

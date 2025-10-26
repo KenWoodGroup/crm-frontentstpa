@@ -35,6 +35,7 @@ import { location } from "../../../utils/Controllers/location";
 
 import { useWarehouse } from "../../../context/WarehouseContext";
 import { NavLink } from "react-router-dom";
+import { Staff } from "../../../utils/Controllers/Staff";
 
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -107,14 +108,16 @@ export default function WareHouseIncome() {
 
     // Main content states (local UI)
     const [locations, setLocations] = useState([]);
+    const [staffs, setStaffs] = useState([])
     const [locationsLoading, setLocationsLoading] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState("");
+    const [selectedStaff, setSelectedStaff] = useState("");
     const [otherLocationName, setOtherLocationName] = useState("");
     const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
 
     const [selected, setSelected] = useState("transfer_in");
     const [sendToTrash, setSendToTrash] = useState(false);
-    const operationLocations = (selected === "transfer_in" ? locations?.filter((loc) => loc.type === "factory" || loc.type === "warehouse") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client")) || []
+    const operationLocations = (selected === "incoming" ? locations?.filter((loc) => loc.type === "factory") : selected === "transfer_in" ? locations?.filter((loc) => loc.type === "warehouse") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client")) || []
 
     // search & barcode (local UI)
     const [searchQuery, setSearchQuery] = useState("");
@@ -167,9 +170,24 @@ export default function WareHouseIncome() {
         }
     };
 
+    // ---------- Fetch staffs ----------
+    const fetchStaffs = async () => {
+        try {
+            setLocationsLoading(true);
+            const res = await Staff.StaffGet(userLId);
+            if (res?.status === 200 || res?.status === 201) setStaffs(res.data  || []);
+            else setStaffs(res?.data || []);
+        } catch (err) {
+            notify.error("Stafflarni olishda xato: " + (err?.message || err));
+        } finally {
+            setLocationsLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchCategories();
         fetchLocations();
+        fetchStaffs();
     }, []);
 
     // keep invoice receiver current when locations load (use context setter)
@@ -210,8 +228,12 @@ export default function WareHouseIncome() {
                 type: operation_type,
                 sender_id: selectedLocation === "other" ? null : selectedLocation,
                 receiver_id: userLId,
+                receiver_name: getLocationNameById(userLId),
+                sender_name: getLocationNameById(selectedLocation),
                 created_by: createdBy,
                 status: "received",
+                carrier_id: selectedStaff,
+                note: ""
             };
             const res = await InvoicesApi.CreateInvoice(payload);
 
@@ -700,6 +722,22 @@ export default function WareHouseIncome() {
                                 {/* Transfer_in */}
                                 <button
                                     onClick={() => {
+                                        setSelected("incoming");
+                                        setSendToTrash(false);
+                                    }}
+                                    className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200 ${selected === "incoming"
+                                        ? "bg-blue-50 border-blue-500 text-blue-700 shadow"
+                                        : "border-gray-300 hover:border-blue-300 text-gray-700"
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <Truck size={22} />
+                                        <span className="text-lg font-medium">Приход на склад</span>
+                                    </div>
+
+                                </button>
+                                <button
+                                    onClick={() => {
                                         setSelected("transfer_in");
                                         setSendToTrash(false);
                                     }}
@@ -765,6 +803,21 @@ export default function WareHouseIncome() {
                                         <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
                                     )}
                                 </div>
+                                <div className="flex items-center gap-2">
+                                    {locationsLoading ? (
+                                        <div className="flex items-center gap-2"><Spinner /> Loading...</div>
+                                    ) : (
+                                        <select value={selectedLocation} onChange={(e) => setSelectedStaff(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
+                                            <option value="">Выберите поставшика</option>
+                                            {staffs?.map((loc) => <option key={loc.id} value={loc.id}>{loc.full_name || loc.address || loc.type}</option>)}
+                                        </select>
+                                    )
+                                    }
+
+                                    {/* {selectedStaff === "other" && (
+                                        <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
+                                    )} */}
+                                </div>
 
                                 <div className="ml-auto">
                                     <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
@@ -777,6 +830,7 @@ export default function WareHouseIncome() {
                                         {selected === "transfer_in" && "Начать Принять перемещение"}
                                         {(selected === "return_in" && sendToTrash === false) && "Начать Принять возврат"}
                                         {(selected === "return_in" && sendToTrash === true) && "Начать Утилизация возврата"}
+                                        {selected === "incoming" && "Приход на склад"}
                                     </button>
                                 </div>
                             </div>

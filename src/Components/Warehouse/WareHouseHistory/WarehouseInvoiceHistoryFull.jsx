@@ -1,55 +1,36 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import AsyncSelect from 'react-select/async';
 import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy } from "lucide-react";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
-import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
 import { notify } from "../../../utils/toast";
-import Select from "react-select";
-/*
-  WarehouseInvoiceHistory.jsx
-  - Keeps full original logic but modernized and fixed per requirements
-  - PER_PAGE fixed to 15
-  - sender/receiver use AsyncSelect but loadLocations uses controller
-  - payload ALWAYS sends keys; if user didn't choose value we send "all"
-  - date inputs default to start of month and today
-  - search is debounced (doesn't call on every keystroke)
-  - invoice id matches in table are highlighted with <mark>
-*/
 
+// WarehouseInvoiceHistory.jsx
+// Senior-quality, single-file React + Tailwind component for Invoice History / Audit page.
+// Features:
+// - Filters bar (type, sender/receiver, client, status, date range, search)
+// - Table (desktop) + Card list (mobile)
+// - Column toggle / persist to localStorage
+// - Pagination with persistent page state (localStorage + query params)
+// - Per-invoice detail view (route: /warehouse/history/:invoiceId) fetched from API
+// - Edit invoice modal & edit invoice-item modal (inline pencil icons)
+// - Export CSV (client-side) and PDF placeholder
+// - Excludes invoice_history and invoice_item_history from UI rendering deliberately
+// - Designed to be connected to your existing backend controllers (placeholder endpoints)
+
+// -------------------------------
+// Helper utilities
+// -------------------------------
 const LS_KEYS = {
     PAGE: "inv_page_v1",
+    PER_PAGE: "inv_per_page_v1",
     COLUMNS: "inv_cols_v1",
 };
 
-const PER_PAGE = 15;
-
-const defaultCols = {
-    id: true,
-    type: true,
-    sender_name: true,
-    receiver_name: true,
-    createdAt: true,
-    status: true,
-    payment_status: true,
-    total_sum: true,
-    actions: true,
-};
-
 function formatDateISO(d) {
-    if (!d) return "-";
+    if (!d) return null;
     const dt = new Date(d);
     return dt.toLocaleString();
-}
-
-function formatDateYMD(date) {
-    if (!date) return "";
-    const d = new Date(date);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
 }
 
 function downloadCSV(filename, rows) {
@@ -58,7 +39,7 @@ function downloadCSV(filename, rows) {
     const csv = [header.join(",")].concat(
         rows.map((r) => header.map((h) => `"${(r[h] ?? "").toString().replace(/"/g, '""')}"`).join(","))
     );
-    const blob = new Blob([csv.join("")], { type: "text / csv; charset = utf - 8; " });
+    const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = filename;
@@ -67,7 +48,7 @@ function downloadCSV(filename, rows) {
     link.remove();
 }
 
-// debounce hook
+// Debounce hook
 function useDebounce(value, delay = 450) {
     const [v, setV] = useState(value);
     useEffect(() => {
@@ -77,32 +58,46 @@ function useDebounce(value, delay = 450) {
     return v;
 }
 
-export default function WarehouseInvoiceHistory() {
+// -------------------------------
+// Main component
+// -------------------------------
+export default function WarehouseInvoiceHistoryFull() {
     const navigate = useNavigate();
-    const params = useParams();
+    const params = useParams(); // optional invoiceId if route is dynamic
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const initialPage = Number(localStorage.getItem(LS_KEYS.PAGE)) || 1;
+    // Pagination persisted
+    const initialPage =  Number(localStorage.getItem(LS_KEYS.PAGE)) || 1;
+    // const initialPerPage = Number(searchParams.get("perPage")) || Number(localStorage.getItem(LS_KEYS.PER_PAGE)) || 15;
 
-    // pagination
     const [page, setPage] = useState(initialPage);
+    // const [perPage, setPerPage] = useState(initialPerPage);
     const [total, setTotal] = useState(0);
 
-    // filters
+    // Filters
     const [typeFilter, setTypeFilter] = useState("all");
-    const [senderFilter, setSenderFilter] = useState(null); // { value: id, label: name }
-    const [receiverFilter, setReceiverFilter] = useState(null);
+    const [senderFilter, setSenderFilter] = useState("all");
+    const [receiverFilter, setReceiverFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [paymentFilter, setPaymentFilter] = useState("all");
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
+    const [searchText, setSearchText] = useState("all");
 
-    const today = new Date();
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const [fromDate, setFromDate] = useState(formatDateYMD(startOfMonth));
-    const [toDate, setToDate] = useState(formatDateYMD(today));
+    const debouncedSearch = useDebounce(searchText, 450);
 
-    const [searchText, setSearchText] = useState("");
-    const debouncedSearch = useDebounce(searchText, 550);
-
+    // Columns toggle (persisted)
+    const defaultCols = {
+        id: true,
+        type: true,
+        sender_name: true,
+        receiver_name: true,
+        createdAt: true,
+        status: true,
+        payment_status: true,
+        total_sum: true,
+        actions: true,
+    };
     const [columns, setColumns] = useState(() => {
         try {
             const raw = localStorage.getItem(LS_KEYS.COLUMNS);
@@ -112,235 +107,178 @@ export default function WarehouseInvoiceHistory() {
         }
     });
 
+    // Data
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // detail
+    // Selected invoice detail
     const invoiceId = params?.invoiceId || null;
+    console.log(params);
+    
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
 
-    // UI
-    const [editingInvoice, setEditingInvoice] = useState(null);
+    // UI modals
+    const [editingInvoice, setEditingInvoice] = useState(null); // invoice being edited
     const [editingItem, setEditingItem] = useState(null);
 
-    // small lists
-    const statusesList = ["draft", "approved", "received", "cancelled"];
-    const typesList = ["transfer_in", "return_in", "return_dis", "outgoing", "transfer_out", "disposal"];
+    // per-filter option lists (fetched separately, server-side recommended)
+    const [sendersList, setSendersList] = useState([]);
+    const [receiversList, setReceiversList] = useState([]);
+    const [statusesList] = useState(["draft", "approved", "received", "cancelled"]);
+    const [typesList] = useState(["transfer_in", "return_in", "return_dis", "outgoing", "transfer_out", "disposal"]);
 
-    const nice = {
-        type: {
-            transfer_in: "Transfer (in)",
-            return_in: "Return (in)",
-            return_dis: "Return (dis)",
-            outgoing: "Outgoing",
-            transfer_out: "Transfer (out)",
-            disposal: "Disposal",
-        },
-        status: {
-            draft: "Draft",
-            approved: "Approved",
-            received: "Received",
-            cancelled: "Cancelled",
-        },
-        payment: {
-            paid: "Paid",
-            unpaid: "Unpaid",
-        },
-    };
-
-    function typeBadge(t) {
-        const map = {
-            transfer_in: "bg-green-100 text-green-700",
-            transfer_out: "bg-blue-100 text-blue-700",
-            outgoing: "bg-yellow-100 text-yellow-800",
-            return_in: "bg-indigo-100 text-indigo-700",
-            return_dis: "bg-red-100 text-red-700",
-            disposal: "bg-red-50 text-red-700",
-        };
-        return <span className={`px-2 py-0.5 text-xs rounded ${map[t] || "bg-gray-100 text-gray-700"}`}>{nice.type[t] || t}</span>;
-    }
-
-    function statusBadge(s) {
-        const map = {
-            draft: "bg-gray-100 text-gray-700",
-            approved: "bg-green-100 text-green-700",
-            received: "bg-blue-100 text-blue-700",
-            cancelled: "bg-red-100 text-red-700",
-        };
-        return <span className={`px-2 py-0.5 text-xs rounded ${map[s] || "bg-gray-100 text-gray-700"}`}>{nice.status[s] || s}</span>;
-    }
-
-    function paymentBadge(p) {
-        const map = {
-            paid: "bg-green-50 text-green-700",
-            unpaid: "bg-yellow-50 text-yellow-700",
-        };
-        return <span className={`px-2 py-0.5 text-xs rounded ${map[p] || "bg-gray-100 text-gray-700"}`}>{nice.payment[p] || p}</span>;
-    }
-
-    const toggleColumn = (k) => {
-        const next = { ...columns, [k]: !columns[k] };
-        setColumns(next);
-        localStorage.setItem(LS_KEYS.COLUMNS, JSON.stringify(next));
-    };
-
-    // locations cache (loaded once)
-    const [locations, setLocations] = useState([]);
-
-    const getLocations = async () => {
-        try {
-            const baseId = Cookies.get("ul_nesw");
-            const res = await location.getAllGroupLocations(baseId);
-            const items = (res?.data || []).map((l) => ({ value: l.id, label: l.name }));
-            // add "all" option
-            setLocations([{ value: "all", label: "All locations" }, ...items]);
-        } catch (err) {
-            console.error(err);
-            notify.error("Failed to load locations");
-        }
-    };
-    useEffect(() => {
-        // (async () => {
-        //     try {
-        //         const baseId = Cookies.get("ul_nesw");
-        //         const res = await location.getAllGroupLocations(baseId);
-        //         const items = (res?.data || []).map((l) => ({ value: l.id, label: l.name }));
-        //         // add "all" option
-        //         setLocationsCache([{ value: "all", label: "All locations" }, ...items]);
-        //     } catch (err) {
-        //         console.error(err);
-        //         notify.error("Failed to load locations");
-        //     }
-        // })();
-        getLocations()
-    }, []);
-
-    // loadOptions for AsyncSelect - uses cached list to avoid repeated server calls
-    const loadLocations = async (inputValue) => {
-        if (!inputValue) return locationsCache;
-        const q = inputValue.toLowerCase();
-        return locationsCache.filter((o) => o.label.toLowerCase().includes(q));
-    };
-
-    // Sender/Receiver auto-fill logic: if user selects receiver (not 'all') we set sender to current loc, and vice-versa
+    // -------------------------------
+    // Effects: fetch filter options (small lists) — separate endpoints recommended
+    // -------------------------------
     // useEffect(() => {
-    //     const baseId = Cookies.get("ul_nesw");
-    //     if (receiverFilter && receiverFilter.value && receiverFilter.value !== "all") {
-    //         // ensure sender is current warehouse
-    //         setSenderFilter({ value: baseId, label: locationsCache.find((l) => l.value === baseId)?.label || baseId });
+    //     // NOTE: Your backend should expose endpoints like /api/senders and /api/receivers to populate filters.
+    //     // Here we call placeholders.
+    //     fetch("/api/filters/senders")
+    //         .then((r) => r.json())
+    //         .then((data) => setSendersList(data || []))
+    //         .catch(() => setSendersList([]));
+
+    //     fetch("/api/filters/receivers")
+    //         .then((r) => r.json())
+    //         .then((data) => setReceiversList(data || []))
+    //         .catch(() => setReceiversList([]));
+    // }, []);
+
+    // -------------------------------
+    // Fetch invoices list — this effect depends on all filters + pagination
+    // Server-side should accept these query params and return { rows: [], total }
+    // -------------------------------
+    // const fetchInvoices = useCallback(async () => {
+    //     setLoading(true);
+    //     setError(null);
+    //     try {
+    //         // construct query params
+    //         const qp = new URLSearchParams();
+    //         qp.set("page", page);
+    //         qp.set("per_page", perPage);
+    //         if (typeFilter) qp.set("type", typeFilter);
+    //         if (senderFilter) qp.set("sender_id", senderFilter);
+    //         if (receiverFilter) qp.set("receiver_id", receiverFilter);
+    //         if (statusFilter) qp.set("status", statusFilter);
+    //         if (paymentFilter) qp.set("payment_status", paymentFilter);
+    //         if (fromDate) qp.set("from", fromDate);
+    //         if (toDate) qp.set("to", toDate);
+    //         if (debouncedSearch) qp.set("q", debouncedSearch);
+
+    //         // update URL query params & persist page/perPage
+    //         setSearchParams((old) => {
+    //             const newParams = new URLSearchParams(old.toString());
+    //             newParams.set("page", page);
+    //             newParams.set("perPage", perPage);
+    //             return newParams;
+    //         });
+    //         localStorage.setItem(LS_KEYS.PAGE, String(page));
+    //         localStorage.setItem(LS_KEYS.PER_PAGE, String(perPage));
+
+    //         const res = await fetch(`/api/invoices?${qp.toString()}`);
+    //         if (!res.ok) throw new Error("Failed to fetch invoices");
+    //         const json = await res.json();
+    //         // expected { rows: [...], total: number }
+    //         setInvoices(json.rows || []);
+    //         setTotal(json.total || 0);
+    //     } catch (err) {
+    //         console.error(err);
+    //         setError(err.message || "Unknown error");
+    //     } finally {
+    //         setLoading(false);
     //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [receiverFilter]);
+    // }, [page, perPage, typeFilter, senderFilter, receiverFilter, statusFilter, paymentFilter, fromDate, toDate, debouncedSearch, setSearchParams]);
 
-    // useEffect(() => {
-    //     const baseId = Cookies.get("ul_nesw");
-    //     if (senderFilter && senderFilter.value && senderFilter.value !== "all") {
-    //         setReceiverFilter({ value: baseId, label: locationsCache.find((l) => l.value === baseId)?.label || baseId });
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [senderFilter]);
-
-    // fetch invoices - payload must include all keys (send "all" when nothing selected)
-    const fetchInvoices = useCallback(async (opts = {}) => {
-        setLoading(true);
-        setError(null);
-
-        const payload = {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    // Sana formatlash funksiyasi (YYYY-MM-DD)
+    const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+    const fetchInvoices = useCallback(async () => {
+        const data = {
             loc_id: Cookies.get("ul_nesw"),
-            startDate: fromDate || formatDateYMD(startOfMonth),
-            endDate: toDate || formatDateYMD(today),
+            startDate: fromDate || formatDate(startOfMonth),
+            endDate: toDate || formatDate(today),
             type: typeFilter || "all",
-            sender: senderFilter?.value ?? "all",
-            receiver: receiverFilter?.value ?? "all",
+            sender: senderFilter || "all",
+            receiver: receiverFilter || "all",
             status: statusFilter || "all",
             payment: paymentFilter || "all",
-            search: debouncedSearch || "all",
+            search: searchText || "all",
             page: page || 1,
-            per_page: PER_PAGE,
-            ...opts,
-        };
+        }
+        console.log(data);
 
         try {
-            const res = await InvoicesApi.GetFilteredInvoices(payload);
-            if (res?.status === 200 || res?.status === 201) {
+            const res = await InvoicesApi.GetFilteredInvoices(data);
+            if (res.status === 200 || res.status === 201) {
                 setInvoices(res?.data?.data?.records || []);
-                setTotal(res?.data?.data?.pagination?.total_count || 0);
-            } else {
-                setInvoices([]);
-                setTotal(0);
+                setTotal(res?.data?.data?.pagination?.total_count)
             }
+            console.log(res);
         } catch (err) {
-            console.error(err);
-            setError(err?.message || "Failed to fetch invoices");
-            notify.error(err?.message || String(err));
-        } finally {
-            setLoading(false);
+            notify.error(err)
         }
-    }, [typeFilter, senderFilter, receiverFilter, statusFilter, paymentFilter, fromDate, toDate, debouncedSearch, page]);
 
-    // trigger fetch when page or query params change
-    useEffect(() => {
-        localStorage.setItem(LS_KEYS.PAGE, String(page));
-        const qp = new URLSearchParams(searchParams.toString());
-        qp.set("page", page);
-        qp.set("perPage", String(PER_PAGE));
-        setSearchParams(qp);
-        fetchInvoices();
-    }, [fetchInvoices, page]);
+    }, [page, typeFilter, senderFilter, receiverFilter, statusFilter, paymentFilter, fromDate, toDate, debouncedSearch]);
 
-    // re-run when filters / dates / search change - reset page to 1
     useEffect(() => {
-        setPage(1);
         fetchInvoices();
-    }, [typeFilter, senderFilter, receiverFilter, statusFilter, paymentFilter, fromDate, toDate, debouncedSearch]);
-
-    // initial sync from query params
-    useEffect(() => {
-        const qpPage = Number(searchParams.get("page")) || initialPage;
-        setPage(qpPage);
-        fetchInvoices();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // fetch invoice detail when route :invoiceId present
+    // -------------------------------
+    // Fetch invoice detail when route has :invoiceId
+    // -------------------------------
     useEffect(() => {
         if (!invoiceId) return setSelectedInvoice(null);
         let mounted = true;
         setDetailLoading(true);
-        (async () => {
-            try {
-                const res = await InvoicesApi.GetInvoiceById(invoiceId);
+        fetch(`/api/invoices/${invoiceId}`)
+            .then((r) => r.json())
+            .then((data) => {
                 if (!mounted) return;
-                if (res?.status === 200 || res?.status === 201) {
-                    const d = res?.data?.data || res?.data || res;
-                    const { invoice_history, invoice_item_history, ...rest } = d;
+                // remove invoice_history & invoice_item_history if present
+                if (data) {
+                    const { invoice_history, invoice_item_history, ...rest } = data;
                     setSelectedInvoice(rest);
-                } else {
-                    setSelectedInvoice(null);
                 }
-            } catch (err) {
-                console.error(err);
-                notify.error(err?.message || "Failed to load invoice");
-            } finally {
-                mounted && setDetailLoading(false);
-            }
-        })();
+            })
+            .catch((err) => console.error(err))
+            .finally(() => mounted && setDetailLoading(false));
         return () => (mounted = false);
     }, [invoiceId]);
 
+    // -------------------------------
+    // Column toggles
+    // -------------------------------
+    const toggleColumn = (key) => {
+        const next = { ...columns, [key]: !columns[key] };
+        setColumns(next);
+        localStorage.setItem(LS_KEYS.COLUMNS, JSON.stringify(next));
+    };
+
+    // -------------------------------
+    // Actions: open detail, edit invoice, edit item
+    // -------------------------------
     const openDetail = (id) => {
+        // navigate to /warehouse/history/:id but keep query params page/perPage
         const qp = new URLSearchParams(searchParams.toString());
-        qp.set("page", String(page));
-        qp.set("perPage", String(PER_PAGE));
+        // qp.set("page", page);
+        // qp.set("perPage", 15);
         navigate(`/warehouse/history/${id}?${qp.toString()}`);
     };
 
     const closeDetail = () => {
+        // navigate back to list preserving page/perPage
         const qp = new URLSearchParams(searchParams.toString());
-        qp.set("page", String(page));
-        qp.set("perPage", String(PER_PAGE));
+        qp.set("page", page);
+        qp.set("perPage", perPage);
         navigate(`/warehouse/history?${qp.toString()}`);
     };
 
@@ -349,49 +287,51 @@ export default function WarehouseInvoiceHistory() {
     const openEditItem = (item, invoiceId) => setEditingItem({ ...item, invoiceId });
     const closeEditItem = () => setEditingItem(null);
 
+    // Save invoice (placeholder)
     async function saveInvoice(updated) {
-        try {
-            const res = await InvoicesApi.UpdateInvoice(updated.id, updated);
-            if (!(res?.status === 200 || res?.status === 201)) throw new Error("Failed to save");
-            await fetchInvoices();
-            if (invoiceId === updated.id) {
-                const fresh = await InvoicesApi.GetInvoiceById(updated.id);
-                const d = fresh?.data?.data || fresh?.data || fresh;
-                const { invoice_history, invoice_item_history, ...rest } = d;
-                setSelectedInvoice(rest);
-            }
-            closeEditInvoice();
-            notify.success("Saved");
-        } catch (err) {
-            console.error(err);
-            notify.error(err?.message || "Save failed");
+        // call your backend: PATCH /api/invoices/:id
+        const res = await fetch(`/api/invoices/${updated.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updated),
+        });
+        if (!res.ok) throw new Error("Failed to save");
+        // refetch list & detail
+        await fetchInvoices();
+        if (invoiceId === updated.id) {
+            // refresh detail
+            const d = await (await fetch(`/api/invoices/${updated.id}`)).json();
+            const { invoice_history, invoice_item_history, ...rest } = d;
+            setSelectedInvoice(rest);
         }
+        closeEditInvoice();
     }
 
+    // Save invoice item (placeholder)
     async function saveItem(updated) {
-        try {
-            const res = await InvoicesApi.UpdateInvoiceItem(updated.id, updated);
-            if (!(res?.status === 200 || res?.status === 201)) throw new Error("Failed to save item");
-            if (invoiceId === updated.invoiceId) {
-                const fresh = await InvoicesApi.GetInvoiceById(updated.invoiceId);
-                const d = fresh?.data?.data || fresh?.data || fresh;
-                const { invoice_history, invoice_item_history, ...rest } = d;
-                setSelectedInvoice(rest);
-            }
-            closeEditItem();
-            notify.success("Item saved");
-        } catch (err) {
-            console.error(err);
-            notify.error(err?.message || "Save item failed");
+        // call your backend: PATCH /api/invoice-items/:id
+        const res = await fetch(`/api/invoice-items/${updated.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updated),
+        });
+        if (!res.ok) throw new Error("Failed to save item");
+        // refresh detail if opened
+        if (invoiceId === updated.invoiceId) {
+            const d = await (await fetch(`/api/invoices/${updated.invoiceId}`)).json();
+            const { invoice_history, invoice_item_history, ...rest } = d;
+            setSelectedInvoice(rest);
         }
+        closeEditItem();
     }
 
+    // Export current page to CSV
     const exportCurrentToCSV = () => {
+        // Build rows but remove invoice_history / invoice_item_history
         const rows = invoices.map((inv) => {
             const { invoice_history, invoice_item_history, ...rest } = inv;
             return {
                 id: rest.id,
-                invoice_number: rest.invoice_number,
                 type: rest.type,
                 sender_name: rest.sender_name || (rest.sender && rest.sender.name) || "",
                 receiver_name: rest.receiver_name || (rest.receiver && rest.receiver.name) || "",
@@ -404,14 +344,10 @@ export default function WarehouseInvoiceHistory() {
         downloadCSV(`invoices_page_${page}.csv`, rows);
     };
 
-    function highlightMatch(text, query) {
-        if (!query) return text;
-        const safe = String(query).replace(`/[.*+?^${text}()|[\]\]/g, "\$&"`);
-        const regex = new RegExp(`(${safe})`, "gi");
-        return String(text).replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
-    }
-
-    const totalPages = Math.max(1, Math.ceil((total || 0) / PER_PAGE));
+    // -------------------------------
+    // Render helpers
+    // -------------------------------
+    const totalPages = Math.max(1, Math.ceil(total / 15)); // /15 = /perPage if ew use select page item count
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
@@ -423,10 +359,10 @@ export default function WarehouseInvoiceHistory() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <button onClick={exportCurrentToCSV} className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
+                        <button onClick={() => exportCurrentToCSV()} className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
                             <Download size={16} /> <span className="text-sm">Export CSV</span>
                         </button>
-                        <button onClick={() => alert("Export PDF - implement server-side or client lib")} className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
+                        <button onClick={() => alert('Export PDF - implement server-side or client lib')} className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
                             <FileText size={16} /> <span className="text-sm">Export PDF</span>
                         </button>
                         <a href="/warehouse/inventory-adjustments" className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
@@ -438,76 +374,59 @@ export default function WarehouseInvoiceHistory() {
                 {/* Filters */}
                 <div className="bg-white p-4 rounded-2xl border mb-6 shadow-sm">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="border rounded-lg p-2">
-                            <option value="all">All types</option>
+                        <select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }} className="border rounded-lg p-2">
+                            <option value="">All types</option>
                             {typesList.map((t) => (
-                                <option value={t} key={t}>{nice.type[t] || t}</option>
+                                <option value={t} key={t}>{t}</option>
                             ))}
                         </select>
 
-                        <Select
-                            options={locations}
-                            value={senderFilter}
-                            onChange={(v) => setSenderFilter(v)}
-                            placeholder="Sender (search...)"
-                            isClearable
-                            isSearchable
-                        />
+                        <select value={senderFilter} onChange={(e) => { setSenderFilter(e.target.value); setPage(1); }} className="border rounded-lg p-2">
+                            <option value="">All senders</option>
+                            {sendersList.map((s) => (
+                                <option value={s.id} key={s.id}>{s.name}</option>
+                            ))}
+                        </select>
 
-                        <Select
-                            options={locations}
-                            value={receiverFilter}
-                            onChange={(v) => setReceiverFilter(v)}
-                            placeholder="Receiver (search...)"
-                            isClearable
-                            isSearchable
-                        />
+                        <select value={receiverFilter} onChange={(e) => { setReceiverFilter(e.target.value); setPage(1); }} className="border rounded-lg p-2">
+                            <option value="">All receivers</option>
+                            {receiversList.map((r) => (
+                                <option value={r.id} key={r.id}>{r.name}</option>
+                            ))}
+                        </select>
 
-                        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="border rounded-lg p-2">
-                            <option value="all">All statuses</option>
+                        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="border rounded-lg p-2">
+                            <option value="">All statuses</option>
                             {statusesList.map((s) => (
-                                <option value={s} key={s}>{nice.status[s] || s}</option>
+                                <option value={s} key={s}>{s}</option>
                             ))}
                         </select>
 
-                        <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border rounded-lg p-2" />
-                        <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border rounded-lg p-2" />
+                        <input type="date" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setPage(1); }} className="border rounded-lg p-2" />
+                        <input type="date" value={toDate} onChange={(e) => { setToDate(e.target.value); setPage(1); }} className="border rounded-lg p-2" />
 
-                        <select value={paymentFilter} onChange={(e) => setPaymentFilter(e.target.value)} className="border rounded-lg p-2">
-                            <option value="all">All payments</option>
-                            <option value="paid">Paid</option>
-                            <option value="unpaid">Unpaid</option>
+                        <select value={paymentFilter} onChange={(e) => { setPaymentFilter(e.target.value); setPage(1); }} className="border rounded-lg p-2">
+                            <option value="">All payments</option>
+                            <option value="paid">paid</option>
+                            <option value="unpaid">unpaid</option>
                         </select>
 
                         <div className="flex gap-2">
-                            <input value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Search id / Receiver or Sender name" className="flex-1 border rounded-lg p-2 w-10" />
+                            <input value={searchText} onChange={(e) => { setSearchText(e.target.value); setPage(1); }} placeholder="Search id / barcode / batch" className="flex-1 border rounded-lg p-2 w-10" />
                         </div>
-                    </div>
 
+                    </div>
                     <div className="mt-2 flex justify-between">
-                        <div />
+                        <div></div>
                         <div className="flex gap-[10px]">
-                            <button
-                                onClick={() => {
-                                    setTypeFilter("all");
-                                    setSenderFilter(null);
-                                    setReceiverFilter(null);
-                                    setStatusFilter("all");
-                                    setPaymentFilter("all");
-                                    setFromDate(formatDateYMD(startOfMonth));
-                                    setToDate(formatDateYMD(today));
-                                    setSearchText("");
-                                    setPage(1);
-                                }}
-                                className="px-3 py-2 bg-gray-100 rounded-lg"
-                            >
-                                Reset
-                            </button>
+
+                            <button onClick={() => { setTypeFilter("all"); setSenderFilter("all"); setReceiverFilter("all"); setStatusFilter("all"); setPaymentFilter("all"); setFromDate(startOfMonth); setToDate(today); setSearchText(""); setPage(1); }} className="px-3 py-2 bg-gray-100 rounded-lg">Reset</button>
 
                             <button onClick={() => fetchInvoices()} className="px-3 py-2 bg-blue-600 text-white rounded-lg">Apply</button>
                         </div>
-                    </div>
 
+                    </div>
+                    {/* Columns toggle */}
                     <div className="mt-4 flex items-center gap-3">
                         <Filter size={16} />
                         <div className="flex items-center gap-2 flex-wrap">
@@ -529,6 +448,7 @@ export default function WarehouseInvoiceHistory() {
                         <div className="py-10 text-center text-red-500">{error}</div>
                     ) : (
                         <div>
+                            {/* Table for desktop */}
                             <div className="hidden md:block">
                                 <table className="w-full table-auto border-collapse">
                                     <thead>
@@ -547,13 +467,13 @@ export default function WarehouseInvoiceHistory() {
                                     <tbody>
                                         {invoices?.map((inv) => (
                                             <tr key={inv.id} className="border-b hover:bg-gray-50">
-                                                {columns.id && <td className="py-3 px-2 text-sm" dangerouslySetInnerHTML={{ __html: highlightMatch(inv.invoice_number || inv.id, searchText) }} />}
-                                                {columns.type && <td className="py-3 px-2 text-sm">{typeBadge(inv.type)}</td>}
+                                                {columns.id && <td className="py-3 px-2 text-sm">{inv.invoice_number}</td>}
+                                                {columns.type && <td className="py-3 px-2 text-sm">{inv.type}</td>}
                                                 {columns.sender_name && <td className="py-3 px-2 text-sm">{inv.sender_name || (inv.sender && inv.sender.name) || "—"}</td>}
                                                 {columns.receiver_name && <td className="py-3 px-2 text-sm">{inv.receiver_name || (inv.receiver && inv.receiver.name) || "—"}</td>}
                                                 {columns.createdAt && <td className="py-3 px-2 text-sm">{formatDateISO(inv.createdAt)}</td>}
-                                                {columns.status && <td className="py-3 px-2 text-sm">{statusBadge(inv.status)}</td>}
-                                                {columns.payment_status && <td className="py-3 px-2 text-sm">{paymentBadge(inv.payment_status)}</td>}
+                                                {columns.status && <td className="py-3 px-2 text-sm">{inv.status}</td>}
+                                                {columns.payment_status && <td className="py-3 px-2 text-sm">{inv.payment_status}</td>}
                                                 {columns.total_sum && <td className="py-3 px-2 text-sm">{inv.total_sum}</td>}
                                                 {columns.actions && <td className="py-3 px-2 text-sm">
                                                     <div className="flex items-center gap-2">
@@ -567,6 +487,7 @@ export default function WarehouseInvoiceHistory() {
                                 </table>
                             </div>
 
+                            {/* Cards for mobile */}
                             <div className="md:hidden grid gap-3">
                                 {invoices.map((inv) => (
                                     <div key={inv.id} className="p-3 border rounded-lg shadow-sm">
@@ -588,10 +509,11 @@ export default function WarehouseInvoiceHistory() {
                                 ))}
                             </div>
 
+                            {/* Pagination */}
                             <div className="mt-4 flex items-center justify-between">
-                                <div className="text-sm text-gray-600">Showing {(page - 1) * PER_PAGE + 1} - {Math.min(page * PER_PAGE, total)} of {total}</div>
+                                <div className="text-sm text-gray-600">Showing {(page - 1) * 15 + 1} - {Math.min(page * 15, total)} of {total}</div>
                                 <div className="flex items-center gap-2">
-                                    <button onClick={() => setPage(1)} disabled={page === 1} className="px-2 py-1 border rounded disabled:opacity-50">First</button>
+                                    <button onClick={() => { setPage(1); }} disabled={page === 1} className="px-2 py-1 border rounded disabled:opacity-50">First</button>
 
                                     <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-2 py-1 border rounded">
                                         <ChevronLeft size={16} />
@@ -603,6 +525,12 @@ export default function WarehouseInvoiceHistory() {
                                     </button>
 
                                     <button onClick={() => setPage(totalPages)} disabled={page === totalPages} className="px-2 py-1 border rounded">Last</button>
+
+                                    {/* <select value={perPage} onChange={(e) => { setPerPage(Number(e.target.value)); setPage(1); }} className="border rounded p-1">
+                                        {[10, 15, 25, 50].map((n) => (
+                                            <option key={n} value={n}> {n} / page</option>
+                                        ))}
+                                    </select> */}
                                 </div>
                             </div>
                         </div>
@@ -626,8 +554,8 @@ export default function WarehouseInvoiceHistory() {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="col-span-2">
                                         <div className="mb-4 bg-gray-50 p-4 rounded-lg">
-                                            <div className="text-sm text-gray-600">Type: <span className="font-medium">{nice.type[selectedInvoice.type] || selectedInvoice.type}</span></div>
-                                            <div className="text-sm text-gray-600">Status: <span className="font-medium">{nice.status[selectedInvoice.status] || selectedInvoice.status}</span></div>
+                                            <div className="text-sm text-gray-600">Type: <span className="font-medium">{selectedInvoice.type}</span></div>
+                                            <div className="text-sm text-gray-600">Status: <span className="font-medium">{selectedInvoice.status}</span></div>
                                             <div className="text-sm text-gray-600">Payment: <span className="font-medium">{selectedInvoice.payment_status}</span></div>
                                             <div className="text-sm text-gray-600">Total: <span className="font-medium">{selectedInvoice.total_sum}</span></div>
                                         </div>
@@ -635,12 +563,12 @@ export default function WarehouseInvoiceHistory() {
                                         <div className="mb-4">
                                             <h3 className="text-sm font-semibold mb-2">Items</h3>
                                             <div className="space-y-3">
-                                                {(selectedInvoice.invoice_items || []).map((it) => (
+                                                {selectedInvoice.invoice_items.map((it) => (
                                                     <div key={it.id} className="flex items-center justify-between border rounded p-3">
                                                         <div>
-                                                            <div className="text-sm font-medium">{it.product.name} — {it.batch}</div>
+                                                            <div className="text-sm font-medium">{it.product_id} — {it.batch}</div>
                                                             <div className="text-xs text-gray-500">Barcode: {it.barcode}</div>
-                                                            <div className="text-xs text-gray-500">Qty: {it.quantity + " " + it.product.unit} × Pirce: {it.price} Total: {+it.quantity * +it.price}</div>
+                                                            <div className="text-xs text-gray-500">Qty: {it.quantity} × {it.price}</div>
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <button onClick={() => openEditItem(it, selectedInvoice.id)} className="p-2 rounded hover:bg-gray-100"><Pencil size={14} /></button>
@@ -650,6 +578,7 @@ export default function WarehouseInvoiceHistory() {
                                             </div>
                                         </div>
 
+                                        {/* Optional: invoice history / item history not shown as requested */}
                                     </div>
 
                                     <aside className="p-4 bg-gray-50 rounded-lg">
@@ -673,10 +602,12 @@ export default function WarehouseInvoiceHistory() {
                     </div>
                 )}
 
+                {/* Edit invoice modal */}
                 {editingInvoice && (
                     <EditInvoiceModal invoice={editingInvoice} onClose={closeEditInvoice} onSave={saveInvoice} />
                 )}
 
+                {/* Edit item modal */}
                 {editingItem && (
                     <EditItemModal item={editingItem} onClose={closeEditItem} onSave={saveItem} />
                 )}
@@ -685,58 +616,41 @@ export default function WarehouseInvoiceHistory() {
     );
 }
 
+// -------------------------------
+// EditInvoiceModal - simple modal for editing basic invoice fields
+// -------------------------------
 function EditInvoiceModal({ invoice, onClose, onSave }) {
-    const [form, setForm] = useState(() => ({ ...invoice, org_status: invoice?.status }));
-    useEffect(() => {
-        setForm(prev => ({ ...invoice, org_status: invoice?.status || prev.org_status }));
-    }, [invoice]);
-    const statusBase = [
-        { id: 1, value: "draft", label: "Draft" },
-        { id: 2, value: "approved", label: "Confirmend" },
-        { id: 3, value: "cancelled", label: "Cancelled" },
-        { id: 4, value: "sent", label: "Sent" },
-        { id: 5, value: "received", label: "Received" }
-    ]
-    const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
-    const statusOptions = statusBase?.filter((st) => st.id >= org_status_id)
+    const [form, setForm] = useState(() => ({ ...invoice }));
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
             <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
                 <div className="flex items-center gap-3 mb-4">
                     <h3 className="text-lg font-semibold">Edit invoice</h3>
-                    <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
+                    <div className="ml-auto text-sm text-gray-500">{invoice?.id?.slice(0, 8)}</div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <label className="flex flex-col">
                         <span className="text-sm text-gray-600">Status</span>
-                        {/* <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} className="border rounded p-2">
-
+                        <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} className="border rounded p-2">
                             <option value="draft">draft</option>
-                            <option value="approved">confirmed</option>
-                            <option value="sent">sent</option>
+                            <option value="confirmed">confirmed</option>
                             <option value="received">received</option>
                             <option value="cancelled">cancelled</option>
-                        </select> */}
-                        <Select
-                            placeholder="Select new status"
-                            options={statusOptions}
-                            value={form.status}
-                            onChange={(e) => setForm((p) => ({ ...p, status: e }))}
-                        />
-
+                        </select>
                     </label>
-                    {/* <label className="flex flex-col">
+
+                    <label className="flex flex-col">
                         <span className="text-sm text-gray-600">Payment status</span>
                         <select value={form.payment_status} onChange={(e) => setForm((p) => ({ ...p, payment_status: e.target.value }))} className="border rounded p-2">
                             <option value="unpaid">unpaid</option>
                             <option value="paid">paid</option>
                         </select>
-                    </label> */}
+                    </label>
 
-                    {/* <label className="flex flex-col">
+                    <label className="flex flex-col">
                         <span className="text-sm text-gray-600">Total sum</span>
                         <input type="text" value={form.total_sum} onChange={(e) => setForm((p) => ({ ...p, total_sum: e.target.value }))} className="border rounded p-2" />
-                    </label> */}
+                    </label>
 
                     <label className="flex flex-col">
                         <span className="text-sm text-gray-600">Note</span>
@@ -753,9 +667,11 @@ function EditInvoiceModal({ invoice, onClose, onSave }) {
     );
 }
 
+// -------------------------------
+// EditItemModal - edit invoice item
+// -------------------------------
 function EditItemModal({ item, onClose, onSave }) {
     const [form, setForm] = useState(() => ({ ...item }));
-    useEffect(() => setForm({ ...item }), [item]);
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
             <div className="bg-white rounded-2xl p-6 w-full max-w-lg">
