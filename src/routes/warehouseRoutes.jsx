@@ -15,6 +15,8 @@ import WarehouseDebtor from "../Components/Warehouse/WarehouseDebtor/WarehouseDe
 import WarehouseExpenses from "../Components/Warehouse/WarehouseExpenses/WarehouseExpenses";
 import WarehouseClients from "../Components/Warehouse/WarehouseClients/WarehouseClients";
 import WarehouseClientDetail from "../Components/Warehouse/WarehouseClientDetail/WarehouseClientDetail";
+import WarehouseCash from "../Components/Warehouse/WarehouseCash/WarehouseCash";
+import WarehouseSupplier from "../Components/Warehouse/WarehouseSupplier/WarehouseSupplier";
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",
@@ -85,5 +87,15 @@ export const warehouseRoutes = [
         path: "/warehouse/client/:id",
         name: "Warehouse Client detail",
         element: <WarehouseClientDetail />
+    },
+    {
+        path: "/warehouse/kassa",
+        name: "Warehouse Kassa",
+        element: <WarehouseCash />
+    },
+    {
+        path: "/warehouse/supplier",
+        name: "Warehouse Supplier",
+        element: <WarehouseSupplier />
     }
 ];

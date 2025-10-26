@@ -18,10 +18,6 @@ export default function WarehousePaymentCreate() {
 
     return (
         <div>
-            {/* 🔹 Кнопка открытия модалки */}
-            <Button color="blue" onClick={handleOpen}>
-                Оплатит
-            </Button>
 
             {/* 🧾 Модал создания оплаты */}
             <Dialog open={open} handler={handleOpen} size="md" className="p-2">

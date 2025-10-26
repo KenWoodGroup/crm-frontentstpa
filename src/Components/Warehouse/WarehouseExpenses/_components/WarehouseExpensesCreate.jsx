@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Button,
     Dialog,
@@ -13,21 +13,40 @@ import {
 import Cookies from "js-cookie";
 
 import { Expenses } from "../../../../utils/Controllers/Expenses";
+import { Cash } from "../../../../utils/Controllers/Cash";
 import { Alert } from "../../../../utils/Alert";
 
 export default function WarehouseExpensesCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [cashes, setCashes] = useState([]);
 
     const [form, setForm] = useState({
         amount: "",
         method: "cash",
         location_id: Cookies?.get('ul_nesw'),
+        cash_id: "",
         note: "",
         created_by: Cookies?.get('us_nesw'),
     });
 
     const handleOpen = () => setOpen(!open);
+
+    const GetAllCash = async () => {
+        try {
+            const response = await Cash?.GetKassa(Cookies.get("ul_nesw"));
+            const data = response?.data || [];
+            setCashes(data);
+
+            // Автоматически выбираем первую кассу
+            if (data.length > 0 && !form.cash_id) {
+                setForm((prev) => ({ ...prev, cash_id: String(data[0].id) }));
+            }
+        } catch (error) {
+            console.log(error);
+            setCashes([]);
+        }
+    };
 
     // 🔹 форматирование чисел с пробелами
     const formatNumber = (value) => {
@@ -51,23 +70,41 @@ export default function WarehouseExpensesCreate({ refresh }) {
     };
 
     const CreateExpenses = async () => {
+        if (!form.cash_id) {
+            Alert("Выберите кассу!", "warning");
+            return;
+        }
+
         try {
             setLoading(true);
             const payload = {
                 ...form,
                 amount: Number(form.amount.replace(/\s/g, "")) || 0,
+                cash_id: form.cash_id
             };
 
             const response = await Expenses.CreateExpenses(payload);
-            Alert("Muvaffaqiyatli yaratildi ", "success");
+            Alert("Muvaffaqiyatli yaratildi", "success");
             setOpen(false);
-            refresh()
+            setForm({
+                amount: "",
+                method: "cash",
+                location_id: Cookies?.get('ul_nesw'),
+                cash_id: "",
+                note: "",
+                created_by: Cookies?.get('us_nesw'),
+            });
+            refresh();
         } catch (error) {
             Alert(`Xatolik yuz berdi ${error?.response?.data?.message}`, "error");
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (open) GetAllCash();
+    }, [open]);
 
     return (
         <>
@@ -80,12 +117,24 @@ export default function WarehouseExpensesCreate({ refresh }) {
                 <DialogBody divider>
                     <div className="flex flex-col gap-4">
                         <Input
-                            label="Сумма"
+                            label="Сумма (so'm)"
                             name="amount"
                             value={form.amount}
                             onChange={handleAmountChange}
                             placeholder=""
                         />
+
+                        <Select
+                            label="Выберите кассу"
+                            value={form.cash_id}
+                            onChange={(val) => setForm((p) => ({ ...p, cash_id: String(val) }))}
+                        >
+                            {cashes.map((cash) => (
+                                <Option key={cash.id} value={String(cash.id)}>
+                                    {`${cash.name}`}
+                                </Option>
+                            ))}
+                        </Select>
 
                         <Select
                             label="Метод оплаты"

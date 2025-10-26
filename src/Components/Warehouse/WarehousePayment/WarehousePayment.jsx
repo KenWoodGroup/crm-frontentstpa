@@ -168,7 +168,6 @@ export default function WarehousePayment() {
                                     "Касса",
                                     "Создал",
                                     "Примечание",
-                                    "Действия",
                                 ].map((header, idx) => (
                                     <th
                                         key={idx}
@@ -214,21 +213,6 @@ export default function WarehousePayment() {
                                             {item?.created?.full_name || "-"}
                                         </td>
                                         <td className="p-3 border-b">{item.note || "-"}</td>
-
-                                        <td className="p-3 border-b text-center">
-                                            <div className="flex justify-center gap-2">
-                                                <Tooltip content="Редактировать">
-                                                    <IconButton color="amber" variant="text" size="sm">
-                                                        <Edit className="h-4 w-4" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip content="Оплатить">
-                                                    <IconButton color="green" variant="text" size="sm">
-                                                        <CreditCard className="h-4 w-4" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </div>
-                                        </td>
                                     </tr>
                                 ))
                             ) : (
