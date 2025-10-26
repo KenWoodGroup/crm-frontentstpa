@@ -366,7 +366,7 @@ export default function DealerDisposal() {
             updateQty(index, val, "dis");
         }
     }
-
+    
     function handleRemoveItem(index) {
         removeItem(index, "dis");
     }

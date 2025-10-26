@@ -10,6 +10,7 @@ import {
     Recycle,
     Settings,
     User,
+    Move,
     BanknoteArrowDown,
     ChevronsLeftRight,
     UserPen,
@@ -38,6 +39,11 @@ export default function WarehouseLayout() {
     const links = [
         { id: 1, label: "Home Page", path: "/warehouse/dashboard", icon: LayoutDashboard },
         { id: 2, label: "Products", path: "/warehouse/product", icon: Package },
+
+        { id: 3, label: "Приём", path: "/warehouse/stockin", icon: PackagePlus },
+        { id: 4, label: "Отгрузки", path: "/warehouse/stockout", icon: PackageMinus },
+        { id: 5, label: "Chiqindi", path: "/warehouse/disposal", icon: Recycle },
+        { id: 6, label: "Операции Склада", path: "/warehouse/history", icon: Move },
         { id: 6, label: "Dilers", path: "/warehouse/dilers", icon: User },
         { id: 3, label: "Kirim", path: "/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: "Chiqim", path: "/warehouse/stockout", icon: PackageMinus },
