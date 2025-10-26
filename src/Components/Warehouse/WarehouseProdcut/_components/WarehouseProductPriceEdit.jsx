@@ -24,7 +24,7 @@ export default function WarehouseEdit({ data }) {
                 product_id: data.product_id,
                 location_id: data.location_id,
                 quantity: Number(data.quantity),
-                price: unformatNumber(price), // убираем пробелы перед отправкой
+                sale_price: unformatNumber(price),
                 barcode: data.barcode,
             };
 
