@@ -6,7 +6,7 @@ class Staff {
         return response
     }
     static CreateStaff = async (data) => {
-        const response = await $api.post(`/staffs/`, data)
+        const response = await $api.post(`/staffs`, data)
         return response
     }
     static DeleteStaff = async (id) => {
