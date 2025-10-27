@@ -1,0 +1,20 @@
+{
+    "newWarehouse": "Новый склад",
+    "warehouse_info": "Информация о складе",
+    "warehouseName": "Название склада",
+    "managerName": "Имя заведующего складом",
+    "warehouseAddress": "Адрес склада",
+    "managerPhone": "Телефон заведующего",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "enterWarehouseName": "Пожалуйста, введите название склада ❗",
+    "enterFullName": "Пожалуйста, введите полное имя ❗",
+    "enterAddress": "Пожалуйста, введите адрес ❗",
+    "enterPhone": "Пожалуйста, введите номер телефона ❗",
+    "enterEmail": "Пожалуйста, введите email ❗",
+    "enterPassword": "Пожалуйста, введите пароль ❗",
+    "warehouseCreated": "Склад успешно создан ✅",
+    "errorOccurred": "Произошла ошибка ❌"
+}

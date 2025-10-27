@@ -10,8 +10,10 @@ import {
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseCreate({ refresh }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
@@ -21,7 +23,7 @@ export default function WarehouseCreate({ refresh }) {
         address: "",
         phone: "+998",
         email: "",
-        parent_id: Cookies.get('ul_nesw'),
+        parent_id: Cookies.get("ul_nesw"),
         password: "",
     });
 
@@ -33,18 +35,12 @@ export default function WarehouseCreate({ refresh }) {
     };
 
     const validateFields = () => {
-        if (!data.name.trim())
-            return Alert("Iltimos, ombor nomini kiriting ❗", "warning");
-        if (!data.full_name.trim())
-            return Alert("Iltimos, to‘liq ismni kiriting ❗", "warning");
-        if (!data.address.trim())
-            return Alert("Iltimos, manzilni kiriting ❗", "warning");
-        if (!data.phone.trim())
-            return Alert("Iltimos, telefon raqam kiriting ❗", "warning");
-        if (!data.email.trim())
-            return Alert("Iltimos, email kiriting ❗", "warning");
-        if (!data.password.trim())
-            return Alert("Iltimos, parolni kiriting ❗", "warning");
+        if (!data.name.trim()) return Alert(t("enterWarehouseName"), "warning");
+        if (!data.full_name.trim()) return Alert(t("enterFullName"), "warning");
+        if (!data.address.trim()) return Alert(t("enterAddress"), "warning");
+        if (!data.phone.trim()) return Alert(t("enterPhone"), "warning");
+        if (!data.email.trim()) return Alert(t("enterEmail"), "warning");
+        if (!data.password.trim()) return Alert(t("enterPassword"), "warning");
         return true;
     };
 
@@ -53,9 +49,9 @@ export default function WarehouseCreate({ refresh }) {
 
         try {
             setLoading(true);
-            const res = await WarehouseApi.CreateWarehouse(data);
+            await WarehouseApi.CreateWarehouse(data);
 
-            Alert("Ombor muvaffaqiyatli yaratildi ", "success");
+            Alert(t("warehouseCreated"), "success");
             setOpen(false);
             setData({
                 type: "warehouse",
@@ -66,10 +62,10 @@ export default function WarehouseCreate({ refresh }) {
                 email: "",
                 password: "",
             });
-            refresh()
+            refresh();
         } catch (error) {
-            console.error("Xatolik:", error);
-            Alert(`Xatolik yuz berdi ${error?.response?.data?.message}`, "error");
+            console.error("Ошибка:", error);
+            Alert(`${t("errorOccurred")} ${error?.response?.data?.message}`, "error");
         } finally {
             setLoading(false);
         }
@@ -81,7 +77,7 @@ export default function WarehouseCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-black text-white normal-case hover:bg-gray-800"
             >
-                + Yangi Ombor
+                + {t("newWarehouse")}
             </Button>
 
             <Dialog
@@ -90,46 +86,46 @@ export default function WarehouseCreate({ refresh }) {
                 className="bg-white text-gray-900 rounded-xl"
             >
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200">
-                    Ombor maʼlumotlari
+                    {t("warehouse_info")}
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
-                        label="Ombor nomi"
+                        label={t("warehouseName")}
                         color="gray"
                         name="name"
                         value={data.name}
                         onChange={handleChange}
                     />
                     <Input
-                        label="Ombor mudiri ismi"
+                        label={t("managerName")}
                         color="gray"
                         name="full_name"
                         value={data.full_name}
                         onChange={handleChange}
                     />
                     <Input
-                        label="Ombor manzili"
+                        label={t("warehouseAddress")}
                         color="gray"
                         name="address"
                         value={data.address}
                         onChange={handleChange}
                     />
                     <Input
-                        label="Ombor mudiri telefon raqam"
+                        label={t("managerPhone")}
                         color="gray"
                         name="phone"
                         value={data.phone}
                         onChange={handleChange}
                     />
                     <Input
-                        label="Email"
+                        label={t("email")}
                         color="gray"
                         name="email"
                         value={data.email}
                         onChange={handleChange}
                     />
                     <Input
-                        label="Parol"
+                        label={t("password")}
                         color="gray"
                         type="password"
                         name="password"
@@ -145,7 +141,7 @@ export default function WarehouseCreate({ refresh }) {
                         className="mr-2"
                         disabled={loading}
                     >
-                        Bekor qilish
+                        {t("cancel")}
                     </Button>
                     <Button
                         className={`bg-black text-white normal-case hover:bg-gray-800 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
@@ -175,7 +171,7 @@ export default function WarehouseCreate({ refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "Saqlash"
+                            t("save")
                         )}
                     </Button>
                 </DialogFooter>
