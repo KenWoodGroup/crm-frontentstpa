@@ -6,15 +6,15 @@ class Staff {
         return response
     }
     static CreateStaff = async (data) => {
-        const response = await $api.get(`/staffs/`, data)
+        const response = await $api.post(`/staffs`, data)
         return response
     }
     static DeleteStaff = async (id) => {
-        const response = await $api.get(`/staffs/${id}`)
+        const response = await $api.delete(`/staffs/${id}`)
         return response;
     }
     static EditStaff = async (id, data) => {
-        const response = await $api.get(`/staffs/by-id/${id}`, data)
+        const response = await $api.put(`/staffs/by-id/${id}`, data)
         return response;
     }
 } export { Staff }
