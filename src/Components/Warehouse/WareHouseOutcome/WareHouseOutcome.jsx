@@ -33,6 +33,7 @@ import { location } from "../../../utils/Controllers/location";
 import { useWarehouse } from "../../../context/WarehouseContext";
 import OutgoingPanel from "./sectionsWhO/OutgoingPanel";
 import { Staff } from "../../../utils/Controllers/Staff";
+import CancelInvoiceButton from "./sectionsWhO/CancelInvoiceButton";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -224,7 +225,7 @@ export default function WareHouseOutcome() {
                 receiver_name: getLocationNameById(selectedLocation),
                 sender_name: getLocationNameById(userLId),
                 carrier_id: selectedStaff,
-                note:"ok"
+                note: "ok"
             };
             const res = await InvoicesApi.CreateInvoice(payload);
             const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
@@ -577,8 +578,15 @@ export default function WareHouseOutcome() {
 
     return (
         <section className="relative w-full min-h-screen bg-white overflow-hidden">
-            <div className="fixed text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
-                Warehouse Outcome <a href="/login" className="ml-4 text-sm text-gray-700">Login</a>
+            <div className={`fixed transition-all duration-300  text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
+                <h2>{!invoiceStarted?.out && "Tovarni ombordan chiqarish"}
+                    {invoiceStarted?.out && (invoiceMeta?.out?.operation_type === "outgoing" ? "Sotuv" :
+                        invoiceMeta?.out?.operation_type === "transfer_out" ? "Ombordan ko'chirish" :
+                            invoiceMeta?.out?.operation_type === "return_out" ? "Ombordan vozvrat" :
+                                invoiceMeta?.out?.operation_type === "disposal" ? "Утилизация" : "Unkown"
+                    )}</h2>
+                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>}
+
             </div>
 
             {/* Sidebar */}

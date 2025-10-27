@@ -132,11 +132,12 @@ export default function WareHouseDisposal() {
             setGroupLoading(false);
         }
     };
+    
 
     const fetchLocations = async () => {
         try {
             setLocationsLoading(true);
-            const res = await location.getAllGroupLocations(Cookies.get("usd_nesw"));
+            const res = await location.getAllGroupLocations(userLId);
 
             if (res?.status === 200 || res?.status === 201) {
                 setLocations(res.data || []);
@@ -197,7 +198,7 @@ export default function WareHouseDisposal() {
                 receiver_id: receiver,
                 sender_id: userLId,
                 type: "disposal",
-                status: "approved",
+                status: "received",
             };
             const res = await InvoicesApi.CreateInvoice(payload);
             const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
