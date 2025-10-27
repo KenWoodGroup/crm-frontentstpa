@@ -414,8 +414,8 @@ export default function WarehouseInvoiceHistory() {
     const totalPages = Math.max(1, Math.ceil((total || 0) / PER_PAGE));
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="max-w-7xl mx-auto">
+        <div className=" bg-gray-50 min-h-screen">
+            <div className=" mx-auto">
                 <header className="flex items-center justify-between mb-6">
                     <div>
                         <h1 className="text-2xl font-semibold">Invoice History</h1>

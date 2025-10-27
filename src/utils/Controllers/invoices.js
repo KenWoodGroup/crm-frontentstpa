@@ -10,6 +10,10 @@ class InvoicesApi {
         const response = await $api.get(`/invoices/page?page=${page}`)
         return response;
     }
+    static GetClientInvoice = async (data) => {
+        const response = await $api.get(`/invoices/${data?.id}/page?page=${data?.page}`)
+        return response;
+    }
     static GetInvoiceById = async (id) => {
         const response = await $api.get(`/invoices/${id}`)
         return response;
@@ -31,4 +35,4 @@ class InvoicesApi {
         return response;
     }
 }
-export { InvoicesApi}
+export { InvoicesApi }

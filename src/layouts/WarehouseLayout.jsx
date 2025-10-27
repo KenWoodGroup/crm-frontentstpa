@@ -22,6 +22,7 @@ import {
 import { WarehouseProvider, useWarehouse } from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
+import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
 
 export default function WarehouseLayout() {
     const location = useLocation();
@@ -57,12 +58,8 @@ export default function WarehouseLayout() {
 
 
     return (
-        <div className={`transition-all bg-[#FAFAFA] min-h-screen duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
-            <SuperAdminSidebar
-                links={links}
-                role={"Ombor Manager"}
-                onToggle={setSidebarOpen}
-            />
+        <div className={`transition-all bg-[#FAFAFA] min-h-screen duration-300 ml-[125px]`}>
+            <WarehouseSidebar />
             <div className="p-6">
                 {/* pass mode to provider so provider can expose per-mode state */}
                 <WarehouseProvider mode={mode}>

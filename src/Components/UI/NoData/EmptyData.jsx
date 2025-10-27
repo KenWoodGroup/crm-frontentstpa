@@ -3,7 +3,7 @@ import { Inbox } from "lucide-react";
 
 export default function EmptyData({ text }) {
     return (
-        <div className="w-full flex flex-col items-center justify-center py-20">
+        <div className="w-full flex flex-col items-center justify-center py-20 bg-[white]">
             <div className="flex items-center justify-center w-24 h-24 rounded-full bg-white shadow-sm mb-6">
                 <Inbox className="w-12 h-12 text-blue-500" />
             </div>

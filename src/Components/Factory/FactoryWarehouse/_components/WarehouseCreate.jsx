@@ -19,7 +19,7 @@ export default function WarehouseCreate({ refresh }) {
         name: "",
         full_name: "",
         address: "",
-        phone: "",
+        phone: "+998",
         email: "",
         parent_id: Cookies.get('ul_nesw'),
         password: "",
@@ -62,7 +62,7 @@ export default function WarehouseCreate({ refresh }) {
                 name: "",
                 full_name: "",
                 address: "",
-                phone: "",
+                phone: "+998",
                 email: "",
                 password: "",
             });
@@ -94,28 +94,28 @@ export default function WarehouseCreate({ refresh }) {
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
-                        label="Nomi"
+                        label="Ombor nomi"
                         color="gray"
                         name="name"
                         value={data.name}
                         onChange={handleChange}
                     />
                     <Input
-                        label="To‘liq ism"
+                        label="Ombor mudiri ismi"
                         color="gray"
                         name="full_name"
                         value={data.full_name}
                         onChange={handleChange}
                     />
                     <Input
-                        label="Manzil"
+                        label="Ombor manzili"
                         color="gray"
                         name="address"
                         value={data.address}
                         onChange={handleChange}
                     />
                     <Input
-                        label="Telefon raqam"
+                        label="Ombor mudiri telefon raqam"
                         color="gray"
                         name="phone"
                         value={data.phone}

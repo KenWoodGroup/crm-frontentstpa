@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Dialog,
     DialogHeader,
@@ -13,9 +13,12 @@ import {
 import Cookies from "js-cookie";
 import { Payment } from "../../../../utils/Controllers/Payment";
 import { Alert } from "../../../../utils/Alert";
+import { Cash } from "../../../../utils/Controllers/Cash";
 
 export default function WarehouseClientDetailPayment({ client, refresh, invoice }) {
     const [open, setOpen] = useState(false);
+    const [cashes, setCashes] = useState([]);
+
     const [form, setForm] = useState({
         amount: "",
         method: "cash",
@@ -23,10 +26,29 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
         payer_id: client?.id,
         receiver_id: Cookies?.get("ul_nesw"),
         note: "",
+        cash_id: "",
         created_by: Cookies?.get("us_nesw"),
     });
 
     const handleOpen = () => setOpen(!open);
+
+
+
+    const GetAllCash = async () => {
+        try {
+            const response = await Cash?.GetKassa(Cookies.get("ul_nesw"));
+            const data = response?.data || [];
+            setCashes(data);
+
+            // Автоматически выбираем первую кассу
+            if (data.length > 0 && !form.cash_id) {
+                setForm((prev) => ({ ...prev, cash_id: String(data[0].id) }));
+            }
+        } catch (error) {
+            console.log(error);
+            setCashes([]);
+        }
+    };
 
     // форматирование суммы с пробелами
     const formatNumber = (value) => {
@@ -71,6 +93,7 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
                 amount: "",
                 method: "cash",
                 status: "confirmed",
+                cash_id: "",
                 payer_id: client?.id,
                 receiver_id: Cookies?.get("ul_nesw"),
                 note: "",
@@ -83,6 +106,11 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
             Alert("To‘lovni yaratishda xato", "error");
         }
     };
+
+    useEffect(() => {
+        if (open) GetAllCash();
+    }, [open]);
+
 
     return (
         <>
@@ -99,6 +127,22 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
                         value={form.amount}
                         onChange={handleChange}
                     />
+
+                    <Select
+                        key={form.cash_id} // Добавьте эту строку
+                        label="Выберите кассу"
+                        value={form.cash_id}
+                        onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
+                    >
+                        {cashes.map((cash) => (
+                            <Option key={cash.id} value={String(cash.id)}>
+                                {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm (${new Date(
+                                    cash.createdAt
+                                ).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" })})`}
+                            </Option>
+                        ))}
+                    </Select>
+
 
                     <Select
                         label="Метод оплаты"
