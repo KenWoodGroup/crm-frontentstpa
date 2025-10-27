@@ -6,47 +6,26 @@ import { InvoicesApi } from "../../../../utils/Controllers/invoices";
 import { useWarehouse } from "../../../../context/WarehouseContext";
 import { notify } from "../../../../utils/toast";
 
-const CancelInvoiceButton = () => {
+const CancelInvoiceButton = ({resetAll}) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const {
         mode, // 'in' or 'out' provided by WarehouseLayout -> WarehouseProvider
-        mixData,
-        addItem,
-        updateQty,
-        updatePrice,
-        updateBatch,
-        removeItem,
-        resetAll,
-        resetMode,
-        invoiceStarted, // object { in, out }
-        setInvoiceStarted, // fn (mode, value)
         invoiceId, // object { in, out }
-        setInvoiceId, // fn (mode, value)
-        invoiceMeta, // object { in: {...}, out: {...} }
-        setInvoiceMeta, // fn (mode, value)
-        isDirty, // object { in, out }
-        setIsDirty, // fn (mode, value)
-        saveSuccess, // object { in, out }
-        setSaveSuccess, // fn (mode, value)
     } = useWarehouse();
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
         resetAll(); // resets both modes per provider
-        // setSelectedLocation("");
-        // setOtherLocationName("");
-        // setSearchResults([]);
-        // setSearchQuery("");
-        // setSidebarMode(0);
     }
 
     const handleCancel = async () => {
         setLoading(true);
         try {
-            const res = await InvoicesApi.DeleteInvoice(invoiceId?.in)
+            const res = await InvoicesApi.DeleteInvoice(invoiceId?.[mode])
             // TODO: delete invoice + clear context here
             if (res.status === 200 || res.status === 201) {
+                resetAllBaseForNewInvoice()
                 setOpen(false);
             }
         } catch (err) {

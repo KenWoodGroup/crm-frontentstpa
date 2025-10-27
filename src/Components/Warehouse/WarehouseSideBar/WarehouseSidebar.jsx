@@ -43,7 +43,7 @@ export default function WarehouseSidebar() {
     ];
 
     const skladSubLinks = [
-        { id: 1, label: "Склад", path: "/warehouse/product", icon: PackagePlus },
+        { id: 1, label: "Склад", path: "/warehouse/product", icon: Package },
         { id: 2, label: "История", path: "/warehouse/history", icon: Move },
         { id: 3, label: "Приход", path: "/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: "Отгрузки", path: "/warehouse/stockout", icon: PackageMinus },
@@ -55,7 +55,7 @@ export default function WarehouseSidebar() {
     };
 
     return (
-        <Card className="h-[95%] w-[120px] fixed top-[15px] left-[15px] z-50 shadow-xl bg-white/30 backdrop-blur-md border border-white/20 px-2 py-5 flex flex-col justify-between">
+        <Card className="h-[100%] w-22 fixed top-[0] left-[0] bottom-0  z-50 shadow-xl bg-white/30 backdrop-blur-md border border-white/20 px-2 py-5 flex flex-col justify-between">
             {/* === Верхняя часть === */}
             <div className="flex flex-col items-center gap-4">
                 {/* Главные ссылки */}

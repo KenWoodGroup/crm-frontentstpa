@@ -645,7 +645,7 @@ export default function WareHouseIncome() {
 
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
-        resetAll(); // resets both modes per provider
+        resetAll(); 
         setSelectedLocation("");
         setOtherLocationName("");
         setSearchResults([]);
@@ -658,15 +658,15 @@ export default function WareHouseIncome() {
 
     return (
         <section className="relative w-full min-h-screen bg-white overflow-hidden">
-            <div className={`fixed transition-all pl-300 duration-300 px-5 text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-between text-xl font-semibold z-30`}>
-                <span></span>
+            <div className={`fixed transition-all duration-300  text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
                 <h2>{!invoiceStarted?.in && "Приём — поступления на склад"}
                     {invoiceStarted?.in && (invoiceMeta?.in?.operation_type === "incoming" ? "Приход" :
                         invoiceMeta?.in?.operation_type === "transfer_in" ? "Перемещение" :
                             invoiceMeta?.in?.operation_type === "return_in" ? "возврат" :
                                 invoiceMeta?.in?.operation_type === "return_dis" ? "Утилизация возврата" : "Unkown"
                     )}</h2>
-                <CancelInvoiceButton />
+                    {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>} 
+                
             </div>
 
             {/* Sidebar */}
