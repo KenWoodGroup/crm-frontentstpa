@@ -502,11 +502,11 @@ export default function WareHouseIncome() {
                         price: Number(it.price || 0),
                         barcode: it.barcode || "",
                         is_new_batch: it.batch === "def" ? false : it.is_new_batch,
-                        batch: it.batch
+                        batch: it.batch === "def" ? null : it.batch
                     }
                     if (it.is_new_batch || it.batch === "def") {
                         delete it.batch
-                    }
+                    };
                     return item
                 }),
             };
