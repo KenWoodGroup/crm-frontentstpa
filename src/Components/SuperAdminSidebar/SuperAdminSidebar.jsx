@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X, ChevronLeft, ChevronRight } from "lucide-react";
 import clsx from "clsx";
+import LogoutButton from "./sectionsSaSide/LogoutButton";
 
 const SuperAdminSidebar = ({ links = [], onToggle, role }) => {
     const [isOpen, setIsOpen] = useState(
@@ -21,6 +22,12 @@ const SuperAdminSidebar = ({ links = [], onToggle, role }) => {
     useEffect(() => {
         onToggle?.(isOpen); // dastlabki renderda ham yuboramiz
     }, []);
+
+    const handleLogout = () => {
+        Object.keys(Cookies.get()).forEach((cookie) => Cookies.remove(cookie));
+        navigate("/login");
+    };
+
 
     return (
         <>
@@ -89,7 +96,9 @@ const SuperAdminSidebar = ({ links = [], onToggle, role }) => {
 
                 {/* Footer */}
                 <div className="p-3 border-t border-gray-100">
-                    <button className="flex items-center gap-3 p-3 w-full rounded-xl text-[rgb(2, 2, 59)] hover:bg-red-100 hover:text-red-700 transition">
+                    {/* <button
+                        onClick={()=>handleLogout()}
+                        className="flex items-center gap-3 p-3 w-full rounded-xl text-[rgb(2, 2, 59)] hover:bg-red-100 hover:text-red-700 transition">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="w-5 h-5"
@@ -112,7 +121,10 @@ const SuperAdminSidebar = ({ links = [], onToggle, role }) => {
                         >
                             Logout
                         </span>
-                    </button>
+                    </button> */}
+                    <LogoutButton
+                        isOpen={isOpen}
+                    />
                 </div>
             </aside>
         </>

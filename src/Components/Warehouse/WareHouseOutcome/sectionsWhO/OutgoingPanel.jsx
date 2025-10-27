@@ -8,9 +8,19 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
     const [status, setStatus] = useState("draft");
     // const [receiver, setReceiver] = useState(null);
 
+    const changeReceiver = (value) => {
+        // setReceiver(value);
+        selectReceiver(value);
+    }
     const changeOprType = (value) => {
         setOperationType(value)
-        selectOprType(value)
+        selectOprType(value);
+        // if (value === "disposal") {
+        //     const disposal = receiverOptions?.find((op) => op.type === "disposal")
+        //     changeReceiver(disposal)
+        // }
+        // console.log(selectedReceiver);
+                
     };
 
     const changeOprSatatus = (value) => {
@@ -18,10 +28,7 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
         selectStatus(value)
     };
 
-    const changeReceiver = (value) => {
-        // setReceiver(value);
-        selectReceiver(value)
-    }
+
 
     const comboLabels = {
         draft_outgoing: { ru: "Черновик отгрузки", uz: "Chiqim zayafkasini qoralab qo‘yish" },
@@ -37,6 +44,7 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
     const typeOptions = [
         { value: "outgoing", label: "Отгрузка (Klientlarga)" },
         { value: "transfer_out", label: "Перемещение (Boshqa omborga)" },
+        { value: "disposal", label: "Diposal" }
     ];
 
     const statusOptions = [
@@ -121,9 +129,10 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
                         options={receiverOptions.filter(r =>
                             operationType === "outgoing"
                                 ? r.type === "client" || r.type === "dealer"
-                                : r.type === "warehouse"
+                                : operationType === "transfer_out" ? r.type === "warehouse"
+                                    : r.type === "disposal"
                         )}
-                        value={receiverOptions?.find((loc) => loc.value === selectReceiver)}
+                        value={receiverOptions?.find((loc) => loc.value === selectedReceiver)}
                         onChange={opt => changeReceiver(opt.value)}
                         isSearchable
                         placeholder="Выберите..."

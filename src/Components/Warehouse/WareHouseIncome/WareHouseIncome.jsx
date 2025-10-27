@@ -1,6 +1,8 @@
 // src/Components/Warehouse/WareHousePages/WareHouseIncome.jsx
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Cookies from "js-cookie";
+import Select from "react-select";
+
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, VerticalAlign } from "docx";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
@@ -36,6 +38,7 @@ import { location } from "../../../utils/Controllers/location";
 import { useWarehouse } from "../../../context/WarehouseContext";
 import { NavLink } from "react-router-dom";
 import { Staff } from "../../../utils/Controllers/Staff";
+import CancelInvoiceButton from "../WareHouseOutcome/sectionsWhO/CancelInvoiceButton";
 
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -115,9 +118,9 @@ export default function WareHouseIncome() {
     const [otherLocationName, setOtherLocationName] = useState("");
     const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
 
-    const [selected, setSelected] = useState("transfer_in");
+    const [selected, setSelected] = useState("incoming");
     const [sendToTrash, setSendToTrash] = useState(false);
-    const operationLocations = (selected === "incoming" ? locations?.filter((loc) => loc.type === "factory") : selected === "transfer_in" ? locations?.filter((loc) => loc.type === "warehouse") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client")) || []
+    const operationLocations = (selected === "incoming" ? locations?.filter((loc) => loc.type === "factory" || loc.type === "default") : selected === "transfer_in" ? locations?.filter((loc) => loc.type === "warehouse" || loc.type === "default") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client" || loc.type === "default")) || []
 
     // search & barcode (local UI)
     const [searchQuery, setSearchQuery] = useState("");
@@ -161,7 +164,16 @@ export default function WareHouseIncome() {
         try {
             setLocationsLoading(true);
             const res = await location.getAllGroupLocations(userLId);
-            if (res?.status === 200 || res?.status === 201) setLocations(res.data || []);
+            if (res?.status === 200 || res?.status === 201) {
+                // setLocations(res.data || []);
+                const formedOptions = (res.data || []).map((lc) => {
+                    return (
+                        { value: lc.id, label: lc.name, type: lc.type }
+                    )
+                });
+
+                setLocations([{ value: null, label: "Укажите отправителя", type: "default" }, ...formedOptions])
+            }
             else setLocations(res || []);
         } catch (err) {
             notify.error("Locationlarni olishda xato: " + (err?.message || err));
@@ -175,7 +187,15 @@ export default function WareHouseIncome() {
         try {
             setLocationsLoading(true);
             const res = await Staff.StaffGet(userLId);
-            if (res?.status === 200 || res?.status === 201) setStaffs(res.data  || []);
+            if (res?.status === 200 || res?.status === 201) {
+                // setStaffs(res.data  || []);
+                const formatted = (res.data || []).map((st) => {
+                    return (
+                        { value: st.id, label: st.full_name }
+                    )
+                });
+                setStaffs(formatted)
+            }
             else setStaffs(res?.data || []);
         } catch (err) {
             notify.error("Stafflarni olishda xato: " + (err?.message || err));
@@ -189,6 +209,9 @@ export default function WareHouseIncome() {
         fetchLocations();
         fetchStaffs();
     }, []);
+    useEffect(() => {
+        setSelectedLocation(operationLocations?.find((it) => it.type === "default"))
+    }, [selected])
 
     // keep invoice receiver current when locations load (use context setter)
     useEffect(() => {
@@ -217,22 +240,22 @@ export default function WareHouseIncome() {
     // ---------- Start invoice (create) ----------
     const startInvoice = async () => {
         // For incoming (this component), type is transfer_incoming
-        if (!selectedLocation) {
-            notify.error("Iltimos, jo'natuvchini tanlang");
+        if (!selectedLocation?.value) {
+            notify.warning("Iltimos, jo'natuvchini tanlang");
             return;
         }
-        const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : "transfer_in"
+        const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : (selected === "incoming" && sendToTrash === false) ? "incoming" : "transfer_in"
         try {
             setCreateInvoiceLoading(true);
             const payload = {
                 type: operation_type,
-                sender_id: selectedLocation === "other" ? null : selectedLocation,
+                sender_id: selectedLocation === "other" ? null : selectedLocation?.value,
                 receiver_id: userLId,
                 receiver_name: getLocationNameById(userLId),
-                sender_name: getLocationNameById(selectedLocation),
+                sender_name: getLocationNameById(selectedLocation?.value),
                 created_by: createdBy,
                 status: "received",
-                carrier_id: selectedStaff,
+                carrier_id: selectedStaff?.value,
                 note: ""
             };
             const res = await InvoicesApi.CreateInvoice(payload);
@@ -248,7 +271,7 @@ export default function WareHouseIncome() {
                 setSidebarMode(1)
                 setInvoiceId(mode, invoice_id);
                 setInvoiceStarted(mode, true);
-                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(selectedLocation), receiver: getLocationNameById(userLId), operation_type });
+                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(selectedLocation?.value), receiver: getLocationNameById(userLId), operation_type });
                 // mark dirty false initially (we just created invoice)
                 setIsDirty(mode, true);
                 if (operation_type === "transfer_in") {
@@ -257,6 +280,8 @@ export default function WareHouseIncome() {
                     notify.success("Операция возврата успешно начата");
                 } else if (operation_type === "return_dis") {
                     notify.success("Возврат направлен на утилизацию");
+                } else if (operation_type === "incoming") {
+                    notify.success("Операция Приход успешно начата")
                 }
             } else {
                 throw new Error("Invoice yaratishda xato");
@@ -271,8 +296,8 @@ export default function WareHouseIncome() {
     function getLocationNameById(id) {
         if (!id) return "";
         if (id === "other") return otherLocationName || "Other";
-        const f = locations.find((l) => String(l.id) === String(id));
-        return f ? f.name || f.address || "Location" : "";
+        const f = locations.find((l) => String(l.value) === String(id));
+        return f ? f.label || "Location" : "";
     }
 
     // ---------- Search products ----------
@@ -382,7 +407,7 @@ export default function WareHouseIncome() {
         const is_raw_stock = productObj !== undefined
         return {
             is_raw_stock: productObj === undefined ? true : false,
-            is_new_batch: false,
+            is_new_batch: is_raw_stock ? false : true,
             name: is_raw_stock ? productObj.name : raw.name || "-",
             price: invoiceMeta?.[mode]?.operation_type === "transfer_in" ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
             origin_price: invoiceMeta?.[mode]?.operation_type === "transfer_in" ? Number(raw.purchase_price || 0) : Number(raw.sale_price || 0),
@@ -390,7 +415,7 @@ export default function WareHouseIncome() {
             unit: is_raw_stock ? productObj.unit : raw.unit || "-",
             product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
             barcode: raw.barcode || null,
-            batch: raw.batch ?? null,
+            batch: is_raw_stock ? (raw.batch || "def") : null,
         };
     };
 
@@ -398,8 +423,6 @@ export default function WareHouseIncome() {
         const item = normalizeIncomingItem(raw);
         // addItem in provider will respect mode (incoming allows new batch; outgoing validates existence)
         const res = addItem(item); // provider default mode = provided mode at creation
-        console.log(item);
-
         if (res && res.ok === false) {
             notify.error(res.message || "Item qo'shilmadi");
         }
@@ -478,10 +501,10 @@ export default function WareHouseIncome() {
                         quantity: Number(it.quantity || 0),
                         price: Number(it.price || 0),
                         barcode: it.barcode || "",
-                        is_new_batch: it.is_new_batch,
+                        is_new_batch: it.batch === "def" ? false : it.is_new_batch,
                         batch: it.batch
                     }
-                    if (it.is_new_batch) {
+                    if (it.is_new_batch || it.batch === "def") {
                         delete it.batch
                     }
                     return item
@@ -622,7 +645,7 @@ export default function WareHouseIncome() {
 
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
-        resetAll(); // resets both modes per provider
+        resetAll(); 
         setSelectedLocation("");
         setOtherLocationName("");
         setSearchResults([]);
@@ -632,10 +655,18 @@ export default function WareHouseIncome() {
 
     // ---------- UI ----------
 
+
     return (
         <section className="relative w-full min-h-screen bg-white overflow-hidden">
-            <div className="fixed text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center justify-center text-xl font-semibold z-30">
-                Приём — поступления на склад <a href="/login" className="ml-4 text-sm text-gray-700">Login</a>
+            <div className={`fixed transition-all duration-300  text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
+                <h2>{!invoiceStarted?.in && "Приём — поступления на склад"}
+                    {invoiceStarted?.in && (invoiceMeta?.in?.operation_type === "incoming" ? "Приход" :
+                        invoiceMeta?.in?.operation_type === "transfer_in" ? "Перемещение" :
+                            invoiceMeta?.in?.operation_type === "return_in" ? "возврат" :
+                                invoiceMeta?.in?.operation_type === "return_dis" ? "Утилизация возврата" : "Unkown"
+                    )}</h2>
+                    {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>} 
+                
             </div>
 
             {/* Sidebar */}
@@ -792,10 +823,18 @@ export default function WareHouseIncome() {
                                     {locationsLoading ? (
                                         <div className="flex items-center gap-2"><Spinner /> Loading...</div>
                                     ) : (
-                                        <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                            <option value="">Укажите отправителя</option>
-                                            {operationLocations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
-                                        </select>
+                                        // <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
+                                        //     <option value="">Укажите отправителя</option>
+                                        //     {operationLocations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
+                                        // </select>
+                                        <Select
+                                            isClearable
+                                            isSearchable
+                                            options={operationLocations.filter((item) => String(item.value) !== String(userLId) && String(item.type) !== "other" && String(item.type) !== "disposal")}
+                                            placeholder="Укажите отправителя"
+                                            value={selectedLocation}
+                                            onChange={(loc) => setSelectedLocation(loc)}
+                                        />
                                     )
                                     }
 
@@ -807,10 +846,19 @@ export default function WareHouseIncome() {
                                     {locationsLoading ? (
                                         <div className="flex items-center gap-2"><Spinner /> Loading...</div>
                                     ) : (
-                                        <select value={selectedLocation} onChange={(e) => setSelectedStaff(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                            <option value="">Выберите поставшика</option>
-                                            {staffs?.map((loc) => <option key={loc.id} value={loc.id}>{loc.full_name || loc.address || loc.type}</option>)}
-                                        </select>
+                                        // <select value={selectedLocation} onChange={(e) => setSelectedStaff(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
+                                        //     <option value="">Выберите поставшика</option>
+                                        //     {staffs?.map((loc) => <option key={loc.id} value={loc.id}>{loc.full_name || 'Noname'}</option>)}
+                                        // </select>
+                                        <Select
+                                            placeholder="Выберите поставшика"
+                                            options={staffs}
+                                            value={selectedStaff}
+                                            onChange={(st) => setSelectedStaff(st)}
+                                            isClearable
+                                            isSearchable
+                                            isOptionDisabled={staffs.find((it) => it.id === 0)}
+                                        />
                                     )
                                     }
 
