@@ -125,16 +125,20 @@ export default function WarehouseExpensesCreate({ refresh }) {
                         />
 
                         <Select
+                            key={form.cash_id} // Добавьте эту строку
                             label="Выберите кассу"
                             value={form.cash_id}
-                            onChange={(val) => setForm((p) => ({ ...p, cash_id: String(val) }))}
+                            onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
                         >
                             {cashes.map((cash) => (
                                 <Option key={cash.id} value={String(cash.id)}>
-                                    {`${cash.name}`}
+                                    {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm (${new Date(
+                                        cash.createdAt
+                                    ).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" })})`}
                                 </Option>
                             ))}
                         </Select>
+
 
                         <Select
                             label="Метод оплаты"

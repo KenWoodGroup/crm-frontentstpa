@@ -15,6 +15,7 @@ import Loading from "../../UI/Loadings/Loading";
 import WarehouseClientDelete from "./_components/WarehouseClientDelete";
 import WarehouseClientEdit from "./_components/WarehouseClientEdit";
 import EmptyData from "../../UI/NoData/EmptyData";
+import Cookies from "js-cookie";
 import WarehouseClientPayment from "./_components/WarehouseClientPayment";
 import { NavLink } from "react-router-dom";
 
@@ -32,6 +33,7 @@ export default function WarehouseClients() {
                 type: "client",
                 page: currentPage,
                 search: searchValue.trim() === "" ? "all" : searchValue,
+                location_id: Cookies.get(`ul_nesw`)
             };
             const response = await Clients?.GetClients(data);
             setClients(response?.data?.data?.records || []);
@@ -53,22 +55,6 @@ export default function WarehouseClients() {
         GetAllClient(search, 1);
     };
 
-    const handleDelete = (id) => {
-        if (window.confirm("Вы уверены, что хотите удалить этого клиента?")) {
-            console.log("Удаляем клиента с ID:", id);
-            // await axios.delete(`/client/${id}`)
-        }
-    };
-
-    const handleEdit = (client) => {
-        console.log("Редактировать клиента:", client);
-        // тут можно открыть модал для редактирования
-    };
-
-    const handlePayment = (client) => {
-        console.log("Открыть окно оплаты клиента:", client);
-        // можно открыть модал для внесения оплаты
-    };
 
     if (loading) return <Loading />;
 

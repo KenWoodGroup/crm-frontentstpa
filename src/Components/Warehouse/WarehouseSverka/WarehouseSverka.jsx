@@ -51,7 +51,7 @@ export default function WarehouseSverka() {
     const getAllClient = async () => {
         setClientLoading(true)
         try {
-            const response = await location.GetAllClients(Cookies?.get("usd_nesw"));
+            const response = await location.GetAllClients(Cookies?.get("ul_nesw"));
             if (response?.data) {
                 setClients(response.data);
                 if (response.data.length > 0) {

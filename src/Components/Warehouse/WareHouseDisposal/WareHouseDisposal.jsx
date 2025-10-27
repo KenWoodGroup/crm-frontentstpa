@@ -17,7 +17,6 @@ import {
     CheckSquare,
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
-// import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
@@ -138,6 +137,7 @@ export default function WareHouseDisposal() {
         try {
             setLocationsLoading(true);
             const res = await location.getAllGroupLocations(Cookies.get("usd_nesw"));
+
             if (res?.status === 200 || res?.status === 201) {
                 setLocations(res.data || []);
                 // find disposal location automatically

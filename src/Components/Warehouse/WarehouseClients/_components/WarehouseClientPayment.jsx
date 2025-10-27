@@ -115,11 +115,11 @@ export default function WarehouseClientPayment({ client, refresh }) {
                         value={form.amount}
                         onChange={handleChange}
                     />
-
                     <Select
+                        key={form.cash_id} // Добавьте эту строку
                         label="Выберите кассу"
                         value={form.cash_id}
-                        onChange={(val) => setForm((p) => ({ ...p, cash_id: String(val) }))}
+                        onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
                     >
                         {cashes.map((cash) => (
                             <Option key={cash.id} value={String(cash.id)}>

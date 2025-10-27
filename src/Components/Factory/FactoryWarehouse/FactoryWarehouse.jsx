@@ -100,13 +100,6 @@ export default function FactoryWarehouse() {
                                                 Users
                                             </Button>
                                         </NavLink>
-
-                                        <NavLink to={`/factory/warehouse/${w?.id}`} className="flex-1">
-                                            <Button className="w-full flex items-center justify-center gap-2">
-                                                <Building2 size={18} />
-                                                Detail
-                                            </Button>
-                                        </NavLink>
                                     </div>
                                 </div>
                             </div>

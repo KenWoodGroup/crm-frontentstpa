@@ -29,7 +29,7 @@ export default function WarehouseDebtor() {
         try {
             setLoading(true);
             const params = {
-                parent_id: Cookies.get("usd_nesw"),
+                parent_id: Cookies.get("ul_nesw"),
                 type: "client",
                 searchName: filterName || "all",
                 page: customPage,
@@ -99,11 +99,6 @@ export default function WarehouseDebtor() {
                         disabled={loading}
                     >
                         {loading ? "Поиск..." : "Поиск"}
-                    </Button>
-
-                    <Button color="green" className="flex items-center gap-2">
-                        <FileDown size={18} />
-                        Скачать Excel
                     </Button>
                 </div>
             </div>
