@@ -16,7 +16,8 @@ import {
     Barcode as BarcodeIcon,
     Eraser,
     MinusCircle,
-    CheckSquare
+    CheckSquare,
+    InfinityIcon
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 // import { ProductApi } from "../../../utils/Controllers/ProductApi";
@@ -106,7 +107,7 @@ export default function WareHouseOutcome() {
     const [locations, setLocations] = useState([{ id: 0, name: "Loading" }]);
     const [staffs, setStaffs] = useState([])
     const [locationsLoading, setLocationsLoading] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState("");
+    const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedStaff, setSelectedStaff] = useState("");
     const [otherLocationName, setOtherLocationName] = useState("");
     const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
@@ -213,6 +214,9 @@ export default function WareHouseOutcome() {
         if (!selectedLocation) {
             notify.warning("Iltimos, qabul qiluvchini tanlang");
             return;
+        } else if (!selectedStaff) {
+            notify.warning("Iltimos, driverni tanlang")
+            return;
         }
         try {
             setCreateInvoiceLoading(true);
@@ -225,7 +229,7 @@ export default function WareHouseOutcome() {
                 receiver_name: getLocationNameById(selectedLocation),
                 sender_name: getLocationNameById(userLId),
                 carrier_id: selectedStaff,
-                note: "ok"
+                note: "ok",
             };
             const res = await InvoicesApi.CreateInvoice(payload);
             const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
@@ -235,9 +239,10 @@ export default function WareHouseOutcome() {
                     notify.error("Server invoice id qaytarmadi");
                     throw new Error("Invoice id topilmadi");
                 }
+                setSidebarMode(1);
                 setInvoiceId(mode, invoice_id);
                 setInvoiceStarted(mode, true);
-                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(userLId), receiver: selectedLocation !== "other" ? getLocationNameById(selectedLocation) : (otherLocationName || "Other"), operation_type: operationType });
+                setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(userLId), receiver: selectedLocation !== "other" ? getLocationNameById(selectedLocation) : (otherLocationName || "Other"), operation_type: operationType, status });
                 setIsDirty(mode, true);
                 notify.success("Chiqim boshlandi");
             } else {
@@ -344,15 +349,16 @@ export default function WareHouseOutcome() {
     // normalize (ensure stock_quantity available for outgoing)
     function normalizeIncomingItem(raw) {
         const productObj = raw.product || undefined;
-        const is_raw_stock = productObj !== undefined
+        const is_raw_stock = productObj !== undefined;
+        const fixed_qty = raw?.fixed_quantity
         return {
             is_raw_stock: productObj === undefined ? true : false,
             is_new_batch: false,
             name: is_raw_stock ? productObj.name : raw.name || "-",
-            price: invoiceMeta?.[mode]?.operation_type === "transfer_out" ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
+            price: (invoiceMeta?.[mode]?.operation_type === "transfer_out" || invoiceMeta?.[mode]?.operation_type === "disposal") ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
             origin_price: invoiceMeta?.[mode]?.operation_type === "transfer_out" ? Number(raw.purchase_price || 0) : Number(raw.sale_price || 0),
             quantity: 1,
-            stock_quantity: raw.draft_quantity,
+            stock_quantity: invoiceMeta?.[mode]?.operation_type === "disposal" ? raw?.quantity : raw?.draft_quantity,
             unit: is_raw_stock ? productObj.unit : raw.unit || "-",
             product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
             barcode: raw.barcode || null,
@@ -446,7 +452,8 @@ export default function WareHouseOutcome() {
                     price: Number(it.price || 0),
                     barcode: it.barcode || "",
                     is_new_batch: false,
-                    batch: it.batch
+                    batch: it.batch,
+                    discount: it.discount,
                 })),
             };
 
@@ -574,6 +581,8 @@ export default function WareHouseOutcome() {
         setSearchResults([]);
         setSearchQuery("");
         setSidebarMode(0);
+        setSelectedCategory(null);
+        setViewMode("category");
     }
 
     return (
@@ -590,75 +599,77 @@ export default function WareHouseOutcome() {
             </div>
 
             {/* Sidebar */}
-            <div
-                className={`absolute z-20 left-0 top-[68px] ${getSidebarWidth()} h-[calc(100vh-68px)] bg-gray-50 shadow-lg transition-all duration-500 ease-in-out flex flex-col`}
-            >
-                <div className="flex items-center justify-between p-2 border-b border-gray-200">
-                    <button onClick={toggleSidebar} className="p-2 hover:bg-gray-200 rounded-xl transition" title="O‘lchamni o‘zgartirish" aria-label="Toggle sidebar size">
-                        {sidebarMode === 0 ? <ChevronRight size={22} /> : sidebarMode === 1 ? <ChevronsRight size={22} /> : <ChevronLeft size={22} />}
-                    </button>
+            {invoiceStarted?.out &&
+                <div
+                    className={`absolute z-20 left-0 top-[68px] ${getSidebarWidth()} h-[calc(100vh-68px)] bg-gray-50 shadow-lg transition-all duration-500 ease-in-out flex flex-col`}
+                >
+                    <div className="flex items-center justify-between p-2 border-b border-gray-200">
+                        <button onClick={toggleSidebar} className="p-2 hover:bg-gray-200 rounded-xl transition" title="O‘lchamni o‘zgartirish" aria-label="Toggle sidebar size">
+                            {sidebarMode === 0 ? <ChevronRight size={22} /> : sidebarMode === 1 ? <ChevronsRight size={22} /> : <ChevronLeft size={22} />}
+                        </button>
+
+                        {(isMedium || isWide) && (
+                            <div className="flex gap-2">
+                                <button onClick={() => setViewMode("category")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "category" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "category"}>
+                                    <Tags size={18} />
+                                    {isWide && <span className="text-sm">Category</span>}
+                                </button>
+                                <button onClick={() => setViewMode("product")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "product" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "product"}>
+                                    <Package size={18} />
+                                    {isWide && <span className="text-sm">Product</span>}
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     {(isMedium || isWide) && (
-                        <div className="flex gap-2">
-                            <button onClick={() => setViewMode("category")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "category" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "category"}>
-                                <Tags size={18} />
-                                {isWide && <span className="text-sm">Category</span>}
-                            </button>
-                            <button onClick={() => setViewMode("product")} className={`flex items-center gap-1 px-2 py-1 rounded-lg transition ${viewMode === "product" ? "bg-black text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`} aria-pressed={viewMode === "product"}>
-                                <Package size={18} />
-                                {isWide && <span className="text-sm">Product</span>}
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {(isMedium || isWide) && (
-                    <div className={`overflow-y-auto p-3 grid gap-3 overflow-x-scroll grid-cols-[repeat(auto-fill,minmax(auto,1fr))]`}>
-                        {viewMode === "category" ? (
-                            groupLoading ? (
+                        <div className={`overflow-y-auto p-3 grid gap-3 overflow-x-scroll grid-cols-[repeat(auto-fill,minmax(auto,1fr))]`}>
+                            {viewMode === "category" ? (
+                                groupLoading ? (
+                                    <p className="p-4 text-center text-gray-400 flex items-center justify-center gap-2">
+                                        <Spinner /> Yuklanmoqda...
+                                    </p>
+                                ) : categories.length === 0 ? (
+                                    <div className="text-gray-500 p-3">Hech qanday kategoriya topilmadi.</div>
+                                ) : (
+                                    categories.map((cat) => (
+                                        <button key={cat.id} onClick={() => handleCategoryClick(cat.id)} className={`cursor-pointer border rounded-xl shadow-sm hover:shadow-md p-3 text-left ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"}`}>
+                                            <div className="text-sm font-medium">{cat.name}</div>
+                                        </button>
+                                    ))
+                                )
+                            ) : productLoading ? (
                                 <p className="p-4 text-center text-gray-400 flex items-center justify-center gap-2">
                                     <Spinner /> Yuklanmoqda...
                                 </p>
-                            ) : categories.length === 0 ? (
-                                <div className="text-gray-500 p-3">Hech qanday kategoriya topilmadi.</div>
+                            ) : products.length === 0 ? selectedCategory ? (
+                                <FreeData text={"Tanlangan kategoriyada mahsulot topilmadi"} icon={<PackageSearch className="w-10 h-10 mb-3 text-gray-400" />} />
                             ) : (
-                                categories.map((cat) => (
-                                    <button key={cat.id} onClick={() => handleCategoryClick(cat.id)} className={`cursor-pointer border rounded-xl shadow-sm hover:shadow-md p-3 text-left ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"}`}>
-                                        <div className="text-sm font-medium">{cat.name}</div>
-                                    </button>
-                                ))
-                            )
-                        ) : productLoading ? (
-                            <p className="p-4 text-center text-gray-400 flex items-center justify-center gap-2">
-                                <Spinner /> Yuklanmoqda...
-                            </p>
-                        ) : products.length === 0 ? selectedCategory ? (
-                            <FreeData text={"Tanlangan kategoriyada mahsulot topilmadi"} icon={<PackageSearch className="w-10 h-10 mb-3 text-gray-400" />} />
-                        ) : (
-                            <FolderOpenMessage text={"Iltimos, mahsulotlarni ko‘rish uchun kategoriya tanlang."} icon={<FolderOpen className="w-10 h-10 mb-3 text-gray-400" />} />
-                        ) : (
-                            products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod, index) => (
-                                <button key={index} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
-                                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-3 min-w-[180px] transition">
-                                        <div className="p-1 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-900 font-medium whitespace-nowrap">{prod.product?.name || prod.name || "No name"}</span>
-                                            <div className="flex items-center justify-center gap-2 text-gray-800 font-medium whitespace-nowrap">
-                                                <span>Partiya: {prod.batch === null ? "Default" : prod.batch}</span>
-                                                <span>Shtrix: {prod.barcode || "undefined"}</span>
+                                <FolderOpenMessage text={"Iltimos, mahsulotlarni ko‘rish uchun kategoriya tanlang."} icon={<FolderOpen className="w-10 h-10 mb-3 text-gray-400" />} />
+                            ) : (
+                                products.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((prod, index) => (
+                                    <button key={index} onClick={() => onSidebarProductClick(prod)} className="active:scale-[0.99]">
+                                        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-3 min-w-[180px] transition">
+                                            <div className="p-1 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <span className="text-gray-900 font-medium whitespace-nowrap">{prod.product?.name || prod.name || "No name"}</span>
+                                                <div className="flex items-center justify-center gap-2 text-gray-800 font-medium whitespace-nowrap">
+                                                    <span>Partiya: {prod.batch === null ? "Default" : prod.batch}</span>
+                                                    <span>Shtrix: {prod.barcode || "undefined"}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </button>
-                            ))
-                        )}
-                    </div>
-                )}
-            </div>
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </div>
+            }
 
             {/* Main content */}
             <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
@@ -780,9 +791,11 @@ export default function WareHouseOutcome() {
                                             <th className="p-2">Miqdor</th>
                                             <th className="p-2">Omborda</th>
                                             <th className="p-2">Birlik</th>
-                                            <th className="p-2">Chegirma(%)</th>
+                                            {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
+                                            <th className="p-2">Chegirma(%)</th>}
                                             <th className="p-2">Jami</th>
-                                            <th className="p-2">Jami(chegirma)</th>
+                                            {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
+                                            <th className="p-2">Jami(chegirma)</th>}
                                             <th className="p-2">Action</th>
                                         </tr>
                                     </thead>
@@ -812,9 +825,21 @@ export default function WareHouseOutcome() {
                                                         <input type="number" step="any" value={it.quantity} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
                                                     </td>
                                                     <td className="p-2 aligin-center text-green-900">
-                                                        {Number.isFinite(stockAvail) && <div> {stockAvail}</div>}
+                                                        {Number.isFinite(stockAvail) && <div className="flex align-center">
+                                                            <span>{stockAvail}</span>
+                                                            {!it.fixed_qty &&
+                                                                <span className="ml-1 flex items-center text-blue-500 text-xs">
+                                                                    {
+                                                                        " (+" }
+                                                                        <InfinityIcon size={18} className="mr-1" /> 
+                                                                       {  ")"
+                                                                    }
+                                                                </span>
+                                                            }
+                                                        </div>}
                                                     </td>
                                                     <td className="p-2 align-center w-[120px]">{it?.unit || "-"}</td>
+                                                    {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
                                                     <td className="p-2 relative">
                                                         <input
                                                             type="number"
@@ -842,8 +867,9 @@ export default function WareHouseOutcome() {
                                                                 Barchasiga qo‘llash
                                                             </button>
                                                         )}
-                                                    </td>
-                                                    <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
+                                                    </td>}
+                                                    {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
+                                                    <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>}
                                                     <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0) * Number(100 - +it.discount) / 100).toLocaleString()}</td>
                                                     <td className="p-2 align-center">
                                                         <div className="flex gap-2 items-center">

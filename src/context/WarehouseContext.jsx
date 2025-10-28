@@ -42,7 +42,7 @@ function mixReducer(state, action) {
                     batch: item.batch || null,
                     // stock_quantity — UI/server passed mayida mavjud bo'lsa saqlaymiz (outgoing validation uchun)
                     stock_quantity: item.stock_quantity ?? null,
-                    fixed_qty: item.fixed_qty ?? true,
+                    fixed_qty: item.fixed_quantity ?? true,
                     discount: item.discount || 0
                 };
                 return [...state, newItem];
@@ -70,23 +70,21 @@ export function WarehouseProvider({ children, mode = "in" }) {
     // uch alohida reducer: in, out and dis
     const [mixIn, dispatchIn] = useReducer(mixReducer, []);
     const [mixOut, dispatchOut] = useReducer(mixReducer, []);
-    const [mixDis, dispatchDis] = useReducer(mixReducer, [])
 
     // per-mode flags/object
-    const [isDirty, setIsDirty] = useState({ in: false, out: false, dis: false });
-    const [saveSuccess, setSaveSuccess] = useState({ in: false, out: false, dis: false });
+    const [isDirty, setIsDirty] = useState({ in: false, out: false, });
+    const [saveSuccess, setSaveSuccess] = useState({ in: false, out: false, });
     const [invoiceMeta, setInvoiceMeta] = useState({
         in: { sender: null, receiver: "Me", operation_type: null, time: new Date().toLocaleString() },
         out: { sender: "Me", receiver: null, operation_type: null, time: new Date().toLocaleString() },
-        dis: { sender: "Me", receiver: "Disposal", operation_type: null, time: new Date().toLocaleString() },
     });
 
-    const [invoiceStarted, setInvoiceStartedRaw] = useState({ in: false, out: false, dis: false });
-    const [invoiceId, setInvoiceIdRaw] = useState({ in: null, out: null, dis: null });
+    const [invoiceStarted, setInvoiceStartedRaw] = useState({ in: false, out: false, });
+    const [invoiceId, setInvoiceIdRaw] = useState({ in: null, out: null });
 
     // helpers to get active mix and dispatch based on current mode
-    const getMix = (m) => (m === "out" ? mixOut : m === "in" ? mixIn : mixDis);
-    const getDispatch = (m) => (m === "out" ? dispatchOut : m === "in" ? dispatchIn : dispatchDis);
+    const getMix = (m) => (m === "out" ? mixOut : mixIn);
+    const getDispatch = (m) => (m === "out" ? dispatchOut : dispatchIn);
 
     // local wrappers for invoiceStarted/invoiceId setters that are per-mode
     const setInvoiceStarted = (m, v) => setInvoiceStartedRaw(prev => ({ ...prev, [m]: v }));
@@ -109,17 +107,17 @@ export function WarehouseProvider({ children, mode = "in" }) {
             setIsDirty(prev => ({ ...prev, out: true }));
             return { ok: true };
         } else if (m === "dis") {
-            // try to find matching in current mixOut
-            const idxExisting = mixDis.findIndex(p => p.product.id && item.product.id && String(p.product.id) === String(item.product.id) && ((p.batch && item.batch && String(p.batch) === String(item.batch)) || (p.batch === null && item.batch === null)));
-            // If not existing in mixOut, we still might allow adding if server-stock exists (caller should provide stock_quantity)
-            const avail = item.quantity ?? null;
-            if (idxExisting === -1 && (avail === null || avail <= 0)) {
-                return { ok: false, message: "Item not available in stock (no matching batch or zero quantity)" };
-            }
-            // allow dispatch (will create or increment)
-            dispatchDis({ type: "ADD", payload: item });
-            setIsDirty(prev => ({ ...prev, dis: true }));
-            return { ok: true };
+            // // try to find matching in current mixOut
+            // const idxExisting = mixDis.findIndex(p => p.product.id && item.product.id && String(p.product.id) === String(item.product.id) && ((p.batch && item.batch && String(p.batch) === String(item.batch)) || (p.batch === null && item.batch === null)));
+            // // If not existing in mixOut, we still might allow adding if server-stock exists (caller should provide stock_quantity)
+            // const avail = item.quantity ?? null;
+            // if (idxExisting === -1 && (avail === null || avail <= 0)) {
+            //     return { ok: false, message: "Item not available in stock (no matching batch or zero quantity)" };
+            // }
+            // // allow dispatch (will create or increment)
+            // dispatchDis({ type: "ADD", payload: item });
+            // setIsDirty(prev => ({ ...prev, dis: true }));
+            // return { ok: true };
         }
         else {
             // incoming: always allow
@@ -139,17 +137,10 @@ export function WarehouseProvider({ children, mode = "in" }) {
         };
 
         if (m === "out") {
-            // if (val !== "0" && !val !== "") {
-            //     getDispatch(m)({ type: "UPDATE_QTY", index, value: val })
-            // } else {
-            //     getDispatch(m)({ type: "UPDATE_QTY", index, value })
-
-            // }
-
             // clamp to stock_quantity if available
             const currentMix = getMix(m);
             const item = currentMix[index];
-            const avail = Number(item?.stock_quantity || Infinity);
+            const avail = item.fixed_qty ? Number(item?.stock_quantity || 0) : Infinity;
             if (val !== "" && val !== null && !Number.isNaN(Number(val))) {
                 const clamped = Math.max(0, Math.min(Number(val), avail));
                 // store as string "0" when zero to keep compatibility with reducer behavior
@@ -160,19 +151,19 @@ export function WarehouseProvider({ children, mode = "in" }) {
             }
             setIsDirty(prev => ({ ...prev, out: true }));
         } else if (m === "dis") {
-            // clamp to stock_quantity if available
-            const currentMix = getMix(m);
-            const item = currentMix[index];
-            const avail = Number(item?.stock_quantity || Infinity);
-            if (val !== "" && val !== null && !Number.isNaN(Number(val))) {
-                const clamped = Math.max(0, Math.min(Number(val), avail));
-                // store as string "0" when zero to keep compatibility with reducer behavior
-                const toSend = clamped === 0 ? "0" : clamped;
-                getDispatch(m)({ type: "UPDATE_QTY", index, value: toSend });
-            } else {
-                getDispatch(m)({ type: "UPDATE_QTY", index, value: val });
-            }
-            setIsDirty(prev => ({ ...prev, dis: true }));
+            // // clamp to stock_quantity if available
+            // const currentMix = getMix(m);
+            // const item = currentMix[index];
+            // const avail = Number(item?.stock_quantity || Infinity);
+            // if (val !== "" && val !== null && !Number.isNaN(Number(val))) {
+            //     const clamped = Math.max(0, Math.min(Number(val), avail));
+            //     // store as string "0" when zero to keep compatibility with reducer behavior
+            //     const toSend = clamped === 0 ? "0" : clamped;
+            //     getDispatch(m)({ type: "UPDATE_QTY", index, value: toSend });
+            // } else {
+            //     getDispatch(m)({ type: "UPDATE_QTY", index, value: val });
+            // }
+            // setIsDirty(prev => ({ ...prev, dis: true }));
         }
         else {
             getDispatch(m)({ type: "UPDATE_QTY", index, value: val });
@@ -215,16 +206,14 @@ export function WarehouseProvider({ children, mode = "in" }) {
     const resetAll = () => {
         dispatchIn({ type: "RESET" });
         dispatchOut({ type: "RESET" });
-        dispatchDis({ type: "RESET" });
-        setInvoiceStartedRaw({ in: false, out: false, dis: false });
-        setInvoiceIdRaw({ in: null, out: null, dis: null });
+        setInvoiceStartedRaw({ in: false, out: false, });
+        setInvoiceIdRaw({ in: null, out: null });
         setInvoiceMeta({
             in: { sender: null, receiver: "Me", time: new Date().toLocaleString(), operation_type: null },
             out: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type: null },
-            dis: { sender: "Me", receiver: null, time: new Date().toLocaleString(), operation_type: null }
         });
-        setIsDirty({ in: false, out: false, dis: false });
-        setSaveSuccess({ in: false, out: false, dis: false });
+        setIsDirty({ in: false, out: false, });
+        setSaveSuccess({ in: false, out: false, });
     };
 
     // expose a unified API but with per-mode internals
@@ -234,7 +223,6 @@ export function WarehouseProvider({ children, mode = "in" }) {
         mixData: getMix(mode),
         mixIn,
         mixOut,
-        mixDis,
         addItem,
         updateQty,
         updatePrice,
@@ -260,8 +248,7 @@ export function WarehouseProvider({ children, mode = "in" }) {
         setSaveSuccess: (m, v) => setSaveSuccess(prev => ({ ...prev, [m]: v })),
         _dispatchIn: dispatchIn,
         _dispatchOut: dispatchOut,
-        _dispatchDis: dispatchDis
-    }), [mode, mixIn, mixOut, mixDis, isDirty, saveSuccess, invoiceMeta, invoiceStarted, invoiceId]);
+    }), [mode, mixIn, mixOut, isDirty, saveSuccess, invoiceMeta, invoiceStarted, invoiceId]);
 
     return <WarehouseContext.Provider value={value}>{children}</WarehouseContext.Provider>;
 }

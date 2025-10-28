@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import AsyncSelect from 'react-select/async';
-import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy } from "lucide-react";
+import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy, Loader2 } from "lucide-react";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
@@ -123,7 +123,10 @@ export default function WarehouseInvoiceHistory() {
 
     // UI
     const [editingInvoice, setEditingInvoice] = useState(null);
+    const [editingStatusInvoice, setEditingStatusInvoice] = useState(null)
     const [editingItem, setEditingItem] = useState(null);
+
+    const [loadingEditStatus, setLoadingEditStatus] = useState(false)
 
     // small lists
     const statusesList = ["draft", "approved", "received", "cancelled"];
@@ -140,7 +143,7 @@ export default function WarehouseInvoiceHistory() {
         },
         status: {
             draft: "Draft",
-            approved: "Approved",
+            sent: 'Sent',
             received: "Received",
             cancelled: "Cancelled",
         },
@@ -165,8 +168,8 @@ export default function WarehouseInvoiceHistory() {
     function statusBadge(s) {
         const map = {
             draft: "bg-gray-100 text-gray-700",
-            approved: "bg-green-100 text-green-700",
-            received: "bg-blue-100 text-blue-700",
+            received: "bg-green-100 text-green-700",
+            sent: "bg-blue-100 text-blue-700",
             cancelled: "bg-red-100 text-red-700",
         };
         return <span className={`px-2 py-0.5 text-xs rounded ${map[s] || "bg-gray-100 text-gray-700"}`}>{nice.status[s] || s}</span>;
@@ -218,11 +221,11 @@ export default function WarehouseInvoiceHistory() {
     }, []);
 
     // loadOptions for AsyncSelect - uses cached list to avoid repeated server calls
-    const loadLocations = async (inputValue) => {
-        if (!inputValue) return locationsCache;
-        const q = inputValue.toLowerCase();
-        return locationsCache.filter((o) => o.label.toLowerCase().includes(q));
-    };
+    // const loadLocations = async (inputValue) => {
+    //     if (!inputValue) return locationsCache;
+    //     const q = inputValue.toLowerCase();
+    //     return locationsCache.filter((o) => o.label.toLowerCase().includes(q));
+    // };
 
     // Sender/Receiver auto-fill logic: if user selects receiver (not 'all') we set sender to current loc, and vice-versa
     // useEffect(() => {
@@ -367,6 +370,27 @@ export default function WarehouseInvoiceHistory() {
             notify.error(err?.message || "Save failed");
         }
     }
+    async function saveStatusInvoice(updated) {
+        setLoadingEditStatus(true)
+        try {
+            const res = await InvoicesApi.EditStatusInvoice(updated.id, { status: updated?.status?.value });
+            if (!(res?.status === 200 || res?.status === 201)) throw new Error("Failed to save");
+            await fetchInvoices();
+            // if (invoiceId === updated.id) {
+            //     const fresh = await InvoicesApi.GetInvoiceById(updated.id);
+            //     const d = fresh?.data?.data || fresh?.data || fresh;
+            //     const { invoice_history, invoice_item_history, ...rest } = d;
+            //     setSelectedInvoice(rest);
+            // }
+            setEditingStatusInvoice(null)
+            notify.success("Saved");
+        } catch (err) {
+            console.error(err);
+            notify.error(err?.message || "Save failed");
+        } finally {
+            setLoadingEditStatus(false)
+        }
+    }
 
     async function saveItem(updated) {
         try {
@@ -414,7 +438,7 @@ export default function WarehouseInvoiceHistory() {
     const totalPages = Math.max(1, Math.ceil((total || 0) / PER_PAGE));
 
     return (
-        <div className=" bg-gray-50 min-h-screen">
+        <div className=" bg-gray-50 min-h-screen px-4 py-3 rounded-xl">
             <div className=" mx-auto">
                 <header className="flex items-center justify-between mb-6">
                     <div>
@@ -552,7 +576,7 @@ export default function WarehouseInvoiceHistory() {
                                                 {columns.sender_name && <td className="py-3 px-2 text-sm">{inv.sender_name || (inv.sender && inv.sender.name) || "—"}</td>}
                                                 {columns.receiver_name && <td className="py-3 px-2 text-sm">{inv.receiver_name || (inv.receiver && inv.receiver.name) || "—"}</td>}
                                                 {columns.createdAt && <td className="py-3 px-2 text-sm">{formatDateISO(inv.createdAt)}</td>}
-                                                {columns.status && <td className="py-3 px-2 text-sm">{statusBadge(inv.status)}</td>}
+                                                {columns.status && <td className="py-3 px-2 text-sm"><button onClick={() => setEditingStatusInvoice(inv)} type="button">{statusBadge(inv.status)}</button></td>}
                                                 {columns.payment_status && <td className="py-3 px-2 text-sm">{paymentBadge(inv.payment_status)}</td>}
                                                 {columns.total_sum && <td className="py-3 px-2 text-sm">{inv.total_sum}</td>}
                                                 {columns.actions && <td className="py-3 px-2 text-sm">
@@ -680,6 +704,11 @@ export default function WarehouseInvoiceHistory() {
                 {editingItem && (
                     <EditItemModal item={editingItem} onClose={closeEditItem} onSave={saveItem} />
                 )}
+
+                {editingStatusInvoice && (
+                    <EditStatusModal invoice={editingStatusInvoice} onClose={() => setEditingStatusInvoice(null)} onSave={saveStatusInvoice} loading={loadingEditStatus} />
+                )}
+
             </div>
         </div>
     );
@@ -692,13 +721,12 @@ function EditInvoiceModal({ invoice, onClose, onSave }) {
     }, [invoice]);
     const statusBase = [
         { id: 1, value: "draft", label: "Draft" },
-        { id: 2, value: "approved", label: "Confirmend" },
         { id: 3, value: "cancelled", label: "Cancelled" },
         { id: 4, value: "sent", label: "Sent" },
         { id: 5, value: "received", label: "Received" }
     ]
     const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
-    const statusOptions = statusBase?.filter((st) => st.id >= org_status_id)
+    const statusOptions = statusBase?.filter((st) => st.id > org_status_id)
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
             <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
@@ -747,6 +775,55 @@ function EditInvoiceModal({ invoice, onClose, onSave }) {
                 <div className="mt-4 flex gap-2 justify-end">
                     <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
                     <button onClick={() => onSave(form)} className="px-4 py-2 rounded bg-blue-600 text-white">Save</button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function EditStatusModal({ invoice, onClose, onSave, loading }) {
+    const [form, setForm] = useState(() => ({ ...invoice, org_status: invoice?.status }));
+    useEffect(() => {
+        setForm(prev => ({ ...invoice, org_status: invoice?.status || prev.org_status }));
+    }, [invoice]);
+    const statusBase = [
+        { id: 1, value: "draft", label: "Draft" },
+        { id: 3, value: "cancelled", label: "Cancelled" },
+        { id: 4, value: "sent", label: "Sent" },
+        { id: 5, value: "received", label: "Received" }
+    ];
+    const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
+    const statusOptions = statusBase?.filter((st) => st.id > org_status_id)
+    return (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
+                <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-lg font-semibold">Edit Status</h3>
+                    <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label className="flex flex-col">
+                        <span className="text-sm text-gray-600">Status</span>
+                        <Select
+                            placeholder="Select new status"
+                            options={statusOptions}
+                            value={form.status}
+                            onChange={(e) => setForm((p) => ({ ...p, status: e }))}
+                        />
+
+                    </label>
+                </div>
+
+                <div className="mt-4 flex gap-2 justify-end">
+                    <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
+                    {loading ? (
+                        <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Updatinging...</span>
+                        </>
+                    ) : (
+                        <button onClick={() => onSave(form)} className="px-4 py-2 rounded bg-blue-600 text-white">Save</button>
+                    )}
                 </div>
             </div>
         </div>

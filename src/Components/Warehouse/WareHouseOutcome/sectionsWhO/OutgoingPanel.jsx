@@ -8,27 +8,6 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
     const [status, setStatus] = useState("draft");
     // const [receiver, setReceiver] = useState(null);
 
-    const changeReceiver = (value) => {
-        // setReceiver(value);
-        selectReceiver(value);
-    }
-    const changeOprType = (value) => {
-        setOperationType(value)
-        selectOprType(value);
-        // if (value === "disposal") {
-        //     const disposal = receiverOptions?.find((op) => op.type === "disposal")
-        //     changeReceiver(disposal)
-        // }
-        // console.log(selectedReceiver);
-                
-    };
-
-    const changeOprSatatus = (value) => {
-        setStatus(value);
-        selectStatus(value)
-    };
-
-
 
     const comboLabels = {
         draft_outgoing: { ru: "Черновик отгрузки", uz: "Chiqim zayafkasini qoralab qo‘yish" },
@@ -49,7 +28,7 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
 
     const statusOptions = [
         { value: "draft", label: "Черновик" },
-        { value: "approved", label: "Подтверждено" },
+        // { value: "approved", label: "Подтверждено" },
         { value: "sent", label: "Отправлено" },
         { value: "received", label: "Получено" },
     ];
@@ -65,12 +44,27 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
         label: loc.full_name,
     })
     )
-    // const receiverOptions = [
-    //     { value: "client_1", label: "Клиент: ООО «Молпродукт»" },
-    //     { value: "client_2", label: "Клиент: ИП «Сергеев»" },
-    //     { value: "warehouse_1", label: "Склад: Центральный №1" },
-    //     { value: "warehouse_2", label: "Склад: Филиал №2" },
-    // ];
+    
+    const changeReceiver = (value) => {
+        // setReceiver(value);
+        selectReceiver(value);
+    };
+    const changeOprSatatus = (value) => {
+        setStatus(value);
+        selectStatus(value)
+    };
+    const changeOprType = (value) => {
+        setOperationType(value);
+        selectOprType(value);
+        if (value === "disposal") {
+            const disposal = receiverOptions?.find((op) => op.type === "disposal");
+            changeReceiver(disposal?.value);
+            changeOprSatatus("received")
+        } else {
+            selectReceiver(null)
+            changeOprSatatus("draft")
+        }
+    };
 
     const activeLabel = comboLabels[`${status}_${operationType}`];
 
@@ -113,7 +107,7 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
                         Статус:
                     </label>
                     <Select
-                        options={statusOptions}
+                        options={operationType === "disposal" ? statusOptions.filter((st)=> st.value === "received") :statusOptions.filter((st)=> st.value !== "received")}
                         value={statusOptions.find(s => s.value === status)}
                         onChange={opt => changeOprSatatus(opt.value)}
                         className="text-sm"
@@ -132,7 +126,7 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
                                 : operationType === "transfer_out" ? r.type === "warehouse"
                                     : r.type === "disposal"
                         )}
-                        value={receiverOptions?.find((loc) => loc.value === selectedReceiver)}
+                        value={selectedReceiver ? receiverOptions?.find((loc) => loc.value === selectedReceiver) : null}
                         onChange={opt => changeReceiver(opt.value)}
                         isSearchable
                         placeholder="Выберите..."
