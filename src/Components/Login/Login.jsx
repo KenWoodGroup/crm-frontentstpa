@@ -3,20 +3,21 @@ import "./_components/login.css"
 import Eye from "../../Components/UI/Svg/Eye";
 import ClosedEye from "../../Components/UI/Svg/ClosedEye";
 import { Auth } from "../../utils/Controllers/Auth";
+import { locationInfo } from "../../utils/Controllers/locationInfo";
 import { NavLink, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { notify } from "../../utils/toast";
 import Spinner from "../../Components/UI/spinner/Spinner";
-
-
+import Offerta from "./_components/Offerta";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showOfferta, setShowOfferta] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const navigate = useNavigate();
 
@@ -31,9 +32,78 @@ export default function Login() {
     return "";
   };
 
-  // const handleForgot = () => {
-  //   alert("Parolni tiklash: sizga email orqali ko'rsatmalar yuboriladi (demo).");
-  // };
+  // Функция для проверки статуса оферты
+  const checkOffertaStatus = async (locationId) => {
+    try {
+      if (!locationId) return false;
+
+      const response = await locationInfo?.GetInfo(locationId);
+      const data = response?.data;
+
+      return data
+    } catch (error) {
+      console.log("Error checking offerta status:", error);
+      return false;
+    }
+  };
+
+  // Функция для сохранения пользовательских данных
+  const saveUserData = (data) => {
+    const { access_token, refresh_token } = data?.tokens || {};
+    const { id, role, location_id } = data?.newUser;
+
+    Cookies.set("token", access_token);
+    Cookies.set("refresh_token", refresh_token);
+
+    const roleMap = {
+      super_admin: "SPAfefefeUID",
+      admin: "AutngergUID",
+      factory: "SefwfmgrUID",
+      company: "SefwfmgrUID",
+      warehouse: "SesdsdfmgrUID",
+      dealer: "SwedsdfmgrUID",
+    };
+
+    Cookies.set("nesw", roleMap[role] || "");
+    Cookies.set("us_nesw", id);
+    Cookies.set("ul_nesw", location_id);
+    Cookies.set("usd_nesw", data?.newUser?.location?.parent_id);
+
+    // Сохраняем полные данные пользователя в состоянии
+    setUserData(data.newUser);
+
+    return { locationId: location_id, userData: data.newUser };
+  };
+
+  // Редирект пользователя
+  const redirectUser = (userData) => {
+    if (!userData) return;
+
+    const role = userData.role;
+
+    if (
+      userData?.location?.parent?.type === "company" &&
+      role === "warehouse"
+    ) {
+      navigate("/company-warehouse/dashboard");
+    } else if (
+      userData?.location?.parent?.type === "company" &&
+      role === "dealer"
+    ) {
+      navigate("/diler/dashboard");
+    } else {
+      const roleLinks = [
+        { role: "super_admin", vektor: "/" },
+        { role: "admin", vektor: "/manager/dashboard" },
+        { role: "factory", vektor: "/factory/dashboard" },
+        { role: "warehouse", vektor: "/warehouse/dashboard" },
+        { role: "dealer", vektor: "/diler/dashboard" },
+        { role: "company", vektor: "/company/dashboard" },
+      ];
+      const vektor_obj = roleLinks.find((item) => item.role === role);
+      navigate(vektor_obj?.vektor || "/");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,56 +117,30 @@ export default function Login() {
     try {
       setLoading(true);
       const base_data = await Auth.Login({ email, password });
-      console.log(base_data);
 
       const { data } = base_data;
-      const { access_token, refresh_token } = data?.tokens || {};
-      const { id, role, location_id } = data?.newUser;
 
-      Cookies.set("token", access_token);
-      Cookies.set("refresh_token", refresh_token);
+      if (base_data?.status === 401) {
+        setError("Email yoki Parol xato");
+        return;
+      }
 
-      const roleMap = {
-        super_admin: "SPAfefefeUID",
-        admin: "AutngergUID",
-        factory: "SefwfmgrUID",
-        company: "SefwfmgrUID",
-        warehouse: "SesdsdfmgrUID",
-        dealer: "SwedsdfmgrUID",
-      };
-
-      const roleLinks = [
-        { role: "super_admin", vektor: "/" },
-        { role: "admin", vektor: "/manager/dashboard" },
-        { role: "factory", vektor: "/factory/dashboard" },
-        { role: "warehouse", vektor: "/warehouse/dashboard" },
-        { role: "dealer", vektor: "/diler/dashboard" },
-        { role: "company", vektor: "/company/dashboard" },
-      ];
-
-      Cookies.set("nesw", roleMap[role] || "");
-      Cookies.set("us_nesw", id);
-      Cookies.set("ul_nesw", location_id);
-      Cookies.set("usd_nesw", data?.newUser?.location?.parent_id);
+      // Сохраняем данные пользователя и получаем locationId
+      const { locationId, userData } = saveUserData(data);
 
       notify.success("Login muvaffaqiyatli!");
 
-      if (
-        data?.newUser?.location?.parent?.type === "company" &&
-        data?.newUser?.role === "warehouse"
-      ) {
-        navigate("/company-warehouse/dashboard");
-      } else if (data?.newUser?.location?.parent?.type === "company" &&
-        data?.newUser?.role === "dealer") {
+      // ✅ ПРОВЕРЯЕМ СТАТУС ОФЕРТЫ ПЕРЕД ПОКАЗОМ МОДАЛКИ
+      const offertaAccepted = await checkOffertaStatus(locationId);
 
+      if (!offertaAccepted) {
+        // Если оферта не принята, показываем модалку
+        setShowOfferta(true);
+      } else {
+        // Если оферта уже принята, сразу перенаправляем
+        redirectUser(userData);
       }
-      else {
-        const vektor_obj = roleLinks.find((item) => item.role === role);
-        navigate(vektor_obj?.vektor || "/");
-      }
-      if (base_data?.status === 401) {
-        console.log(base_data?.message || "Email yoki Parol xato");
-      }
+
     } catch (err) {
       setError(
         err?.message === "Request failed with status code 401"
@@ -105,6 +149,28 @@ export default function Login() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOffertaClose = () => {
+    setShowOfferta(false);
+    // При отмене оферты разлогиниваем пользователя
+    Cookies.remove("token");
+    Cookies.remove("refresh_token");
+    Cookies.remove("nesw");
+    Cookies.remove("us_nesw");
+    Cookies.remove("ul_nesw");
+    Cookies.remove("usd_nesw");
+    setUserData(null);
+    setEmail("");
+    setPassword("");
+  };
+
+  const handleOffertaAgree = () => {
+    setShowOfferta(false);
+    // После согласия с офертой перенаправляем пользователя
+    if (userData) {
+      redirectUser(userData);
     }
   };
 
@@ -172,12 +238,7 @@ export default function Login() {
                 aria-label={showPassword ? "Parolni yashirish" : "Parolni ko‘rsatish"}
                 disabled={loading}
               >
-                {/* Eye / Eye-off SVGs */}
-                {showPassword ? (
-                  <Eye />
-                ) : (
-                  <ClosedEye />
-                )}
+                {showPassword ? <Eye /> : <ClosedEye />}
               </button>
             </div>
 
@@ -216,6 +277,14 @@ export default function Login() {
           <small>© {new Date().getFullYear()}  KENWOOD Barcha huquqlar himoyalangan.</small>
         </footer>
       </div>
+
+      {/* Модальное окно оферты */}
+      <Offerta
+        locationId={userData?.location_id}
+        isOpen={showOfferta}
+        onClose={handleOffertaClose}
+        onAgree={handleOffertaAgree}
+      />
     </div>
   );
 }

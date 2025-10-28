@@ -46,11 +46,9 @@ export default function WarehouseCreate({ refresh }) {
 
     const CreateWarehouse = async () => {
         if (validateFields() !== true) return;
-
         try {
             setLoading(true);
             await WarehouseApi.CreateWarehouse(data);
-
             Alert(t("warehouseCreated"), "success");
             setOpen(false);
             setData({
@@ -73,85 +71,75 @@ export default function WarehouseCreate({ refresh }) {
 
     return (
         <>
+            {/* Кнопка открытия */}
             <Button
                 onClick={handleOpen}
-                className="bg-black text-white normal-case hover:bg-gray-800"
+                className="bg-black text-white normal-case hover:bg-gray-800 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
             >
                 + {t("newWarehouse")}
             </Button>
 
+            {/* Модальное окно */}
             <Dialog
                 open={open}
                 handler={handleOpen}
-                className="bg-white text-gray-900 rounded-xl"
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark rounded-xl transition-colors duration-300"
             >
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
+                {/* Заголовок */}
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700">
                     {t("warehouse_info")}
                 </DialogHeader>
+
+                {/* Тело */}
                 <DialogBody divider className="space-y-4">
-                    <Input
-                        label={t("warehouseName")}
-                        color="gray"
-                        name="name"
-                        value={data.name}
-                        onChange={handleChange}
-                    />
-                    <Input
-                        label={t("managerName")}
-                        color="gray"
-                        name="full_name"
-                        value={data.full_name}
-                        onChange={handleChange}
-                    />
-                    <Input
-                        label={t("warehouseAddress")}
-                        color="gray"
-                        name="address"
-                        value={data.address}
-                        onChange={handleChange}
-                    />
-                    <Input
-                        label={t("managerPhone")}
-                        color="gray"
-                        name="phone"
-                        value={data.phone}
-                        onChange={handleChange}
-                    />
-                    <Input
-                        label={t("email")}
-                        color="gray"
-                        name="email"
-                        value={data.email}
-                        onChange={handleChange}
-                    />
+                    {[
+                        { label: t("warehouseName"), name: "name" },
+                        { label: t("managerName"), name: "full_name" },
+                        { label: t("warehouseAddress"), name: "address" },
+                        { label: t("managerPhone"), name: "phone" },
+                        { label: t("email"), name: "email" },
+                    ].map((field) => (
+                        <Input
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            value={data[field.name]}
+                            onChange={handleChange}
+                            className="text-text-light dark:text-text-dark"
+                            color="gray"
+                        />
+                    ))}
                     <Input
                         label={t("password")}
-                        color="gray"
                         type="password"
                         name="password"
                         value={data.password}
                         onChange={handleChange}
+                        className="text-text-light dark:text-text-dark"
+                        color="gray"
                     />
                 </DialogBody>
-                <DialogFooter className="border-t border-gray-200">
+
+                {/* Футер */}
+                <DialogFooter className="border-t border-gray-200 dark:border-gray-700">
                     <Button
                         variant="text"
                         color="gray"
                         onClick={handleOpen}
-                        className="mr-2"
+                        className="mr-2 text-text-light dark:text-text-dark"
                         disabled={loading}
                     >
                         {t("cancel")}
                     </Button>
                     <Button
-                        className={`bg-black text-white normal-case hover:bg-gray-800 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
-                            }`}
                         onClick={CreateWarehouse}
                         disabled={loading}
+                        className={`bg-black text-white normal-case hover:bg-gray-800 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 flex items-center gap-2 transition-colors ${loading ? "opacity-70 cursor-not-allowed" : ""
+                            }`}
                     >
                         {loading ? (
                             <svg
-                                className="animate-spin h-5 w-5 text-white"
+                                className="animate-spin h-5 w-5 text-current"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
