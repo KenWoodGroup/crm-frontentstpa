@@ -72,7 +72,7 @@ export default function Login() {
     // Сохраняем полные данные пользователя в состоянии
     setUserData(data.newUser);
 
-    return { locationId: location_id, userData: data.newUser };
+    return { locationId: location_id, userData: data.newUser, role: role };
   };
 
   // Редирект пользователя
@@ -105,6 +105,12 @@ export default function Login() {
     }
   };
 
+  // Функция для проверки, нужно ли показывать оферту
+  const shouldShowOfferta = (role) => {
+    // Не показывать оферту для super_admin и admin
+    return !["super_admin", "admin"].includes(role);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -125,19 +131,25 @@ export default function Login() {
         return;
       }
 
-      // Сохраняем данные пользователя и получаем locationId
-      const { locationId, userData } = saveUserData(data);
+      // Сохраняем данные пользователя и получаем locationId и роль
+      const { locationId, userData, role } = saveUserData(data);
 
       notify.success("Login muvaffaqiyatli!");
 
-      // ✅ ПРОВЕРЯЕМ СТАТУС ОФЕРТЫ ПЕРЕД ПОКАЗОМ МОДАЛКИ
-      const offertaAccepted = await checkOffertaStatus(locationId);
+      // ✅ ПРОВЕРЯЕМ НУЖНО ЛИ ПОКАЗЫВАТЬ ОФЕРТУ ДЛЯ ДАННОЙ РОЛИ
+      if (shouldShowOfferta(role)) {
+        // Для ролей, которым нужна оферта, проверяем статус
+        const offertaAccepted = await checkOffertaStatus(locationId);
 
-      if (!offertaAccepted) {
-        // Если оферта не принята, показываем модалку
-        setShowOfferta(true);
+        if (!offertaAccepted) {
+          // Если оферта не принята, показываем модалку
+          setShowOfferta(true);
+        } else {
+          // Если оферта уже принята, сразу перенаправляем
+          redirectUser(userData);
+        }
       } else {
-        // Если оферта уже принята, сразу перенаправляем
+        // Для super_admin и admin сразу перенаправляем без проверки оферты
         redirectUser(userData);
       }
 
@@ -243,9 +255,6 @@ export default function Login() {
             </div>
 
             <div className="flex justify-between mt-2">
-              <NavLink to={"/register"}>
-                <button type="button" className="bg-[rgba(19, 102, 214, 0.06)] px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium">Ro'yhatdan o'tish</button>
-              </NavLink>
               <NavLink to={"/forgot-password"}>
                 <button type="button" className="login-forgot bg-[rgba(19, 102, 214, 0.06)] px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium" disabled={loading}>
                   Parolni unutdingizmi?
