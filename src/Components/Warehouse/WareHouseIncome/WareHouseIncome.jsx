@@ -243,6 +243,8 @@ export default function WareHouseIncome() {
         if (!selectedLocation?.value) {
             notify.warning("Iltimos, jo'natuvchini tanlang");
             return;
+        }else if(!selectedStaff?.value) {
+            notify.warning("Iltimos, driverni tanlang")
         }
         const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : (selected === "incoming" && sendToTrash === false) ? "incoming" : "transfer_in"
         try {
@@ -407,7 +409,7 @@ export default function WareHouseIncome() {
         const is_raw_stock = productObj !== undefined
         return {
             is_raw_stock: productObj === undefined ? true : false,
-            is_new_batch: is_raw_stock ? false : true,
+            is_new_batch: (is_raw_stock && raw.batch) ? false : true,
             name: is_raw_stock ? productObj.name : raw.name || "-",
             price: invoiceMeta?.[mode]?.operation_type === "transfer_in" ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
             origin_price: invoiceMeta?.[mode]?.operation_type === "transfer_in" ? Number(raw.purchase_price || 0) : Number(raw.sale_price || 0),
@@ -557,10 +559,10 @@ export default function WareHouseIncome() {
             notify.error("Hech qanday mahsulot qo'shilmagan");
             return;
         }
-        const value_spaces = mixData.filter((item) => item.price === "" || (item.quantity === "" || item.quantity === 0));
+        const value_spaces = mixData.filter((item) => !item.price || (item.quantity === "" || item.quantity === 0));
         if (value_spaces.length > 0) {
             value_spaces.forEach((err) => {
-                notify.warning(err.product?.name + " tovar uchun " + (err.price === "" ? "Narx kiriting" : "Miqdor kiriting"));
+                notify.warning(err?.name + " tovar uchun " + (!err.price ? "Narx " : (!err.price && !err.quantity) ? "Narx va Miqdor " : "Miqdor ") + "kiriting");
             });
             return;
         }
@@ -651,6 +653,8 @@ export default function WareHouseIncome() {
         setSearchResults([]);
         setSearchQuery("");
         setSidebarMode(0);
+        setViewMode("category");
+        setSelectedCategory(null);
     }
 
     // ---------- UI ----------

@@ -30,9 +30,13 @@ class InvoicesApi {
         const response = await $api.delete(`/invoices/${id}`)
         return response;
     }
-    static EditInvoice = async (data, id) => {
+    static EditInvoice = async (id, data) => {
         const response = await $api.put(`/invoices/${id}`, data)
         return response;
+    }
+    static EditStatusInvoice = async (id, data) => {
+        const response = await $api.put(`/invoices/type/${id}`, data)
+        return response
     }
 }
 export { InvoicesApi }

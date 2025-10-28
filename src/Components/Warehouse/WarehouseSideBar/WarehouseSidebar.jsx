@@ -47,10 +47,9 @@ export default function WarehouseSidebar() {
 
     const skladSubLinks = [
         { id: 1, label: "Склад", path: "/warehouse/product", icon: Package },
-        { id: 2, label: "История", path: "/warehouse/history", icon: Move },
         { id: 3, label: "Приход", path: "/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: "Отгрузки", path: "/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: "Chiqindi", path: "/warehouse/disposal", icon: Recycle },
+        { id: 2, label: "История", path: "/warehouse/history", icon: Move },
     ];
 
     const handleLogout = () => {
