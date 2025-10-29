@@ -154,7 +154,7 @@ export default function WareHouseOutcome() {
     const fetchLocations = async () => {
         try {
             setLocationsLoading(true);
-            const res = await location.getAllGroupLocations(userLId);
+            const res = await location.getAllGroupLocalLocations(userLId);
             if (res?.status === 200 || res?.status === 201) setLocations(res.data || []);
             else setLocations(res || []);
         } catch (err) {
@@ -452,8 +452,8 @@ export default function WareHouseOutcome() {
                     price: Number(it.price || 0),
                     barcode: it.barcode || "",
                     is_new_batch: false,
-                    batch: it.batch,
-                    discount: it.discount,
+                    batch: it.batch || null,
+                    discount: it.discount || 0,
                 })),
             };
 
@@ -741,6 +741,10 @@ export default function WareHouseOutcome() {
                                     <div className="font-semibold text-lg">{Number(total || 0).toLocaleString()} сум</div>
                                 </div>
                                 <div className="ml-auto text-right">
+                                    <div className="text-xs text-gray-500">Umumiy chegirma qiymati</div>
+                                    <div className="font-semibold text-lg">{(Number(total || 0) - Number(disTotal || 0)).toLocaleString()} сум</div>
+                                </div>
+                                <div className="ml-auto text-right">
                                     <div className="text-xs text-gray-500">Umumiy qiymat chegirma bilan</div>
                                     <div className="font-semibold text-lg">{Number(disTotal || 0).toLocaleString()} сум</div>
                                 </div>
@@ -780,7 +784,7 @@ export default function WareHouseOutcome() {
                                 )}
                             </div>
 
-                            <div className="bg-white rounded-lg p-3 shadow-sm overflow-auto">
+                            <div className="bg-white rounded-lg p-3 shadow-sm overflow-auto max-w-[100%] overflow-x-scroll">
                                 <table className="min-w-full text-sm">
                                     <thead className="text-left text-xs text-gray-500 border-b">
                                         <tr>
@@ -792,10 +796,10 @@ export default function WareHouseOutcome() {
                                             <th className="p-2">Omborda</th>
                                             <th className="p-2">Birlik</th>
                                             {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
-                                            <th className="p-2">Chegirma(%)</th>}
+                                                <th className="p-2">Chegirma(%)</th>}
                                             <th className="p-2">Jami</th>
                                             {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
-                                            <th className="p-2">Jami(chegirma)</th>}
+                                                <th className="p-2">Jami(chegirma)</th>}
                                             <th className="p-2">Action</th>
                                         </tr>
                                     </thead>
@@ -813,7 +817,7 @@ export default function WareHouseOutcome() {
                                                         {/* no is_new_batch UI for outgoing */}
                                                         <div className="text-[14px] text-gray-700">{it.batch ?? "Default"}</div>
                                                     </td>
-                                                    <td className="p-2 align-center">
+                                                    <td className="p-2 align-center min-w-[300px]">
                                                         <div className="font-medium">{it.name || "—"}</div>
                                                         <div className="text-xs text-gray-500">{it.barcode}</div>
                                                     </td>
@@ -830,9 +834,9 @@ export default function WareHouseOutcome() {
                                                             {!it.fixed_qty &&
                                                                 <span className="ml-1 flex items-center text-blue-500 text-xs">
                                                                     {
-                                                                        " (+" }
-                                                                        <InfinityIcon size={18} className="mr-1" /> 
-                                                                       {  ")"
+                                                                        " (+"}
+                                                                    <InfinityIcon size={18} className="mr-1" />
+                                                                    {")"
                                                                     }
                                                                 </span>
                                                             }
@@ -840,36 +844,37 @@ export default function WareHouseOutcome() {
                                                     </td>
                                                     <td className="p-2 align-center w-[120px]">{it?.unit || "-"}</td>
                                                     {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
-                                                    <td className="p-2 relative">
-                                                        <input
-                                                            type="number"
-                                                            value={it.discount}
-                                                            min={0}
-                                                            max={20}
-                                                            onFocus={() => {
-                                                                setShowApplyAll(true);
-                                                                setFocusedInput(idx);
-                                                            }}
-                                                            onBlur={() => {
-                                                                // biroz kechikish tugmani bosganda yo‘qolmasin
-                                                                setTimeout(() => setShowApplyAll(false), 200);
-                                                            }}
-                                                            onChange={(e) => handleDiscountChange(idx, e.target.value)}
-                                                            className="w-16 px-2 py-1  border rounded outline-blue-500"
-                                                        />
+                                                        <td className="p-2 relative">
+                                                            <input
+                                                                type="number"
+                                                                value={it.discount}
+                                                                min={0}
+                                                                max={20}
+                                                                onFocus={() => {
+                                                                    if(mixData?.length > 1) {                                                                        
+                                                                    setShowApplyAll(true);
+                                                                    setFocusedInput(idx);}
+                                                                }}
+                                                                onBlur={() => {
+                                                                    // biroz kechikish tugmani bosganda yo‘qolmasin
+                                                                    setTimeout(() => setShowApplyAll(false), 200);
+                                                                }}
+                                                                onChange={(e) => handleDiscountChange(idx, e.target.value)}
+                                                                className="w-16 px-2 py-1  border rounded outline-blue-500"
+                                                            />
 
-                                                        {/* Apply All button faqat shu input fokusta bo‘lsa ko‘rinadi */}
-                                                        {showApplyAll && focusedInput === idx && (
-                                                            <button
-                                                                onMouseDown={() => handleApplyAll(it.discount)}
-                                                                className="absolute right-[-140px] top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded shadow transition-all"
-                                                            >
-                                                                Barchasiga qo‘llash
-                                                            </button>
-                                                        )}
-                                                    </td>}
+                                                            {/* Apply All button faqat shu input fokusta bo‘lsa ko‘rinadi */}
+                                                            {showApplyAll && focusedInput === idx && (
+                                                                <button
+                                                                    onMouseDown={() => handleApplyAll(it.discount)}
+                                                                    className="absolute right-[-140px] top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded shadow transition-all"
+                                                                >
+                                                                    Barchasiga qo‘llash
+                                                                </button>
+                                                            )}
+                                                        </td>}
                                                     {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
-                                                    <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>}
+                                                        <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>}
                                                     <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0) * Number(100 - +it.discount) / 100).toLocaleString()}</td>
                                                     <td className="p-2 align-center">
                                                         <div className="flex gap-2 items-center">
@@ -910,7 +915,9 @@ export default function WareHouseOutcome() {
                                     <div><strong>Jo'natuvchi:</strong> {invoiceMeta?.[mode]?.sender || getLocationNameById(userLId)}</div>
                                     <div><strong>Qabul qiluvchi:</strong> {invoiceMeta?.[mode]?.receiver || "—"}</div>
                                     <div><strong>Vaqt:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
-                                    <div><strong>Umumiy:</strong> {Number(total || 0).toLocaleString()} сум</div>
+                                    <div><strong>Jami:</strong> {Number(total || 0).toLocaleString()} сум</div>
+                                    <div><strong>Umumiy chegirma qiymati:</strong> {(Number(total || 0) - Number(disTotal || 0)).toLocaleString()} сум</div>
+                                    <div><strong>Chegirma bilan jami:</strong> {Number(disTotal || 0).toLocaleString()} сум</div>
                                 </div>
 
                                 <div className="overflow-x-auto">
@@ -922,7 +929,12 @@ export default function WareHouseOutcome() {
                                                 <th style={{ border: "1px solid #333", padding: 6 }}>Barcode</th>
                                                 <th style={{ border: "1px solid #333", padding: 6 }}>Narx</th>
                                                 <th style={{ border: "1px solid #333", padding: 6 }}>Miqdor</th>
+                                                <th style={{ border: "1px solid #333", padding: 6 }}>Birlik</th>
+                                                {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>Chegirma(%)</th>}
                                                 <th style={{ border: "1px solid #333", padding: 6 }}>Jami</th>
+                                                {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") &&
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>Jami(chegirma)</th>}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -933,12 +945,16 @@ export default function WareHouseOutcome() {
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{it.barcode || ""}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.price || 0).toLocaleString()}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.quantity || 0)}</td>
+                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{String(it.unit || "birlik")}</td>
+                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.discount || 0)}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
+                                                    <td className="p-2 align-center" style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0) * Number(100 - +it.discount) / 100).toLocaleString()}</td>
                                                 </tr>
                                             ))}
                                             <tr>
-                                                <td colSpan={5} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>Jami</td>
+                                                <td colSpan={7} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>Jami</td>
                                                 <td style={{ border: "1px solid #333", padding: 6 }}>{Number(total || 0).toLocaleString()}</td>
+                                                <td style={{ border: "1px solid #333", padding: 6 }}>{Number(disTotal || 0).toLocaleString()}</td>
                                             </tr>
                                         </tbody>
                                     </table>

@@ -163,7 +163,7 @@ export default function WareHouseIncome() {
     const fetchLocations = async () => {
         try {
             setLocationsLoading(true);
-            const res = await location.getAllGroupLocations(userLId);
+            const res = await location.getAllGroupLocalLocations(userLId);
             if (res?.status === 200 || res?.status === 201) {
                 // setLocations(res.data || []);
                 const formedOptions = (res.data || []).map((lc) => {

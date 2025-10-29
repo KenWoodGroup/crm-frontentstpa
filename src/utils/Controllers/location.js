@@ -33,6 +33,10 @@ class location {
         const response = await $api.get(`/locations/all-location/${id}`)
         return response;
     }
+    static getAllGroupLocalLocations = async (id) => {
+        const response = await $api.get(`/locations/all-location-local/${id}`)
+        return response
+    }
     static Delete = async (id) => {
         const response = await $api.delete(`/locations/${id}`)
         return response;
