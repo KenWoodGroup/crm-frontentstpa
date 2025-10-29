@@ -108,7 +108,7 @@ export default function Login() {
   // Функция для проверки, нужно ли показывать оферту
   const shouldShowOfferta = (role) => {
     // Не показывать оферту для super_admin и admin
-    return !["super_admin", "admin"].includes(role);
+    return !["super_admin", "admin", 'warehouse', 'dealer'].includes(role);
   };
 
   const handleSubmit = async (e) => {
