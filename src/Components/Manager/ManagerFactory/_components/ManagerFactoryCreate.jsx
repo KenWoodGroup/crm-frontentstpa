@@ -369,7 +369,7 @@ export default function RegisterModal({ refresh }) {
 
                                 <div>
                                     <Input
-                                        label="FISh *"
+                                        label="Zavod Egasi (F.I.SH)*"
                                         name="fullName"
                                         value={form.fullName}
                                         onChange={handleChange}
