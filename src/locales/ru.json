@@ -15,6 +15,6 @@
     "enterPhone": "Пожалуйста, введите номер телефона ❗",
     "enterEmail": "Пожалуйста, введите email ❗",
     "enterPassword": "Пожалуйста, введите пароль ❗",
-    "warehouseCreated": "Склад успешно создан ✅",
-    "errorOccurred": "Произошла ошибка ❌"
+    "warehouseCreated": "Склад успешно создан ",
+    "errorOccurred": "Произошла ошибка "
 }

@@ -16,7 +16,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
     const [loading, setLoading] = useState(false);
     const [warehouseId, setWarehouseId] = useState(""); // сюда передаём id для редактирования
     const [data, setData] = useState({
-        type: "warehouse",
         name: "",
         address: "",
         phone: "",
@@ -27,7 +26,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
     useEffect(() => {
         if (warehouse) {
             setData({
-                type: warehouse.type || "warehouse",
                 name: warehouse.name || "",
                 address: warehouse.address || "",
                 phone: warehouse.phone || "",
