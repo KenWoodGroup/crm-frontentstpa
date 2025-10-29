@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 
-const LogoutButton = ({ isOpen }) => {
+const LogoutButton = () => {
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
 
@@ -65,7 +65,7 @@ const LogoutButton = ({ isOpen }) => {
         <>
             <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-3 p-3 w-full rounded-xl text-[rgb(2,2,59)] hover:bg-red-100 hover:text-red-700 transition"
+                className="flex items-center gap-2 p-3 w-full rounded-xl text-[rgb(2,2,59)] hover:bg-red-100 hover:text-red-700 transition"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -82,10 +82,9 @@ const LogoutButton = ({ isOpen }) => {
                     />
                 </svg>
                 <span
-                    className={`whitespace-nowrap transition-opacity duration-300 ${!isOpen && "opacity-0 hidden"
-                        }`}
+                    className={`whitespace-nowrap transition-opacity text-sm`}
                 >
-                    Logout
+                    Выйти
                 </span>
             </button>
 

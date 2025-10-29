@@ -6,7 +6,6 @@ import WarehouseProdcut from "../Components/Warehouse/WarehouseProdcut/Warehouse
 import WarehouseDiler from "../Components/Warehouse/WarehouseDiler/WarehouseDiler";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
 import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
-import WareHouseDisposal from "../Components/Warehouse/WareHouseDisposal/WareHouseDisposal";
 import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/SettingsWareHouse";
 import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
 import { elements } from "chart.js";
@@ -49,15 +48,11 @@ export const warehouseRoutes = [
         element: <WareHouseOutcome />
     },
     {
-        path: "/warehouse/disposal",
-        name: "Warehouse Disposal",
-        element: <WareHouseDisposal />
+        path:"/warehouse/history",
+        name:"warehouse history",
+        element:<WarehouseInvoiceHistory/>
     },
-    {
-        path: "/warehouse/history",
-        name: "warehouse history",
-        element: <WarehouseInvoiceHistory />
-    },
+  
     {
         path: "/warehouse/history/:invoiceId",
         name: "warehouse detail history by id",

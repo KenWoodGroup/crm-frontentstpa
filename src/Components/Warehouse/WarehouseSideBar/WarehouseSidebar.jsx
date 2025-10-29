@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
     Card,
     Menu,
@@ -25,6 +25,7 @@ import {
     Settings,
     LogOut,
 } from "lucide-react";
+import LogoutButton from "../../SuperAdminSidebar/sectionsSaSide/LogoutButton";
 
 export default function WarehouseSidebar() {
     const mainLinks = [
@@ -52,9 +53,7 @@ export default function WarehouseSidebar() {
         { id: 2, label: "История", path: "/warehouse/history", icon: Move },
     ];
 
-    const handleLogout = () => {
-        console.log("Logout clicked");
-    };
+    
 
     return (
         <Card className="h-[100%] w-22 fixed top-[0] left-[0] bottom-0  z-50 shadow-xl bg-white/30 backdrop-blur-md border border-white/20 px-2 py-5 flex flex-col justify-between">
@@ -187,13 +186,14 @@ export default function WarehouseSidebar() {
 
             {/* === Выйти === */}
             <div className="flex justify-center mt-4">
-                <button
+                {/* <button
                     onClick={handleLogout}
                     className="flex items-center gap-2 text-sm text-red-500 font-medium hover:text-white hover:bg-red-500 px-3 py-2 rounded-lg transition-all duration-300"
                 >
                     <LogOut className="w-4 h-4" />
                     Выйти
-                </button>
+                </button> */}
+                <LogoutButton/>
             </div>
         </Card>
     );

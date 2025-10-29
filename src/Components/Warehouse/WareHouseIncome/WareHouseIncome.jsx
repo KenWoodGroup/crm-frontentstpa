@@ -243,7 +243,7 @@ export default function WareHouseIncome() {
         if (!selectedLocation?.value) {
             notify.warning("Iltimos, jo'natuvchini tanlang");
             return;
-        }else if(!selectedStaff?.value) {
+        } else if (!selectedStaff?.value) {
             notify.warning("Iltimos, driverni tanlang")
         }
         const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : (selected === "incoming" && sendToTrash === false) ? "incoming" : "transfer_in"
@@ -647,7 +647,7 @@ export default function WareHouseIncome() {
 
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
-        resetAll(); 
+        resetAll();
         setSelectedLocation("");
         setOtherLocationName("");
         setSearchResults([]);
@@ -669,8 +669,8 @@ export default function WareHouseIncome() {
                             invoiceMeta?.in?.operation_type === "return_in" ? "возврат" :
                                 invoiceMeta?.in?.operation_type === "return_dis" ? "Утилизация возврата" : "Unkown"
                     )}</h2>
-                    {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>} 
-                
+                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>}
+
             </div>
 
             {/* Sidebar */}
@@ -1076,10 +1076,12 @@ export default function WareHouseIncome() {
                                         "Документ перемещения на склад" :
                                         invoiceMeta?.[mode]?.operation_type === "return_in" ?
                                             "Документ приёма возврата" :
-                                            "Документ приёма возврата с утилизацией"
+                                            invoiceMeta?.[mode]?.operation_type === "return_dis" ?
+                                                "Документ приёма возврата с утилизацией" :
+                                                "Документ Приход на склад"
                                     }
                                 </h1>
-                                <div className="meta">
+                                <div className="meta mb-4">
                                     <div><strong>Отправитель:</strong> {invoiceMeta?.[mode]?.sender || "—"}</div>
                                     <div><strong>Получатель:</strong> {invoiceMeta?.[mode]?.receiver || "—"}</div>
                                     <div><strong>Время:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
@@ -1105,7 +1107,7 @@ export default function WareHouseIncome() {
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{it?.name || "—"}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{it.barcode || ""}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.price || 0).toLocaleString()}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.quantity || 0)}</td>
+                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.quantity || 0)} {it.unit || "birlik"}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
                                                 </tr>
                                             ))}
