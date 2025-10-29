@@ -6,7 +6,7 @@ import {
     Chip,
     Typography,
 } from "@material-tailwind/react";
-import { CheckCircleIcon, ClockIcon, CreditCardIcon, CurrencyDollarIcon, ReceiptRefundIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { BanknotesIcon, CheckCircleIcon, ClockIcon, CreditCardIcon, CurrencyDollarIcon, ReceiptRefundIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { Payment } from "../../../../utils/Controllers/Payment";
 import { CalendarSearchIcon } from "lucide-react";
 
