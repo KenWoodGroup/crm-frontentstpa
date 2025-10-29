@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import { CheckCircle2Icon } from "lucide-react";
 import WarehouseClientPaymentDetail from "./WarehouseClientPaymentDetail";
 
-export default function WarehouseClientInvoices({ clientData }) {
+export default function WarehousesClientInvoiceReturn({ clientData }) {
     const [invoices, setInvoices] = useState([]);
     const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(true);
@@ -119,7 +119,7 @@ export default function WarehouseClientInvoices({ clientData }) {
                 page: pageNumber,
                 id: clientData?.id,
             };
-            const response = await InvoicesApi?.GetClientInvoice(data);
+            const response = await InvoicesApi?.GetClientInvoiceReturn(data);
             const records = response?.data?.data?.records || [];
             const paginationInfo = response?.data?.data?.pagination || {};
 
@@ -164,12 +164,12 @@ export default function WarehouseClientInvoices({ clientData }) {
                                             >
                                                 Накладная #{invoice.invoice_number}
                                             </Typography>
-                                            <Chip
+                                            {/* <Chip
                                                 value={getPaymentStatusText(invoice.payment_status)}
                                                 color={getPaymentStatusColor(invoice.payment_status)}
                                                 size="sm"
                                                 icon={getStatusIcon(invoice.payment_status)}
-                                            />
+                                            /> */}
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -216,7 +216,7 @@ export default function WarehouseClientInvoices({ clientData }) {
                                             </div>
                                         </div>
                                     </div>
-
+{/* 
                                     <div className="flex gap-2">
                                         <WarehouseClientPaymentDetail data={invoice} />
                                         {invoice.payment_status === "unpaid" || invoice?.payment_status === 'partially_paid' ? (
@@ -226,7 +226,7 @@ export default function WarehouseClientInvoices({ clientData }) {
                                                 invoice={invoice}
                                             />
                                         ) : (<></>)}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </CardBody>
                         </Card>

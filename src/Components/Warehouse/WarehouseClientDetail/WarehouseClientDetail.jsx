@@ -29,6 +29,7 @@ import EmptyData from "../../UI/NoData/EmptyData"
 import WarehouseClientDetailPayment from "./_components/WarehouseClientDetailPayment"
 import WarehouseClientInvoices from "./_components/WarehouseClientInvoices"
 import WarehouseClientPayment from "./_components/WarehouseClientPayment"
+import WarehousesClientInvoiceReturn from "./_components/WarehousesClientInvoiceReturn"
 
 
 
@@ -272,6 +273,13 @@ export default function WarehouseClientDetail() {
                                     Полученные накладные {' '}
                                 </div>
                             </Tab>
+                            <Tab value="returns" onClick={() => setActiveTab("returns")}>
+                                <div className="flex items-center gap-2">
+                                    <ReceiptRefundIcon className="h-5 w-5" />
+                                    Возвраты
+                                    {' '}
+                                </div>
+                            </Tab>
                             <Tab value="payments" onClick={() => setActiveTab("payments")}>
                                 <div className="flex items-center gap-2">
                                     <ReceiptRefundIcon className="h-5 w-5" />
@@ -288,7 +296,10 @@ export default function WarehouseClientDetail() {
                     )}
 
 
-                    {/* Содержимое платежей */}
+                    {/* Содержимое возвратов */}
+                    {activeTab === "returns" && (
+                        <WarehousesClientInvoiceReturn clientData={clientData} />
+                    )}
                     {activeTab === "payments" && (
                         <WarehouseClientPayment clientData={clientData} />
                     )}

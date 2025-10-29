@@ -9,7 +9,6 @@ import {
     Chip,
     Card,
 } from "@material-tailwind/react";
-import { formatNumber, unformatNumber } from "../../../../utils/Helpers/Formater";
 
 export default function WarehouseClientPaymentDetail({ data }) {
     const [open, setOpen] = useState(false);
@@ -24,6 +23,13 @@ export default function WarehouseClientPaymentDetail({ data }) {
             minute: "2-digit",
         });
     };
+
+    // ✅ Форматирование числа: 50000 → 50 000
+    const formatNumber = (num) => {
+        if (num === null || num === undefined) return "—";
+        return Math.floor(num).toLocaleString("ru-RU");
+    };
+
 
     const getPaymentStatusColor = (status) => {
         switch (status) {
@@ -89,7 +95,7 @@ export default function WarehouseClientPaymentDetail({ data }) {
                             <Typography variant="small" color="blue-gray" className="font-semibold">
                                 Общая сумма:
                             </Typography>
-                            <Typography>{data?.total_sum} UZS</Typography>
+                            <Typography>{formatNumber(data?.total_sum)} UZS</Typography>
                         </div>
 
                         <div>
@@ -164,7 +170,7 @@ export default function WarehouseClientPaymentDetail({ data }) {
                                         {data.payments.map((p, i) => (
                                             <tr key={p.id} className="border-b hover:bg-blue-gray-50/50">
                                                 <td className="px-4 py-2">{i + 1}</td>
-                                                <td className="px-4 py-2">{unformatNumber(p.amount)} UZS</td>
+                                                <td className="px-4 py-2">{formatNumber(p.amount)} UZS</td>
                                                 <td className="px-4 py-2">{p.method}</td>
                                                 <td className="px-4 py-2">
                                                     <Chip

@@ -14,6 +14,10 @@ class InvoicesApi {
         const response = await $api.get(`/invoices/${data?.id}/page?page=${data?.page}`)
         return response;
     }
+    static GetClientInvoiceReturn = async (data) => {
+        const response = await $api.get(`/invoices/return/${data?.id}/page?page=${data?.page}`)
+        return response;
+    }
     static GetInvoiceById = async (id) => {
         const response = await $api.get(`/invoices/${id}`)
         return response;
