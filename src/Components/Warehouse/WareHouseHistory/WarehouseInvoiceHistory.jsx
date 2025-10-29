@@ -735,24 +735,7 @@ function EditInvoiceModal({ invoice, onClose, onSave }) {
                     <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <label className="flex flex-col">
-                        <span className="text-sm text-gray-600">Status</span>
-                        {/* <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} className="border rounded p-2">
-
-                            <option value="draft">draft</option>
-                            <option value="approved">confirmed</option>
-                            <option value="sent">sent</option>
-                            <option value="received">received</option>
-                            <option value="cancelled">cancelled</option>
-                        </select> */}
-                        <Select
-                            placeholder="Select new status"
-                            options={statusOptions}
-                            value={form.status}
-                            onChange={(e) => setForm((p) => ({ ...p, status: e }))}
-                        />
-
-                    </label>
+                    {/*  */}
                     {/* <label className="flex flex-col">
                         <span className="text-sm text-gray-600">Payment status</span>
                         <select value={form.payment_status} onChange={(e) => setForm((p) => ({ ...p, payment_status: e.target.value }))} className="border rounded p-2">
@@ -787,13 +770,15 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
         setForm(prev => ({ ...invoice, org_status: invoice?.status || prev.org_status }));
     }, [invoice]);
     const statusBase = [
-        { id: 1, value: "draft", label: "Draft" },
+        { id: 1, value: "received", label: "Received" },
+        { id: 2, value: "draft", label: "Draft" },
         { id: 3, value: "cancelled", label: "Cancelled" },
         { id: 4, value: "sent", label: "Sent" },
-        { id: 5, value: "received", label: "Received" }
     ];
     const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
-    const statusOptions = statusBase?.filter((st) => st.id > org_status_id)
+    const statusOptions = invoice?.status === "cancelled" ? statusBase.filter((st) => st.id === 2 || st.id === 4)
+        : invoice?.status === "sent" ? statusBase.filter((st) => st.id === 1)
+            : statusBase?.filter((st) => st.id > org_status_id)
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
             <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
@@ -801,29 +786,36 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
                     <h3 className="text-lg font-semibold">Edit Status</h3>
                     <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <label className="flex flex-col">
-                        <span className="text-sm text-gray-600">Status</span>
-                        <Select
-                            placeholder="Select new status"
-                            options={statusOptions}
-                            value={form.status}
-                            onChange={(e) => setForm((p) => ({ ...p, status: e }))}
-                        />
+                {invoice?.status === "received" ?
+                    <div>Operatsiya yakunlangan tovarlarni vozvrat orqali qaytarishingiz mumkin</div> :
 
-                    </label>
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <label className="flex flex-col">
+                            <span className="text-sm text-gray-600">Status</span>
+                            <Select
+                                placeholder="Select new status"
+                                options={statusOptions}
+                                value={form.status}
+                                onChange={(e) => setForm((p) => ({ ...p, status: e }))}
+                            />
+
+                        </label>
+                    </div>
+                }
 
                 <div className="mt-4 flex gap-2 justify-end">
                     <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
-                    <button onClick={() => onSave(form)} className={`px-4 py-2 flex items-center gap-2 rounded bg-blue-600 text-white transition-all disabled:opacity-70 ${loading ? "cursor-wait" : "cursor-pointer"}`}>
-                        {loading ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Updatinging...</span>
-                            </>
-                        ) : <span>Save</span>}
-                    </button>
+                    {invoice?.status === "received" ?
+                        <noscript></noscript> :
+                        <button onClick={() => onSave(form)} className={`px-4 py-2 flex items-center gap-2 rounded bg-blue-600 text-white transition-all disabled:opacity-70 ${loading ? "cursor-wait" : "cursor-pointer"}`}>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Updatinging...</span>
+                                </>
+                            ) : <span>Save</span>}
+                        </button>
+                    }
 
                 </div>
             </div>
