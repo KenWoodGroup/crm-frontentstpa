@@ -227,9 +227,9 @@ export default function WarehouseClientPayment({ clientData }) {
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <Button variant="outlined" color="blue" size="sm">
+                                        {/* <Button variant="outlined" color="blue" size="sm">
                                             Детали
-                                        </Button>
+                                        </Button> */}
                                     </div>
                                 </div>
                             </CardBody>

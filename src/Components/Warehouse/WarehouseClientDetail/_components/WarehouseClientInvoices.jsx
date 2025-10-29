@@ -5,6 +5,7 @@ import { CheckCircleIcon, ClockIcon, DocumentTextIcon, XCircleIcon } from "@hero
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
 import Cookies from "js-cookie";
 import { CheckCircle2Icon } from "lucide-react";
+import WarehouseClientPaymentDetail from "./WarehouseClientPaymentDetail";
 
 export default function WarehouseClientInvoices({ clientData }) {
     const [invoices, setInvoices] = useState([]);
@@ -171,9 +172,7 @@ export default function WarehouseClientInvoices({ clientData }) {
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <Button variant="outlined" color="blue" size="sm">
-                                            Детали
-                                        </Button>
+                                        <WarehouseClientPaymentDetail data={invoice} />
                                         {invoice.payment_status === "unpaid" || invoice?.payment_status === 'partially_paid' ? (
                                             <WarehouseClientDetailPayment
                                                 refresh={getAllInvoice}
