@@ -411,7 +411,7 @@ export default function WareHouseIncome() {
             is_raw_stock: productObj === undefined ? true : false,
             is_new_batch: (is_raw_stock && raw.batch) ? false : true,
             name: is_raw_stock ? productObj.name : raw.name || "-",
-            price: invoiceMeta?.[mode]?.operation_type === "transfer_in" ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
+            price: (invoiceMeta?.[mode]?.operation_type === "transfer_in" || invoiceMeta?.[mode]?.operation_type === "incoming") ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
             origin_price: (invoiceMeta?.[mode]?.operation_type === "transfer_in" || invoiceMeta?.[mode]?.operation_type === "incoming") ? Number(raw.purchase_price || 0) : Number(raw.sale_price || 0),
             quantity: 1,
             unit: is_raw_stock ? productObj.unit : raw.unit || "-",
