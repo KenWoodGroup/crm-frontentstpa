@@ -38,7 +38,10 @@ export default function WarehouseSidebar() {
         { id: 1, label: "Оплата клиентов", path: "/warehouse/payment", icon: BanknoteArrowDown, group: "clients" },
         { id: 2, label: "Долги клиентов", path: "/warehouse/debtor", icon: UserPen, group: "clients" },
         { id: 3, label: "Сверка клиентов", path: "/warehouse/revisen", icon: ChevronsLeftRight, group: "clients" },
-        { id: 4, label: "Поставщики", path: "/warehouse/supplier", icon: Truck, group: "suppliers" },
+        { id: 4, label: "Доставщик", path: "/warehouse/carrier", icon: Truck, group: "suppliers" },
+        { id: 5, label: "Поставщики", path: "/warehouse/supplier", icon: UsersRound, group: "suppliers" },
+        { id: 5, label: "Оплата Поставщиков", path: "/warehouse/supplier/payment", icon: BanknoteArrowDown, group: "suppliers" },
+        { id: 5, label: "Сверка Поставщиков", path: "/warehouse/supplier/sverka", icon: ChevronsLeftRight, group: "suppliers" },
         { id: 6, label: "Расходы", path: "/warehouse/expenses", icon: Blocks, group: "others" },
         { id: 7, label: "Касса", path: "/warehouse/kassa", icon: CreditCard, group: "others" },
     ];
@@ -109,7 +112,7 @@ export default function WarehouseSidebar() {
                             <span className="text-[11px] font-medium text-center">Касса</span>
                         </div>
                     </MenuHandler>
-                    <MenuList className="p-4 w-[600px] translate-x-6 bg-white/95 backdrop-blur-md shadow-2xl border border-gray-100 rounded-xl grid grid-cols-3 gap-4">
+                    <MenuList className="p-4 w-[650px] translate-x-6 bg-white/95 backdrop-blur-md shadow-2xl border border-gray-100 rounded-xl grid grid-cols-3 gap-4">
                         <div>
                             <Typography variant="small" color="gray" className="mb-2 font-semibold text-[13px] uppercase tracking-wide text-center">
                                 Клиенты

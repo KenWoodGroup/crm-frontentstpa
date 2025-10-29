@@ -24,6 +24,11 @@ class location {
         return response;
     }
 
+    static GetAllSuppliers = async (id) => {
+        const response = await $api.get(`/locations/all-supplier/${id}`)
+        return response;
+    }
+
     static getAllGroupLocations = async (id) => {
         const response = await $api.get(`/locations/all-location/${id}`)
         return response;

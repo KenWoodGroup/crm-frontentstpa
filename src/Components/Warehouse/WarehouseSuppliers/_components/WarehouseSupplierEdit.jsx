@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
     Button,
     Dialog,
@@ -9,33 +9,23 @@ import {
     Tooltip,
     IconButton,
 } from "@material-tailwind/react";
+import { Clients } from "../../../../utils/Controllers/Clients";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
-import { Staff } from "../../../../utils/Controllers/Staff";
-import Edit from "../../../UI/Icons/Edit";
+import { Edit } from "lucide-react";
 
-export default function WarehouseSupplierEdit({ refresh, data, id }) {
+
+export default function WarehouseSupplierEdit({ data, refresh, id }) {
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({
-        role: "carrier",
-        full_name: "",
-        phone: "+998",
-        location_id: Cookies.get("ul_nesw"),
+        type: "supplier",
+        name: data?.name || '',
+        address: data?.address || '',
+        phone: data?.phone || '',
+        parent_id: Cookies.get(`usd_nesw`),
     });
 
     const handleOpen = () => setOpen(!open);
-
-    // когда модал открывается, загружаем старые данные
-    useEffect(() => {
-        if (open && data) {
-            setForm({
-                role: data?.role || "carrier",
-                full_name: data?.full_name || "",
-                phone: data?.phone || "+998",
-                location_id: data?.location_id || Cookies.get("ul_nesw"),
-            });
-        }
-    }, [open, data]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -44,18 +34,27 @@ export default function WarehouseSupplierEdit({ refresh, data, id }) {
 
     const handleSubmit = async () => {
         try {
-            await Staff?.EditStaff(id, form);
-            Alert("Поставщик успешно обновлён", "success");
+            const response = await Clients?.EditClient(id, form);
+            Alert("Muvaffaqiyatli", "success");
+
+            setForm({
+                type: "supplier",
+                name: "",
+                address: "",
+                phone: "+998",
+            });
+
             handleOpen();
             refresh();
         } catch (error) {
-            Alert("Ошибка при обновлении поставщика", "error");
+            Alert("Xato", "error");
             console.log(error);
         }
     };
 
+
     return (
-        <div>
+        <div className="">
             <Tooltip content="Изменить">
                 <IconButton
                     variant="text"
@@ -65,21 +64,29 @@ export default function WarehouseSupplierEdit({ refresh, data, id }) {
                     <Edit size={18} />
                 </IconButton>
             </Tooltip>
-
             <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Редактирование Поставщика</DialogHeader>
-
+                <DialogHeader>Изменения поставщика</DialogHeader>
                 <DialogBody divider className="flex flex-col gap-4">
                     <div>
                         <Input
                             label="Имя поставщика"
-                            name="full_name"
-                            value={form.full_name}
+                            name="name"
+                            value={form.name}
                             onChange={handleChange}
                         />
                     </div>
 
                     <div>
+                        <Input
+                            label="Адрес"
+                            name="address"
+                            value={form.address}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div>
+
                         <Input
                             label="Телефон"
                             name="phone"
@@ -87,6 +94,7 @@ export default function WarehouseSupplierEdit({ refresh, data, id }) {
                             onChange={handleChange}
                         />
                     </div>
+
                 </DialogBody>
 
                 <DialogFooter>
@@ -98,8 +106,8 @@ export default function WarehouseSupplierEdit({ refresh, data, id }) {
                     >
                         Отмена
                     </Button>
-                    <Button onClick={handleSubmit} color="green">
-                        Сохранить изменения
+                    <Button onClick={handleSubmit}>
+                        Сохранить
                     </Button>
                 </DialogFooter>
             </Dialog>

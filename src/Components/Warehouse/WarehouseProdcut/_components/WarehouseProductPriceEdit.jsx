@@ -7,23 +7,23 @@ import {
     Button,
     Input,
     Typography,
+    Switch,
 } from "@material-tailwind/react";
 import { Stock } from "../../../../utils/Controllers/Stock";
 import { Alert } from "../../../../utils/Alert";
 import { formatNumber, unformatNumber } from "../../../../utils/Helpers/Formater";
 
 export default function WarehouseEdit({ data }) {
-
     const [open, setOpen] = useState(false);
     const [price, setPrice] = useState(formatNumber(data?.sale_price || 0));
+    const [fixedQuantity, setFixedQuantity] = useState(!!data?.fixed_quantity);
 
     const handleOpen = () => setOpen(!open);
 
     const handleSave = async () => {
         try {
             const form = {
-                // старые данные
-                fixed_quantity: data.fixed_quantity,
+                fixed_quantity: fixedQuantity, 
                 barcode: data.barcode,
                 sale_price: unformatNumber(price),
             };
@@ -34,7 +34,7 @@ export default function WarehouseEdit({ data }) {
             });
 
             handleOpen();
-            Alert("Narx muvaffaqiyatli o‘zgartirildi", "success");
+            Alert("Ma'lumotlar muvaffaqiyatli saqlandi", "success");
         } catch (error) {
             console.log(error);
             Alert(`Xatolik yuz berdi: ${error?.response?.data?.message || error.message}`, "error");
@@ -62,7 +62,7 @@ export default function WarehouseEdit({ data }) {
             <Dialog open={open} handler={handleOpen} size="xs">
                 <DialogHeader>
                     <Typography variant="h6" color="blue-gray">
-                        Narxni o‘zgartirish
+                        Ma'lumotlarni tahrirlash
                     </Typography>
                 </DialogHeader>
 
@@ -73,6 +73,18 @@ export default function WarehouseEdit({ data }) {
                         value={price}
                         onChange={handleChange}
                     />
+
+                    <div className="flex items-center justify-between">
+                        <Typography variant="small" color="blue-gray">
+                            Cheklangan (fixed_quantity)
+                        </Typography>
+                        <Switch
+                            color="blue"
+                            checked={fixedQuantity}
+                            onChange={(e) => setFixedQuantity(e.target.checked)}
+                            label={fixedQuantity ? "Cheklangan" : "Cheklanmagan"}
+                        />
+                    </div>
                 </DialogBody>
 
                 <DialogFooter>

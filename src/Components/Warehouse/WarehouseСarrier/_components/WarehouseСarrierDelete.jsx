@@ -5,7 +5,7 @@ import { Alert } from "../../../../utils/Alert";
 import { Clients } from "../../../../utils/Controllers/Clients";
 import { Staff } from "../../../../utils/Controllers/Staff";
 
-export default function WarehouseSupplierDelete({ id, refresh }) {
+export default function WarehouseСarrierDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 

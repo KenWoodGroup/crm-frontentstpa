@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ResetPassword } from "../../utils/Controllers/ResedPassword";
+import { Alert } from "../../utils/Alert";
 
 export default function ForgotPassword() {
     const [step, setStep] = useState(1);
@@ -11,49 +13,44 @@ export default function ForgotPassword() {
 
     const navigate = useNavigate();
 
-    // 1-step: send verification email
     const handleSendEmail = async (e) => {
         e.preventDefault();
         try {
             setLoading(true);
-            // await axios.post(`${BASE_URL}/api/verification/send`, { email });
-            alert("Verification code sent to your email ✅");
+            await ResetPassword.EmailSend({ email: email });
+            Alert("Tasdiqlash kodi emailingizga yuborildi", "success");
             setStep(2);
         } catch (err) {
-            alert("Failed to send verification code ❌");
+            Alert("Tasdiqlash kodini yuborish muvaffaqiyatsiz tugadi ❌", "error");
         } finally {
             setLoading(false);
         }
     };
 
-    // 2-step: verify OTP
+    // 2-qadam: OTP ni tasdiqlash
     const handleVerifyOtp = async (e) => {
         e.preventDefault();
         try {
             setLoading(true);
-            // await axios.post(`${BASE_URL}/api/verification/verify`, { email, otp });
-            alert("OTP verified successfully ✅");
+            await ResetPassword.SendOtp({ email: email, otp: otp });
+            Alert("OTP muvaffaqiyatli tasdiqlandi", "success");
             setStep(3);
         } catch (err) {
-            alert("Invalid OTP ❌");
+            Alert("Noto'g'ri OTP", "error");
         } finally {
             setLoading(false);
         }
     };
 
-    // 3-step: reset password
+    // 3-qadam: parolni tiklash
     const handleResetPassword = async (e) => {
         e.preventDefault();
-        if (password !== confirmPassword) return alert("Passwords do not match ❌");
+        if (password !== confirmPassword) return Alert("Parollar mos kelmadi", "error");
 
         try {
             setLoading(true);
-            // await axios.post(`${BASE_URL}/api/auth/reset-password`, {
-            //     email,
-            //     password,
-            //     otp,
-            // });
-            alert("Password successfully reset ✅");
+            await ResetPassword.PasswordSend({ email: email, password: password, otp: otp });
+            Alert("Parol muvaffaqiyatli tiklandi", "success");
             setStep(1);
             setEmail("");
             setOtp("");
@@ -61,7 +58,7 @@ export default function ForgotPassword() {
             setConfirmPassword("");
             navigate("/login");
         } catch (err) {
-            alert("Error resetting password ❌");
+            Alert("Parolni tiklashda xatolik", "error");
         } finally {
             setLoading(false);
         }
@@ -71,21 +68,21 @@ export default function ForgotPassword() {
         <section className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-blue-100 px-4">
             <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md transition-all duration-300">
                 <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
-                    Forgot Password
+                    Parolni Unutdingizmi?
                 </h1>
 
                 {step === 1 && (
                     <form onSubmit={handleSendEmail}>
                         <p className="text-gray-600 text-center mb-6">
-                            Enter your email and we’ll send you a verification code.
+                            Email manzilingizni kiriting va biz sizga tasdiqlash kodini yuboramiz.
                         </p>
-                        <label className="block text-gray-700 mb-2">Email Address</label>
+                        <label className="block text-gray-700 mb-2">Email Manzil</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none mb-4"
-                            placeholder="you@example.com"
+                            placeholder="siz@example.com"
                             required
                         />
                         <button
@@ -93,7 +90,7 @@ export default function ForgotPassword() {
                             disabled={loading}
                             className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
                         >
-                            {loading ? "Sending..." : "Send Email"}
+                            {loading ? "Yuborilmoqda..." : "Email Yuborish"}
                         </button>
                     </form>
                 )}
@@ -101,15 +98,15 @@ export default function ForgotPassword() {
                 {step === 2 && (
                     <form onSubmit={handleVerifyOtp}>
                         <p className="text-gray-600 text-center mb-6">
-                            Enter the 6-digit code we sent to <b>{email}</b>
+                            Biz yuborgan 6 xonali kodni kiriting <b>{email}</b>
                         </p>
-                        <label className="block text-gray-700 mb-2">Verification Code</label>
+                        <label className="block text-gray-700 mb-2">Tasdiqlash Kodi</label>
                         <input
                             type="text"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
                             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none mb-4"
-                            placeholder="Enter OTP"
+                            placeholder="OTP ni kiriting"
                             required
                         />
                         <button
@@ -117,7 +114,7 @@ export default function ForgotPassword() {
                             disabled={loading}
                             className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
                         >
-                            {loading ? "Verifying..." : "Verify OTP"}
+                            {loading ? "Tasdiqlanmoqda..." : "OTP ni Tasdiqlash"}
                         </button>
                     </form>
                 )}
@@ -125,27 +122,27 @@ export default function ForgotPassword() {
                 {step === 3 && (
                     <form onSubmit={handleResetPassword}>
                         <p className="text-gray-600 text-center mb-6">
-                            Create your new password below.
+                            Yangi parolingizni yarating.
                         </p>
-                        <label className="block text-gray-700 mb-2">New Password</label>
+                        <label className="block text-gray-700 mb-2">Yangi Parol</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none mb-4"
-                            placeholder="Enter new password"
+                            placeholder="Yangi parolni kiriting"
                             required
                         />
 
                         <label className="block text-gray-700 mb-2">
-                            Confirm New Password
+                            Yangi Parolni Tasdiqlang
                         </label>
                         <input
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none mb-4"
-                            placeholder="Confirm new password"
+                            placeholder="Yangi parolni qayta kiriting"
                             required
                         />
                         <button
@@ -153,7 +150,7 @@ export default function ForgotPassword() {
                             disabled={loading}
                             className="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
                         >
-                            {loading ? "Saving..." : "Reset Password"}
+                            {loading ? "Saqlanmoqda..." : "Parolni Tiklash"}
                         </button>
                     </form>
                 )}

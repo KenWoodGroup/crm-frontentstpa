@@ -8,19 +8,16 @@ import {
     IconButton,
     Tooltip,
 } from "@material-tailwind/react";
-import { Search, ChevronLeft, ChevronRight, Trash2, Edit, DollarSign } from "lucide-react";
-import { Clients } from "../../../utils/Controllers/Clients";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
-import { NavLink } from "react-router-dom";
-import WarehouseSupplierCreate from "./_components/WarehouseSupplierCreate";
+import WarehouseSupplierCreate from "./_components/WarehouseСarrierCreate";
 import { Staff } from "../../../utils/Controllers/Staff";
 import Cookies from "js-cookie";
-import WarehouseSupplierDelete from "./_components/WarehouseSupplierDelete";
-import WarehouseSupplierEdit from "./_components/WarehouseSupplierEdit";
+import WarehouseSupplierDelete from "./_components/WarehouseСarrierDelete";
+import WarehouseSupplierEdit from "./_components/WarehouseСarrierEdit";
 
 
-export default function WarehouseSupplier() {
+export default function WarehouseСarrier() {
     const [loading, setLoading] = useState(true);
     const [clients, setClients] = useState([]);
 

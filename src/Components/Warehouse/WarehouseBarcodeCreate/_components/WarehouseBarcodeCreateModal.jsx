@@ -136,10 +136,13 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
 
         try {
             if (isEdit) {
-                await Stock.EditStock({ form, id: data?.stock_id });
+                const editData = {
+                    barcode: form?.barcode,
+                }
+                await Stock.EditBarcode({ editData, id: data?.stock_id });
                 Alert("Barcode muvaffaqiyatli yangilandi", "success");
                 setEditMode(false);
-                refresh()   
+                refresh()
             } else {
                 await Stock.CreateBarcode(form);
                 Alert("Muvaffaqiyatli yaratildi", "success");

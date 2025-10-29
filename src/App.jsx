@@ -8,7 +8,6 @@ import { userRoutes } from "./routes/userRoutes";
 import Login from "./Components/Login/Login";
 import ErrorPage from "./Components/ErrorPage/ErrorPage";
 import ProtectedRoute from "./Components/ProtectedRoute";
-import Register from "./Components/Register/Register";
 import SuperAdminLayout from "./layouts/SuperAdminLayout";
 import MainLayout from "./layouts/MainLayout";
 
@@ -28,6 +27,11 @@ import CompanyDilerLayout from "./layouts/CompanyDilerLayout";
 import { companyDiler } from "./routes/companyDilerRoutes";
 import ManagerLayout from "./layouts/ManagerLayout";
 import { managerRoutes } from "./routes/managerRoutes";
+import Factory from "./Components/ProtectedRoutes/Factory";
+import SuperAdmin from "./Components/ProtectedRoutes/SuperAdmin";
+import Manager from "./Components/ProtectedRoutes/Manager";
+import Warehouse from "./Components/ProtectedRoutes/Warehouse";
+import Dealer from "./Components/ProtectedRoutes/Dealer";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -39,12 +43,12 @@ function App() {
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route element={
-              <ProtectedRoute>
+              <SuperAdmin>
                 <SuperAdminLayout />
-              </ProtectedRoute>
+              </SuperAdmin>
+
             }>
               {supperAdminRoutes.map((r) => {
                 return (
@@ -53,9 +57,9 @@ function App() {
               })}
             </Route>
             <Route element={
-              // <ProtectedAdminsRoute>
-              <ManagerLayout />
-              // </ProtectedAdminsRoute>
+              <Manager>
+                <ManagerLayout />
+              </Manager>
             }>
               {managerRoutes?.map((r) => {
                 return (
@@ -64,9 +68,9 @@ function App() {
               })}
             </Route>
             <Route element={
-              // <ProtectedUsersRoute>
-              <MainLayout />
-              // </ProtectedUsersRoute>
+              <Factory>
+                <MainLayout />
+              </Factory>
             }>
               {userRoutes.map((r) => {
                 return (
@@ -75,9 +79,9 @@ function App() {
               })}
             </Route>
             <Route element={
-              // <ProtectedUsersRoute>
-              <WarehouseLayout />
-              // </ProtectedUsersRoute>
+              <Warehouse>
+                <WarehouseLayout />
+              </Warehouse>
             }>
               {warehouseRoutes?.map((r) => {
                 return (
@@ -86,9 +90,9 @@ function App() {
               })}
             </Route>
             <Route element={
-              // <ProtectedUsersRoute>
-              <DilerLayout />
-              // </ProtectedUsersRoute>
+              <Dealer>
+                <DilerLayout />
+              </Dealer>
             }>
               {dilertoutes?.map((r) => {
                 return (
@@ -96,7 +100,7 @@ function App() {
                 )
               })}
             </Route>
-            <Route element={
+            {/* <Route element={
               // <ProtectedUsersRoute>
               <CompanyLayout />
               // </ProtectedUsersRoute>
@@ -106,8 +110,8 @@ function App() {
                   <Route key={r.name} path={r.path} element={r.element} />
                 )
               })}
-            </Route>
-            <Route element={
+            </Route> */}
+            {/* <Route element={
               // <ProtectedUsersRoute>
               <CompanyWarehouseLayout />
               // </ProtectedUsersRoute>
@@ -128,12 +132,12 @@ function App() {
                   <Route key={r.name} path={r.path} element={r.element} />
                 )
               })}
-            </Route>
+            </Route> */}
             <Route path="*" element={<ErrorPage />} />
           </Route>
         </Routes>
 
-      </Router>
+      </Router >
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -143,7 +147,7 @@ function App() {
         draggable
         theme="colored"
       />
-    </QueryClientProvider>
+    </QueryClientProvider >
   );
 }
 

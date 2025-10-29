@@ -9,6 +9,8 @@ import WarehouseEdit from "./_components/WarehouseProductPriceEdit";
 import { formatNumber } from "../../../utils/Helpers/Formater";
 import { io } from "socket.io-client";
 import { Info } from "lucide-react";
+import axios from "../../../utils/axios";
+import Socket from "../../../utils/Socket";
 
 export default function WarehouseProduct() {
     const [loading, setLoading] = useState(false);
@@ -58,7 +60,7 @@ export default function WarehouseProduct() {
         if (!locationId) return;
         GetAllProduct(1);
 
-        const socket = io("https://test.edu-devosoft.uz", {
+        const socket = io(`${Socket}`, {
             path: "/socket.io",
             transports: ["websocket"],
         });

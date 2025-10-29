@@ -1,4 +1,12 @@
-import { Building2, User, MapPin, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+    Building2,
+    User,
+    MapPin,
+    Phone,
+    Mail,
+    ChevronLeft,
+    ChevronRight,
+} from "lucide-react";
 import WarehouseCreate from "./_components/WarehouseCreate";
 import { WarehouseApi } from "../../../utils/Controllers/WarehouseApi";
 import { Alert } from "../../../utils/Alert";
@@ -27,12 +35,16 @@ export default function FactoryWarehouse() {
         if (!parent_id) return Alert(t("no_parent_id"), "error");
         setLoading(true);
         try {
-            const response = await WarehouseApi.WarehouseGetAll({ id: parent_id, page: pageNumber });
+            const response = await WarehouseApi.WarehouseGetAll({
+                id: parent_id,
+                page: pageNumber,
+            });
             const records = response.data?.data?.records || [];
             const pagination = response.data?.data?.pagination || {};
 
-            // 🔥 Исключаем склады с type === "other" или type === "disposal"
-            const filtered = records.filter((w) => w.type !== "other" && w.type !== "disposal");
+            const filtered = records.filter(
+                (w) => w.type !== "other" && w.type !== "disposal"
+            );
 
             setWarehouses(filtered);
             setTotalPages(Number(pagination.total_pages) || 1);
@@ -48,15 +60,18 @@ export default function FactoryWarehouse() {
 
     useEffect(() => {
         GetAll(page);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (loading) return <Loading />;
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen k text-text-light dark:text-text-dark transition-colors duration-300">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-                <h1 className="text-2xl font-semibold text-gray-800">{t("warehouse_info")}</h1>
+                <h1 className="text-2xl font-semibold">
+                    {t("warehouse_info")}
+                </h1>
                 <WarehouseCreate refresh={() => GetAll(page)} />
             </div>
 
@@ -67,40 +82,51 @@ export default function FactoryWarehouse() {
                         {warehouses.map((w) => (
                             <div
                                 key={w.id}
-                                className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 hover:shadow-md transition"
+                                className="bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 hover:shadow-md transition-colors duration-300"
                             >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-3 bg-gray-100 rounded-xl">
-                                            <Building2 className="w-6 h-6 text-gray-700" />
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
+                                            <Building2 className="w-6 h-6 text-text-light dark:text-text-dark" />
                                         </div>
-                                        <h2 className="text-xl font-semibold text-gray-800">{w.name}</h2>
+                                        <h2 className="text-xl font-semibold">
+                                            {w.name}
+                                        </h2>
                                     </div>
-                                    <div className="flex items-center gap-[10px]">
-                                        <WarehouseEdit refresh={() => GetAll(page)} warehouse={w} />
-                                        <WarehouseDelete refresh={() => GetAll(page)} warehouseId={w?.id} />
+                                    <div className="flex items-center gap-2">
+                                        <WarehouseEdit
+                                            refresh={() => GetAll(page)}
+                                            warehouse={w}
+                                        />
+                                        <WarehouseDelete
+                                            refresh={() => GetAll(page)}
+                                            warehouseId={w?.id}
+                                        />
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-gray-700">
-                                        <Mail className="w-5 h-5 text-gray-500" />
-                                        <span>{w.users?.[0]?.email || "—"}</span>
+                                    <div className="flex items-center gap-2">
+                                        <Mail className="w-5 h-5 opacity-70" />
+                                        <span>{w?.email || "—"}</span>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-gray-700">
-                                        <MapPin className="w-5 h-5 text-gray-500" />
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="w-5 h-5 opacity-70" />
                                         <span>{w.address}</span>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-gray-700">
-                                        <Phone className="w-5 h-5 text-gray-500" />
+                                    <div className="flex items-center gap-2">
+                                        <Phone className="w-5 h-5 opacity-70" />
                                         <span>{w.phone}</span>
                                     </div>
 
                                     <div className="flex flex-col md:flex-row gap-3">
-                                        <NavLink to={`/factory/warehouse/user/${w?.id}`} className="flex-1">
-                                            <Button className="w-full flex items-center justify-center gap-2">
+                                        <NavLink
+                                            to={`/factory/warehouse/user/${w?.id}`}
+                                            className="flex-1"
+                                        >
+                                            <Button className="w-full flex items-center justify-center gap-2 bg-background-dark dark:bg-background-light  dark:text-text-light  text-white transition-colors">
                                                 <User size={18} />
                                                 {t("users")}
                                             </Button>
@@ -117,7 +143,7 @@ export default function FactoryWarehouse() {
                             <button
                                 onClick={() => GetAll(page - 1)}
                                 disabled={page <= 1}
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
+                                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center transition-colors"
                             >
                                 <ChevronLeft className="w-5 h-5" />
                             </button>
@@ -127,7 +153,7 @@ export default function FactoryWarehouse() {
                             <button
                                 onClick={() => GetAll(page + 1)}
                                 disabled={page >= totalPages}
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
+                                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center transition-colors"
                             >
                                 <ChevronRight className="w-5 h-5" />
                             </button>

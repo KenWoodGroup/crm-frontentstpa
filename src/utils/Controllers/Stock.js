@@ -15,7 +15,7 @@ class Stock {
         const response = await $api.get(`/stock/category/${location_id}/${id}/${operation_type}`)
         return response;
     }
-    static getLocationStocksBySearch = async ({data}) => {
+    static getLocationStocksBySearch = async ({ data }) => {
         const response = await $api.get(`/stock/search/${data.locationId}/${data.fac_id}/${data.operation_type}/${data.search}`)
         return response;
     }
@@ -26,6 +26,10 @@ class Stock {
 
     static EditStock = async (data) => {
         const response = await $api.put(`/stock/${data?.id}`, data?.form)
+        return response;
+    }
+    static EditBarcode = async (data) => {
+        const response = await $api.put(`/stock/barcode/${data?.id}`, data?.editData)
         return response;
     }
 

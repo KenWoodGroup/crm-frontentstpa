@@ -17,7 +17,10 @@ import WarehouseExpenses from "../Components/Warehouse/WarehouseExpenses/Warehou
 import WarehouseClients from "../Components/Warehouse/WarehouseClients/WarehouseClients";
 import WarehouseClientDetail from "../Components/Warehouse/WarehouseClientDetail/WarehouseClientDetail";
 import WarehouseCash from "../Components/Warehouse/WarehouseCash/WarehouseCash";
-import WarehouseSupplier from "../Components/Warehouse/WarehouseSupplier/WarehouseSupplier";
+import WarehouseСarrier from "../Components/Warehouse/WarehouseСarrier/WarehouseСarrier";
+import WarehouseSupplier from "../Components/Warehouse/WarehouseSuppliers/WarehouseSupplier";
+import WarehouseSupplierPayment from "../Components/Warehouse/WarehouseSupplierPayment/WarehouseSupplierPayment";
+import WarehouseSupplierSverka from "../Components/Warehouse/WarehouseSupplierSverka/WarehouseSupplierSverka";
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",
@@ -49,10 +52,11 @@ export const warehouseRoutes = [
         name:"warehouse history",
         element:<WarehouseInvoiceHistory/>
     },
+  
     {
-        path:"/warehouse/history/:invoiceId",
-        name:"warehouse detail history by id",
-        element:<WarehouseInvoiceHistory/>
+        path: "/warehouse/history/:invoiceId",
+        name: "warehouse detail history by id",
+        element: <WarehouseInvoiceHistory />
     },
     {
         path: "/warehouse/dilers",
@@ -100,8 +104,23 @@ export const warehouseRoutes = [
         element: <WarehouseCash />
     },
     {
+        path: "/warehouse/carrier",
+        name: "Warehouse carrier ",
+        element: <WarehouseСarrier />
+    },
+    {
         path: "/warehouse/supplier",
-        name: "Warehouse Supplier",
+        name: "Warehouse supplier ",
         element: <WarehouseSupplier />
+    },
+    {
+        path: "/warehouse/supplier/payment",
+        name: "Warehouse Payment supplier",
+        element: <WarehouseSupplierPayment />
+    },
+    {
+        path: "/warehouse/supplier/sverka",
+        name: "Warehouse Payment sverka",
+        element: <WarehouseSupplierSverka />
     }
 ];
