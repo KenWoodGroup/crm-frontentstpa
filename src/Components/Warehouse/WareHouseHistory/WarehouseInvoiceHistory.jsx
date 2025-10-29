@@ -816,14 +816,15 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
 
                 <div className="mt-4 flex gap-2 justify-end">
                     <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
-                    {loading ? (
-                        <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Updatinging...</span>
-                        </>
-                    ) : (
-                        <button onClick={() => onSave(form)} className="px-4 py-2 rounded bg-blue-600 text-white">Save</button>
-                    )}
+                    <button onClick={() => onSave(form)} className={`px-4 py-2 flex items-center gap-2 rounded bg-blue-600 text-white transition-all disabled:opacity-70 ${loading ? "cursor-wait" : "cursor-pointer"}`}>
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Updatinging...</span>
+                            </>
+                        ) : <span>Save</span>}
+                    </button>
+
                 </div>
             </div>
         </div>
