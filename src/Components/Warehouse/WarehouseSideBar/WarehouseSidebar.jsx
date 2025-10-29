@@ -39,9 +39,9 @@ export default function WarehouseSidebar() {
         { id: 2, label: "Долги клиентов", path: "/warehouse/debtor", icon: UserPen, group: "clients" },
         { id: 3, label: "Сверка клиентов", path: "/warehouse/revisen", icon: ChevronsLeftRight, group: "clients" },
         { id: 4, label: "Доставщик", path: "/warehouse/carrier", icon: Truck, group: "suppliers" },
-        { id: 5, label: "Поставщики", path: "/warehouse/supplier", icon: UsersRound, group: "suppliers" },
-        { id: 5, label: "Оплата Поставщиков", path: "/warehouse/supplier/payment", icon: BanknoteArrowDown, group: "suppliers" },
-        { id: 5, label: "Сверка Поставщиков", path: "/warehouse/supplier/sverka", icon: ChevronsLeftRight, group: "suppliers" },
+        // { id: 5, label: "Поставщики", path: "/warehouse/supplier", icon: UsersRound, group: "suppliers" },
+        // { id: 5, label: "Оплата Поставщиков", path: "/warehouse/supplier/payment", icon: BanknoteArrowDown, group: "suppliers" },
+        // { id: 5, label: "Сверка Поставщиков", path: "/warehouse/supplier/sverka", icon: ChevronsLeftRight, group: "suppliers" },
         { id: 6, label: "Расходы", path: "/warehouse/expenses", icon: Blocks, group: "others" },
         { id: 7, label: "Касса", path: "/warehouse/kassa", icon: CreditCard, group: "others" },
     ];

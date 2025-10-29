@@ -108,19 +108,19 @@ export const warehouseRoutes = [
         name: "Warehouse carrier ",
         element: <WarehouseСarrier />
     },
-    {
-        path: "/warehouse/supplier",
-        name: "Warehouse supplier ",
-        element: <WarehouseSupplier />
-    },
-    {
-        path: "/warehouse/supplier/payment",
-        name: "Warehouse Payment supplier",
-        element: <WarehouseSupplierPayment />
-    },
-    {
-        path: "/warehouse/supplier/sverka",
-        name: "Warehouse Payment sverka",
-        element: <WarehouseSupplierSverka />
-    }
+    // {
+    //     path: "/warehouse/supplier",
+    //     name: "Warehouse supplier ",
+    //     element: <WarehouseSupplier />
+    // },
+    // {
+    //     path: "/warehouse/supplier/payment",
+    //     name: "Warehouse Payment supplier",
+    //     element: <WarehouseSupplierPayment />
+    // },
+    // {
+    //     path: "/warehouse/supplier/sverka",
+    //     name: "Warehouse Payment sverka",
+    //     element: <WarehouseSupplierSverka />
+    // }
 ];

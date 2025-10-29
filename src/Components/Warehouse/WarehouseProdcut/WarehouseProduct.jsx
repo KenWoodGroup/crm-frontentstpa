@@ -69,7 +69,6 @@ export default function WarehouseProduct() {
 
         socket.on("stockUpdate", (data) => {
             if (data.location_id === locationId) {
-                // При обновлении через сокет перезагружаем все с первой страницы
                 GetAllProduct(1);
             }
         });
@@ -114,6 +113,7 @@ export default function WarehouseProduct() {
                                     <th className="p-4 font-semibold text-gray-700">Sotuv narxi</th>
                                     <th className="p-4 font-semibold text-gray-700">Tan narxi</th>
                                     <th className="p-4 font-semibold text-gray-700">Soni</th>
+                                    <th className="p-4 font-semibold text-gray-700">Draft soni</th>
                                     <th className="p-4 font-semibold text-gray-700">Barcode</th>
                                     <th className="p-4 font-semibold text-gray-700">Sana</th>
                                     <th className="p-4 font-semibold text-gray-700 text-center">Amallar</th>
@@ -121,7 +121,7 @@ export default function WarehouseProduct() {
                             </thead>
                             <tbody>
                                 {products.map((item, index) => {
-                                    const date = item.product?.createdAt;
+                                    const date = item?.createdAt;
                                     const formattedDate = date
                                         ? new Date(date).toLocaleDateString("uz-UZ")
                                         : null;
@@ -156,6 +156,7 @@ export default function WarehouseProduct() {
                                                     : "—"}
                                             </td>
                                             <td className="p-4 text-gray-700">{item.quantity}</td>
+                                            <td className="p-4 text-gray-700">{item.draft_quantity}</td>
                                             <td className="p-4 text-gray-700">{item.barcode}</td>
                                             <td className="p-4 text-gray-700">
                                                 {formattedDate ? (

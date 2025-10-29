@@ -22,14 +22,13 @@ export default function WarehouseEdit({ warehouse, refresh }) {
         email: "",
         password: "",
     });
-
     useEffect(() => {
         if (warehouse) {
             setData({
                 name: warehouse.name || "",
                 address: warehouse.address || "",
                 phone: warehouse.phone || "",
-                email: warehouse.users?.[0]?.email || "",
+                email: warehouse?.email || "",
             });
             setWarehouseId(warehouse?.id)
         }
