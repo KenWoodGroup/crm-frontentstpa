@@ -220,31 +220,6 @@ export default function WarehouseInvoiceHistory() {
         getLocations()
     }, []);
 
-    // loadOptions for AsyncSelect - uses cached list to avoid repeated server calls
-    // const loadLocations = async (inputValue) => {
-    //     if (!inputValue) return locationsCache;
-    //     const q = inputValue.toLowerCase();
-    //     return locationsCache.filter((o) => o.label.toLowerCase().includes(q));
-    // };
-
-    // Sender/Receiver auto-fill logic: if user selects receiver (not 'all') we set sender to current loc, and vice-versa
-    // useEffect(() => {
-    //     const baseId = Cookies.get("ul_nesw");
-    //     if (receiverFilter && receiverFilter.value && receiverFilter.value !== "all") {
-    //         // ensure sender is current warehouse
-    //         setSenderFilter({ value: baseId, label: locationsCache.find((l) => l.value === baseId)?.label || baseId });
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [receiverFilter]);
-
-    // useEffect(() => {
-    //     const baseId = Cookies.get("ul_nesw");
-    //     if (senderFilter && senderFilter.value && senderFilter.value !== "all") {
-    //         setReceiverFilter({ value: baseId, label: locationsCache.find((l) => l.value === baseId)?.label || baseId });
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [senderFilter]);
-
     // fetch invoices - payload must include all keys (send "all" when nothing selected)
     const fetchInvoices = useCallback(async (opts = {}) => {
         setLoading(true);
@@ -353,8 +328,9 @@ export default function WarehouseInvoiceHistory() {
     const closeEditItem = () => setEditingItem(null);
 
     async function saveInvoice(updated) {
+        const {id, ...rest} = updated
         try {
-            const res = await InvoicesApi.UpdateInvoice(updated.id, updated);
+            const res = await InvoicesApi.EditInvoice(updated.id, rest);
             if (!(res?.status === 200 || res?.status === 201)) throw new Error("Failed to save");
             await fetchInvoices();
             if (invoiceId === updated.id) {
@@ -438,35 +414,31 @@ export default function WarehouseInvoiceHistory() {
     const totalPages = Math.max(1, Math.ceil((total || 0) / PER_PAGE));
 
     return (
-        <div className="bg-gray-50 dark:bg-background-dark min-h-screen px-4 py-3 rounded-xl transition-colors duration-200">
-            <div className="mx-auto">
+        <div className=" bg-gray-50 min-h-screen px-4 py-3 rounded-xl">
+            <div className=" mx-auto">
                 <header className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900 dark:text-text-dark">Invoice History</h1>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Audit, filters and exports for all warehouse operations</p>
+                        <h1 className="text-2xl font-semibold">Invoice History</h1>
+                        <p className="text-sm text-gray-500">Audit, filters and exports for all warehouse operations</p>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <button onClick={exportCurrentToCSV} className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-card-dark border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-300">
+                        <button onClick={exportCurrentToCSV} className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
                             <Download size={16} /> <span className="text-sm">Export CSV</span>
                         </button>
-                        <button onClick={() => alert("Export PDF - implement server-side or client lib")} className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-card-dark border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-300">
+                        <button onClick={() => alert("Export PDF - implement server-side or client lib")} className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
                             <FileText size={16} /> <span className="text-sm">Export PDF</span>
                         </button>
-                        <a href="/warehouse/inventory-adjustments" className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-card-dark border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-300">
+                        <a href="/warehouse/inventory-adjustments" className="flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm hover:shadow-md">
                             <Copy size={16} /> <span className="text-sm">Inventory log</span>
                         </a>
                     </div>
                 </header>
 
                 {/* Filters */}
-                <div className="bg-white dark:bg-card-dark p-4 rounded-2xl border border-gray-200 dark:border-gray-700 mb-6 shadow-sm transition-colors duration-200">
+                <div className="bg-white p-4 rounded-2xl border mb-6 shadow-sm">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <select
-                            value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                        >
+                        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="border rounded-lg p-2">
                             <option value="all">All types</option>
                             {typesList.map((t) => (
                                 <option value={t} key={t}>{nice.type[t] || t}</option>
@@ -480,86 +452,6 @@ export default function WarehouseInvoiceHistory() {
                             placeholder="Sender (search...)"
                             isClearable
                             isSearchable
-                            styles={{
-                                control: (base, state) => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    borderColor: state.isFocused
-                                        ? "#3b82f6"
-                                        : "#d1d5db",
-                                    backgroundColor: "#ffffff",
-                                    "&:hover": {
-                                        borderColor: state.isFocused
-                                            ? "#3b82f6"
-                                            : "#9ca3af"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        borderColor: state.isFocused
-                                            ? "#60a5fa"
-                                            : "#4b5563",
-                                        color: "#f9fafb",
-                                        "&:hover": {
-                                            borderColor: state.isFocused
-                                                ? "#60a5fa"
-                                                : "#6b7280"
-                                        }
-                                    }
-                                }),
-                                menu: base => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    backgroundColor: "#ffffff",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        border: "1px solid #4b5563"
-                                    }
-                                }),
-                                option: (base, state) => ({
-                                    ...base,
-                                    backgroundColor: state.isSelected
-                                        ? "#3b82f6"
-                                        : state.isFocused
-                                            ? "#f3f4f6"
-                                            : "#ffffff",
-                                    color: state.isSelected ? "#ffffff" : "#1f2937",
-                                    "&:hover": {
-                                        backgroundColor: "#f3f4f6"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: state.isSelected
-                                            ? "#2563eb"
-                                            : state.isFocused
-                                                ? "#4b5563"
-                                                : "#374151",
-                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
-                                        "&:hover": {
-                                            backgroundColor: "#4b5563"
-                                        }
-                                    }
-                                }),
-                                singleValue: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                input: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                placeholder: base => ({
-                                    ...base,
-                                    color: "#9ca3af",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#9ca3af"
-                                    }
-                                })
-                            }}
                         />
 
                         <Select
@@ -569,129 +461,26 @@ export default function WarehouseInvoiceHistory() {
                             placeholder="Receiver (search...)"
                             isClearable
                             isSearchable
-                            styles={{
-                                control: (base, state) => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    borderColor: state.isFocused
-                                        ? "#3b82f6"
-                                        : "#d1d5db",
-                                    backgroundColor: "#ffffff",
-                                    "&:hover": {
-                                        borderColor: state.isFocused
-                                            ? "#3b82f6"
-                                            : "#9ca3af"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        borderColor: state.isFocused
-                                            ? "#60a5fa"
-                                            : "#4b5563",
-                                        color: "#f9fafb",
-                                        "&:hover": {
-                                            borderColor: state.isFocused
-                                                ? "#60a5fa"
-                                                : "#6b7280"
-                                        }
-                                    }
-                                }),
-                                menu: base => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    backgroundColor: "#ffffff",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        border: "1px solid #4b5563"
-                                    }
-                                }),
-                                option: (base, state) => ({
-                                    ...base,
-                                    backgroundColor: state.isSelected
-                                        ? "#3b82f6"
-                                        : state.isFocused
-                                            ? "#f3f4f6"
-                                            : "#ffffff",
-                                    color: state.isSelected ? "#ffffff" : "#1f2937",
-                                    "&:hover": {
-                                        backgroundColor: "#f3f4f6"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: state.isSelected
-                                            ? "#2563eb"
-                                            : state.isFocused
-                                                ? "#4b5563"
-                                                : "#374151",
-                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
-                                        "&:hover": {
-                                            backgroundColor: "#4b5563"
-                                        }
-                                    }
-                                }),
-                                singleValue: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                input: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                placeholder: base => ({
-                                    ...base,
-                                    color: "#9ca3af",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#9ca3af"
-                                    }
-                                })
-                            }}
                         />
 
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                        >
+                        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="border rounded-lg p-2">
                             <option value="all">All statuses</option>
                             {statusesList.map((s) => (
                                 <option value={s} key={s}>{nice.status[s] || s}</option>
                             ))}
                         </select>
 
-                        <input
-                            type="date"
-                            value={fromDate}
-                            onChange={(e) => setFromDate(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                        />
-                        <input
-                            type="date"
-                            value={toDate}
-                            onChange={(e) => setToDate(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                        />
+                        <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border rounded-lg p-2" />
+                        <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border rounded-lg p-2" />
 
-                        <select
-                            value={paymentFilter}
-                            onChange={(e) => setPaymentFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                        >
+                        <select value={paymentFilter} onChange={(e) => setPaymentFilter(e.target.value)} className="border rounded-lg p-2">
                             <option value="all">All payments</option>
                             <option value="paid">Paid</option>
                             <option value="unpaid">Unpaid</option>
                         </select>
 
                         <div className="flex gap-2">
-                            <input
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                                placeholder="Search id / Receiver or Sender name"
-                                className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                            />
+                            <input value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Search id / Receiver or Sender name" className="flex-1 border rounded-lg p-2 w-10" />
                         </div>
                     </div>
 
@@ -710,26 +499,21 @@ export default function WarehouseInvoiceHistory() {
                                     setSearchText("");
                                     setPage(1);
                                 }}
-                                className="px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-300 transition-colors duration-200"
+                                className="px-3 py-2 bg-gray-100 rounded-lg"
                             >
                                 Reset
                             </button>
 
-                            <button onClick={() => fetchInvoices()} className="px-3 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg transition-colors duration-200">Apply</button>
+                            <button onClick={() => fetchInvoices()} className="px-3 py-2 bg-blue-600 text-white rounded-lg">Apply</button>
                         </div>
                     </div>
 
                     <div className="mt-4 flex items-center gap-3">
-                        <Filter size={16} className="text-gray-600 dark:text-gray-400" />
+                        <Filter size={16} />
                         <div className="flex items-center gap-2 flex-wrap">
                             {Object.keys(columns).map((k) => (
-                                <label key={k} className="flex items-center gap-2 text-sm bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded text-gray-700 dark:text-gray-300 transition-colors duration-200">
-                                    <input
-                                        type="checkbox"
-                                        checked={columns[k]}
-                                        onChange={() => toggleColumn(k)}
-                                        className="accent-blue-500 dark:accent-blue-400"
-                                    />
+                                <label key={k} className="flex items-center gap-2 text-sm bg-gray-50 px-2 py-1 rounded">
+                                    <input type="checkbox" checked={columns[k]} onChange={() => toggleColumn(k)} />
                                     <span className="capitalize">{k.replaceAll("_", " ")}</span>
                                 </label>
                             ))}
@@ -738,17 +522,17 @@ export default function WarehouseInvoiceHistory() {
                 </div>
 
                 {/* List area */}
-                <div className="bg-white dark:bg-card-dark rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-200">
+                <div className="bg-white rounded-2xl p-4 border shadow-sm">
                     {loading ? (
-                        <div className="py-10 text-center text-gray-500 dark:text-gray-400">Loading...</div>
+                        <div className="py-10 text-center text-gray-500">Loading...</div>
                     ) : error ? (
-                        <div className="py-10 text-center text-red-500 dark:text-red-400">{error}</div>
+                        <div className="py-10 text-center text-red-500">{error}</div>
                     ) : (
                         <div>
                             <div className="hidden md:block">
                                 <table className="w-full table-auto border-collapse">
                                     <thead>
-                                        <tr className="text-left text-sm text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600">
+                                        <tr className="text-left text-sm text-gray-600 border-b">
                                             {columns.id && <th className="py-3 px-2">ID</th>}
                                             {columns.type && <th className="py-3 px-2">Type</th>}
                                             {columns.sender_name && <th className="py-3 px-2">Sender</th>}
@@ -762,19 +546,19 @@ export default function WarehouseInvoiceHistory() {
                                     </thead>
                                     <tbody>
                                         {invoices?.map((inv) => (
-                                            <tr key={inv.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                                                {columns.id && <td className="py-3 px-2 text-sm text-gray-900 dark:text-gray-100" dangerouslySetInnerHTML={{ __html: highlightMatch(inv.invoice_number || inv.id, searchText) }} />}
+                                            <tr key={inv.id} className="border-b hover:bg-gray-50">
+                                                {columns.id && <td className="py-3 px-2 text-sm" dangerouslySetInnerHTML={{ __html: highlightMatch(inv.invoice_number || inv.id, searchText) }} />}
                                                 {columns.type && <td className="py-3 px-2 text-sm">{typeBadge(inv.type)}</td>}
-                                                {columns.sender_name && <td className="py-3 px-2 text-sm text-gray-900 dark:text-gray-100">{inv.sender_name || (inv.sender && inv.sender.name) || "—"}</td>}
-                                                {columns.receiver_name && <td className="py-3 px-2 text-sm text-gray-900 dark:text-gray-100">{inv.receiver_name || (inv.receiver && inv.receiver.name) || "—"}</td>}
-                                                {columns.createdAt && <td className="py-3 px-2 text-sm text-gray-900 dark:text-gray-100">{formatDateISO(inv.createdAt)}</td>}
+                                                {columns.sender_name && <td className="py-3 px-2 text-sm">{inv.sender_name || (inv.sender && inv.sender.name) || "—"}</td>}
+                                                {columns.receiver_name && <td className="py-3 px-2 text-sm">{inv.receiver_name || (inv.receiver && inv.receiver.name) || "—"}</td>}
+                                                {columns.createdAt && <td className="py-3 px-2 text-sm">{formatDateISO(inv.createdAt)}</td>}
                                                 {columns.status && <td className="py-3 px-2 text-sm"><button onClick={() => setEditingStatusInvoice(inv)} type="button">{statusBadge(inv.status)}</button></td>}
                                                 {columns.payment_status && <td className="py-3 px-2 text-sm">{paymentBadge(inv.payment_status)}</td>}
-                                                {columns.total_sum && <td className="py-3 px-2 text-sm text-gray-900 dark:text-gray-100">{inv.total_sum}</td>}
+                                                {columns.total_sum && <td className="py-3 px-2 text-sm">{inv.total_sum}</td>}
                                                 {columns.actions && <td className="py-3 px-2 text-sm">
                                                     <div className="flex items-center gap-2">
-                                                        <button onClick={() => openDetail(inv.id)} className="text-sm px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 transition-colors duration-200">Open</button>
-                                                        <button onClick={() => openEditInvoice(inv)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 transition-colors duration-200"><Pencil size={14} /></button>
+                                                        <button onClick={() => openDetail(inv.id)} className="text-sm px-2 py-1 rounded bg-blue-50 border">Open</button>
+                                                        <button onClick={() => openEditInvoice(inv)} className="p-1 rounded hover:bg-gray-100"><Pencil size={14} /></button>
                                                     </div>
                                                 </td>}
                                             </tr>
@@ -785,18 +569,18 @@ export default function WarehouseInvoiceHistory() {
 
                             <div className="md:hidden grid gap-3">
                                 {invoices.map((inv) => (
-                                    <div key={inv.id} className="p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-card-dark transition-colors duration-200">
+                                    <div key={inv.id} className="p-3 border rounded-lg shadow-sm">
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{inv.type} — {inv.id.slice(0, 8)}</div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-400">{inv.sender_name || (inv.sender && inv.sender.name)}</div>
-                                                <div className="text-xs text-gray-500 dark:text-gray-400">{formatDateISO(inv.createdAt)}</div>
+                                                <div className="text-sm font-medium">{inv.type} — {inv.id.slice(0, 8)}</div>
+                                                <div className="text-xs text-gray-500">{inv.sender_name || (inv.sender && inv.sender.name)}</div>
+                                                <div className="text-xs text-gray-500">{formatDateISO(inv.createdAt)}</div>
                                             </div>
                                             <div className="flex flex-col gap-2 items-end">
-                                                <div className="text-sm text-gray-900 dark:text-gray-100">{inv.total_sum}</div>
+                                                <div className="text-sm">{inv.total_sum}</div>
                                                 <div className="flex gap-2">
-                                                    <button onClick={() => openDetail(inv.id)} className="text-sm px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 transition-colors duration-200">Open</button>
-                                                    <button onClick={() => openEditInvoice(inv)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 transition-colors duration-200"><Pencil size={14} /></button>
+                                                    <button onClick={() => openDetail(inv.id)} className="text-sm px-2 py-1 rounded bg-blue-50 border">Open</button>
+                                                    <button onClick={() => openEditInvoice(inv)} className="p-1 rounded hover:bg-gray-100"><Pencil size={14} /></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -805,21 +589,20 @@ export default function WarehouseInvoiceHistory() {
                             </div>
 
                             <div className="mt-4 flex items-center justify-between">
-                                <div className="text-sm text-gray-600 dark:text-gray-400">Showing {(page - 1) * PER_PAGE + 1} - {Math.min(page * PER_PAGE, total)} of {total}</div>
+                                <div className="text-sm text-gray-600">Showing {(page - 1) * PER_PAGE + 1} - {Math.min(page * PER_PAGE, total)} of {total}</div>
                                 <div className="flex items-center gap-2">
-                                    <button onClick={() => setPage(1)} disabled={page === 1} className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 text-gray-700 dark:text-gray-300 transition-colors duration-200">First</button>
+                                    <button onClick={() => setPage(1)} disabled={page === 1} className="px-2 py-1 border rounded disabled:opacity-50">First</button>
 
-                                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-2 py-1 border rounded">
                                         <ChevronLeft size={16} />
                                     </button>
 
-                                    <div className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300">{page} / {totalPages}</div>
+                                    <div className="px-3 py-1 border rounded">{page} / {totalPages}</div>
 
-                                    <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300">
-                                        <ChevronRight size={16} />
+                                    <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-2 py-1 border rounded"><ChevronRight size={16} />
                                     </button>
 
-                                    <button onClick={() => setPage(totalPages)} disabled={page === totalPages} className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300">Last</button>
+                                    <button onClick={() => setPage(totalPages)} disabled={page === totalPages} className="px-2 py-1 border rounded">Last</button>
                                 </div>
                             </div>
                         </div>
@@ -828,39 +611,39 @@ export default function WarehouseInvoiceHistory() {
 
                 {/* Detail drawer/modal */}
                 {invoiceId && (
-                    <div className="fixed inset-0 bg-black/40 dark:bg-black/60 z-50 flex items-start justify-center p-6">
-                        <div className="bg-white dark:bg-card-dark w-full max-w-4xl rounded-2xl shadow-2xl p-6 overflow-auto max-h-[90vh] transition-colors duration-200">
+                    <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center p-6">
+                        <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-6 overflow-auto max-h-[90vh]">
                             <div className="flex items-center gap-3 mb-4">
-                                <button onClick={closeDetail} className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 transition-colors duration-200"><ArrowLeft size={18} /></button>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-text-dark">Invoice detail</h2>
-                                <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">{detailLoading ? "Loading..." : formatDateISO(selectedInvoice?.createdAt)}</div>
-                                <button onClick={() => openEditInvoice(selectedInvoice)} className="ml-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 transition-colors duration-200"><Pencil size={16} /></button>
+                                <button onClick={closeDetail} className="p-2 rounded hover:bg-gray-100"><ArrowLeft size={18} /></button>
+                                <h2 className="text-lg font-semibold">Invoice detail</h2>
+                                <div className="ml-auto text-sm text-gray-500">{detailLoading ? "Loading..." : formatDateISO(selectedInvoice?.createdAt)}</div>
+                                <button onClick={() => openEditInvoice(selectedInvoice)} className="ml-3 p-2 rounded hover:bg-gray-100"><Pencil size={16} /></button>
                             </div>
 
                             {detailLoading ? (
-                                <div className="py-10 text-center text-gray-500 dark:text-gray-400">Loading...</div>
+                                <div className="py-10 text-center text-gray-500">Loading...</div>
                             ) : selectedInvoice ? (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="col-span-2">
-                                        <div className="mb-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg transition-colors duration-200">
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">Type: <span className="font-medium text-gray-900 dark:text-gray-100">{nice.type[selectedInvoice.type] || selectedInvoice.type}</span></div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">Status: <span className="font-medium text-gray-900 dark:text-gray-100">{nice.status[selectedInvoice.status] || selectedInvoice.status}</span></div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">Payment: <span className="font-medium text-gray-900 dark:text-gray-100">{selectedInvoice.payment_status}</span></div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">Total: <span className="font-medium text-gray-900 dark:text-gray-100">{selectedInvoice.total_sum}</span></div>
+                                        <div className="mb-4 bg-gray-50 p-4 rounded-lg">
+                                            <div className="text-sm text-gray-600">Type: <span className="font-medium">{nice.type[selectedInvoice.type] || selectedInvoice.type}</span></div>
+                                            <div className="text-sm text-gray-600">Status: <span className="font-medium">{nice.status[selectedInvoice.status] || selectedInvoice.status}</span></div>
+                                            <div className="text-sm text-gray-600">Payment: <span className="font-medium">{selectedInvoice.payment_status}</span></div>
+                                            <div className="text-sm text-gray-600">Total: <span className="font-medium">{selectedInvoice.total_sum}</span></div>
                                         </div>
 
                                         <div className="mb-4">
-                                            <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-text-dark">Items</h3>
+                                            <h3 className="text-sm font-semibold mb-2">Items</h3>
                                             <div className="space-y-3">
                                                 {(selectedInvoice.invoice_items || []).map((it) => (
-                                                    <div key={it.id} className="flex items-center justify-between border border-gray-200 dark:border-gray-600 rounded p-3 bg-white dark:bg-gray-700 transition-colors duration-200">
+                                                    <div key={it.id} className="flex items-center justify-between border rounded p-3">
                                                         <div>
-                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{it.product.name} — {it.batch}</div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400">Barcode: {it.barcode}</div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400">Qty: {it.quantity + " " + it.product.unit} × Pirce: {it.price} Total: {+it.quantity * +it.price}</div>
+                                                            <div className="text-sm font-medium">{it.product.name} — {it.batch}</div>
+                                                            <div className="text-xs text-gray-500">Barcode: {it.barcode}</div>
+                                                            <div className="text-xs text-gray-500">Qty: {it.quantity + " " + it.product.unit} × Pirce: {it.price} Total: {+it.quantity * +it.price}</div>
                                                         </div>
                                                         <div className="flex items-center gap-2">
-                                                            <button onClick={() => openEditItem(it, selectedInvoice.id)} className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 transition-colors duration-200"><Pencil size={14} /></button>
+                                                            <button onClick={() => openEditItem(it, selectedInvoice.id)} className="p-2 rounded hover:bg-gray-100"><Pencil size={14} /></button>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -869,22 +652,22 @@ export default function WarehouseInvoiceHistory() {
 
                                     </div>
 
-                                    <aside className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors duration-200">
-                                        <div className="text-sm text-gray-500 dark:text-gray-400">Sender</div>
-                                        <div className="font-medium text-gray-900 dark:text-gray-100">{selectedInvoice.sender?.name || selectedInvoice.sender_name || "—"}</div>
-                                        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">Receiver</div>
-                                        <div className="font-medium text-gray-900 dark:text-gray-100">{selectedInvoice.receiver?.name || selectedInvoice.receiver_name || "—"}</div>
+                                    <aside className="p-4 bg-gray-50 rounded-lg">
+                                        <div className="text-sm text-gray-500">Sender</div>
+                                        <div className="font-medium">{selectedInvoice.sender?.name || selectedInvoice.sender_name || "—"}</div>
+                                        <div className="mt-3 text-sm text-gray-500">Receiver</div>
+                                        <div className="font-medium">{selectedInvoice.receiver?.name || selectedInvoice.receiver_name || "—"}</div>
 
-                                        <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">Created by</div>
-                                        <div className="font-medium text-gray-900 dark:text-gray-100">{selectedInvoice.created?.full_name}</div>
+                                        <div className="mt-4 text-sm text-gray-500">Created by</div>
+                                        <div className="font-medium">{selectedInvoice.created?.full_name}</div>
 
                                         <div className="mt-4">
-                                            <button className="w-full py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg transition-colors duration-200" onClick={() => alert('Print / download invoice')}>Print / PDF</button>
+                                            <button className="w-full py-2 bg-blue-600 text-white rounded-lg" onClick={() => alert('Print / download invoice')}>Print / PDF</button>
                                         </div>
                                     </aside>
                                 </div>
                             ) : (
-                                <div className="py-10 text-center text-gray-500 dark:text-gray-400">Not found</div>
+                                <div className="py-10 text-center text-gray-500">Not found</div>
                             )}
                         </div>
                     </div>
@@ -908,161 +691,40 @@ export default function WarehouseInvoiceHistory() {
 }
 
 function EditInvoiceModal({ invoice, onClose, onSave }) {
-    const [form, setForm] = useState(() => ({ ...invoice, org_status: invoice?.status }));
+    const [form, setForm] = useState(() => ({ ...invoice}));
     useEffect(() => {
-        setForm(prev => ({ ...invoice, org_status: invoice?.status || prev.org_status }));
+        const {note, id} = invoice
+        setForm({note, id, changed_by:Cookies.get("us_nesw")});
     }, [invoice]);
-    const statusBase = [
-        { id: 1, value: "draft", label: "Draft" },
-        { id: 3, value: "cancelled", label: "Cancelled" },
-        { id: 4, value: "sent", label: "Sent" },
-        { id: 5, value: "received", label: "Received" }
-    ]
-    const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
-    const statusOptions = statusBase?.filter((st) => st.id > org_status_id)
+   
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 dark:bg-black/60 flex items-center justify-center transition-colors duration-200">
-            <div className="bg-white dark:bg-card-dark rounded-2xl p-6 w-full max-w-2xl border border-gray-200 dark:border-gray-700 shadow-xl transition-colors duration-200">
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
                 <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-text-dark">Edit invoice</h3>
-                    <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">{invoice?.invoice_number}</div>
+                    <h3 className="text-lg font-semibold">Edit invoice comment</h3>
+                    <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-<<<<<<< HEAD
-                    <label className="flex flex-col">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</span>
-                        <Select
-                            placeholder="Select new status"
-                            options={statusOptions}
-                            value={form.status}
-                            onChange={(e) => setForm((p) => ({ ...p, status: e }))}
-                            styles={{
-                                control: (base, state) => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    borderColor: state.isFocused
-                                        ? "#3b82f6"
-                                        : "#d1d5db",
-                                    backgroundColor: "#ffffff",
-                                    "&:hover": {
-                                        borderColor: state.isFocused
-                                            ? "#3b82f6"
-                                            : "#9ca3af"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        borderColor: state.isFocused
-                                            ? "#60a5fa"
-                                            : "#4b5563",
-                                        color: "#f9fafb",
-                                        "&:hover": {
-                                            borderColor: state.isFocused
-                                                ? "#60a5fa"
-                                                : "#6b7280"
-                                        }
-                                    }
-                                }),
-                                menu: base => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    backgroundColor: "#ffffff",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        border: "1px solid #4b5563"
-                                    }
-                                }),
-                                option: (base, state) => ({
-                                    ...base,
-                                    backgroundColor: state.isSelected
-                                        ? "#3b82f6"
-                                        : state.isFocused
-                                            ? "#f3f4f6"
-                                            : "#ffffff",
-                                    color: state.isSelected ? "#ffffff" : "#1f2937",
-                                    "&:hover": {
-                                        backgroundColor: "#f3f4f6"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: state.isSelected
-                                            ? "#2563eb"
-                                            : state.isFocused
-                                                ? "#4b5563"
-                                                : "#374151",
-                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
-                                        "&:hover": {
-                                            backgroundColor: "#4b5563"
-                                        }
-                                    }
-                                }),
-                                singleValue: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                input: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                placeholder: base => ({
-                                    ...base,
-                                    color: "#9ca3af",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#9ca3af"
-                                    }
-                                })
-                            }}
-                        />
-                    </label>
-=======
-                    {/*  */}
-                    {/* <label className="flex flex-col">
-                        <span className="text-sm text-gray-600">Payment status</span>
-                        <select value={form.payment_status} onChange={(e) => setForm((p) => ({ ...p, payment_status: e.target.value }))} className="border rounded p-2">
-                            <option value="unpaid">unpaid</option>
-                            <option value="paid">paid</option>
-                        </select>
-                    </label> */}
-
                     {/* <label className="flex flex-col">
                         <span className="text-sm text-gray-600">Total sum</span>
                         <input type="text" value={form.total_sum} onChange={(e) => setForm((p) => ({ ...p, total_sum: e.target.value }))} className="border rounded p-2" />
                     </label> */}
->>>>>>> ca0bd2a5be3d340b0eb06f26ad30ba4e98dea52f
 
                     <label className="flex flex-col">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 mb-1">Note</span>
-                        <input
-                            type="text"
-                            value={form.note || ""}
-                            onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
-                            className="border border-gray-300 dark:border-gray-600 rounded p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                        />
+                        <span className="text-sm text-gray-600">Note</span>
+                        <input type="text" value={form.note || ""} onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))} className="border rounded p-2" />
                     </label>
                 </div>
 
                 <div className="mt-4 flex gap-2 justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => onSave(form)}
-                        className="px-4 py-2 rounded bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
-                    >
-                        Save
-                    </button>
+                    <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
+                    <button onClick={() => onSave(form)} className="px-4 py-2 rounded bg-blue-600 text-white">Save</button>
                 </div>
             </div>
         </div>
     );
 }
+
 function EditStatusModal({ invoice, onClose, onSave, loading }) {
     const [form, setForm] = useState(() => ({ ...invoice, org_status: invoice?.status }));
     useEffect(() => {
@@ -1079,127 +741,12 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
         : invoice?.status === "sent" ? statusBase.filter((st) => st.id === 1)
             : statusBase?.filter((st) => st.id > org_status_id)
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 dark:bg-black/60 flex items-center justify-center transition-colors duration-200">
-            <div className="bg-white dark:bg-card-dark rounded-2xl p-6 w-full max-w-2xl border border-gray-200 dark:border-gray-700 shadow-xl transition-colors duration-200">
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
                 <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-text-dark">Edit Status</h3>
-                    <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">{invoice?.invoice_number}</div>
+                    <h3 className="text-lg font-semibold">Edit Status</h3>
+                    <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
                 </div>
-<<<<<<< HEAD
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <label className="flex flex-col">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</span>
-                        <Select
-                            placeholder="Select new status"
-                            options={statusOptions}
-                            value={form.status}
-                            onChange={(e) => setForm((p) => ({ ...p, status: e }))}
-                            styles={{
-                                control: (base, state) => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    borderColor: state.isFocused
-                                        ? "#3b82f6"
-                                        : "#d1d5db",
-                                    backgroundColor: "#ffffff",
-                                    "&:hover": {
-                                        borderColor: state.isFocused
-                                            ? "#3b82f6"
-                                            : "#9ca3af"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        borderColor: state.isFocused
-                                            ? "#60a5fa"
-                                            : "#4b5563",
-                                        color: "#f9fafb",
-                                        "&:hover": {
-                                            borderColor: state.isFocused
-                                                ? "#60a5fa"
-                                                : "#6b7280"
-                                        }
-                                    }
-                                }),
-                                menu: base => ({
-                                    ...base,
-                                    borderRadius: "0.5rem",
-                                    backgroundColor: "#ffffff",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: "#374151",
-                                        border: "1px solid #4b5563"
-                                    }
-                                }),
-                                option: (base, state) => ({
-                                    ...base,
-                                    backgroundColor: state.isSelected
-                                        ? "#3b82f6"
-                                        : state.isFocused
-                                            ? "#f3f4f6"
-                                            : "#ffffff",
-                                    color: state.isSelected ? "#ffffff" : "#1f2937",
-                                    "&:hover": {
-                                        backgroundColor: "#f3f4f6"
-                                    },
-                                    "@media (prefers-color-scheme: dark)": {
-                                        backgroundColor: state.isSelected
-                                            ? "#2563eb"
-                                            : state.isFocused
-                                                ? "#4b5563"
-                                                : "#374151",
-                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
-                                        "&:hover": {
-                                            backgroundColor: "#4b5563"
-                                        }
-                                    }
-                                }),
-                                singleValue: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                input: base => ({
-                                    ...base,
-                                    color: "#1f2937",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#f9fafb"
-                                    }
-                                }),
-                                placeholder: base => ({
-                                    ...base,
-                                    color: "#9ca3af",
-                                    "@media (prefers-color-scheme: dark)": {
-                                        color: "#9ca3af"
-                                    }
-                                })
-                            }}
-                        />
-                    </label>
-                </div>
-
-                <div className="mt-4 flex gap-2 justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50"
-                        disabled={loading}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => onSave(form)}
-                        className={`px-4 py-2 flex items-center gap-2 rounded bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 disabled:opacity-70 ${loading ? "cursor-wait" : "cursor-pointer"
-                            }`}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Updating...</span>
-                            </>
-                        ) : <span>Save</span>}
-                    </button>
-=======
                 {invoice?.status === "received" ?
                     <div>Operatsiya yakunlangan tovarlarni vozvrat orqali qaytarishingiz mumkin</div> :
 
@@ -1231,7 +778,6 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
                         </button>
                     }
 
->>>>>>> ca0bd2a5be3d340b0eb06f26ad30ba4e98dea52f
                 </div>
             </div>
         </div>

@@ -30,8 +30,6 @@ export default function WarehouseLayout() {
     const mode = location.pathname.includes("/warehouse/stockout")
         ? "out" : "in";
 
-
-
     return (
         <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
             <WarehouseSidebar />

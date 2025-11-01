@@ -2,10 +2,12 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Cookies from "js-cookie";
 import Select from "react-select";
+import { motion, AnimatePresence } from "framer-motion";
 
-import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, VerticalAlign } from "docx";
-import { saveAs } from "file-saver";
-import * as XLSX from "xlsx";
+// import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, VerticalAlign } from "docx";
+// import { saveAs } from "file-saver";
+// import * as XLSX from "xlsx";
+
 import {
     Tags,
     Package,
@@ -22,11 +24,15 @@ import {
     PlusCircle,
     CheckSquare,
     CheckCircle,
-    Truck, Undo2, Trash2
+    Truck, Undo2, Trash2,
+    X, Plus,
+    Search,
+    Circle,
+    CircleX
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
-import { Spinner } from "@material-tailwind/react";
+import { select, Spinner } from "@material-tailwind/react";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
 import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
@@ -39,6 +45,9 @@ import { useWarehouse } from "../../../context/WarehouseContext";
 import { NavLink } from "react-router-dom";
 import { Staff } from "../../../utils/Controllers/Staff";
 import CancelInvoiceButton from "../WareHouseOutcome/sectionsWhO/CancelInvoiceButton";
+import { data } from "autoprefixer";
+import { border, style } from "@mui/system";
+import ReturnedInvoiceProcessor from "./sectionsWhI/ReturnedInvoiceProcessor";
 
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -75,6 +84,8 @@ export default function WareHouseIncome() {
         setInvoiceStarted, // fn (mode, value)
         invoiceId, // object { in, out }
         setInvoiceId, // fn (mode, value)
+        returnInvoices,
+        setReturnInvoices,
         invoiceMeta, // object { in: {...}, out: {...} }
         setInvoiceMeta, // fn (mode, value)
         isDirty, // object { in, out }
@@ -113,7 +124,8 @@ export default function WareHouseIncome() {
     const [locations, setLocations] = useState([]);
     const [staffs, setStaffs] = useState([])
     const [locationsLoading, setLocationsLoading] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState("");
+    const [staffsLoading, setStaffsLoading] = useState(false)
+    const [selectedLocation, setSelectedLocation] = useState({ value: null, label: "Укажите отправителя", type: "default" });
     const [selectedStaff, setSelectedStaff] = useState("");
     const [otherLocationName, setOtherLocationName] = useState("");
     const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
@@ -135,6 +147,7 @@ export default function WareHouseIncome() {
 
     const [batchModalOpen, setBatchModalOpen] = useState(false);
     const [batchProducts, setBatchProducts] = useState([]);
+    const [operationComment, setOperationComment] = useState("")
 
     // Local UI-only states for modal / saving / printing
     const [modalOpen, setModalOpen] = useState(false);
@@ -143,6 +156,45 @@ export default function WareHouseIncome() {
     const [saving, setSaving] = useState(false); // local saving indicator for UI
     const lastFocusedRef = useRef(null);
     const [error, setError] = useState(null);
+
+    // --- Invoice search/select uchun state (ota component ichida e'lon qilinadi) ---
+    const [invoiceQuery, setInvoiceQuery] = useState("");
+    const debounceInvQuery = useDebounce(invoiceQuery, 550)
+    // const fakeInvoices = useMemo(() => [
+    //     { id: "qwer1234zxcv5678gfds", invoice_number: "INV-202510-0154", createdAt: "2025-10-30T05:15:00.923Z", total_sum: "12550000" },
+    //     { id: "a1b2c3d4e5f6g7h8j9k0", invoice_number: "INV-202510-0010", createdAt: "2025-10-01T12:00:00.000Z", total_sum: "3500000" },
+    //     { id: "z9y8x7w6v5u4t3s2r1q0", invoice_number: "INV-202510-0023", createdAt: "2025-10-02T09:10:00.000Z", total_sum: "420000" },
+    //     { id: "poiuyt1234lkjh5678gf", invoice_number: "INV-202510-0101", createdAt: "2025-10-15T14:20:00.000Z", total_sum: "950000" },
+    //     { id: "mnbvcxz0987asdf6543q", invoice_number: "INV-202510-0077", createdAt: "2025-10-08T11:30:00.000Z", total_sum: "2230000" },
+    //     { id: "lkjhgfdsa87654321poi", invoice_number: "INV-202510-0133", createdAt: "2025-10-21T08:45:00.000Z", total_sum: "170000" },
+    //     { id: "uytrewq5678zxcv1234l", invoice_number: "INV-202510-0110", createdAt: "2025-10-17T16:05:00.000Z", total_sum: "760000" },
+    //     { id: "asdfghjkl1112131415z", invoice_number: "INV-202510-0055", createdAt: "2025-10-05T10:00:00.000Z", total_sum: "5500000" },
+    //     { id: "q1w2e3r4t5y6u7i8o9p0", invoice_number: "INV-202510-0099", createdAt: "2025-10-11T13:00:00.000Z", total_sum: "430000" },
+    //     { id: "z1x2c3v4b5n6m7l8k9j0", invoice_number: "INV-202510-0200", createdAt: "2025-10-29T18:35:00.000Z", total_sum: "9990000" },
+    // ], []);
+
+    const [invoiceResults, setInvoiceResults] = useState([]);
+    const [selectedInvoices, setSelectedInvoices] = useState([]);
+
+    // filter qilish — oddiy client-side qidiruv (keyinchalik API bilan almashtirasiz)
+    // useEffect(() => {
+    //     const q = (invoiceQuery || "all").trim().toLowerCase();
+    //     if (!q) {
+    //         setInvoiceResults([]);
+    //         return;
+    //     }
+    //     setInvoiceResults(fakeInvoices.filter(inv => inv.invoice_number.toLowerCase().includes(q)));
+    // }, [invoiceQuery, fakeInvoices]);
+
+    function addInvoice(inv) {
+        if (selectedInvoices.find(i => i.id === inv.id)) return; // duplicate oldini olish
+        const next = [...selectedInvoices, inv].sort((a, b) => a.invoice_number.localeCompare(b.invoice_number));
+        setSelectedInvoices(next);
+    }
+
+    function removeInvoice(invId) {
+        setSelectedInvoices(selectedInvoices.filter(i => i.id !== invId));
+    };
 
     // ---------- Fetch categories ----------
     const fetchCategories = async () => {
@@ -185,7 +237,7 @@ export default function WareHouseIncome() {
     // ---------- Fetch staffs ----------
     const fetchStaffs = async () => {
         try {
-            setLocationsLoading(true);
+            setStaffsLoading(true);
             const res = await Staff.StaffGet(userLId);
             if (res?.status === 200 || res?.status === 201) {
                 // setStaffs(res.data  || []);
@@ -200,15 +252,49 @@ export default function WareHouseIncome() {
         } catch (err) {
             notify.error("Stafflarni olishda xato: " + (err?.message || err));
         } finally {
-            setLocationsLoading(false);
+            setStaffsLoading(false);
         }
     };
+    // -------fetch Invoices for Return Operatins
+    const fetchInvoicesForReturn = async () => {
+        const q = (debounceInvQuery || "all").trim().toLowerCase();
+        const data = {
+            sender_id: userLId,
+            receiver_id: selectedLocation?.value,
+            searchINV: q || "all"
+        }
+        try {
+            const res = await InvoicesApi.GetLocationInvoicesesForReturnIn(data)
+            if (res.status === 200 || res.status === 201) {
+                setInvoiceResults(res.data);
+            }
+        } catch (err) {
+            notify.error("invocielarni olishda xatolik: ", err)
+        }
+    };
+    useEffect(() => {
+        const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : (selected === "incoming" && sendToTrash === false) ? "incoming" : "transfer_in"
+        if (operation_type !== "return_in" && operation_type !== "return_dis") {
+            return
+        }
+        if (selectedLocation?.value && selectedLocation?.type !== "default") {
+            fetchInvoicesForReturn()
+        } else {
+            setInvoiceResults([]);
+            setSelectedInvoices([]);
+            setInvoiceQuery("")
+        }
+
+    }, [debounceInvQuery, selectedLocation, selected])
 
     useEffect(() => {
-        fetchCategories();
-        fetchLocations();
-        fetchStaffs();
-    }, []);
+        if (invoiceStarted?.in) {
+            fetchCategories();
+        } else {
+            fetchLocations();
+            fetchStaffs();
+        }
+    }, [invoiceStarted]);
     useEffect(() => {
         setSelectedLocation(operationLocations?.find((it) => it.type === "default"))
     }, [selected])
@@ -244,9 +330,14 @@ export default function WareHouseIncome() {
             notify.warning("Iltimos, jo'natuvchini tanlang");
             return;
         } else if (!selectedStaff?.value) {
-            notify.warning("Iltimos, driverni tanlang")
+            notify.warning("Iltimos, driverni tanlang");
+            return;
         }
-        const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : (selected === "incoming" && sendToTrash === false) ? "incoming" : "transfer_in"
+        const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : (selected === "incoming" && sendToTrash === false) ? "incoming" : "transfer_in";
+        if ((operation_type === "return_in" || operation_type === "return_dis") && selectedInvoices?.length === 0) {
+            notify.warning("vozvrat uchun kamida bitta invoice tanlang");
+            return;
+        }
         try {
             setCreateInvoiceLoading(true);
             const payload = {
@@ -258,19 +349,24 @@ export default function WareHouseIncome() {
                 created_by: createdBy,
                 status: "received",
                 carrier_id: selectedStaff?.value,
-                note: ""
+                note: operationComment,
             };
             const res = await InvoicesApi.CreateInvoice(payload);
 
             // robust id extraction
-            const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
+            const invoice_id = res?.data?.invoice?.id;
 
             if (res?.status === 200 || res?.status === 201) {
                 if (!invoice_id) {
                     notify.error("Server invoice id qaytarmadi");
                     throw new Error("Invoice id topilmadi");
                 }
-                setSidebarMode(1)
+                setReturnInvoices(selectedInvoices);
+                if (operation_type !== "return_in" && operation_type !== "return_dis") {
+                    setSidebarMode(1)
+                } else {
+                    setSidebarMode(0)
+                }
                 setInvoiceId(mode, invoice_id);
                 setInvoiceStarted(mode, true);
                 setInvoiceMeta(mode, { ...invoiceMeta?.[mode], sender: getLocationNameById(selectedLocation?.value), receiver: getLocationNameById(userLId), operation_type });
@@ -300,7 +396,7 @@ export default function WareHouseIncome() {
         if (id === "other") return otherLocationName || "Other";
         const f = locations.find((l) => String(l.value) === String(id));
         return f ? f.label || "Location" : "";
-    }
+    };
 
     // ---------- Search products ----------
     useEffect(() => {
@@ -346,7 +442,7 @@ export default function WareHouseIncome() {
         } else {
             document.removeEventListener("mousedown", handleClickOutside);
         }
-        return () => document.removeEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [barcodeEnabled, handleClickOutside]);
 
     useEffect(() => {
@@ -411,13 +507,14 @@ export default function WareHouseIncome() {
             is_raw_stock: productObj === undefined ? true : false,
             is_new_batch: (is_raw_stock && raw.batch) ? false : true,
             name: is_raw_stock ? productObj.name : raw.name || "-",
-            price: (invoiceMeta?.[mode]?.operation_type === "transfer_in" || invoiceMeta?.[mode]?.operation_type === "incoming") ? (Number(raw.purchase_price) || 0) : (Number(raw.sale_price) || 0),
-            origin_price: (invoiceMeta?.[mode]?.operation_type === "transfer_in" || invoiceMeta?.[mode]?.operation_type === "incoming") ? Number(raw.purchase_price || 0) : Number(raw.sale_price || 0),
+            price: Number(raw.purchase_price || 0),
+            origin_price: Number(raw.purchase_price || 0),
             quantity: 1,
             unit: is_raw_stock ? productObj.unit : raw.unit || "-",
             product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
             barcode: raw.barcode || null,
             batch: is_raw_stock ? (raw.batch || "def") : null,
+            is_returning:false
         };
     };
 
@@ -440,7 +537,6 @@ export default function WareHouseIncome() {
         );
     }, [mixData]);
 
-
     // ---------- Click handlers ----------
     const onSidebarProductClick = (prodStock) => {
         addItemToMixData(prodStock);
@@ -450,7 +546,17 @@ export default function WareHouseIncome() {
     };
 
     // ---------- Table handlers ---------- (use context helpers)
-    function handleUpdateQuantity(index, value) {
+    function handleUpdateQuantity(index, value, return_quantity) {
+        if (invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") {
+            const avail = Number(return_quantity || 0);
+            if (value !== "" && value !== null && !Number.isNaN(Number(value))) {
+                const clamped = Math.max(0, Math.min(Number(value), avail));
+                const toSend = clamped === 0 ? "0" : clamped;
+                return updateQty(index, toSend)
+            }else {
+                return updateQty(index, value)
+            }
+        }
         if (value === "" || Number(value) > 0 || value === "0") {
             updateQty(index, value); // provider will clamp for outgoing
         }
@@ -504,11 +610,16 @@ export default function WareHouseIncome() {
                         price: Number(it.price || 0),
                         barcode: it.barcode || "",
                         is_new_batch: it.batch === "def" ? false : it.is_new_batch,
-                        batch: it.batch === "def" ? null : it.batch
+                        batch: it.batch === "def" ? null : it.batch || null,
+                        purchase_price: (invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") ? Number(it.purchase_price) : Number(it.price || 0),
+                        discount:it.discount
                     }
-                    if (it.is_new_batch || it.batch === "def") {
-                        delete it.batch
-                    };
+                    // if (it.is_new_batch || it.batch === "def") {
+                    //     delete item.batch
+                    // };
+                    if(!it.is_returning) {
+                        delete item.discount
+                    }
                     return item
                 }),
             };
@@ -648,7 +759,7 @@ export default function WareHouseIncome() {
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
         resetAll();
-        setSelectedLocation("");
+        setSelectedLocation({ value: null, label: "Укажите отправителя", type: "default" });
         setOtherLocationName("");
         setSearchResults([]);
         setSearchQuery("");
@@ -661,20 +772,23 @@ export default function WareHouseIncome() {
 
 
     return (
-        <section className="relative w-full min-h-screen overflow-hidden">
-            <div className={`fixed transition-all duration-300 bg-white dark:bg-card-dark text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] в shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
-                <h2>{!invoiceStarted?.in && "Приём — поступления на склад"}
-                    {invoiceStarted?.in && (invoiceMeta?.in?.operation_type === "incoming" ? "Приход" :
-                        invoiceMeta?.in?.operation_type === "transfer_in" ? "Перемещение" :
-                            invoiceMeta?.in?.operation_type === "return_in" ? "возврат" :
-                                invoiceMeta?.in?.operation_type === "return_dis" ? "Утилизация возврата" : "Unkown"
-                    )}</h2>
+        <section className="relative w-full min-h-screen bg-white overflow-hidden">
+            <div className={`fixed transition-all duration-300  text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
+                <h2>{!invoiceStarted?.[mode] && "Приём — поступления на склад"}
+                    {invoiceStarted?.[mode] && (
+                        invoiceMeta?.[mode]?.operation_type === "incoming" ? "Приход" :
+                            invoiceMeta?.[mode]?.operation_type === "transfer_in" ? "Перемещение" :
+                                invoiceMeta?.[mode]?.operation_type === "return_in" ? "возврат" :
+                                    invoiceMeta?.[mode]?.operation_type === "return_dis" ? "Утилизация возврата" :
+                                        "Unknown"
+                    )}
+                </h2>
                 {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>}
 
             </div>
 
             {/* Sidebar */}
-            {invoiceStarted?.in &&
+            {(invoiceStarted?.[mode] && invoiceMeta?.[mode]?.operation_type !== "return_in" && invoiceMeta?.[mode]?.operation_type !== "return_dis") &&
                 <div
                     className={`absolute z-20 left-0 top-[68px] ${getSidebarWidth()} h-[calc(100vh-68px)] bg-gray-50 shadow-lg transition-all duration-500 ease-in-out flex flex-col`}
                 >
@@ -821,110 +935,156 @@ export default function WareHouseIncome() {
                                     )}
                                 </div>
                             </div>
+                            <div>
+                                <div>
+                                    {/* --- Invoice Search & Select panel (Qo'shimcha, return holatlar uchun) --- */}
+                                    <AnimatePresence>
+                                        {(selected === "return_in" || selected === "return_dis") && (
+                                            <motion.div
+                                                layout
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.35 }}
+                                                className="mb-4"
+                                            >
+                                                <div className="bg-white rounded-xl border p-4 shadow-sm">
+                                                    <div className="flex flex-col gap-3">
+                                                        <div className="flex items-center gap-3 flex-wrap">
+                                                            {/* 1) location select (sizning original selectni shu yerga ko'rinish beramiz) */}
+                                                            <div className="min-w-[220px] flex-1">
+                                                                {locationsLoading ? (
+                                                                    <div className="flex items-center gap-2"><Spinner /> Loading...</div>
+                                                                ) : (
+                                                                    <motion.div layout initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.25 }}>
+                                                                        <Select
+                                                                            isClearable
+                                                                            isSearchable
+                                                                            options={operationLocations.filter((item) => String(item.value) !== String(userLId) && String(item.type) !== "other" && String(item.type) !== "disposal")}
+                                                                            placeholder="Укажите отправителя"
+                                                                            value={selectedLocation}
+                                                                            onChange={(loc) => setSelectedLocation(loc)}
+                                                                        />
+                                                                    </motion.div>
+                                                                )}
+                                                            </div>
 
-                            <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-4 px-3 shadow-sm transition-colors duration-200">
-                                <div className="flex items-center gap-2">
-                                    {locationsLoading ? (
-                                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                                            <Spinner /> Loading...
-                                        </div>
-                                    ) : (
-                                        <Select
-                                            isClearable
-                                            isSearchable
-                                            options={operationLocations.filter((item) => String(item.value) !== String(userLId) && String(item.type) !== "other" && String(item.type) !== "disposal")}
-                                            placeholder="Укажите отправителя"
-                                            value={selectedLocation}
-                                            onChange={(loc) => setSelectedLocation(loc)}
-                                            styles={{
-                                                control: (base, state) => ({
-                                                    ...base,
-                                                    borderRadius: "0.5rem",
-                                                    borderColor: state.isFocused
-                                                        ? "#3b82f6"
-                                                        : "#d1d5db",
-                                                    backgroundColor: "#ffffff",
-                                                    "&:hover": {
-                                                        borderColor: state.isFocused
-                                                            ? "#3b82f6"
-                                                            : "#9ca3af"
-                                                    },
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        backgroundColor: "#374151",
-                                                        borderColor: state.isFocused
-                                                            ? "#60a5fa"
-                                                            : "#4b5563",
-                                                        color: "#f9fafb",
-                                                        "&:hover": {
-                                                            borderColor: state.isFocused
-                                                                ? "#60a5fa"
-                                                                : "#6b7280"
-                                                        }
-                                                    }
-                                                }),
-                                                menu: base => ({
-                                                    ...base,
-                                                    borderRadius: "0.5rem",
-                                                    backgroundColor: "#ffffff",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        backgroundColor: "#374151",
-                                                        border: "1px solid #4b5563"
-                                                    }
-                                                }),
-                                                option: (base, state) => ({
-                                                    ...base,
-                                                    backgroundColor: state.isSelected
-                                                        ? "#3b82f6"
-                                                        : state.isFocused
-                                                            ? "#f3f4f6"
-                                                            : "#ffffff",
-                                                    color: state.isSelected ? "#ffffff" : "#1f2937",
-                                                    "&:hover": {
-                                                        backgroundColor: "#f3f4f6"
-                                                    },
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        backgroundColor: state.isSelected
-                                                            ? "#2563eb"
-                                                            : state.isFocused
-                                                                ? "#4b5563"
-                                                                : "#374151",
-                                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
-                                                        "&:hover": {
-                                                            backgroundColor: "#4b5563"
-                                                        }
-                                                    }
-                                                }),
-                                                singleValue: base => ({
-                                                    ...base,
-                                                    color: "#1f2937",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        color: "#f9fafb"
-                                                    }
-                                                }),
-                                                input: base => ({
-                                                    ...base,
-                                                    color: "#1f2937",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        color: "#f9fafb"
-                                                    }
-                                                }),
-                                                placeholder: base => ({
-                                                    ...base,
-                                                    color: "#9ca3af",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        color: "#9ca3af"
-                                                    }
-                                                })
-                                            }}
-                                        />
-                                    )}
+                                                            {/* 3) selected invoices pills (mini preview) */}
+                                                            <div className="ml-auto flex items-center gap-2">
+                                                                <div className="text-sm text-gray-500">Tanlanganlar:</div>
+                                                                <div className="flex items-center gap-2">
+                                                                    {selectedInvoices.slice(0, 5).map(s => (
+                                                                        <div key={s.id} className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded text-sm">
+                                                                            <span>{s.invoice_number}</span>
+                                                                            <button onClick={() => removeInvoice(s.id)} aria-label={`remove-${s.invoice_number}`}><X size={14} /></button>
+                                                                        </div>
+                                                                    ))}
+                                                                    {selectedInvoices.length > 5 && <div className="text-xs text-gray-500">+{selectedInvoices.length - 5}</div>}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Search input Поиск по номеру накладной (например INV-202510-0154) */}
+                                                        <div className={`mt-2 transition-all duration-700 overflow-hidden relative ${selectedLocation?.value ? "max-w-[600px] w-full" : "max-w-0 w-0 border-transparent opacity-0 cursor-default"}`}>
+                                                            <input
+                                                                placeholder="Поиск по номеру накладной (например INV-202510-0154)"
+                                                                value={invoiceQuery}
+                                                                onChange={(e) => setInvoiceQuery(e.target.value)}
+                                                                className={`border rounded pl-3 pr-10 py-2 w-full`}
+                                                            />
+                                                            <div className="absolute top-[10px] right-[18px]">
+                                                                {invoiceQuery ?
+                                                                    <span onClick={() => setInvoiceQuery("")} className="cursor-pointer hover:text-red-500"><CircleX size={18} /></span>
+                                                                    :
+                                                                    <span><Search size={18} color="gray" /></span>
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Results list */}
+                                                        <div className="mt-3 grid grid-cols-1 gap-2 max-h-56 overflow-auto">
+                                                            {invoiceResults.map(inv => (
+                                                                <div key={inv.id} className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="font-medium text-sm">{inv.invoice_number}</span>
+                                                                        <span className="text-xs text-gray-500">{new Date(inv.createdAt).toLocaleString()}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="text-sm font-semibold">{inv.total_sum}</div>
+                                                                        <button
+                                                                            onClick={() => addInvoice(inv)}
+                                                                            disabled={!!selectedInvoices.find(i => i.id === inv.id)}
+                                                                            className={`flex items-center gap-2 px-2 py-1 rounded text-sm border ${selectedInvoices.find(i => i.id === inv.id) ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
+                                                                            aria-label={`select-${inv.invoice_number}`}
+                                                                        >
+                                                                            <Plus size={14} /> <span>Tanla</span>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                            {(invoiceResults.length === 0 && invoiceQuery) && <div className="text-sm text-gray-500 p-3">Ничего не найдено</div>}
+                                                        </div>
+
+                                                        <div className="text-xs text-gray-500 mt-2">* Natijadan bir nechta накладные tanlab olishingiz mumkin. Bir xil id ikki marta tanlanmaydi.</div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
                                 </div>
+                            </div>
+                            {/* Comment field - faqat operation tanlanganda chiqadi */}
+                            {selected && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="mt-3"
+                                >
+                                    <label className="block text-sm text-gray-600 mb-1">
+                                        Комментарий (необязательно)
+                                    </label>
+                                    <textarea
+                                        value={operationComment}
+                                        onChange={(e) => setOperationComment(e.target.value)}
+                                        placeholder="Добавьте комментарий к операции..."
+                                        className="w-full border rounded-lg p-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-400 "
+                                        rows={2}
+                                    />
+                                </motion.div>
+                            )}
 
+                            <div className="h-[65px] bg-white rounded-lg flex items-center gap-4 px-3 shadow-sm">
+                                {(selected !== "return_in" && selected !== "return_dis") && (
+                                    <div className="flex items-center gap-2">
+                                        {locationsLoading ? (
+                                            <div className="flex items-center gap-2"><Spinner /> Loading...</div>
+                                        ) : (
+                                            // <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
+                                            //     <option value="">Укажите отправителя</option>
+                                            //     {operationLocations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
+                                            // </select>
+                                            <Select
+                                                isClearable
+                                                isSearchable
+                                                options={operationLocations.filter((item) => String(item.value) !== String(userLId) && String(item.type) !== "other" && String(item.type) !== "disposal")}
+                                                placeholder="Укажите отправителя"
+                                                value={selectedLocation}
+                                                onChange={(loc) => setSelectedLocation(loc)}
+                                            />
+                                        )
+                                        }
+
+                                        {selectedLocation === "other" && (
+                                            <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
+                                        )}
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-2">
-                                    {locationsLoading ? (
-                                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                                            <Spinner /> Loading...
-                                        </div>
+                                    {staffsLoading ? (
+                                        <div className="flex items-center gap-2"><Spinner /> Loading...</div>
                                     ) : (
                                         <Select
                                             placeholder="Выберите поставшика"
@@ -933,87 +1093,7 @@ export default function WareHouseIncome() {
                                             onChange={(st) => setSelectedStaff(st)}
                                             isClearable
                                             isSearchable
-                                            isOptionDisabled={staffs.find((it) => it.id === 0)}
-                                            styles={{
-                                                control: (base, state) => ({
-                                                    ...base,
-                                                    borderRadius: "0.5rem",
-                                                    borderColor: state.isFocused
-                                                        ? "#3b82f6"
-                                                        : "#d1d5db",
-                                                    backgroundColor: "#ffffff",
-                                                    "&:hover": {
-                                                        borderColor: state.isFocused
-                                                            ? "#3b82f6"
-                                                            : "#9ca3af"
-                                                    },
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        backgroundColor: "#374151",
-                                                        borderColor: state.isFocused
-                                                            ? "#60a5fa"
-                                                            : "#4b5563",
-                                                        color: "#f9fafb",
-                                                        "&:hover": {
-                                                            borderColor: state.isFocused
-                                                                ? "#60a5fa"
-                                                                : "#6b7280"
-                                                        }
-                                                    }
-                                                }),
-                                                menu: base => ({
-                                                    ...base,
-                                                    borderRadius: "0.5rem",
-                                                    backgroundColor: "#ffffff",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        backgroundColor: "#374151",
-                                                        border: "1px solid #4b5563"
-                                                    }
-                                                }),
-                                                option: (base, state) => ({
-                                                    ...base,
-                                                    backgroundColor: state.isSelected
-                                                        ? "#3b82f6"
-                                                        : state.isFocused
-                                                            ? "#f3f4f6"
-                                                            : "#ffffff",
-                                                    color: state.isSelected ? "#ffffff" : "#1f2937",
-                                                    "&:hover": {
-                                                        backgroundColor: "#f3f4f6"
-                                                    },
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        backgroundColor: state.isSelected
-                                                            ? "#2563eb"
-                                                            : state.isFocused
-                                                                ? "#4b5563"
-                                                                : "#374151",
-                                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
-                                                        "&:hover": {
-                                                            backgroundColor: "#4b5563"
-                                                        }
-                                                    }
-                                                }),
-                                                singleValue: base => ({
-                                                    ...base,
-                                                    color: "#1f2937",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        color: "#f9fafb"
-                                                    }
-                                                }),
-                                                input: base => ({
-                                                    ...base,
-                                                    color: "#1f2937",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        color: "#f9fafb"
-                                                    }
-                                                }),
-                                                placeholder: base => ({
-                                                    ...base,
-                                                    color: "#9ca3af",
-                                                    "@media (prefers-color-scheme: dark)": {
-                                                        color: "#9ca3af"
-                                                    }
-                                                })
-                                            }}
+                                            isOptionDisabled={staffs.find((it) => it.value === 0)}
                                         />
                                     )}
                                 </div>
@@ -1039,52 +1119,36 @@ export default function WareHouseIncome() {
                             </div>
                         </div>
                     ) : (
-                        <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-3 px-3 shadow-sm transition-colors duration-200">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Mahsulot nomi bilan qidirish..."
-                                    className="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-[420px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                                    aria-label="Search products by name"
-                                />
-                                <button
-                                    onClick={() => setSearchQuery((s) => s.trim())}
-                                    className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 transition-colors duration-200"
-                                    aria-label="Search"
-                                >
-                                    <SearchIcon size={16} /> Поиск
-                                </button>
-                            </div>
+                        ((invoiceMeta?.[mode]?.operation_type !== "return_in" && invoiceMeta?.[mode]?.operation_type !== "return_dis") && (
+                            <div className="h-[65px] bg-white rounded-lg flex items-center gap-3 px-3 shadow-sm">
+                                <div className="flex items-center gap-2">
+                                    <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Mahsulot nomi bilan qidirish..." className="border rounded px-3 py-2 w-[420px]" aria-label="Search products by name" />
+                                    <button onClick={() => setSearchQuery((s) => s.trim())} className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 hover:bg-gray-300" aria-label="Search">
+                                        <SearchIcon size={16} /> Поиск
+                                    </button>
+                                </div>
 
-                            <div className="ml-auto flex items-center gap-2">
-                                <button
-                                    onClick={() => { setBarcodeEnabled((s) => !s); setBarcodeInput(""); }}
-                                    className={`flex items-center gap-2 px-3 py-2 rounded transition-colors duration-200 ${barcodeEnabled
-                                        ? "bg-green-600 dark:bg-green-700 text-white animate-[pulse_1.5s_infinite]"
-                                        : "bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-                                        }`}
-                                    aria-pressed={barcodeEnabled}
-                                    aria-label="Toggle barcode input"
-                                >
-                                    <BarcodeIcon size={16} /> Штрихкод
-                                </button>
-                                {barcodeEnabled && (
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            ref={barcodeRef}
-                                            value={barcodeInput}
-                                            onChange={(e) => setBarcodeInput(e.target.value)}
-                                            placeholder="13 ta raqamni kiriting..."
-                                            className="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-[200px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                                            inputMode="numeric"
-                                            aria-label="Barcode input"
-                                        />
-                                        {barcodeLoading && <Spinner size="sm" />}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                                <div className="ml-auto flex items-center gap-2">
+                                    <button onClick={() => { setBarcodeEnabled((s) => !s); setBarcodeInput(""); }} className={`flex items-center gap-2 px-3 py-2 rounded ${barcodeEnabled ? "bg-green-600 text-white animate-[pulse_1.5s_infinite]" : "bg-gray-200 text-gray-800"}`} aria-pressed={barcodeEnabled} aria-label="Toggle barcode input">
+                                        <BarcodeIcon size={16} /> Штрихкод
+                                    </button>
+                                    {barcodeEnabled && (
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                ref={barcodeRef}
+                                                value={barcodeInput}
+                                                onChange={(e) => setBarcodeInput(e.target.value)}
+                                                placeholder="13 ta raqamni kiriting..."
+                                                className="border rounded px-3 py-2 w-[200px]"
+                                                inputMode="numeric"
+                                                aria-label="Barcode input"
+                                            />
+                                            {barcodeLoading && <Spinner size="sm" />}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>)
+                        )
                     )}
 
                     {/* Invoice info & body */}
@@ -1109,45 +1173,54 @@ export default function WareHouseIncome() {
                                 </div>
                             </div>
 
-                            <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm transition-colors duration-200">
-                                <div className="text-sm font-medium mb-2 flex items-center justify-between text-gray-900 dark:text-gray-100">
-                                    <h4>Результаты поиска</h4>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => setSearchResults([])}
-                                            className="p-2 rounded-full border border-gray-600 dark:border-gray-400 text-gray-900 dark:text-gray-100 hover:text-red-500 dark:hover:text-red-400 hover:border-red-800 dark:hover:border-red-400 transition-all duration-200"
-                                            title="Clear results"
-                                            aria-label="Clear search results"
-                                        >
-                                            <Eraser size={18} />
-                                        </button>
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">{searchResults.length} natija</div>
-                                    </div>
-                                </div>
-                                {searchLoading ? (
-                                    <div className="p-4 flex items-center gap-2 text-gray-700 dark:text-gray-300"><Spinner /> Поиск...</div>
-                                ) : searchResults.length === 0 ? (
-                                    <div className="text-gray-500 dark:text-gray-400">Ничего не найдено</div>
-                                ) : (
-                                    <div className="flex gap-3 flex-wrap">
-                                        {searchResults.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((r) => (
-                                            <button
-                                                key={r.id || r.stock_id || generateId()}
-                                                onClick={() => onSelectSearchResult(r)}
-                                                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px] transition-colors duration-200"
-                                            >
-                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{r.product?.name || r.name}</div>
-                                                <div className="flex items-center justify-center gap-3">
-                                                    <div className="text-xs text-gray-600 dark:text-gray-400">Штрих: {r.barcode || ""}</div>
-                                                    <div className="text-xs text-gray-600 dark:text-gray-400">Партия: {r.batch === null ? "Default" : r.batch}</div>
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
 
-                            <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm overflow-auto transition-colors duration-200">
+                            {(invoiceMeta?.[mode]?.operation_type !== "return_in" && invoiceMeta?.[mode]?.operation_type !== "return_dis") ?
+                                (
+                                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                                        <div className="text-sm font-medium mb-2 flex items-center justify-between">
+                                            <h4>Результаты поиска</h4>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => setSearchResults([])}
+                                                    className="p-2 rounded-full border border-gray-600 text-gray-900 hover:text-red-500 hover:border-red-800 transition-all duration-200"
+                                                    title="Clear results"
+                                                    aria-label="Clear search results"
+                                                >
+                                                    <Eraser size={18} />
+                                                </button>
+                                                <div className="text-xs text-gray-500">{searchResults.length} natija</div>
+                                            </div>
+                                        </div>
+                                        {searchLoading ? (
+                                            <div className="p-4 flex items-center gap-2"><Spinner /> Поиск...</div>
+                                        ) : searchResults.length === 0 ? (
+                                            <div className="text-gray-500">Ничего не найдено</div>
+                                        ) : (
+                                            <div className="flex gap-3 flex-wrap">
+                                                {searchResults.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((r) => (
+                                                    <button key={r.id || r.stock_id || generateId()} onClick={() => onSelectSearchResult(r)} className="bg-white border rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px]">
+                                                        <div className="text-sm font-medium">{r.product?.name || r.name}</div>
+                                                        <div className="flex items-center justify-center gap-3">
+                                                            <div className="text-xs text-gray-600">Штрих: {r.barcode || ""}</div>
+                                                            <div className="text-xs text-gray-600">Партия: {r.batch === null ? "Default" : r.batch}</div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ) :
+                                (<div>
+                                    {/* "cards invoicess check proccess"
+                                    {returnInvoices?.map((inv, index) => {
+                                        return (
+                                            <div>{index} {inv.invoice_number}</div>
+                                        )
+                                    })} */}
+                                    <ReturnedInvoiceProcessor />
+                                </div>)
+                            }
+                            <div className="bg-white rounded-lg p-3 shadow-sm overflow-auto">
                                 <table className="min-w-full text-sm">
                                     <thead className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600">
                                         <tr>
@@ -1156,6 +1229,9 @@ export default function WareHouseIncome() {
                                             <th className="p-2">Наименование</th>
                                             <th className="p-2">Цена</th>
                                             <th className="p-2">Количество</th>
+                                            {(invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") && (
+                                                ["Продано", "Цена продажи"].map((th) => <th key={th} className="p-2">{th}</th>)
+                                            )}
                                             <th className="p-2">Ед. изм.</th>
                                             <th className="p-2">Итого</th>
                                             <th className="p-2">Убрать</th>
@@ -1169,9 +1245,10 @@ export default function WareHouseIncome() {
                                                 </td>
                                             </tr>
                                         ) : mixData.map((it, idx) => {
-                                            const stockAvail = Number(it.stock_quantity ?? it.stock?.quantity ?? Infinity);
+                                            // compute stock available if provided
+                                            const stockAvail = Number(it.return_quantity ?? Infinity);
                                             const qty = Number(it.quantity ?? 0);
-                                            const qtyError = (mode === "out") && Number.isFinite(stockAvail) && qty > stockAvail;
+                                            const qtyError = (invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") && Number.isFinite(stockAvail) && qty > stockAvail;
                                             return (
                                                 <tr key={it.id || idx} className="border-b border-gray-200 dark:border-gray-600">
                                                     <td className="p-2 align-center text-gray-900 dark:text-gray-100">{idx + 1}</td>
@@ -1214,20 +1291,19 @@ export default function WareHouseIncome() {
                                                             aria-label={`Price for ${it.product?.name || idx + 1}`}
                                                         />
                                                     </td>
-                                                    <td className="p-2 align-center w-[120px]">
-                                                        <input
-                                                            type="number"
-                                                            step="1"
-                                                            min={0}
-                                                            max={mode === "out" ? (Number.isFinite(stockAvail) ? stockAvail : undefined) : undefined}
-                                                            value={it.quantity === 0 ? "0" : (it.quantity ?? "")}
-                                                            onChange={(e) => handleUpdateQuantity(idx, e.target.value)}
-                                                            className={`border border-gray-300 dark:border-gray-600 rounded px-2 py-1 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200 ${qtyError ? "ring-2 ring-red-400 dark:ring-red-500" : ""
-                                                                }`}
-                                                            aria-label={`Quantity for ${it.product?.name || idx + 1}`}
-                                                        />
+                                                    <td className="p-2 align-center w-[120px] min-w-[120px]">
+                                                        <input type="number" step="1" min={0} max={(invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") ? (Number.isFinite(stockAvail) ? stockAvail : undefined) : Infinity} value={it.quantity === 0 ? "0" : (it.quantity ?? "")} onChange={(e) => handleUpdateQuantity(idx, e.target.value, it.return_quantity)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
                                                     </td>
-                                                    <td className="p-2 align-center w-[120px] text-gray-900 dark:text-gray-100">
+                                                    {(invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") && (
+                                                        [{a:it.return_quantity, b:"rq"}, {a:it.purchase_price, b:it.discount}]?.map((td) => {
+                                                            return (
+                                                                <td key={td.b} className="p-2 align-center w-[120px]">
+                                                                    {td.b === "rq" ? td.a : <div className="text-xs"><span className="block">{td.a}</span> <span className="text-green-700 text-xs">{"(-"+td.b+"%)" }<p className="text-blue-gray-600 inline text-[16px]">{Number(td.a)*(100 - Number(td.b))/100}</p></span></div>}
+                                                                </td>
+                                                            )
+                                                        })
+                                                    )}
+                                                    <td className="p-2 align-center w-[120px] ">
                                                         {it?.unit || "-"}
                                                     </td>
                                                     <td className="p-2 align-center text-gray-900 dark:text-gray-100">
@@ -1256,7 +1332,6 @@ export default function WareHouseIncome() {
                                     </tbody>
                                 </table>
                             </div>
-
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
                                     <button

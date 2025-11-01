@@ -30,6 +30,10 @@ class InvoicesApi {
         const response = await $api.get(`/invoices/filter/${data.loc_id}/${data.startDate}/${data.endDate}/${data.type}/${data.sender}/${data.receiver}/${data.status}/${data.payment}/${data.search}/page?page=${data.page}`)
         return response;
     }
+    static GetLocationInvoicesesForReturnIn = async (data) => {
+        const response = await $api.get(`invoices/find-returnIn/${data.sender_id}/${data.receiver_id}/${data.searchINV}`)
+        return response
+    }
     static DeleteInvoice = async (id) => {
         const response = await $api.delete(`/invoices/${id}`)
         return response;
