@@ -3,20 +3,17 @@ import { TrendingUp, Info } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartTooltip } from "recharts";
 
 export default function AllMinusPlusChart({ data = [], filter, year }) {
-    // Названия месяцев
     const months = [
         "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
         "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
     ];
 
-    // Преобразуем входящие данные
     const moneyGrowthData = data.map((item) => ({
         oy: months[item.month - 1],
         pul: item.outgoing || 0,
         kirim: item.incoming || 0,
     }));
 
-    // Подсчёты
     const last = moneyGrowthData[moneyGrowthData.length - 1] || { pul: 0, kirim: 0 };
     const first = moneyGrowthData[0] || { pul: 0, kirim: 0 };
     const average =
@@ -26,15 +23,14 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
             )
             : 0;
 
-    // Кастомный Tooltip для графика
     const CustomMoneyTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             const kirim = payload.find((p) => p.dataKey === "kirim")?.value || 0;
             const pul = payload.find((p) => p.dataKey === "pul")?.value || 0;
 
             return (
-                <div className="bg-white shadow-lg border border-gray-200 rounded-lg p-3 text-sm">
-                    <p className="font-semibold text-gray-800 mb-1">{label}</p>
+                <div className="bg-white dark:bg-card-dark shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm">
+                    <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1">{label}</p>
                     <p className="text-blue-600">Kirim: {kirim.toLocaleString()} so‘m</p>
                     <p className="text-green-600">Chiqim: {pul.toLocaleString()} so‘m</p>
                 </div>
@@ -44,9 +40,12 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
     };
 
     return (
-        <Card className="bg-white border-0 shadow-lg p-8 mb-10">
+        <Card className="bg-card-light dark:bg-card-dark border-0 shadow-lg p-8 mb-10">
             <div className="flex items-center justify-between mb-8">
-                <Typography variant="h4" className="font-bold text-gray-800 flex items-center gap-3">
+                <Typography
+                    variant="h4"
+                    className="font-bold text-text-light dark:text-text-dark flex items-center gap-3"
+                >
                     <TrendingUp className="w-8 h-8 text-green-600" />
                     Oyma-Oy Pul Kiritish va O'sish
                 </Typography>
@@ -55,7 +54,13 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
                         label="Yilni tanlang"
                         value={year?.toString() || ""}
                         onChange={(val) => filter(val)}
-                    >
+                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark"
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark"
+                        }}                    >
                         {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
                             <Option key={y} value={y.toString()}>
                                 {y}
@@ -65,7 +70,6 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
                 </div>
             </div>
 
-            {/* График */}
             <ResponsiveContainer width="100%" height={450}>
                 <AreaChart data={moneyGrowthData}>
                     <defs>
@@ -81,11 +85,11 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis
                         dataKey="oy"
-                        stroke="#6b7280"
+                        stroke="#9ca3af"
                         style={{ fontSize: "14px", fontWeight: "500" }}
                     />
                     <YAxis
-                        stroke="#6b7280"
+                        stroke="#9ca3af"
                         style={{ fontSize: "14px", fontWeight: "500" }}
                         tickFormatter={(value) => `${(value / 1000).toFixed(0)}k so‘m`}
                     />
@@ -109,11 +113,10 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
                 </AreaChart>
             </ResponsiveContainer>
 
-            {/* Нижняя статистика с hover */}
-            <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-gray-200">
+            <div className="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <Tooltip content="So‘nggi oydagi chiqim miqdori">
-                    <div className="text-center cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition">
-                        <p className="text-sm text-gray-600 mb-2 flex items-center justify-center gap-1">
+                    <div className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-3 rounded-lg transition">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 flex items-center justify-center gap-1">
                             Joriy oy <Info size={14} className="text-gray-400" />
                         </p>
                         <p className="text-3xl font-bold text-green-600">
@@ -123,8 +126,8 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
                 </Tooltip>
 
                 <Tooltip content="Birinchi oyga nisbatan o‘sish summasi">
-                    <div className="text-center cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition">
-                        <p className="text-sm text-gray-600 mb-2 flex items-center justify-center gap-1">
+                    <div className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-3 rounded-lg transition">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 flex items-center justify-center gap-1">
                             O‘sish <Info size={14} className="text-gray-400" />
                         </p>
                         <p className="text-3xl font-bold text-blue-600">
@@ -134,8 +137,8 @@ export default function AllMinusPlusChart({ data = [], filter, year }) {
                 </Tooltip>
 
                 <Tooltip content="Oyma-oy chiqimning o‘rtacha qiymati">
-                    <div className="text-center cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition">
-                        <p className="text-sm text-gray-600 mb-2 flex items-center justify-center gap-1">
+                    <div className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-3 rounded-lg transition">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 flex items-center justify-center gap-1">
                             O‘rtacha <Info size={14} className="text-gray-400" />
                         </p>
                         <p className="text-3xl font-bold text-purple-600">

@@ -284,9 +284,9 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
             >
                 {data?.barcode || isEdit ? "Barcode tahrirlash" : "Barcode qo'shish"}
             </Button>
-            <Dialog open={open} handler={handleOpen} className="p-2 max-w-2xl">
+            <Dialog open={open} handler={handleOpen} className="p-2 max-w-2xl bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark" >
                 <DialogHeader>
-                    <Typography variant="h5" className="text-gray-800 font-semibold">
+                    <Typography variant="h5" className="text-gray-800 font-semibold dark:text-text-dark">
                         {isEdit && !editMode ? "Barcode" : isEdit ? "Barcode tahrirlash" : "Barcode yaratish"}
                     </Typography>
                 </DialogHeader>
@@ -299,10 +299,18 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                             type="text"
                             value={form.barcode}
                             onChange={handleChange}
-                            className="w-full"
                             maxLength={13}
                             disabled={(isEdit && !editMode) || isSaved}
+                            className="!text-text-light dark:!text-text-dark placeholde r-gray-500 dark:placeholder-gray-400 disabled:!text-text-dark disabled:dark:!text-text-light disabled:!opacity-100 dark:disabled:!opacity-60"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark`,
+                            }}
+                            color="blue-gray"
                         />
+
                     </div>
 
                     {/* Кнопка Generate - всегда доступна */}
@@ -395,7 +403,8 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                 <DialogFooter>
                     <Button
                         variant="outlined"
-                        color="gray"
+                        color="red"
+
                         onClick={handleOpen}
                         className="rounded-xl"
                     >

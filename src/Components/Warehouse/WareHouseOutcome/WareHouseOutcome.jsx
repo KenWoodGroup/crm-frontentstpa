@@ -586,8 +586,8 @@ export default function WareHouseOutcome() {
     }
 
     return (
-        <section className="relative w-full min-h-screen bg-white overflow-hidden">
-            <div className={`fixed transition-all duration-300  text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
+        <section className="relative w-full min-h-screen overflow-hidden">
+            <div className={`fixed transition-all duration-300 bg-white dark:bg-card-dark text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] в shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
                 <h2>{!invoiceStarted?.out && "Tovarni ombordan chiqarish"}
                     {invoiceStarted?.out && (invoiceMeta?.out?.operation_type === "outgoing" ? "Sotuv" :
                         invoiceMeta?.out?.operation_type === "transfer_out" ? "Ombordan ko'chirish" :
@@ -673,7 +673,7 @@ export default function WareHouseOutcome() {
 
             {/* Main content */}
             <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
-                <div className="bg-gray-100 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
+                <div className=" rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (
                         <OutgoingPanel

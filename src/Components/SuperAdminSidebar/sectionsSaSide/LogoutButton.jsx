@@ -65,7 +65,7 @@ const LogoutButton = () => {
         <>
             <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-2 p-3 w-full rounded-xl text-[rgb(2,2,59)] hover:bg-red-100 hover:text-red-700 transition"
+                className="flex items-center gap-2 p-3 w-full rounded-xl text-[red] hover:bg-red-100 hover:text-red-700 transition"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

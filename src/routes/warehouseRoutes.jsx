@@ -1,5 +1,4 @@
 
-import { patch } from "@mui/material";
 import WarehouseBarcodeCreate from "../Components/Warehouse/WarehouseBarcodeCreate/WarehouseBarcodeCreate";
 import WarehouseDashboard from "../Components/Warehouse/WarehouseDashboard/WarehouseDashboard";
 import WarehouseProdcut from "../Components/Warehouse/WarehouseProdcut/WarehouseProduct";
@@ -7,8 +6,7 @@ import WarehouseDiler from "../Components/Warehouse/WarehouseDiler/WarehouseDile
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
 import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
 import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/SettingsWareHouse";
-import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
-import { elements } from "chart.js";
+
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
 import WarehousePayment from "../Components/Warehouse/WarehousePayment/WarehousePayment";
 import WarehouseSverka from "../Components/Warehouse/WarehouseSverka/WarehouseSverka";
@@ -18,9 +16,7 @@ import WarehouseClients from "../Components/Warehouse/WarehouseClients/Warehouse
 import WarehouseClientDetail from "../Components/Warehouse/WarehouseClientDetail/WarehouseClientDetail";
 import WarehouseCash from "../Components/Warehouse/WarehouseCash/WarehouseCash";
 import WarehouseСarrier from "../Components/Warehouse/WarehouseСarrier/WarehouseСarrier";
-import WarehouseSupplier from "../Components/Warehouse/WarehouseSuppliers/WarehouseSupplier";
-import WarehouseSupplierPayment from "../Components/Warehouse/WarehouseSupplierPayment/WarehouseSupplierPayment";
-import WarehouseSupplierSverka from "../Components/Warehouse/WarehouseSupplierSverka/WarehouseSupplierSverka";
+
 export const warehouseRoutes = [
     {
         path: "/warehouse/dashboard",
@@ -108,19 +104,5 @@ export const warehouseRoutes = [
         name: "Warehouse carrier ",
         element: <WarehouseСarrier />
     },
-    // {
-    //     path: "/warehouse/supplier",
-    //     name: "Warehouse supplier ",
-    //     element: <WarehouseSupplier />
-    // },
-    // {
-    //     path: "/warehouse/supplier/payment",
-    //     name: "Warehouse Payment supplier",
-    //     element: <WarehouseSupplierPayment />
-    // },
-    // {
-    //     path: "/warehouse/supplier/sverka",
-    //     name: "Warehouse Payment sverka",
-    //     element: <WarehouseSupplierSverka />
-    // }
+
 ];

@@ -16,6 +16,7 @@ import Edit from "../../../UI/Icons/Edit";
 
 export default function WarehouseСarrierEdit({ refresh, data, id }) {
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         role: "carrier",
         full_name: "",
@@ -44,6 +45,7 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
 
     const handleSubmit = async () => {
         try {
+            setLoading(true);
             await Staff?.EditStaff(id, form);
             Alert("Поставщик успешно обновлён", "success");
             handleOpen();
@@ -51,6 +53,8 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
         } catch (error) {
             Alert("Ошибка при обновлении поставщика", "error");
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -66,16 +70,32 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
                 </IconButton>
             </Tooltip>
 
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Редактирование Поставщика</DialogHeader>
+            <Dialog
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+                open={open}
+                handler={handleOpen}
+                size="sm"
+            >
+                <DialogHeader className="dark:text-text-dark">
+                    Редактирование Доставщика
+                </DialogHeader>
 
                 <DialogBody divider className="flex flex-col gap-4">
                     <div>
                         <Input
-                            label="Имя поставщика"
+                            label="Имя Доставщика"
                             name="full_name"
                             value={form.full_name}
                             onChange={handleChange}
+                            color="blue-gray"
+                            disabled={loading}
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: "!text-text-light dark:!text-text-dark",
+                            }}
                         />
                     </div>
 
@@ -85,6 +105,15 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
                             name="phone"
                             value={form.phone}
                             onChange={handleChange}
+                            color="blue-gray"
+                            disabled={loading}
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: "!text-text-light dark:!text-text-dark",
+                            }}
                         />
                     </div>
                 </DialogBody>
@@ -95,11 +124,14 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
                         color="red"
                         onClick={handleOpen}
                         className="mr-2"
+                        disabled={loading}
                     >
                         Отмена
                     </Button>
-                    <Button onClick={handleSubmit} color="green">
-                        Сохранить изменения
+                    <Button onClick={handleSubmit} className="bg-text-light text-card-light normal-case hover:bg-gray-800
+                                   dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300
+                                   transition-colors" disabled={loading} >
+                        {loading ? "Сохранение..." : "Сохранить изменения"}
                     </Button>
                 </DialogFooter>
             </Dialog>

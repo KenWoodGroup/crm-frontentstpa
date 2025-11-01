@@ -248,10 +248,10 @@ export default function SAusers() {
                                     <td className="p-4">{u.full_name}</td>
                                     <td className="p-4">{u.email}</td>
                                     <td className="p-4 flex items-center gap-2">
-                                        {renameBaseRole.find((item) => item.from === u.role).icon
+                                        {renameBaseRole?.find((item) => item.from === u.role).icon
                                         }
                                         {
-                                            renameBaseRole.find((item) => item.from === u.role).to
+                                            renameBaseRole?.find((item) => item.from === u.role).to
                                         }
                                     </td>
                                     <td className="p-4">{u.location?.name}</td>

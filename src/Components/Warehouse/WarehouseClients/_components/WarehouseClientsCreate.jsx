@@ -10,7 +10,7 @@ import {
 import { Clients } from "../../../../utils/Controllers/Clients";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
-
+import { Moon, Sun } from "lucide-react";
 
 export default function WarehouseClientsCreate({ refresh }) {
     const [open, setOpen] = useState(false);
@@ -31,70 +31,110 @@ export default function WarehouseClientsCreate({ refresh }) {
 
     const handleSubmit = async () => {
         try {
-            const response = await Clients?.ClientsCreate(form)
-            Alert("Muvaffaqiyatli yaratildi ", "success");
+            await Clients?.ClientsCreate(form);
+            Alert("Muvaffaqiyatli yaratildi", "success");
             setForm({
                 type: "client",
                 name: "",
                 address: "",
                 phone: "+998",
-            })
-            handleOpen()
-            refresh()
+                parent_id: Cookies.get(`ul_nesw`),
+            });
+            handleOpen();
+            refresh();
         } catch (error) {
-            Alert("Xato ", "error");
-            console.log(error)
+            Alert("Xato", "error");
+            console.log(error);
         }
     };
 
     return (
-        <div className="">
-            <Button onClick={handleOpen}>
-                + Добавить клиента
-            </Button>
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Создание клиента</DialogHeader>
-                <DialogBody divider className="flex flex-col gap-4">
-                    <div>
-                        <Input
-                            label="Имя клиента"
-                            name="name"
-                            value={form.name}
-                            onChange={handleChange}
-                        />
-                    </div>
+        <div>
+            <div className="flex items-center gap-2">
 
-                    <div>
-                        <Input
-                            label="Адрес"
-                            name="address"
-                            value={form.address}
-                            onChange={handleChange}
-                        />
-                    </div>
 
-                    <div>
+                {/* Кнопка добавления клиента */}
+                <Button
+                    onClick={handleOpen}
+                    className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
+                >
+                    + Добавить клиента
+                </Button>
+            </div>
 
-                        <Input
-                            label="Телефон"
-                            name="phone"
-                            value={form.phone}
-                            onChange={handleChange}
-                        />
-                    </div>
+            <Dialog
+                open={open}
+                handler={handleOpen}
+                size="sm"
+                className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
+            >
+                <DialogHeader className="flex justify-between items-center dark:text-text-dark">
+                    Создание клиента
+                </DialogHeader>
 
+                <DialogBody
+                    divider
+                    className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
+                >
+                    <Input
+                        label="Имя клиента"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
+                    />
+
+                    <Input
+                        label="Адрес"
+                        name="address"
+                        value={form.address}
+                        onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
+                    />
+
+                    <Input
+                        label="Телефон"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
+                    />
                 </DialogBody>
 
-                <DialogFooter>
+                <DialogFooter className="flex justify-end gap-2 dark:bg-card-dark">
                     <Button
                         variant="text"
                         color="red"
                         onClick={handleOpen}
-                        className="mr-2"
+                        className="dark:text-gray-300"
                     >
                         Отмена
                     </Button>
-                    <Button onClick={handleSubmit}>
+                    <Button
+                        onClick={handleSubmit}
+                        className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
+                    >
                         Сохранить
                     </Button>
                 </DialogFooter>

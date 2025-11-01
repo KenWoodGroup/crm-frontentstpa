@@ -12,8 +12,7 @@ export default function MainLayout() {
                 open={active}
                 onClose={() => setActive(false)}
                 active={() => setActive((s) => !s)}
-            />
-
+            />  
             <div
                 className="mt-[10px] pb-[30px] px-[15px] min-h-screen transition-all duration-300"
                 style={{

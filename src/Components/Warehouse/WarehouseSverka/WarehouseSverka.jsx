@@ -124,20 +124,26 @@ export default function WarehouseSverka() {
     );
 
     return (
-        <div className="flex h-[calc(100vh-100px)] gap-4">
+        <div className="flex h-[calc(100vh-100px)] gap-4 bg-background-light dark:bg-background-dark p-4 transition-colors duration-200">
             {/* 🔹 Левая часть — список клиентов с поиском */}
-            <Card className="w-[30%] border border-gray-200 shadow-md overflow-hidden flex flex-col">
-                <div className="p-4 border-b bg-gray-50">
-                    <Typography variant="h5" className="font-semibold text-blue-gray-700">
+            <Card className="w-[30%] border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
+                    <Typography variant="h5" className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
                         Клиенты
                     </Typography>
                     <div className="relative mt-3">
-                        <Search className="absolute left-3 top-3 text-gray-500" size={18} />
                         <Input
                             label="Поиск"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="bg-white"
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark `
+                            }}
                         />
                     </div>
                 </div>
@@ -155,9 +161,9 @@ export default function WarehouseSverka() {
                                         <div
                                             key={client.id}
                                             onClick={() => handleClientSelect(client)}
-                                            className={`p-3 cursor-pointer border-b hover:bg-blue-50 transition-all ${selectedClient?.id === client.id
-                                                ? "bg-blue-100 font-semibold"
-                                                : "bg-white"
+                                            className={`p-3 cursor-pointer border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 ${selectedClient?.id === client.id
+                                                ? "bg-blue-100 dark:bg-blue-900/40 font-semibold text-text-light dark:text-text-dark"
+                                                : "bg-white dark:bg-gray-800 text-text-light dark:text-text-dark"
                                                 }`}
                                         >
                                             {client.name}
@@ -165,7 +171,7 @@ export default function WarehouseSverka() {
                                     ))
                                 ) : (
                                     <div className="h-[400px] flex items-center justify-center">
-                                        <Typography className="p-4 text-center text-gray-500">
+                                        <Typography className="p-4 text-center text-gray-500 dark:text-gray-400 transition-colors duration-200">
                                             Не найдено
                                         </Typography>
                                     </div>
@@ -173,13 +179,14 @@ export default function WarehouseSverka() {
                             </>
                         )
                     }
-
                 </CardBody>
             </Card>
-            <Card className="w-[70%] border border-gray-200 shadow-md flex flex-col">
+
+            {/* 🔹 Правая часть — история клиента */}
+            <Card className="w-[70%] border border-gray-200 dark:border-gray-700 shadow-md flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <CardBody className="flex flex-col flex-grow overflow-hidden">
                     <div className="flex flex-wrap items-center justify-between mb-5 gap-3">
-                        <Typography variant="h5" className="font-semibold text-blue-gray-700">
+                        <Typography variant="h5" className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
                             {selectedClient
                                 ? `История клиента: ${selectedClient.name}`
                                 : "Выберите клиента"}
@@ -191,16 +198,24 @@ export default function WarehouseSverka() {
                                 label="C даты"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
-                                className="bg-white"
-                                containerProps={{ className: "w-[150px]" }}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark `
+                                }}
+                                containerProps={{ className: "w-[150px] !min-w-0" }}
                             />
                             <Input
                                 type="date"
                                 label="По дату"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
-                                className="bg-white"
-                                containerProps={{ className: "w-[150px]" }}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark `
+                                }}
+                                containerProps={{ className: "w-[150px] !min-w-0" }}
                             />
                             <Button
                                 color="blue"
@@ -209,29 +224,26 @@ export default function WarehouseSverka() {
                             >
                                 Применить
                             </Button>
-                            <Button color="green" className="w-[200px]! flex items-center justify-center">
-                                <FileDown size={18} />
-                                Excel
-                            </Button>
                         </div>
                     </div>
+
                     {history?.length > 0 ? (
-                        <div className="overflow-y-auto border rounded-lg flex-grow">
+                        <div className="overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg flex-grow bg-white dark:bg-gray-800 transition-colors duration-200">
                             {loading ? (
                                 <div className="h-[400px] flex items-center justify-center">
                                     <Spinner className="h-12 w-12" />
                                 </div>
                             ) : (
                                 <table className="w-full text-left min-w-max">
-                                    <thead className="bg-blue-50 text-gray-700 text-sm sticky top-0 z-10">
+                                    <thead className="bg-blue-50 dark:bg-blue-900/30 text-gray-700 dark:text-gray-300 text-sm sticky top-0 z-10 transition-colors duration-200">
                                         <tr>
-                                            <th className="p-3 border-b font-semibold">Дата</th>
-                                            <th className="p-3 border-b font-semibold">Плательщик</th>
-                                            <th className="p-3 border-b font-semibold">Получатель</th>
-                                            <th className="p-3 border-b font-semibold">Сумма</th>
-                                            <th className="p-3 border-b font-semibold">Метод</th>
-                                            <th className="p-3 border-b font-semibold">Статус</th>
-                                            <th className="p-3 border-b font-semibold">Комментарий</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Дата</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Плательщик</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Получатель</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Сумма</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Метод</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Статус</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Комментарий</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -239,32 +251,40 @@ export default function WarehouseSverka() {
                                             history.map((item, index) => (
                                                 <tr
                                                     key={item.id}
-                                                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                                                        } hover:bg-blue-50 transition-colors`}
+                                                    className={`${index % 2 === 0
+                                                        ? "bg-white dark:bg-gray-800"
+                                                        : "bg-gray-50 dark:bg-gray-700/50"
+                                                        } hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200`}
                                                 >
-                                                    <td className="p-3 border-b">
+                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
                                                         {new Date(item.createdAt).toLocaleDateString('ru-RU')}
                                                     </td>
-                                                    <td className="p-3 border-b">{item.payer?.name || '-'}</td>
-                                                    <td className="p-3 border-b">{item.receiver?.name || '-'}</td>
-                                                    <td className="p-3 border-b text-green-600 font-semibold">
+                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                                        {item.payer?.name || '-'}
+                                                    </td>
+                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                                        {item.receiver?.name || '-'}
+                                                    </td>
+                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-green-600 dark:text-green-400 font-semibold transition-colors duration-200">
                                                         {parseFloat(item.amount).toLocaleString('ru-RU')} сум
                                                     </td>
-                                                    <td className="p-3 border-b">
+                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
                                                         {item.method === 'cash' ? 'Наличные' :
                                                             item.method === 'card' ? 'Карта' :
                                                                 item.method === 'transfer' ? 'Перевод' : item.method}
                                                     </td>
-                                                    <td className="p-3 border-b">
-                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${item.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                                            item.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                                'bg-gray-100 text-gray-700'
-                                                            }`}>
+                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${item.status === 'confirmed'
+                                                            ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                            : item.status === 'pending'
+                                                                ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'
+                                                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                                            } transition-colors duration-200`}>
                                                             {item.status === 'confirmed' ? 'Подтверждено' :
                                                                 item.status === 'pending' ? 'В ожидании' : item.status}
                                                         </span>
                                                     </td>
-                                                    <td className="p-3 border-b text-gray-600">
+                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 transition-colors duration-200">
                                                         {item.note || "-"}
                                                     </td>
                                                 </tr>
@@ -275,9 +295,8 @@ export default function WarehouseSverka() {
                             )}
                         </div>
                     ) : (
-
-                        <Card className="flex items-center justify-center h-[300px] border-[2px]">
-                            <h2>
+                        <Card className="flex items-center justify-center h-[300px] border-[2px] border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-200">
+                            <h2 className="text-text-light dark:text-text-dark transition-colors duration-200">
                                 Нет данных
                             </h2>
                         </Card>
@@ -285,17 +304,18 @@ export default function WarehouseSverka() {
 
                     {/* 🔹 Пагинация */}
                     {!loading && totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t">
+                        <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
                             <IconButton
                                 variant="outlined"
                                 size="sm"
                                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                 disabled={currentPage === 1}
+                                className="dark:border-blue-400 dark:text-blue-400 transition-colors duration-200"
                             >
                                 <ChevronLeft size={18} />
                             </IconButton>
 
-                            <Typography className="text-gray-700">
+                            <Typography className="text-gray-700 dark:text-gray-300 transition-colors duration-200">
                                 Страница {currentPage} из {totalPages}
                             </Typography>
 
@@ -304,6 +324,7 @@ export default function WarehouseSverka() {
                                 size="sm"
                                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                 disabled={currentPage === totalPages}
+                                className="dark:border-blue-400 dark:text-blue-400 transition-colors duration-200"
                             >
                                 <ChevronRight size={18} />
                             </IconButton>

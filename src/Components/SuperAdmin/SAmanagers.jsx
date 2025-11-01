@@ -1,7 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { notify } from "../../utils/toast"; // Toastify helper
-import { Confirm } from "../../utils/Alert"; // Swal Confirm helper
-import {user} from "../../utils/Controllers/users"
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  Input,
+  Button,
+  Typography,
+  Spinner,
+  IconButton,
+  Tooltip,
+} from "@material-tailwind/react";
+import {
+  PencilIcon,
+  TrashIcon,
+  PlusCircleIcon,
+  UserGroupIcon,
+} from "@heroicons/react/24/outline";
+import { notify } from "../../utils/toast";
+import { Confirm } from "../../utils/Alert";
+import { user } from "../../utils/Controllers/users";
 
 const SAmanagers = () => {
   const [managers, setManagers] = useState([]);
@@ -14,13 +31,11 @@ const SAmanagers = () => {
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Barcha managerlarni olish
+  // 🔹 Получение всех менеджеров
   const fetchManagers = async () => {
     try {
       setLoading(true);
       const res = await user.getAdmins();
-      console.log(res);
-      
       setManagers(res.data || []);
     } catch (error) {
       notify.error("Ma'lumot yuklanmadi!");
@@ -33,12 +48,11 @@ const SAmanagers = () => {
     fetchManagers();
   }, []);
 
-  // 🔹 Input o‘zgarishi
-  const handleChange = (e) => {
+  // 🔹 Изменение инпута
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  // 🔹 Qo‘shish yoki tahrirlash
+  // 🔹 Добавление или редактирование
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -57,18 +71,18 @@ const SAmanagers = () => {
     }
   };
 
-  // 🔹 Tahrirlash bosilganda
+  // 🔹 Редактирование
   const handleEdit = (m) => {
     setFormData({
       full_name: m.full_name,
       email: m.email,
-      password: m.password,
+      password: "",
       role: m.role,
     });
     setEditId(m.id);
   };
 
-  // 🔹 O‘chirish
+  // 🔹 Удаление
   const handleDelete = async (id) => {
     const isConfirmed = await Confirm("Rostan ham o‘chirmoqchimisiz?");
     if (!isConfirmed) return;
@@ -77,101 +91,127 @@ const SAmanagers = () => {
       await user.Delete(id);
       notify.success("Manager o‘chirildi!");
       fetchManagers();
-    } catch (error) {
+    } catch {
       notify.error("O‘chirishda xatolik!");
     }
   };
 
   return (
-    <div className="p-6 text-[#fff]">
-      <h1 className="text-2xl font-semibold mb-6 text-blue-400">Managers</h1>
-
-      {/* --- FORM --- */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-[rgb(5,5,36)] p-5 rounded-2xl shadow-md grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8"
-      >
-        <input
-          type="text"
-          name="full_name"
-          value={formData.full_name}
-          onChange={handleChange}
-          placeholder="Full Name"
-          required
-          className="p-2 rounded-md text-black outline-none"
-        />
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Email"
-          required
-          className="p-2 rounded-md text-black outline-none"
-        />
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Password"
-          required={!editId}
-          className="p-2 rounded-md text-black outline-none"
-        />
-
-        <button
-          type="submit"
-          className="col-span-1 sm:col-span-2 md:col-span-3 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition"
-        >
-          {editId ? "Saqlash" : "Qo‘shish"}
-        </button>
-      </form>
-
-      {/* --- TABLE --- */}
-      <div className="bg-[rgb(5,5,36)] rounded-2xl shadow-md overflow-x-auto">
-        {loading ? (
-          <p className="p-4 text-center text-gray-400">Yuklanmoqda...</p>
-        ) : (
-          <table className="w-full border-collapse">
-            <thead className="bg-[rgb(2,2,59)] text-blue-300">
-              <tr>
-                <th className="py-3 px-4 text-left">Full Name</th>
-                <th className="py-3 px-4 text-left">Email</th>
-                <th className="py-3 px-4 text-left">Role</th>
-                <th className="py-3 px-4 text-center">Amallar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {managers.map((m) => (
-                <tr
-                  key={m.id}
-                  className="border-b border-gray-700 hover:bg-[rgb(8,8,46)]"
-                >
-                  <td className="py-2 px-4">{m.full_name}</td>
-                  <td className="py-2 px-4">{m.email}</td>
-                  <td className="py-2 px-4">{m.role}</td>
-                  <td className="py-2 px-4 flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => handleEdit(m)}
-                      className="text-blue-400 hover:text-blue-500 font-medium"
-                    >
-                      Tahrirlash
-                    </button>
-                    <button
-                      onClick={() => handleDelete(m.id)}
-                      className="text-red-400 hover:text-red-500 font-medium"
-                    >
-                      O‘chirish
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+    <div className=" min-h-screen">
+      {/* --- Заголовок --- */}
+      <div className="flex items-center gap-3 mb-6">
+        <UserGroupIcon className="h-8 w-8 text-blue-600" />
+        <Typography variant="h4" color="blue-gray" className="font-semibold">
+          Managers
+        </Typography>
       </div>
+
+      {/* --- Форма --- */}
+      <Card className="mb-10 bg-white p-6 rounded-2xl shadow-md border border-gray-200">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          <Input
+            color="blue"
+            label="Full Name"
+            name="full_name"
+            value={formData.full_name}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            color="blue"
+            label="Email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <Input
+            color="blue"
+            label="Password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required={!editId}
+          />
+
+          <div className="md:col-span-3 flex justify-end mt-2">
+            <Button
+              type="submit"
+              color="blue"
+              className="flex items-center gap-2 rounded-lg px-5 py-2"
+            >
+              <PlusCircleIcon className="h-5 w-5" />
+              {editId ? "Saqlash" : "Qo‘shish"}
+            </Button>
+          </div>
+        </form>
+      </Card>
+
+      {/* --- Таблица --- */}
+      <Card className="bg-white rounded-2xl shadow-md border border-gray-200">
+        <CardBody className="overflow-x-auto p-0">
+          {loading ? (
+            <div className="flex justify-center py-6">
+              <Spinner color="blue" className="h-8 w-8" />
+            </div>
+          ) : managers.length === 0 ? (
+            <p className="text-center text-gray-500 py-6">
+              Hech qanday manager topilmadi
+            </p>
+          ) : (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-blue-50 text-blue-gray-600">
+                  <th className="py-3 px-4 font-semibold">Full Name</th>
+                  <th className="py-3 px-4 font-semibold">Email</th>
+                  <th className="py-3 px-4 font-semibold">Role</th>
+                  <th className="py-3 px-4 text-center font-semibold">Amallar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {managers.map((m, index) => (
+                  <tr
+                    key={m.id}
+                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-blue-50 transition`}
+                  >
+                    <td className="py-2 px-4">{m.full_name}</td>
+                    <td className="py-2 px-4">{m.email}</td>
+                    <td className="py-2 px-4 capitalize">{m.role}</td>
+                    <td className="py-2 px-4 flex items-center justify-center gap-2">
+                      <Tooltip content="Tahrirlash">
+                        <IconButton
+                          color="blue"
+                          variant="text"
+                          onClick={() => handleEdit(m)}
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip content="O‘chirish">
+                        <IconButton
+                          color="red"
+                          variant="text"
+                          onClick={() => handleDelete(m.id)}
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </IconButton>
+                      </Tooltip>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </CardBody>
+      </Card>
     </div>
   );
 };
 
-export default  SAmanagers
+export default SAmanagers;

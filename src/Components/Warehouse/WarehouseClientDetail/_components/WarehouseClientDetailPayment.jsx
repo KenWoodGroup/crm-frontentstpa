@@ -118,14 +118,21 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
                 Оплатить
             </Button>
 
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Создать оплату</DialogHeader>
-                <DialogBody divider className="flex flex-col gap-4">
+            <Dialog className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300"
+                open={open} handler={handleOpen} size="sm">
+                <DialogHeader className="flex justify-between items-center dark:text-text-dark border-b border-gray-200 dark:border-gray-700">
+                    Создать оплату</DialogHeader>
+                <DialogBody divider className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark">
                     <Input
                         label="Сумма (so‘m)"
                         name="amount"
                         value={form.amount}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: "!text-text-light dark:!text-text-dark",
+                        }}
                     />
 
                     <Select
@@ -133,6 +140,13 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
                         label="Выберите кассу"
                         value={form.cash_id}
                         onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
+                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark"
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark"
+                        }}
                     >
                         {cashes.map((cash) => (
                             <Option key={cash.id} value={String(cash.id)}>
@@ -151,6 +165,13 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
                         onChange={(val) =>
                             setForm((p) => ({ ...p, method: val }))
                         }
+                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark"
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark"
+                        }}
                     >
                         <Option value="cash">Naqd (Cash)</Option>
                         <Option value="transfer">O‘tkazma (Transfer)</Option>
@@ -162,6 +183,11 @@ export default function WarehouseClientDetailPayment({ client, refresh, invoice 
                         name="note"
                         value={form.note}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: "!text-text-light dark:!text-text-dark",
+                        }}
                     />
                 </DialogBody>
 

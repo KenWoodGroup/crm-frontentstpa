@@ -6,6 +6,7 @@ import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
 import ManagerFactoryDelete from "./_components/ManagerFactoryDelete";
 import ManagerFactoryEdit from "./_components/ManagetFactoryEdit";
+import ManagerDealerDelete from "../ManagerDealer/_components/ManagerDealerDelete";
 
 export default function ManagerFactory() {
     const [loading, setLoading] = useState(false);
@@ -14,7 +15,6 @@ export default function ManagerFactory() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    // 🔹 Основная функция для получения фабрик
     const GetAllFactory = useCallback(async (pageNum = 1, append = false) => {
         if (pageNum === 1) setLoading(true);
         else setLoadingMore(true);
@@ -84,14 +84,14 @@ export default function ManagerFactory() {
                         {factories.map((factory, index) => (
                             <Card
                                 key={`${factory.id}-${index}`}
-                                className="p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all dark:bg-background-dark dark:border-gray-700"
+                                className="p-4 border border-gray-200 shadow-sm hover:shadow-md bg-[white] transition-all dark:bg-background-dark dark:border-gray-700"
                             >
                                 <div className="flex items-center justify-between">
                                     <Typography variant="h6" className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
                                         {factory.name}
                                     </Typography>
                                     <div className="flex items-center gap-[10px]">
-                                        <ManagerFactoryDelete id={factory.id} refresh={refresh} />
+                                        <ManagerDealerDelete id={factory.id} refresh={refresh} />
                                         <ManagerFactoryEdit data={factory} refresh={refresh} />
                                     </div>
                                 </div>

@@ -5,7 +5,6 @@ import {
 } from "@material-tailwind/react";
 import { BanknoteArrowDown } from "lucide-react";
 import Cookies from "js-cookie";
-
 import { Payment } from "../../../../utils/Controllers/Payment";
 import { Alert } from "../../../../utils/Alert";
 import { Cash } from "../../../../utils/Controllers/Cash";
@@ -33,7 +32,6 @@ export default function WarehouseClientPayment({ client, refresh }) {
             const data = response?.data || [];
             setCashes(data);
 
-            // Если есть кассы и cash_id пустой, установим первую кассу по умолчанию
             if (data.length > 0 && !form.cash_id) {
                 setForm((prev) => ({ ...prev, cash_id: String(data[0].id) }));
             }
@@ -68,7 +66,7 @@ export default function WarehouseClientPayment({ client, refresh }) {
             const payload = {
                 ...form,
                 amount: numericAmount,
-                cash_id: form.cash_id
+                cash_id: form.cash_id,
             };
 
             await Payment.Payment(payload);
@@ -100,32 +98,63 @@ export default function WarehouseClientPayment({ client, refresh }) {
     return (
         <>
             <Tooltip content="Сделать оплату">
-                <IconButton variant="text" color="green" onClick={handleOpen}>
+                <IconButton
+                    variant="text"
+                    color="green"
+                    onClick={handleOpen}
+                >
                     <BanknoteArrowDown size={18} />
                 </IconButton>
             </Tooltip>
 
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Создать оплату</DialogHeader>
+            <Dialog
+                open={open}
+                handler={handleOpen}
+                size="sm"
+                className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300"
+            >
+                <DialogHeader className="flex justify-between items-center dark:text-text-dark border-b border-gray-200 dark:border-gray-700">
+                    Создать оплату
+                </DialogHeader>
 
-                <DialogBody divider className="flex flex-col gap-4">
+                <DialogBody
+                    divider
+                    className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
+                >
                     <Input
                         label="Сумма (so'm)"
                         name="amount"
                         value={form.amount}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: "!text-text-light dark:!text-text-dark",
+                        }}
                     />
+
                     <Select
-                        key={form.cash_id} // Добавьте эту строку
+                        key={form.cash_id}
                         label="Выберите кассу"
                         value={form.cash_id}
                         onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
+                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark"
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark"
+                        }}
                     >
                         {cashes.map((cash) => (
                             <Option key={cash.id} value={String(cash.id)}>
                                 {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm (${new Date(
                                     cash.createdAt
-                                ).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" })})`}
+                                ).toLocaleDateString("ru-RU", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                })})`}
                             </Option>
                         ))}
                     </Select>
@@ -134,6 +163,13 @@ export default function WarehouseClientPayment({ client, refresh }) {
                         label="Метод оплаты"
                         value={form.method}
                         onChange={(val) => setForm((p) => ({ ...p, method: val }))}
+                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark"
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark"
+                        }}
                     >
                         <Option value="cash">Naqd (Cash)</Option>
                         <Option value="transfer">O'tkazma (Transfer)</Option>
@@ -145,14 +181,28 @@ export default function WarehouseClientPayment({ client, refresh }) {
                         name="note"
                         value={form.note}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: "!text-text-light dark:!text-text-dark",
+                        }}
                     />
                 </DialogBody>
 
-                <DialogFooter>
-                    <Button variant="text" color="red" onClick={handleOpen} className="mr-2">
-                        Отменить
+                <DialogFooter className="flex justify-end gap-2 border-t border-gray-200 dark:border-gray-700 dark:bg-card-dark">
+                    <Button
+                        variant="text"
+                        color="red"
+                        onClick={handleOpen}
+                        className="dark:text-gray-300"
+                    >
+                        Отмена
                     </Button>
-                    <Button color="green" onClick={handleSubmit}>
+                    <Button
+                        color="green"
+                        onClick={handleSubmit}
+                        className="bg-green-600 text-white hover:bg-green-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
+                    >
                         Сохранить
                     </Button>
                 </DialogFooter>

@@ -1,17 +1,14 @@
 import { useParams } from "react-router-dom"
 import { location } from "../../../utils/Controllers/location"
 import { useEffect, useState } from "react"
+import io from "socket.io-client"
 import {
     Card,
     CardBody,
     Typography,
-    Avatar,
-    Chip,
-    Button,
-    Badge,
     Tabs,
     TabsHeader,
-    Tab
+    Tab,
 } from "@material-tailwind/react"
 import {
     UserCircleIcon,
@@ -20,9 +17,8 @@ import {
     EnvelopeIcon,
     CurrencyDollarIcon,
     CalendarDaysIcon,
-    BuildingOfficeIcon,
     DocumentTextIcon,
-    ReceiptRefundIcon
+    ReceiptRefundIcon,
 } from "@heroicons/react/24/outline"
 import Loading from "../../UI/Loadings/Loading"
 import EmptyData from "../../UI/NoData/EmptyData"
@@ -30,15 +26,16 @@ import WarehouseClientDetailPayment from "./_components/WarehouseClientDetailPay
 import WarehouseClientInvoices from "./_components/WarehouseClientInvoices"
 import WarehouseClientPayment from "./_components/WarehouseClientPayment"
 import WarehousesClientInvoiceReturn from "./_components/WarehousesClientInvoiceReturn"
-
-
+import Socket from "../../../utils/Socket"
 
 export default function WarehouseClientDetail() {
     const { id } = useParams()
     const [clientData, setClientData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState("invoices")
+    const [refreshKey, setRefreshKey] = useState(false) // ✅ добавлено
 
+    // === Получение данных клиента ===
     const getUser = async () => {
         try {
             const response = await location.Get(id)
@@ -50,210 +47,203 @@ export default function WarehouseClientDetail() {
         }
     }
 
+    // === Загрузка при открытии страницы ===
     useEffect(() => {
         getUser()
     }, [])
 
-    if (loading) {
-        return (
-            <Loading />
-        )
-    }
+    // === Подключение socket.io ===
+    useEffect(() => {
+        if (!id) return
 
-    if (!clientData) {
-        return (
-            <EmptyData text={'Нет такого клиента'} />
-        )
-    }
-
-    const formatBalance = (balance) => {
-        const amount = parseFloat(balance)
-        return new Intl.NumberFormat('ru-RU', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount) + ' UZS'
-    }
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('ru-RU', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+        const socket = io(`${Socket}`, {
+            path: "/socket.io",
+            transports: ["websocket"],
         })
-    }
 
-    const getInitials = (name) => {
-        return name ? name.charAt(0).toUpperCase() : 'C'
-    }
+        socket.emit("joinLocation", id)
+
+        // === Обновление накладной ===
+        socket.on("invoiceUpdate", (data) => {
+            console.log("📦 Обновление накладной:", data)
+            if (data?.location_id === id || data?.client_id === id) {
+                console.log("🔄 Обновляем все данные клиента...")
+                getUser()
+                setRefreshKey((prev) => !prev) // ✅ триггер обновления дочерних компонентов
+            }
+        })
+
+        // === Обновление платежа ===
+        socket.on("paymentUpdate", (data) => {
+            console.log("💰 Обновление платежа:", data)
+            if (data?.location_id === id || data?.client_id === id) {
+                getUser()
+                setRefreshKey((prev) => !prev) // ✅ триггер обновления дочерних компонентов
+            }
+        })
+
+        // Очистка при размонтировании
+        return () => {
+            socket.disconnect()
+        }
+    }, [id])
+
+    // === Визуализация ===
+    if (loading) return <Loading />
+    if (!clientData) return <EmptyData text="Нет такого клиента" />
+
+    const formatBalance = (balance) =>
+        new Intl.NumberFormat("ru-RU", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(parseFloat(balance)) + " UZS"
+
+    const formatDate = (dateString) =>
+        new Date(dateString).toLocaleDateString("ru-RU", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        })
+
+    const getInitials = (name) => (name ? name.charAt(0).toUpperCase() : "C")
 
     const getAvatarColor = (name) => {
         const colors = [
-            'bg-blue-500', 'bg-green-500', 'bg-purple-500',
-            'bg-amber-500', 'bg-red-500', 'bg-indigo-500'
+            "bg-blue-500",
+            "bg-green-500",
+            "bg-purple-500",
+            "bg-amber-500",
+            "bg-red-500",
+            "bg-indigo-500",
         ]
         const index = name ? name.charCodeAt(0) % colors.length : 0
         return colors[index]
     }
 
     return (
-        <div className="mx-auto space-y-6">
-            {/* Основная карточка профиля */}
-            <Card className="shadow-lg rounded-2xl overflow-hidden">
+        <div className="mx-auto space-y-6 bg-background-light dark:bg-background-dark min-h-screen p-4 transition-colors duration-200">
+            {/* Основная информация о клиенте */}
+            <Card className="shadow-lg rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <CardBody className="p-8">
                     <div className="flex flex-col lg:flex-row gap-8">
-                        {/* Левая часть - Аватар и основная информация */}
                         <div className="flex-1">
                             <div className="flex items-start justify-between">
-                                <div className="flex items-center  gap-6 mb-6">
-                                    <div className={`relative ${getAvatarColor(clientData.name)} rounded-lg w-24 h-24 flex items-center justify-center border-4 border-blue-500 shadow-lg`}>
-                                        <Typography variant="h2" color="white" className="font-bold">
+                                <div className="flex items-center gap-6 mb-6">
+                                    <div
+                                        className={`relative ${getAvatarColor(
+                                            clientData.name
+                                        )} rounded-lg w-24 h-24 flex items-center justify-center border-4 border-blue-500 dark:border-blue-400 shadow-lg transition-colors duration-200`}
+                                    >
+                                        <Typography
+                                            variant="h2"
+                                            color="white"
+                                            className="font-bold"
+                                        >
                                             {getInitials(clientData.name)}
                                         </Typography>
                                     </div>
                                     <div>
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <Typography variant="h3" color="blue-gray" className="font-bold">
-                                                {clientData.name}
-                                            </Typography>
-                                        </div>
+                                        <Typography
+                                            variant="h3"
+                                            color="blue-gray"
+                                            className="font-bold text-text-light dark:text-text-dark transition-colors duration-200"
+                                        >
+                                            {clientData.name}
+                                        </Typography>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-[30px]">
-                                    <WarehouseClientDetailPayment client={clientData} refresh={getUser} />
-                                </div>
+                                <WarehouseClientDetailPayment
+                                    client={clientData}
+                                    refresh={getUser}
+                                />
                             </div>
 
-                            {/* Информационные карточки */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                                 {/* Контактная информация */}
-                                <Card className="bg-blue-gray-50/50">
+                                <Card className="bg-blue-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
                                     <CardBody className="p-4">
-                                        <Typography variant="h6" color="blue-gray" className="mb-4 flex items-center gap-2">
-                                            <UserCircleIcon className="h-5 w-5" />
+                                        <Typography
+                                            variant="h6"
+                                            color="blue-gray"
+                                            className="mb-4 flex items-center gap-2 text-text-light dark:text-text-dark transition-colors duration-200"
+                                        >
+                                            <UserCircleIcon className="h-5 w-5 text-blue-500 dark:text-blue-400 transition-colors duration-200" />
                                             Контактная информация
                                         </Typography>
-
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-3">
-                                                <PhoneIcon className="h-4 w-4 text-blue-500" />
-                                                <div>
-                                                    <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                        Телефон
-                                                    </Typography>
-                                                    <Typography variant="paragraph" className="text-blue-gray-700">
-                                                        {clientData.phone}
-                                                    </Typography>
-                                                </div>
+                                                <PhoneIcon className="h-4 w-4 text-blue-500 dark:text-blue-400 transition-colors duration-200" />
+                                                <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
+                                                    {clientData.phone}
+                                                </Typography>
                                             </div>
-
                                             <div className="flex items-center gap-3">
-                                                <MapPinIcon className="h-4 w-4 text-green-500" />
-                                                <div>
-                                                    <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                        Адрес
-                                                    </Typography>
-                                                    <Typography variant="paragraph" className="text-blue-gray-700">
-                                                        {clientData.address}
-                                                    </Typography>
-                                                </div>
+                                                <MapPinIcon className="h-4 w-4 text-green-500 dark:text-green-400 transition-colors duration-200" />
+                                                <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
+                                                    {clientData.address}
+                                                </Typography>
                                             </div>
-
                                             {clientData.email && (
                                                 <div className="flex items-center gap-3">
-                                                    <EnvelopeIcon className="h-4 w-4 text-purple-500" />
-                                                    <div>
-                                                        <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                            Email
-                                                        </Typography>
-                                                        <Typography variant="paragraph" className="text-blue-gray-700">
-                                                            {clientData.email}
-                                                        </Typography>
-                                                    </div>
+                                                    <EnvelopeIcon className="h-4 w-4 text-purple-500 dark:text-purple-400 transition-colors duration-200" />
+                                                    <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
+                                                        {clientData.email}
+                                                    </Typography>
                                                 </div>
                                             )}
                                         </div>
                                     </CardBody>
                                 </Card>
 
-                                {/* Финансовая информация */}
-                                <Card className="bg-blue-gray-50/50">
+                                {/* Финансы */}
+                                <Card className="bg-blue-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
                                     <CardBody className="p-4">
-                                        <Typography variant="h6" color="blue-gray" className="mb-4 flex items-center gap-2">
-                                            <CurrencyDollarIcon className="h-5 w-5" />
+                                        <Typography
+                                            variant="h6"
+                                            color="blue-gray"
+                                            className="mb-4 flex items-center gap-2 text-text-light dark:text-text-dark transition-colors duration-200"
+                                        >
+                                            <CurrencyDollarIcon className="h-5 w-5 text-blue-500 dark:text-blue-400 transition-colors duration-200" />
                                             Финансы
                                         </Typography>
-
-                                        <div className="space-y-4">
-                                            <div>
-                                                <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                    Баланс
-                                                </Typography>
-                                                <Typography
-                                                    variant="h5"
-                                                    className={parseFloat(clientData.balance) < 0 ? 'text-red-600' : 'text-green-600'}
-                                                >
-                                                    {formatBalance(clientData.balance)}
-                                                </Typography>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                        Накладные
-                                                    </Typography>
-                                                    <Typography variant="h6" color="blue-gray">
-                                                        {clientData.received_invoices?.length || 0} шт.
-                                                    </Typography>
-                                                </div>
-                                                <div>
-                                                    <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                        Платежи
-                                                    </Typography>
-                                                    <Typography variant="h6" color="blue-gray">
-                                                        {clientData.payer_payments?.length || 0} шт.
-                                                    </Typography>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <Typography
+                                            variant="h5"
+                                            className={
+                                                parseFloat(clientData.balance) < 0
+                                                    ? "text-red-600 dark:text-red-400"
+                                                    : "text-green-600 dark:text-green-400"
+                                            }
+                                        >
+                                            {formatBalance(clientData.balance)}
+                                        </Typography>
                                     </CardBody>
                                 </Card>
 
                                 {/* Статистика */}
-                                <Card className="bg-blue-gray-50/50 md:col-span-2">
+                                <Card className="bg-blue-gray-50/50 dark:bg-gray-800/50 md:col-span-2 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
                                     <CardBody className="p-4">
-                                        <Typography variant="h6" color="blue-gray" className="mb-4 flex items-center gap-2">
-                                            <CalendarDaysIcon className="h-5 w-5" />
+                                        <Typography
+                                            variant="h6"
+                                            color="blue-gray"
+                                            className="mb-4 flex items-center gap-2 text-text-light dark:text-text-dark transition-colors duration-200"
+                                        >
+                                            <CalendarDaysIcon className="h-5 w-5 text-blue-500 dark:text-blue-400 transition-colors duration-200" />
                                             Статистика
                                         </Typography>
-
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
-                                                <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                    Дата регистрации
-                                                </Typography>
-                                                <Typography variant="paragraph" className="text-blue-gray-700">
-                                                    {formatDate(clientData.createdAt)}
-                                                </Typography>
-                                            </div>
-
-                                            <div>
-                                                <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                    Последнее обновление
-                                                </Typography>
-                                                <Typography variant="paragraph" className="text-blue-gray-700">
-                                                    {formatDate(clientData.updatedAt)}
-                                                </Typography>
-                                            </div>
-
-                                            <div>
-                                                <Typography variant="small" color="blue-gray" className="font-semibold">
-                                                    ID клиента
-                                                </Typography>
-                                                <Typography variant="small" className="text-blue-gray-600 font-mono">
-                                                    {clientData.id.slice(0, 8)}...
-                                                </Typography>
-                                            </div>
+                                            <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
+                                                Регистрация:{" "}
+                                                {formatDate(clientData.createdAt)}
+                                            </Typography>
+                                            <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
+                                                Обновление:{" "}
+                                                {formatDate(clientData.updatedAt)}
+                                            </Typography>
+                                            <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
+                                                ID: {clientData.id.slice(0, 8)}...
+                                            </Typography>
                                         </div>
                                     </CardBody>
                                 </Card>
@@ -262,46 +252,76 @@ export default function WarehouseClientDetail() {
                     </div>
                 </CardBody>
             </Card>
-            {/* Табы для накладок и платежей */}
-            <Card className="shadow-lg rounded-2xl overflow-hidden">
+
+            {/* === Таб меню === */}
+            <Card className="shadow-lg rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <CardBody className="p-6">
                     <Tabs value={activeTab} className="mb-6">
-                        <TabsHeader>
-                            <Tab value="invoices" onClick={() => setActiveTab("invoices")}>
-                                <div className="flex items-center gap-2">
+                        <TabsHeader
+                            className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 backdrop-blur-sm"
+                            indicatorProps={{
+                                className: "bg-blue-500 dark:bg-blue-600 shadow-lg"
+                            }}
+                        >
+                            <Tab
+                                value="invoices"
+                                onClick={() => setActiveTab("invoices")}
+                                className={`font-medium transition-all duration-200 ${activeTab === "invoices"
+                                        ? "text-white"
+                                        : "text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400"
+                                    }`}
+                            >
+                                <div className="flex items-center gap-[10px]">
                                     <DocumentTextIcon className="h-5 w-5" />
-                                    Полученные накладные {' '}
+                                    Накладные
                                 </div>
                             </Tab>
-                            <Tab value="returns" onClick={() => setActiveTab("returns")}>
-                                <div className="flex items-center gap-2">
+                            <Tab
+                                value="returns"
+                                onClick={() => setActiveTab("returns")}
+                                className={`font-medium transition-all duration-200 ${activeTab === "returns"
+                                        ? "text-white"
+                                        : "text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400"
+                                    }`}
+                            >
+                                <div className="flex items-center gap-[10px]">
                                     <ReceiptRefundIcon className="h-5 w-5" />
                                     Возвраты
-                                    {' '}
                                 </div>
                             </Tab>
-                            <Tab value="payments" onClick={() => setActiveTab("payments")}>
-                                <div className="flex items-center gap-2">
+                            <Tab
+                                value="payments"
+                                onClick={() => setActiveTab("payments")}
+                                className={`font-medium transition-all duration-200 ${activeTab === "payments"
+                                        ? "text-white"
+                                        : "text-gray-700 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400"
+                                    }`}
+                            >
+                                <div className="flex items-center gap-[10px]">
                                     <ReceiptRefundIcon className="h-5 w-5" />
                                     История оплаты
-                                    {' '}
                                 </div>
                             </Tab>
                         </TabsHeader>
                     </Tabs>
 
-                    {/* Содержимое накладок */}
                     {activeTab === "invoices" && (
-                        <WarehouseClientInvoices clientData={clientData} />
+                        <WarehouseClientInvoices
+                            clientData={clientData}
+                            refreshKey={refreshKey} // ✅ передаём ключ
+                        />
                     )}
-
-
-                    {/* Содержимое возвратов */}
                     {activeTab === "returns" && (
-                        <WarehousesClientInvoiceReturn clientData={clientData} />
+                        <WarehousesClientInvoiceReturn
+                            clientData={clientData}
+                            refreshKey={refreshKey}
+                        />
                     )}
                     {activeTab === "payments" && (
-                        <WarehouseClientPayment clientData={clientData} />
+                        <WarehouseClientPayment
+                            clientData={clientData}
+                            refreshKey={refreshKey}
+                        />
                     )}
                 </CardBody>
             </Card>

@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, Typography, Button } from "@material-tailwind/react";
 import { location } from "../../../utils/Controllers/location";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
 import ManagerDealerCreate from "./_components/ManagerDealerCreate";
+import ManagerFactoryDelete from "../ManagerFactory/_components/ManagerFactoryDelete";
+import ManagerFactoryEdit from "../ManagerFactory/_components/ManagetFactoryEdit";
+import ManagerDealerEdit from "./_components/ManagerDealerEdit";
 
 export default function ManagerDealer() {
     const [loading, setLoading] = useState(false);
@@ -11,18 +14,11 @@ export default function ManagerDealer() {
     const [factories, setFactories] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const GetAllFactory = async (pageNum = 1, append = false) => {
-        if (pageNum === 1) {
-            setLoading(true);
-        } else {
-            setLoadingMore(true);
-        }
-
+    const GetAllFactory = useCallback(async (pageNum = 1, append = false) => {
+        if (pageNum === 1) setLoading(true);
+        else setLoadingMore(true);
         try {
-            const data = {
-                type: "independent",
-                page: pageNum,
-            };
+            const data = { type: "independent", page: pageNum };
             const response = await location.GetFactory(data);
 
             const newFactories = response?.data?.data?.records || [];
@@ -30,11 +26,10 @@ export default function ManagerDealer() {
 
             setTotalPages(total);
 
-            if (append) {
-                // 🔸 Янги саҳифани эскиларига қўшамиз
-                setFactories((prev) => [...prev, ...newFactories]);
+            // 🔹 Если append=false, просто заменяем старые данные (чистое обновление)
+            if (!append) {
+                setFactories(newFactories);
             } else {
-
                 setFactories((prev) => {
                     const existingIds = new Set(prev.map((f) => f.id));
                     const uniqueNew = newFactories.filter((f) => !existingIds.has(f.id));
@@ -47,13 +42,14 @@ export default function ManagerDealer() {
             setLoading(false);
             setLoadingMore(false);
         }
-    };
-
-    useEffect(() => {
-        GetAllFactory(1);
     }, []);
 
-    // 🔹 Кейинги саҳифани юклаш
+    // 🔹 При первом рендере
+    useEffect(() => {
+        GetAllFactory(1);
+    }, [GetAllFactory]);
+
+    // 🔹 Загрузка следующей страницы
     const loadNextPage = () => {
         const nextPage = page + 1;
         if (nextPage <= totalPages) {
@@ -61,6 +57,12 @@ export default function ManagerDealer() {
             GetAllFactory(nextPage, true);
         }
     };
+
+    // 🔹 Функция refresh для передачи в дочерние компоненты
+    const refresh = useCallback(() => {
+        setPage(1);
+        GetAllFactory(1);
+    }, [GetAllFactory]);
 
     if (loading) {
         return <Loading />;
@@ -73,20 +75,26 @@ export default function ManagerDealer() {
                 <Typography variant="h4" className="font-semibold">
                     Dealer
                 </Typography>
-                <ManagerDealerCreate refresh={() => GetAllFactory(page)} />
+                <ManagerDealerCreate refresh={refresh} />
             </div>
 
             {factories?.length > 0 ? (
                 <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
                         {factories.map((factory, index) => (
                             <Card
                                 key={`${factory.id}-${index}`}
                                 className="p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all"
                             >
-                                <Typography variant="h6" className="font-semibold text-gray-800 mb-2">
-                                    {factory.name}
-                                </Typography>
+                                <div className="flex items-center justify-between">
+                                    <Typography variant="h6" className="font-semibold text-gray-800 mb-2">
+                                        {factory.name}
+                                    </Typography>
+                                    <div className="flex items-center gap-[10px]">
+                                        <ManagerFactoryDelete id={factory.id} refresh={refresh} />
+                                        <ManagerDealerEdit data={factory} refresh={refresh} />
+                                    </div>
+                                </div>
                                 <Typography className="text-gray-600 text-sm mb-1">
                                     <span className="font-medium">Manzil:</span> {factory.address || "—"}
                                 </Typography>

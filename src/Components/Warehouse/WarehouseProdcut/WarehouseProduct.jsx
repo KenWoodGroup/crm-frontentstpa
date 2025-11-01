@@ -9,7 +9,6 @@ import WarehouseEdit from "./_components/WarehouseProductPriceEdit";
 import { formatNumber } from "../../../utils/Helpers/Formater";
 import { io } from "socket.io-client";
 import { Info } from "lucide-react";
-import axios from "../../../utils/axios";
 import Socket from "../../../utils/Socket";
 
 export default function WarehouseProduct() {
@@ -21,7 +20,6 @@ export default function WarehouseProduct() {
 
     const locationId = Cookies?.get("ul_nesw");
 
-    // 🔹 Получаем данные
     const GetAllProduct = async (pageNum = 1, append = false) => {
         if (pageNum === 1) {
             setLoading(true);
@@ -41,10 +39,8 @@ export default function WarehouseProduct() {
             setTotalPages(total);
 
             if (append) {
-                // Добавляем новые данные в конец (сохраняем старые)
                 setProducts((prev) => [...prev, ...newProducts]);
             } else {
-                // Первая загрузка - заменяем все данные
                 setProducts(newProducts);
             }
         } catch (error) {
@@ -55,7 +51,6 @@ export default function WarehouseProduct() {
         }
     };
 
-    // 🔁 Первичная загрузка + сокет
     useEffect(() => {
         if (!locationId) return;
         GetAllProduct(1);
@@ -76,7 +71,6 @@ export default function WarehouseProduct() {
         return () => socket.disconnect();
     }, [locationId]);
 
-    // 🔁 Подгрузка следующей страницы
     const loadNextPage = () => {
         const nextPage = page + 1;
         if (nextPage <= totalPages) {
@@ -85,38 +79,31 @@ export default function WarehouseProduct() {
         }
     };
 
-    if (loading && products.length === 0) {
-        return <Loading />;
-    }
+    if (loading && products.length === 0) return <Loading />;
 
     return (
-        <div className="text-black min-h-screen">
+        <div className="min-h-screen text-text-light dark:text-text-dark">
             <div className="flex items-center justify-between mb-5">
                 <Typography variant="h4" className="font-semibold">
                     Ombordagi Mahsulotlar
                 </Typography>
 
                 <NavLink to={"/warehouse/barcode/create"}>
-                    <Button>Barcode qo‘shish</Button>
+                    <Button className="bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600">
+                        Barcode qo‘shish
+                    </Button>
                 </NavLink>
             </div>
 
             {products?.length > 0 ? (
                 <>
-                    <Card className="overflow-x-auto shadow-sm border border-gray-200">
+                    <Card className="overflow-x-auto shadow-sm border border-gray-200 dark:border-card-dark bg-card-light dark:bg-card-dark">
                         <table className="w-full min-w-max table-auto text-left">
                             <thead>
-                                <tr className="bg-gray-100">
-                                    <th className="p-4 font-semibold text-gray-700">№</th>
-                                    <th className="p-4 font-semibold text-gray-700">Mahsulot nomi</th>
-                                    <th className="p-4 font-semibold text-gray-700">Partiya</th>
-                                    <th className="p-4 font-semibold text-gray-700">Sotuv narxi</th>
-                                    <th className="p-4 font-semibold text-gray-700">Tan narxi</th>
-                                    <th className="p-4 font-semibold text-gray-700">Soni</th>
-                                    <th className="p-4 font-semibold text-gray-700">Draft soni</th>
-                                    <th className="p-4 font-semibold text-gray-700">Barcode</th>
-                                    <th className="p-4 font-semibold text-gray-700">Sana</th>
-                                    <th className="p-4 font-semibold text-gray-700 text-center">Amallar</th>
+                                <tr className="bg-gray-100 dark:bg-card-dark">
+                                    {["№", "Mahsulot nomi", "Partiya", "Sotuv narxi", "Tan narxi", "Soni", "Draft soni", "Barcode", "Sana", "Amallar"].map((title) => (
+                                        <th key={title} className="p-4 font-semibold text-gray-700 dark:text-text-dark">{title}</th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
@@ -129,40 +116,30 @@ export default function WarehouseProduct() {
                                     return (
                                         <tr
                                             key={`${item.id}-${index}`}
-                                            className="border-b hover:bg-gray-50 transition"
+                                            className="border-b border-gray-200 dark:border-card-dark hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                                         >
-                                            <td className="p-4 text-gray-700">
-                                                {index + 1}
-                                            </td>
-                                            <td className="p-4 text-gray-900 font-medium">
-                                                {item.product?.name}
-                                            </td>
-                                            <td className="p-4 text-gray-700">
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">{index + 1}</td>
+                                            <td className="p-4 text-gray-900 font-medium dark:text-text-dark">{item.product?.name}</td>
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">
                                                 {item.batch || (
-                                                    <span className="flex items-center gap-1 text-gray-500">
+                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                                                         <Info size={16} />
                                                         <span>—</span>
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="p-4 text-gray-700">
-                                                {item.sale_price
-                                                    ? `${formatNumber(item.sale_price)} so‘m`
-                                                    : "—"}
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">
+                                                {item.sale_price ? `${formatNumber(item.sale_price)} so‘m` : "—"}
                                             </td>
-                                            <td className="p-4 text-gray-700">
-                                                {item.purchase_price
-                                                    ? `${formatNumber(item.purchase_price)} so‘m`
-                                                    : "—"}
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">
+                                                {item.purchase_price ? `${formatNumber(item.purchase_price)} so‘m` : "—"}
                                             </td>
-                                            <td className="p-4 text-gray-700">{item.quantity}</td>
-                                            <td className="p-4 text-gray-700">{item.draft_quantity}</td>
-                                            <td className="p-4 text-gray-700">{item.barcode}</td>
-                                            <td className="p-4 text-gray-700">
-                                                {formattedDate ? (
-                                                    formattedDate
-                                                ) : (
-                                                    <span className="flex items-center gap-1 text-gray-500">
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.quantity}</td>
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.draft_quantity}</td>
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.barcode}</td>
+                                            <td className="p-4 text-gray-700 dark:text-text-dark">
+                                                {formattedDate || (
+                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                                                         <Info size={16} />
                                                         <span>Дата отсутствует</span>
                                                     </span>
@@ -178,7 +155,6 @@ export default function WarehouseProduct() {
                         </table>
                     </Card>
 
-                    {/* 🔹 Кнопка подгрузки (только если есть следующая страница) */}
                     {page < totalPages && (
                         <div className="flex justify-center mt-6">
                             <Button
@@ -187,7 +163,7 @@ export default function WarehouseProduct() {
                                 size="sm"
                                 onClick={loadNextPage}
                                 disabled={loadingMore}
-                                className="rounded-full border-gray-400 text-gray-800 hover:bg-gray-100"
+                                className="rounded-full border-gray-400 dark:border-card-dark text-gray-800 dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                                 {loadingMore ? "Yuklanmoqda..." : "Yana ko‘rish"}
                             </Button>

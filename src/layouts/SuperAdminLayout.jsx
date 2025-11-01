@@ -18,10 +18,10 @@ export default function SuperAdminLayout() {
     const links = [
         { path: "/", label: "Dashboard", icon: Home },
         { path: "/managers", label: "Managers", icon: UserCog },
-        { path: "/users", label: "Users", icon: Users },
-        { path: "/reports", label: "Reports", icon: ClipboardList },
-        { path: "/stats", label: "Statistics", icon: BarChart3 },
-        { path: "/settings", label: "Settings", icon: Settings },
+        // { path: "/users", label: "Users", icon: Users },
+        // { path: "/reports", label: "Reports", icon: ClipboardList },
+        // { path: "/stats", label: "Statistics", icon: BarChart3 },
+        // { path: "/settings", label: "Settings", icon: Settings },
     ];
 
     return (

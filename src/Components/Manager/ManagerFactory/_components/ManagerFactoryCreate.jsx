@@ -21,7 +21,7 @@ export default function RegisterModal({ refresh }) {
         setForm({
             companyName: "",
             companyEmail: "",
-            companyPhone: "",
+            companyPhone: "+998",
             fullName: "",
             password: "",
             confirmPassword: "",
@@ -37,7 +37,7 @@ export default function RegisterModal({ refresh }) {
     const [form, setForm] = useState({
         companyName: "",
         companyEmail: "",
-        companyPhone: "",
+        companyPhone: "+998",
         fullName: "",
         password: "",
         confirmPassword: "",
@@ -225,17 +225,6 @@ export default function RegisterModal({ refresh }) {
     const formatAccountNumber = (value) => {
         const numbers = value.replace(/\D/g, '').slice(0, 16);
         return numbers.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-    };
-
-    const handleActivitySelect = (type) => {
-        setForm((prev) => ({ ...prev, activityType: type }));
-        // Убираем ошибку при выборе типа деятельности
-        if (errors.activityType) {
-            setErrors(prev => ({
-                ...prev,
-                activityType: ""
-            }));
-        }
     };
 
     const handleSubmit = async (e) => {
@@ -489,37 +478,7 @@ export default function RegisterModal({ refresh }) {
                             </div>
                         </div>
 
-                        {/* Тип деятельности */}
-                        <div className="mb-6">
-                            <Typography variant="small" className="block mb-3 font-medium text-gray-900">
-                                Faoliyat turi *
-                            </Typography>
-                            <div className="flex gap-3">
-                                <Button
-                                    type="button"
-                                    variant={form.activityType === "factory" ? "filled" : "outlined"}
-                                    color={form.activityType === "factory" ? "blue" : "gray"}
-                                    onClick={() => handleActivitySelect("factory")}
-                                    className="flex-1"
-                                >
-                                    Ta'minotchi
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={form.activityType === "company" ? "filled" : "outlined"}
-                                    color={form.activityType === "company" ? "blue" : "gray"}
-                                    onClick={() => handleActivitySelect("company")}
-                                    className="flex-1"
-                                >
-                                    Iste'molchi
-                                </Button>
-                            </div>
-                            {errors.activityType && (
-                                <Typography variant="small" color="red" className="mt-1 text-xs">
-                                    {errors.activityType}
-                                </Typography>
-                            )}
-                        </div>
+
 
 
                         {/* Кнопка отправки */}

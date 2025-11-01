@@ -113,7 +113,7 @@ export default function FactoryProduct() {
     const rightColumnCategories = categories.slice(Math.ceil(categories.length / 2));
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300"> {/* 🔥 dark:bg */}
+        <div className="min-h-screen "> {/* 🔥 dark:bg */}
             <div className="fixed top-[20px] right-4 z-50">
                 <div className="relative">
                     <IconButton

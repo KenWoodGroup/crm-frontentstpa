@@ -661,8 +661,8 @@ export default function WareHouseIncome() {
 
 
     return (
-        <section className="relative w-full min-h-screen bg-white overflow-hidden">
-            <div className={`fixed transition-all duration-300  text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-gray-200 shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
+        <section className="relative w-full min-h-screen overflow-hidden">
+            <div className={`fixed transition-all duration-300 bg-white dark:bg-card-dark text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px] в shadow flex items-center pr-8  justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}>
                 <h2>{!invoiceStarted?.in && "Приём — поступления на склад"}
                     {invoiceStarted?.in && (invoiceMeta?.in?.operation_type === "incoming" ? "Приход" :
                         invoiceMeta?.in?.operation_type === "transfer_in" ? "Перемещение" :
@@ -747,8 +747,8 @@ export default function WareHouseIncome() {
             }
 
             {/* Main content */}
-            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
-                <div className="bg-gray-100 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
+            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6 bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-200`}>
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4 transition-colors duration-200">
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (
                         <div>
@@ -761,38 +761,37 @@ export default function WareHouseIncome() {
                                         setSendToTrash(false);
                                     }}
                                     className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200 ${selected === "incoming"
-                                        ? "bg-blue-50 border-blue-500 text-blue-700 shadow"
-                                        : "border-gray-300 hover:border-blue-300 text-gray-700"
+                                        ? "bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-400 text-blue-700 dark:text-blue-300 shadow"
+                                        : "border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <Truck size={22} />
                                         <span className="text-lg font-medium">Приход на склад</span>
                                     </div>
-
                                 </button>
+
                                 <button
                                     onClick={() => {
                                         setSelected("transfer_in");
                                         setSendToTrash(false);
                                     }}
                                     className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200 ${selected === "transfer_in"
-                                        ? "bg-blue-50 border-blue-500 text-blue-700 shadow"
-                                        : "border-gray-300 hover:border-blue-300 text-gray-700"
+                                        ? "bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-400 text-blue-700 dark:text-blue-300 shadow"
+                                        : "border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <Truck size={22} />
                                         <span className="text-lg font-medium">Перемещение на склад</span>
                                     </div>
-
                                 </button>
 
                                 {/* Return_in */}
                                 <div
                                     className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200 ${selected === "return_in"
-                                        ? "bg-green-50 border-green-500 text-green-700 shadow"
-                                        : "border-gray-300 hover:border-green-300 text-gray-700"
+                                        ? "bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-400 text-green-700 dark:text-green-300 shadow"
+                                        : "border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         }`}
                                 >
                                     <div
@@ -807,8 +806,8 @@ export default function WareHouseIncome() {
 
                                     {/* Checkbox for return_dis */}
                                     {selected === "return_in" && (
-                                        <label className="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer">
-                                            <div className="flex items-center gap-2 text-gray-700">
+                                        <label className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer transition-colors duration-200">
+                                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                                 <Trash2 size={18} />
                                                 <span>Направить на утилизацию</span>
                                             </div>
@@ -816,21 +815,20 @@ export default function WareHouseIncome() {
                                                 type="checkbox"
                                                 checked={sendToTrash}
                                                 onChange={(e) => setSendToTrash(e.target.checked)}
-                                                className="w-5 h-5 accent-red-500"
+                                                className="w-5 h-5 accent-red-500 dark:accent-red-400"
                                             />
                                         </label>
                                     )}
                                 </div>
                             </div>
-                            <div className="h-[65px] bg-white rounded-lg flex items-center gap-4 px-3 shadow-sm">
+
+                            <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-4 px-3 shadow-sm transition-colors duration-200">
                                 <div className="flex items-center gap-2">
                                     {locationsLoading ? (
-                                        <div className="flex items-center gap-2"><Spinner /> Loading...</div>
+                                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                            <Spinner /> Loading...
+                                        </div>
                                     ) : (
-                                        // <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                        //     <option value="">Укажите отправителя</option>
-                                        //     {operationLocations.filter((item) => String(item.id) !== String(userLId) && item.type !== "other" && item.type !== "disposal").map((loc) => <option key={loc.id} value={loc.id}>{loc.name || loc.address || loc.type}</option>)}
-                                        // </select>
                                         <Select
                                             isClearable
                                             isSearchable
@@ -838,22 +836,96 @@ export default function WareHouseIncome() {
                                             placeholder="Укажите отправителя"
                                             value={selectedLocation}
                                             onChange={(loc) => setSelectedLocation(loc)}
+                                            styles={{
+                                                control: (base, state) => ({
+                                                    ...base,
+                                                    borderRadius: "0.5rem",
+                                                    borderColor: state.isFocused
+                                                        ? "#3b82f6"
+                                                        : "#d1d5db",
+                                                    backgroundColor: "#ffffff",
+                                                    "&:hover": {
+                                                        borderColor: state.isFocused
+                                                            ? "#3b82f6"
+                                                            : "#9ca3af"
+                                                    },
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        backgroundColor: "#374151",
+                                                        borderColor: state.isFocused
+                                                            ? "#60a5fa"
+                                                            : "#4b5563",
+                                                        color: "#f9fafb",
+                                                        "&:hover": {
+                                                            borderColor: state.isFocused
+                                                                ? "#60a5fa"
+                                                                : "#6b7280"
+                                                        }
+                                                    }
+                                                }),
+                                                menu: base => ({
+                                                    ...base,
+                                                    borderRadius: "0.5rem",
+                                                    backgroundColor: "#ffffff",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        backgroundColor: "#374151",
+                                                        border: "1px solid #4b5563"
+                                                    }
+                                                }),
+                                                option: (base, state) => ({
+                                                    ...base,
+                                                    backgroundColor: state.isSelected
+                                                        ? "#3b82f6"
+                                                        : state.isFocused
+                                                            ? "#f3f4f6"
+                                                            : "#ffffff",
+                                                    color: state.isSelected ? "#ffffff" : "#1f2937",
+                                                    "&:hover": {
+                                                        backgroundColor: "#f3f4f6"
+                                                    },
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        backgroundColor: state.isSelected
+                                                            ? "#2563eb"
+                                                            : state.isFocused
+                                                                ? "#4b5563"
+                                                                : "#374151",
+                                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
+                                                        "&:hover": {
+                                                            backgroundColor: "#4b5563"
+                                                        }
+                                                    }
+                                                }),
+                                                singleValue: base => ({
+                                                    ...base,
+                                                    color: "#1f2937",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        color: "#f9fafb"
+                                                    }
+                                                }),
+                                                input: base => ({
+                                                    ...base,
+                                                    color: "#1f2937",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        color: "#f9fafb"
+                                                    }
+                                                }),
+                                                placeholder: base => ({
+                                                    ...base,
+                                                    color: "#9ca3af",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        color: "#9ca3af"
+                                                    }
+                                                })
+                                            }}
                                         />
-                                    )
-                                    }
-
-                                    {selectedLocation === "other" && (
-                                        <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
                                     )}
                                 </div>
+
                                 <div className="flex items-center gap-2">
                                     {locationsLoading ? (
-                                        <div className="flex items-center gap-2"><Spinner /> Loading...</div>
+                                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                            <Spinner /> Loading...
+                                        </div>
                                     ) : (
-                                        // <select value={selectedLocation} onChange={(e) => setSelectedStaff(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                        //     <option value="">Выберите поставшика</option>
-                                        //     {staffs?.map((loc) => <option key={loc.id} value={loc.id}>{loc.full_name || 'Noname'}</option>)}
-                                        // </select>
                                         <Select
                                             placeholder="Выберите поставшика"
                                             options={staffs}
@@ -862,21 +934,100 @@ export default function WareHouseIncome() {
                                             isClearable
                                             isSearchable
                                             isOptionDisabled={staffs.find((it) => it.id === 0)}
+                                            styles={{
+                                                control: (base, state) => ({
+                                                    ...base,
+                                                    borderRadius: "0.5rem",
+                                                    borderColor: state.isFocused
+                                                        ? "#3b82f6"
+                                                        : "#d1d5db",
+                                                    backgroundColor: "#ffffff",
+                                                    "&:hover": {
+                                                        borderColor: state.isFocused
+                                                            ? "#3b82f6"
+                                                            : "#9ca3af"
+                                                    },
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        backgroundColor: "#374151",
+                                                        borderColor: state.isFocused
+                                                            ? "#60a5fa"
+                                                            : "#4b5563",
+                                                        color: "#f9fafb",
+                                                        "&:hover": {
+                                                            borderColor: state.isFocused
+                                                                ? "#60a5fa"
+                                                                : "#6b7280"
+                                                        }
+                                                    }
+                                                }),
+                                                menu: base => ({
+                                                    ...base,
+                                                    borderRadius: "0.5rem",
+                                                    backgroundColor: "#ffffff",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        backgroundColor: "#374151",
+                                                        border: "1px solid #4b5563"
+                                                    }
+                                                }),
+                                                option: (base, state) => ({
+                                                    ...base,
+                                                    backgroundColor: state.isSelected
+                                                        ? "#3b82f6"
+                                                        : state.isFocused
+                                                            ? "#f3f4f6"
+                                                            : "#ffffff",
+                                                    color: state.isSelected ? "#ffffff" : "#1f2937",
+                                                    "&:hover": {
+                                                        backgroundColor: "#f3f4f6"
+                                                    },
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        backgroundColor: state.isSelected
+                                                            ? "#2563eb"
+                                                            : state.isFocused
+                                                                ? "#4b5563"
+                                                                : "#374151",
+                                                        color: state.isSelected ? "#ffffff" : "#f9fafb",
+                                                        "&:hover": {
+                                                            backgroundColor: "#4b5563"
+                                                        }
+                                                    }
+                                                }),
+                                                singleValue: base => ({
+                                                    ...base,
+                                                    color: "#1f2937",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        color: "#f9fafb"
+                                                    }
+                                                }),
+                                                input: base => ({
+                                                    ...base,
+                                                    color: "#1f2937",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        color: "#f9fafb"
+                                                    }
+                                                }),
+                                                placeholder: base => ({
+                                                    ...base,
+                                                    color: "#9ca3af",
+                                                    "@media (prefers-color-scheme: dark)": {
+                                                        color: "#9ca3af"
+                                                    }
+                                                })
+                                            }}
                                         />
-                                    )
-                                    }
-
-                                    {/* {selectedStaff === "other" && (
-                                        <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
-                                    )} */}
+                                    )}
                                 </div>
 
                                 <div className="ml-auto">
-                                    <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
+                                    <button
+                                        disabled={createInvoiceLoading}
+                                        onClick={startInvoice}
+                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 transition-colors duration-200`}
+                                        aria-label="Start invoice"
+                                    >
                                         {
                                             !createInvoiceLoading ?
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                                </svg> :
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg> :
                                                 <Spinner />
                                         }
                                         {selected === "transfer_in" && "Начать Принять перемещение"}
@@ -887,18 +1038,35 @@ export default function WareHouseIncome() {
                                 </div>
                             </div>
                         </div>
-
                     ) : (
-                        <div className="h-[65px] bg-white rounded-lg flex items-center gap-3 px-3 shadow-sm">
+                        <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-3 px-3 shadow-sm transition-colors duration-200">
                             <div className="flex items-center gap-2">
-                                <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Mahsulot nomi bilan qidirish..." className="border rounded px-3 py-2 w-[420px]" aria-label="Search products by name" />
-                                <button onClick={() => setSearchQuery((s) => s.trim())} className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 hover:bg-gray-300" aria-label="Search">
+                                <input
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Mahsulot nomi bilan qidirish..."
+                                    className="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-[420px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                                    aria-label="Search products by name"
+                                />
+                                <button
+                                    onClick={() => setSearchQuery((s) => s.trim())}
+                                    className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 transition-colors duration-200"
+                                    aria-label="Search"
+                                >
                                     <SearchIcon size={16} /> Поиск
                                 </button>
                             </div>
 
                             <div className="ml-auto flex items-center gap-2">
-                                <button onClick={() => { setBarcodeEnabled((s) => !s); setBarcodeInput(""); }} className={`flex items-center gap-2 px-3 py-2 rounded ${barcodeEnabled ? "bg-green-600 text-white animate-[pulse_1.5s_infinite]" : "bg-gray-200 text-gray-800"}`} aria-pressed={barcodeEnabled} aria-label="Toggle barcode input">
+                                <button
+                                    onClick={() => { setBarcodeEnabled((s) => !s); setBarcodeInput(""); }}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded transition-colors duration-200 ${barcodeEnabled
+                                        ? "bg-green-600 dark:bg-green-700 text-white animate-[pulse_1.5s_infinite]"
+                                        : "bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
+                                        }`}
+                                    aria-pressed={barcodeEnabled}
+                                    aria-label="Toggle barcode input"
+                                >
                                     <BarcodeIcon size={16} /> Штрихкод
                                 </button>
                                 {barcodeEnabled && (
@@ -908,7 +1076,7 @@ export default function WareHouseIncome() {
                                             value={barcodeInput}
                                             onChange={(e) => setBarcodeInput(e.target.value)}
                                             placeholder="13 ta raqamni kiriting..."
-                                            className="border rounded px-3 py-2 w-[200px]"
+                                            className="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-[200px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
                                             inputMode="numeric"
                                             aria-label="Barcode input"
                                         />
@@ -922,52 +1090,56 @@ export default function WareHouseIncome() {
                     {/* Invoice info & body */}
                     {invoiceStarted?.[mode] && (
                         <>
-                            <div className="bg-white rounded-lg p-3 shadow-sm flex items-center gap-6">
+                            <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm flex items-center gap-6 transition-colors duration-200">
                                 <div>
-                                    <div className="text-xs text-gray-500">Отправитель</div>
-                                    <div className="font-medium">{invoiceMeta?.[mode]?.sender || "—"}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Отправитель</div>
+                                    <div className="font-medium text-gray-900 dark:text-gray-100">{invoiceMeta?.[mode]?.sender || "—"}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-gray-500">Получатель</div>
-                                    <div className="font-medium">{invoiceMeta?.[mode]?.receiver}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Получатель</div>
+                                    <div className="font-medium text-gray-900 dark:text-gray-100">{invoiceMeta?.[mode]?.receiver}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-gray-500">Время</div>
-                                    <div className="font-medium">{invoiceMeta?.[mode]?.time}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Время</div>
+                                    <div className="font-medium text-gray-900 dark:text-gray-100">{invoiceMeta?.[mode]?.time}</div>
                                 </div>
                                 <div className="ml-auto text-right">
-                                    <div className="text-xs text-gray-500">Общая стоимость</div>
-                                    <div className="font-semibold text-lg">{(total || 0).toLocaleString()} сум</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Общая стоимость</div>
+                                    <div className="font-semibold text-lg text-gray-900 dark:text-gray-100">{(total || 0).toLocaleString()} сум</div>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-lg p-3 shadow-sm">
-                                <div className="text-sm font-medium mb-2 flex items-center justify-between">
+                            <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm transition-colors duration-200">
+                                <div className="text-sm font-medium mb-2 flex items-center justify-between text-gray-900 dark:text-gray-100">
                                     <h4>Результаты поиска</h4>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => setSearchResults([])}
-                                            className="p-2 rounded-full border border-gray-600 text-gray-900 hover:text-red-500 hover:border-red-800 transition-all duration-200"
+                                            className="p-2 rounded-full border border-gray-600 dark:border-gray-400 text-gray-900 dark:text-gray-100 hover:text-red-500 dark:hover:text-red-400 hover:border-red-800 dark:hover:border-red-400 transition-all duration-200"
                                             title="Clear results"
                                             aria-label="Clear search results"
                                         >
                                             <Eraser size={18} />
                                         </button>
-                                        <div className="text-xs text-gray-500">{searchResults.length} natija</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">{searchResults.length} natija</div>
                                     </div>
                                 </div>
                                 {searchLoading ? (
-                                    <div className="p-4 flex items-center gap-2"><Spinner /> Поиск...</div>
+                                    <div className="p-4 flex items-center gap-2 text-gray-700 dark:text-gray-300"><Spinner /> Поиск...</div>
                                 ) : searchResults.length === 0 ? (
-                                    <div className="text-gray-500">Ничего не найдено</div>
+                                    <div className="text-gray-500 dark:text-gray-400">Ничего не найдено</div>
                                 ) : (
                                     <div className="flex gap-3 flex-wrap">
                                         {searchResults.sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: 'base' })).map((r) => (
-                                            <button key={r.id || r.stock_id || generateId()} onClick={() => onSelectSearchResult(r)} className="bg-white border rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px]">
-                                                <div className="text-sm font-medium">{r.product?.name || r.name}</div>
+                                            <button
+                                                key={r.id || r.stock_id || generateId()}
+                                                onClick={() => onSelectSearchResult(r)}
+                                                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px] transition-colors duration-200"
+                                            >
+                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{r.product?.name || r.name}</div>
                                                 <div className="flex items-center justify-center gap-3">
-                                                    <div className="text-xs text-gray-600">Штрих: {r.barcode || ""}</div>
-                                                    <div className="text-xs text-gray-600">Партия: {r.batch === null ? "Default" : r.batch}</div>
+                                                    <div className="text-xs text-gray-600 dark:text-gray-400">Штрих: {r.barcode || ""}</div>
+                                                    <div className="text-xs text-gray-600 dark:text-gray-400">Партия: {r.batch === null ? "Default" : r.batch}</div>
                                                 </div>
                                             </button>
                                         ))}
@@ -975,9 +1147,9 @@ export default function WareHouseIncome() {
                                 )}
                             </div>
 
-                            <div className="bg-white rounded-lg p-3 shadow-sm overflow-auto">
+                            <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm overflow-auto transition-colors duration-200">
                                 <table className="min-w-full text-sm">
-                                    <thead className="text-left text-xs text-gray-500 border-b">
+                                    <thead className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600">
                                         <tr>
                                             <th className="p-2">#</th>
                                             <th>Партия</th>
@@ -991,57 +1163,91 @@ export default function WareHouseIncome() {
                                     </thead>
                                     <tbody>
                                         {(!mixData || mixData.length === 0) ? (
-                                            <tr><td colSpan={8} className="p-4 text-center text-gray-400">Mahsulotlar mavjud emas</td></tr>
+                                            <tr>
+                                                <td colSpan={8} className="p-4 text-center text-gray-400 dark:text-gray-500">
+                                                    Mahsulotlar mavjud emas
+                                                </td>
+                                            </tr>
                                         ) : mixData.map((it, idx) => {
-                                            // compute stock available if provided
                                             const stockAvail = Number(it.stock_quantity ?? it.stock?.quantity ?? Infinity);
                                             const qty = Number(it.quantity ?? 0);
                                             const qtyError = (mode === "out") && Number.isFinite(stockAvail) && qty > stockAvail;
                                             return (
-                                                <tr key={it.id || idx} className="border-b">
-                                                    <td className="p-2 align-center">{idx + 1}</td>
+                                                <tr key={it.id || idx} className="border-b border-gray-200 dark:border-gray-600">
+                                                    <td className="p-2 align-center text-gray-900 dark:text-gray-100">{idx + 1}</td>
                                                     <td>
-                                                        {/* is_new_batch only relevant for incoming */}
                                                         {mode === "in" ? (
-                                                            <input checked={!!it.is_new_batch} onChange={(e) => updateBatchNew(idx, e.target.checked, it.price, it.origin_price)} type="checkbox" name="is_new_batch" />
+                                                            <input
+                                                                checked={!!it.is_new_batch}
+                                                                onChange={(e) => updateBatchNew(idx, e.target.checked, it.price, it.origin_price)}
+                                                                type="checkbox"
+                                                                name="is_new_batch"
+                                                                className="accent-blue-500 dark:accent-blue-400"
+                                                            />
                                                         ) : (
-                                                            <span className="text-xs text-gray-400">—</span>
+                                                            <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
                                                         )}
                                                     </td>
                                                     <td className="p-2 align-top">
-                                                        <div className="font-medium">{it?.name || "—"}</div>
-                                                        <div className="text-xs text-gray-500">{it.barcode}</div>
-                                                        <div className="text-xs text-gray-500 flex">Партия:
+                                                        <div className="font-medium text-gray-900 dark:text-gray-100">{it?.name || "—"}</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">{it.barcode}</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 flex">
+                                                            Партия:
                                                             {mode === "in" ? (
-                                                                it.is_new_batch ? (<div className="tex-xs text-blue-gray-700 ">Новая партия</div>) : (it.batch === null ? "Default" : it.batch)
+                                                                it.is_new_batch ? (
+                                                                    <div className="text-xs text-blue-gray-700 dark:text-blue-300">Новая партия</div>
+                                                                ) : (
+                                                                    it.batch === null ? "Default" : it.batch
+                                                                )
                                                             ) : (
                                                                 (it.batch === null ? "Default" : it.batch)
                                                             )}
                                                         </div>
                                                     </td>
                                                     <td className="p-2 align-center w-[140px]">
-                                                        <input type="number" step="any" value={it.price ?? ""} onChange={(e) => handleUpdatePrice(idx, e.target.value, it.origin_price)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
+                                                        <input
+                                                            type="number"
+                                                            step="any"
+                                                            value={it.price ?? ""}
+                                                            onChange={(e) => handleUpdatePrice(idx, e.target.value, it.origin_price)}
+                                                            className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                                                            aria-label={`Price for ${it.product?.name || idx + 1}`}
+                                                        />
                                                     </td>
                                                     <td className="p-2 align-center w-[120px]">
-                                                        <input type="number" step="1" min={0} max={mode === "out" ? (Number.isFinite(stockAvail) ? stockAvail : undefined) : undefined} value={it.quantity === 0 ? "0" : (it.quantity ?? "")} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
+                                                        <input
+                                                            type="number"
+                                                            step="1"
+                                                            min={0}
+                                                            max={mode === "out" ? (Number.isFinite(stockAvail) ? stockAvail : undefined) : undefined}
+                                                            value={it.quantity === 0 ? "0" : (it.quantity ?? "")}
+                                                            onChange={(e) => handleUpdateQuantity(idx, e.target.value)}
+                                                            className={`border border-gray-300 dark:border-gray-600 rounded px-2 py-1 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200 ${qtyError ? "ring-2 ring-red-400 dark:ring-red-500" : ""
+                                                                }`}
+                                                            aria-label={`Quantity for ${it.product?.name || idx + 1}`}
+                                                        />
                                                     </td>
-                                                    <td className="p-2 align-center w-[120px] ">
+                                                    <td className="p-2 align-center w-[120px] text-gray-900 dark:text-gray-100">
                                                         {it?.unit || "-"}
                                                     </td>
-                                                    <td className="p-2 align-center">
+                                                    <td className="p-2 align-center text-gray-900 dark:text-gray-100">
                                                         {(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}
                                                     </td>
                                                     <td className="p-2 align-center">
                                                         <div className="flex gap-2 items-center">
                                                             <button
                                                                 onClick={() => handleRemoveItem(idx)}
-                                                                className="p-2 text-gray-800 hover:text-red-500 active:scale-90 transition-all duration-200"
+                                                                className="p-2 text-gray-800 dark:text-gray-200 hover:text-red-500 dark:hover:text-red-400 active:scale-90 transition-all duration-200"
                                                                 title="Remove row"
                                                                 aria-label={`Remove item ${idx + 1}`}
                                                             >
                                                                 <MinusCircle size={22} />
                                                             </button>
-                                                            {qtyError && <div className="text-xs text-red-600">Miqdor ombordagi ({stockAvail}) dan oshdi</div>}
+                                                            {qtyError && (
+                                                                <div className="text-xs text-red-600 dark:text-red-400">
+                                                                    Miqdor ombordagi ({stockAvail}) dan oshdi
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -1053,7 +1259,10 @@ export default function WareHouseIncome() {
 
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
-                                    <button onClick={openModal} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white text-[16px] rounded hover:opacity-95`}>
+                                    <button
+                                        onClick={openModal}
+                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white text-[16px] rounded hover:opacity-95 transition-colors duration-200`}
+                                    >
                                         <CheckSquare size={22} />
                                         Завершить
                                     </button>

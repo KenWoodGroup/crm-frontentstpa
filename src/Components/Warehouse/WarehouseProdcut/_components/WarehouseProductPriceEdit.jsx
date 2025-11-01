@@ -23,7 +23,7 @@ export default function WarehouseEdit({ data }) {
     const handleSave = async () => {
         try {
             const form = {
-                fixed_quantity: fixedQuantity, 
+                fixed_quantity: fixedQuantity,
                 barcode: data.barcode,
                 sale_price: unformatNumber(price),
             };
@@ -55,13 +55,14 @@ export default function WarehouseEdit({ data }) {
                 color="blue"
                 className="rounded-lg"
                 onClick={handleOpen}
+
             >
                 Narx o‘zgartirish
             </Button>
 
-            <Dialog open={open} handler={handleOpen} size="xs">
+            <Dialog className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark" open={open} handler={handleOpen} size="xs">
                 <DialogHeader>
-                    <Typography variant="h6" color="blue-gray">
+                    <Typography variant="h6" className="dark:text-text-dark" color="blue-gray">
                         Ma'lumotlarni tahrirlash
                     </Typography>
                 </DialogHeader>
@@ -72,13 +73,22 @@ export default function WarehouseEdit({ data }) {
                         type="text"
                         value={price}
                         onChange={handleChange}
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
+                        color="blue-gray"
                     />
 
                     <div className="flex items-center justify-between">
-                        <Typography variant="small" color="blue-gray">
+                        <Typography variant="small" className="dark:text-text-dark" color="blue-gray">
                             Cheklangan (fixed_quantity)
                         </Typography>
                         <Switch
+                            className="dark:text-text-dark" color="blue-gray"
                             color="blue"
                             checked={fixedQuantity}
                             onChange={(e) => setFixedQuantity(e.target.checked)}

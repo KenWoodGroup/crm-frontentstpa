@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Card, CardBody, Typography, Button } from "@material-tailwind/react";
-import { Plus, Minus } from "lucide-react";
+import { Card, CardBody, Typography, Button, Switch } from "@material-tailwind/react";
+import { Plus, Minus, Moon, Sun } from "lucide-react";
 
 export default function FactorySettings() {
-    const [zoom, setZoom] = useState(100); // масштаб в %
-    const [fontScale, setFontScale] = useState(100); // размер шрифта в %
+    const [zoom, setZoom] = useState(100);
+    const [fontScale, setFontScale] = useState(100);
+    const [darkMode, setDarkMode] = useState(false);
 
     const minZoom = 80;
     const maxZoom = 150;
@@ -12,12 +13,12 @@ export default function FactorySettings() {
 
     const minFont = 80;
     const maxFont = 150;
-    const defaultFont = 100;
 
     // Загружаем сохранённые настройки
     useEffect(() => {
         const savedZoom = localStorage.getItem("appZoom");
         const savedFont = localStorage.getItem("textFontScale");
+        const savedTheme = localStorage.getItem("theme");
 
         if (savedZoom) {
             const value = Number(savedZoom);
@@ -30,14 +31,20 @@ export default function FactorySettings() {
             setFontScale(value);
             applyFontScale(value);
         }
+
+        if (savedTheme === "dark") {
+            setDarkMode(true);
+            document.documentElement.classList.add("dark");
+        } else {
+            setDarkMode(false);
+            document.documentElement.classList.remove("dark");
+        }
     }, []);
 
-    // ✅ Масштаб экрана без ломки fixed
     const applyZoom = (value) => {
         document.body.style.zoom = `${value}%`;
     };
 
-    // ✅ Изменяем размер шрифта глобально
     const applyFontScale = (percent) => {
         document.documentElement.style.fontSize = `${(percent / 100) * 16}px`;
     };
@@ -65,16 +72,41 @@ export default function FactorySettings() {
         localStorage.setItem("textFontScale", 100);
     };
 
+    // ✅ Переключатель тёмного режима
+    const toggleDarkMode = () => {
+        const newMode = !darkMode;
+        setDarkMode(newMode);
+        if (newMode) {
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+        }
+    };
+
     return (
-        <div>
-            <Typography variant="h2" className="mb-6 font-semibold text-gray-800">
-                Sozlamalar
-            </Typography>
+        <div className="transition-colors duration-300 bg-background-light dark:bg-background-dark min-h-screen p-6">
+            <div className="flex justify-between items-center mb-6">
+                <Typography variant="h2" className="font-semibold text-text-light dark:text-text-dark">
+                    Sozlamalar
+                </Typography>
+
+                <Button
+                    color="blue-gray"
+                    variant="outlined"
+                    onClick={toggleDarkMode}
+                    className="flex items-center gap-2"
+                >
+                    {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                    {darkMode ? "Yorug‘ rejim" : "Tungi rejim"}
+                </Button>
+            </div>
 
             {/* --- Масштаб экрана --- */}
-            <Card className="shadow-md rounded-2xl mb-6">
+            <Card className="shadow-md rounded-2xl mb-6 bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <CardBody className="p-6 flex flex-col gap-4">
-                    <Typography variant="h6" className="text-gray-700">
+                    <Typography variant="h6" className="text-text-light dark:text-text-dark">
                         Ekran masshtabi
                     </Typography>
 
@@ -89,7 +121,7 @@ export default function FactorySettings() {
                             <Minus size={18} />
                         </Button>
 
-                        <Typography variant="h5" className="w-16 text-center">
+                        <Typography variant="h5" className="w-16 text-center text-text-light dark:text-text-dark">
                             {zoom}%
                         </Typography>
 
@@ -107,9 +139,9 @@ export default function FactorySettings() {
             </Card>
 
             {/* --- Размер текста --- */}
-            <Card className="shadow-md rounded-2xl">
+            <Card className="shadow-md rounded-2xl bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <CardBody className="p-6 flex flex-col gap-6">
-                    <Typography variant="h6" className="text-gray-700">
+                    <Typography variant="h6" className="text-text-light dark:text-text-dark">
                         Matn hajmi
                     </Typography>
 
@@ -124,7 +156,7 @@ export default function FactorySettings() {
                             <Minus size={18} />
                         </Button>
 
-                        <Typography variant="h5" className="w-16 text-center">
+                        <Typography variant="h5" className="w-16 text-center text-text-light dark:text-text-dark">
                             {fontScale}%
                         </Typography>
 
@@ -146,23 +178,21 @@ export default function FactorySettings() {
                         step="5"
                         value={fontScale}
                         onChange={(e) => handleFontChange(Number(e.target.value))}
-                        className="w-full"
+                        className="w-full accent-blue-500"
                     />
 
                     <div
-                        className="border border-gray-200 bg-white rounded-lg p-5 mt-4"
+                        className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg p-5 mt-4 transition-all duration-300"
                         style={{
                             fontSize: `${(fontScale / 100) * 16}px`,
-                            transition: "font-size 0.2s ease",
                         }}
                     >
-                        <Typography className="mb-2 font-medium">
+                        <Typography className="mb-2 font-medium text-text-light dark:text-text-dark">
                             Sinov matni (test text)
                         </Typography>
-                        <p>
-                            Bu joyda matn hajmini sinab ko‘rishingiz mumkin. Har safar siz
-                            qiymатni o‘zgartirsangiz, matn darhol kattalashadi yoki
-                            kichrayadi.
+                        <p className="text-text-light dark:text-text-dark">
+                            Bu joyda matn hajmini sinab ko‘rishingiz mumkin. Har safar siz qiymатni
+                            o‘zgartirsangiz, matn darhol kattalashadi yoki kichrayadi.
                         </p>
                     </div>
 

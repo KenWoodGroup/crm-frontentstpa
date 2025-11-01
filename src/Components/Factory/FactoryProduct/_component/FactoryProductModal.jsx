@@ -61,14 +61,14 @@ export default function FactoryProductModal({
             size="xl"
             open={showModal}
             handler={() => setShowModal(false)}
-            className="relative bg-white  dark:text-white"
+            className="relative bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
             animate={{
                 mount: { scale: 1, y: 0 },
                 unmount: { scale: 0.9, y: -100 },
             }}
         >
-            <DialogHeader className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
-                <span className="font-semibold text-lg">Tanlangan mahsulotlar</span>
+            <DialogHeader className="flex justify-between rounded-xl items-center border-b border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark">
+                <span className="font-semibold text-lg dark:text-text-dark">Tanlangan mahsulotlar</span>
                 <IconButton
                     color="red"
                     variant="text"
@@ -85,7 +85,7 @@ export default function FactoryProductModal({
                         {selectedProducts.map((product) => (
                             <div
                                 key={product.id}
-                                className="bg-gray-50  border border-gray-200 dark:border-gray-700 rounded-xl p-3 transition-all duration-300 hover:shadow-md hover:border-blue-400"
+                                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 transition-all duration-300 hover:shadow-md hover:border-blue-400"
                             >
                                 <div className="flex flex-col h-full justify-between">
                                     <Typography
@@ -110,10 +110,10 @@ export default function FactoryProductModal({
                     </div>
                 ) : (
                     <div className="text-center py-10">
-                        <Typography variant="paragraph" className="text-gray-500 mb-2">
+                        <Typography variant="paragraph" className="text-gray-500 dark:text-gray-400 mb-2">
                             Hozircha mahsulot tanlanmagan
                         </Typography>
-                        <Typography variant="small" className="text-gray-400">
+                        <Typography variant="small" className="text-gray-400 dark:text-gray-500">
                             Mahsulotlarni tanlash uchun kategoriyalarni oching
                         </Typography>
                     </div>
@@ -132,7 +132,7 @@ export default function FactoryProductModal({
                 <div className="flex gap-2">
                     <Button
                         variant="outlined"
-                        color="blue-gray"
+                        color="gray"
                         onClick={() => setShowModal(false)}
                     >
                         Yopish

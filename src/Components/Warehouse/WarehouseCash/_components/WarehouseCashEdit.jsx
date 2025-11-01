@@ -54,8 +54,9 @@ export default function WarehouseCashEdit({ data, refresh, id }) {
                     <Edit size={18} />
                 </IconButton>
             </Tooltip>
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Изменения Кассы</DialogHeader>
+            <Dialog open={open} handler={handleOpen} size="sm" className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+            >
+                <DialogHeader className="dark:text-text-dark">Изменения Кассы</DialogHeader>
                 <DialogBody divider className="flex flex-col gap-4">
                     <div>
                         <Input
@@ -63,6 +64,14 @@ export default function WarehouseCashEdit({ data, refresh, id }) {
                             name="name"
                             value={form.name}
                             onChange={handleChange}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
                     </div>
 
@@ -77,7 +86,8 @@ export default function WarehouseCashEdit({ data, refresh, id }) {
                     >
                         Отмена
                     </Button>
-                    <Button onClick={handleSubmit}>
+                    <Button className="bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                        onClick={handleSubmit}>
                         Сохранить
                     </Button>
                 </DialogFooter>

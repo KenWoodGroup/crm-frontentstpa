@@ -15,7 +15,7 @@ class Clients {
         return response;
     }
     static EditClient = async (id, data) => {
-        const response = await $api.put(`/locations/${id}`, data);
+        const response = await $api.put(`/locations/client/${id}`, data);
         return response;
     };
 

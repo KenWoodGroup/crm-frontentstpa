@@ -32,6 +32,9 @@ import SuperAdmin from "./Components/ProtectedRoutes/SuperAdmin";
 import Manager from "./Components/ProtectedRoutes/Manager";
 import Warehouse from "./Components/ProtectedRoutes/Warehouse";
 import Dealer from "./Components/ProtectedRoutes/Dealer";
+import IndependentLayout from "./layouts/IndependentLayout";
+import { independentRoutes } from "./routes/independentRoutes";
+import Independent from "./Components/ProtectedRoutes/Independent";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -95,6 +98,17 @@ function App() {
               </Dealer>
             }>
               {dilertoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              <Independent>
+                <IndependentLayout />
+              </Independent>
+            }>
+              {independentRoutes?.map((r) => {
                 return (
                   <Route key={r.name} path={r.path} element={r.element} />
                 )

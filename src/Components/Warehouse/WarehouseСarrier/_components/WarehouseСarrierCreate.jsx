@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
     Button,
     Dialog,
-    DialogHeader,
+    DialogHeader,   
     DialogBody,
     DialogFooter,
     Input,
@@ -11,14 +11,13 @@ import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { Staff } from "../../../../utils/Controllers/Staff";
 
-
-export default function WarehouseСarrierCreate({ refresh }) {
+export default function WarehouseCarrierCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({
         role: "carrier",
         full_name: "",
         phone: "+998",
-        location_id: Cookies.get(`ul_nesw`),
+        location_id: Cookies.get("ul_nesw"),
     });
 
     const handleOpen = () => setOpen(!open);
@@ -30,59 +29,94 @@ export default function WarehouseСarrierCreate({ refresh }) {
 
     const handleSubmit = async () => {
         try {
-            const response = await Staff?.CreateStaff(form)
-            Alert("Muvaffaqiyatli yaratildi ", "success");
+            await Staff.CreateStaff(form);
+            Alert("Muvaffaqiyatli yaratildi", "success");
             setForm({
                 role: "carrier",
+                full_name: "",
                 phone: "+998",
-            })
-            handleOpen()
-            refresh()
+                location_id: Cookies.get("ul_nesw"),
+            });
+            handleOpen();
+            refresh();
         } catch (error) {
-            Alert("Xato ", "error");
-            console.log(error)
+            Alert("Xato", "error");
+            console.log(error);
         }
     };
 
     return (
-        <div className="">
-            <Button onClick={handleOpen}>
-                + Добавить Поставшик
+        <div>
+            {/* Кнопка открытия */}
+            <Button
+                onClick={handleOpen}
+                className="bg-text-light text-card-light normal-case hover:bg-gray-800
+                           dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300
+                           transition-colors"
+            >
+                + Добавить Доставщика
             </Button>
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Создание Поставшик</DialogHeader>
-                <DialogBody divider className="flex flex-col gap-4">
-                    <div>
-                        <Input
-                            label="Имя клиента"
-                            name="full_name"
-                            value={form.full_name}
-                            onChange={handleChange}
-                        />
-                    </div>
 
-                    <div>
+            {/* Модальное окно */}
+            <Dialog
+                open={open}
+                handler={handleOpen}
+                size="sm"
+                className="bg-card-light text-text-light dark:bg-card-dark dark:text-text-dark"
+            >
+                <DialogHeader className="text-text-light dark:text-text-dark">
+                    Создание Доставщика
+                </DialogHeader>
 
-                        <Input
-                            label="Телефон"
-                            name="phone"
-                            value={form.phone}
-                            onChange={handleChange}
-                        />
-                    </div>
-
+                <DialogBody
+                    divider
+                    className="flex flex-col gap-4 bg-background-light dark:bg-background-dark"
+                >
+                    <Input
+                        label="Имя Доставщика"
+                        name="full_name"
+                        value={form.full_name}
+                        onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
+                    />
+                    <Input
+                        label="Телефон"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
+                    />
                 </DialogBody>
 
-                <DialogFooter>
+                <DialogFooter className="bg-card-light dark:bg-card-dark rounded-b-lg">
                     <Button
                         variant="text"
                         color="red"
                         onClick={handleOpen}
-                        className="mr-2"
+                        className="mr-2 normal-case text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
                         Отмена
                     </Button>
-                    <Button onClick={handleSubmit}>
+                    <Button
+                        onClick={handleSubmit}
+                        className="bg-text-light text-card-light normal-case hover:bg-gray-800
+                                   dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300
+                                   transition-colors"
+                    >
                         Сохранить
                     </Button>
                 </DialogFooter>

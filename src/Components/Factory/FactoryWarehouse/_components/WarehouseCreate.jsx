@@ -18,7 +18,6 @@ export default function WarehouseCreate({ refresh }) {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
-    // Получаем parent_id из cookies при загрузке компонента
     const initialData = {
         type: "warehouse",
         name: "",
@@ -26,7 +25,7 @@ export default function WarehouseCreate({ refresh }) {
         address: "",
         phone: "+998",
         email: "",
-        parent_id: Cookies.get("ul_nesw") || "", // Добавляем значение по умолчанию
+        parent_id: Cookies.get("ul_nesw") || "",
         password: "",
         confirm_password: ""
     };
@@ -36,7 +35,6 @@ export default function WarehouseCreate({ refresh }) {
     const handleOpen = () => {
         setOpen(!open);
         setErrors({});
-        // При открытии/закрытии модального окна обновляем parent_id из cookies
         const currentParentId = Cookies.get("ul_nesw");
         setData({
             ...initialData,
@@ -48,7 +46,6 @@ export default function WarehouseCreate({ refresh }) {
         const { name, value } = e.target;
         setData((prev) => ({ ...prev, [name]: value }));
 
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: "" }));
         }
@@ -71,59 +68,46 @@ export default function WarehouseCreate({ refresh }) {
     const validateFields = () => {
         const newErrors = {};
 
-        // Name validation
         if (!data.name.trim()) {
             newErrors.name = t("enterWarehouseName");
         } else if (data.name.trim().length < 2) {
             newErrors.name = t("warehouseNameMinLength");
         }
 
-        // Full name validation
         if (!data.full_name.trim()) {
             newErrors.full_name = t("enterFullName");
         } else if (data.full_name.trim().length < 3) {
             newErrors.full_name = t("fullNameMinLength");
         }
 
-        // Address validation
         if (!data.address.trim()) {
             newErrors.address = t("enterAddress");
         } else if (data.address.trim().length < 5) {
             newErrors.address = t("addressMinLength");
         }
 
-        // Phone validation
         if (!data.phone.trim()) {
             newErrors.phone = t("enterPhone");
         } else if (!validatePhone(data.phone)) {
             newErrors.phone = t("invalidPhoneFormat");
         }
 
-        // Email validation
         if (!data.email.trim()) {
             newErrors.email = t("enterEmail");
         } else if (!validateEmail(data.email)) {
             newErrors.email = t("invalidEmailFormat");
         }
 
-        // Password validation
         if (!data.password.trim()) {
             newErrors.password = t("enterPassword");
         } else if (!validatePassword(data.password)) {
             newErrors.password = t("passwordMinLength");
         }
 
-        // Confirm password validation
         if (!data.confirm_password.trim()) {
             newErrors.confirm_password = t("confirmPasswordRequired");
         } else if (data.password !== data.confirm_password) {
             newErrors.confirm_password = t("passwordsDoNotMatch");
-        }
-
-        // Parent ID validation (если требуется)
-        if (!data.parent_id) {
-            // Можно добавить обработку, если parent_id обязателен
-            // newErrors.parent_id = "Parent ID is required";
         }
 
         setErrors(newErrors);
@@ -135,23 +119,17 @@ export default function WarehouseCreate({ refresh }) {
 
         try {
             setLoading(true);
-
-            // Обновляем parent_id перед отправкой
             const currentParentId = Cookies.get("ul_nesw");
             const finalData = {
                 ...data,
                 parent_id: currentParentId || data.parent_id
             };
 
-
-            // Remove confirm_password from data before sending to API
             const { confirm_password, ...apiData } = finalData;
-
             await WarehouseApi.CreateWarehouse(apiData);
+
             Alert(t("warehouseCreated"), "success");
             setOpen(false);
-
-            // Сбрасываем данные, но сохраняем актуальный parent_id
             setData({
                 ...initialData,
                 parent_id: currentParentId || ""
@@ -178,28 +156,25 @@ export default function WarehouseCreate({ refresh }) {
 
     return (
         <>
-            {/* Ochish tugmasi */}
             <Button
                 onClick={handleOpen}
-                className="bg-black text-white normal-case hover:bg-gray-800 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
+                className="bg-black text-white normal-case hover:bg-gray-800 active:bg-gray-900 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 dark:active:bg-gray-400 transition-colors duration-200 shadow-md hover:shadow-lg active:shadow-sm"
             >
                 + {t("newWarehouse")}
             </Button>
 
-            {/* Modal oynasi */}
             <Dialog
                 open={open}
                 handler={handleOpen}
-                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark rounded-xl transition-colors duration-300"
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300"
                 size="md"
             >
-                {/* Sarlavha */}
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 pb-4">
+                <DialogHeader className="bg-card-light rounded-xl dark:bg-card-dark text-text-light dark:text-text-dark  transition-colors duration-300"
+                >
                     {t("warehouse_info")}
                 </DialogHeader>
 
-                {/* Tana */}
-                <DialogBody divider className="space-y-4 max-h-[60vh] overflow-y-auto py-4">
+                <DialogBody divider className="space-y-4 max-h-[60vh] overflow-y-auto py-6">
                     {inputFields.map((field) => (
                         <div key={field.name} className="space-y-1">
                             <Input
@@ -208,24 +183,36 @@ export default function WarehouseCreate({ refresh }) {
                                 type={field.type}
                                 value={data[field.name]}
                                 onChange={handleChange}
-                                className={`text-text-light dark:text-text-dark ${errors[field.name] ? "border-red-500 focus:border-red-500" : ""}`}
-                                color={errors[field.name] ? "red" : "gray"}
                                 error={!!errors[field.name]}
+                                color={errors[field.name] ? "red" : 'gray'}
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark ${errors[field.name] ? '!text-red-500 dark:!text-red-400' : ''
+                                        }`
+                                }}
+                                crossOrigin={undefined}
                             />
                             {errors[field.name] && (
-                                <p className="text-red-500 text-xs mt-1 ml-1">{errors[field.name]}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1 ml-1 font-medium">
+                                    {errors[field.name]}
+                                </p>
                             )}
                         </div>
                     ))}
                 </DialogBody>
 
-                {/* Footer */}
                 <DialogFooter className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <Button
                         variant="text"
                         color="gray"
                         onClick={handleOpen}
-                        className="mr-2 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        className="mr-2 text-text-light dark:text-text-dark 
+                                  hover:bg-gray-100 dark:hover:bg-gray-700 
+                                  active:bg-gray-200 dark:active:bg-gray-600
+                                  transition-colors duration-200 font-medium"
                         disabled={loading}
                     >
                         {t("cancel")}
@@ -233,8 +220,13 @@ export default function WarehouseCreate({ refresh }) {
                     <Button
                         onClick={CreateWarehouse}
                         disabled={loading}
-                        className={`bg-black text-white normal-case hover:bg-gray-800 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 flex items-center gap-2 transition-colors ${loading ? "opacity-70 cursor-not-allowed" : ""
-                            }`}
+                        className={`bg-black text-white normal-case 
+                                  hover:bg-gray-800 active:bg-gray-900 
+                                  dark:bg-gray-200 dark:text-black 
+                                  dark:hover:bg-gray-300 dark:active:bg-gray-400
+                                  flex items-center gap-2 transition-colors duration-200 
+                                  font-medium shadow-md hover:shadow-lg active:shadow-sm
+                                  ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                     >
                         {loading ? (
                             <>
