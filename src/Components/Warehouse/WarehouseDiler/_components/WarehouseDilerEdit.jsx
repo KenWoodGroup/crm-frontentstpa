@@ -86,36 +86,64 @@ export default function WarehouseDilerEdit({ diler, refresh }) {
             <Dialog
                 open={open}
                 handler={handleOpen}
-                className="bg-white text-gray-900 rounded-xl"
+                className="bg-white text-gray-900 rounded-xl dark:bg-card-dark"
             >
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
                     Diler maʼlumotlarini tahrirlash
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
                         label="Nomi"
-                        color="gray"
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                         name="name"
                         value={data.name}
                         onChange={handleChange}
                     />
                     <Input
                         label="Manzil"
-                        color="gray"
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                         name="address"
                         value={data.address}
                         onChange={handleChange}
                     />
                     <Input
                         label="Telefon raqam"
-                        color="gray"
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                         name="phone"
                         value={data.phone}
                         onChange={handleChange}
                     />
                     <Input
                         label="Email"
-                        color="gray"
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                         name="email"
                         value={data.email}
                         onChange={handleChange}
@@ -124,7 +152,7 @@ export default function WarehouseDilerEdit({ diler, refresh }) {
                 <DialogFooter className="border-t border-gray-200">
                     <Button
                         variant="text"
-                        color="gray"
+                        color="red"
                         onClick={handleOpen}
                         className="mr-2"
                         disabled={loading}
@@ -132,7 +160,7 @@ export default function WarehouseDilerEdit({ diler, refresh }) {
                         Bekor qilish
                     </Button>
                     <Button
-                        className={`bg-blue-600 text-white normal-case hover:bg-blue-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
+                        className={`bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
                             }`}
                         onClick={EditWarehouse}
                         disabled={loading}

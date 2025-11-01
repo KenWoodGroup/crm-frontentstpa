@@ -60,12 +60,12 @@ export default function WarehouseMonyChart({ data = [] }) {
             : 0;
 
     return (
-        <Card className="bg-white border-0 shadow-lg p-6">
+        <Card className="bg-card-light dark:bg-card-dark border-0 shadow-lg p-6 transition-colors duration-300">
             <Typography
                 variant="h5"
-                className="mb-6 font-bold text-gray-800 flex items-center gap-2"
+                className="mb-6 font-bold text-text-light dark:text-text-dark flex items-center gap-2"
             >
-                <Warehouse className="w-6 h-6 text-blue-600" />
+                <Warehouse className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 Omborlardagi Pul Holati
             </Typography>
 
@@ -85,55 +85,49 @@ export default function WarehouseMonyChart({ data = [] }) {
                             {omborPieData.map((entry, index) => (
                                 <Cell
                                     key={`cell-${index}`}
-                                    fill={
-                                        COLORS_WAREHOUSE[
-                                        index % COLORS_WAREHOUSE.length
-                                        ]
-                                    }
-                                    stroke="#fff"
+                                    fill={COLORS_WAREHOUSE[index % COLORS_WAREHOUSE.length]}
+                                    stroke="transparent"
                                     strokeWidth={2}
                                 />
                             ))}
                         </Pie>
 
-                        {/* ✅ Встроенный Tooltip Recharts */}
                         <ReTooltip
                             formatter={(value, name) => [
                                 `${value.toLocaleString()} so‘m`,
                                 name,
                             ]}
                             contentStyle={{
-                                backgroundColor: "white",
+                                backgroundColor: "#181818",
                                 borderRadius: "8px",
-                                border: "1px solid #ddd",
-                                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                                color: "#333",
+                                border: "1px solid #333",
+                                color: "#FAFAFA",
                                 fontSize: "14px",
                             }}
                         />
                     </PieChart>
                 </ResponsiveContainer>
             ) : (
-                <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
-                    <Package className="w-12 h-12 mb-3 text-gray-400" />
-                    <Typography variant="h6" className="text-gray-600">
+                <div className="flex flex-col items-center justify-center h-[350px] text-gray-500 dark:text-gray-400">
+                    <Package className="w-12 h-12 mb-3 text-gray-400 dark:text-gray-500" />
+                    <Typography variant="h6" className="text-text-light dark:text-text-dark">
                         Ma'lumot yo‘q
                     </Typography>
                 </div>
             )}
 
             {omborPieData.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="text-center">
-                            <p className="text-sm text-gray-600 mb-1">Eng ko'p</p>
-                            <p className="text-2xl font-bold text-blue-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Eng ko'p</p>
+                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                                 {maxValue.toLocaleString()} so‘m
                             </p>
                         </div>
                         <div className="text-center">
-                            <p className="text-sm text-gray-600 mb-1">Umumiy</p>
-                            <p className="text-2xl font-bold text-purple-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Umumiy</p>
+                            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                                 {totalSum.toLocaleString()} so‘m
                             </p>
                         </div>
@@ -141,5 +135,6 @@ export default function WarehouseMonyChart({ data = [] }) {
                 </div>
             )}
         </Card>
+
     );
 }

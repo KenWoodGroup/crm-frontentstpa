@@ -35,11 +35,12 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
                 <Delete size={20} />
             </Button>
 
-            <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl">
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
+            <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl dark:bg-card-dark">
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
                     Omborni o‘chirish
                 </DialogHeader>
-                <DialogBody divider className="text-gray-700">
+                <DialogBody divider className="text-gray-700 dark:text-text-dark dark:bg-card-dark"
+                >
                     Siz haqiqatdan ham bu omborni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
@@ -47,10 +48,10 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
                         variant="text"
                         color="gray"
                         onClick={handleOpen}
-                        className="mr-2"
+                        className="dark:text-text-dark mr-2"
                         disabled={loading}
                     >
-                        Bekor qilish
+                        Отмена
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -83,7 +84,7 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
                         )}
                     </Button>
                 </DialogFooter>
-            </Dialog>
+            </Dialog >
         </>
     );
 }

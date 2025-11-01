@@ -861,8 +861,8 @@ export default function WareHouseIncome() {
             }
 
             {/* Main content */}
-            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
-                <div className="bg-gray-100 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4">
+            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6 bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-200`}>
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4 transition-colors duration-200">
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (
                         <div>
@@ -875,38 +875,37 @@ export default function WareHouseIncome() {
                                         setSendToTrash(false);
                                     }}
                                     className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200 ${selected === "incoming"
-                                        ? "bg-blue-50 border-blue-500 text-blue-700 shadow"
-                                        : "border-gray-300 hover:border-blue-300 text-gray-700"
+                                        ? "bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-400 text-blue-700 dark:text-blue-300 shadow"
+                                        : "border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <Truck size={22} />
                                         <span className="text-lg font-medium">Приход на склад</span>
                                     </div>
-
                                 </button>
+
                                 <button
                                     onClick={() => {
                                         setSelected("transfer_in");
                                         setSendToTrash(false);
                                     }}
                                     className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200 ${selected === "transfer_in"
-                                        ? "bg-blue-50 border-blue-500 text-blue-700 shadow"
-                                        : "border-gray-300 hover:border-blue-300 text-gray-700"
+                                        ? "bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-400 text-blue-700 dark:text-blue-300 shadow"
+                                        : "border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <Truck size={22} />
                                         <span className="text-lg font-medium">Перемещение на склад</span>
                                     </div>
-
                                 </button>
 
                                 {/* Return_in */}
                                 <div
                                     className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200 ${selected === "return_in"
-                                        ? "bg-green-50 border-green-500 text-green-700 shadow"
-                                        : "border-gray-300 hover:border-green-300 text-gray-700"
+                                        ? "bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-400 text-green-700 dark:text-green-300 shadow"
+                                        : "border-gray-300 dark:border-gray-600 hover:border-green-300 dark:hover:border-green-500 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                         }`}
                                 >
                                     <div
@@ -921,8 +920,8 @@ export default function WareHouseIncome() {
 
                                     {/* Checkbox for return_dis */}
                                     {selected === "return_in" && (
-                                        <label className="flex items-center justify-between bg-gray-50 p-3 rounded-lg cursor-pointer">
-                                            <div className="flex items-center gap-2 text-gray-700">
+                                        <label className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer transition-colors duration-200">
+                                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                                 <Trash2 size={18} />
                                                 <span>Направить на утилизацию</span>
                                             </div>
@@ -930,7 +929,7 @@ export default function WareHouseIncome() {
                                                 type="checkbox"
                                                 checked={sendToTrash}
                                                 onChange={(e) => setSendToTrash(e.target.checked)}
-                                                className="w-5 h-5 accent-red-500"
+                                                className="w-5 h-5 accent-red-500 dark:accent-red-400"
                                             />
                                         </label>
                                     )}
@@ -1087,10 +1086,6 @@ export default function WareHouseIncome() {
                                     {staffsLoading ? (
                                         <div className="flex items-center gap-2"><Spinner /> Loading...</div>
                                     ) : (
-                                        // <select value={selectedLocation} onChange={(e) => setSelectedStaff(e.target.value)} className="border rounded px-3 py-2 bg-white" aria-label="Sender location">
-                                        //     <option value="">Выберите поставшика</option>
-                                        //     {staffs?.map((loc) => <option key={loc.id} value={loc.id}>{loc.full_name || 'Noname'}</option>)}
-                                        // </select>
                                         <Select
                                             placeholder="Выберите поставшика"
                                             options={staffs}
@@ -1100,20 +1095,19 @@ export default function WareHouseIncome() {
                                             isSearchable
                                             isOptionDisabled={staffs.find((it) => it.value === 0)}
                                         />
-                                    )
-                                    }
-
-                                    {/* {selectedStaff === "other" && (
-                                        <input value={otherLocationName} onChange={(e) => setOtherLocationName(e.target.value)} placeholder="Tashqi location nomi" className="border rounded px-3 py-2" aria-label="Other location name" />
-                                    )} */}
+                                    )}
                                 </div>
 
                                 <div className="ml-auto">
-                                    <button disabled={createInvoiceLoading} onClick={startInvoice} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white rounded hover:opacity-95`} aria-label="Start invoice">
+                                    <button
+                                        disabled={createInvoiceLoading}
+                                        onClick={startInvoice}
+                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 transition-colors duration-200`}
+                                        aria-label="Start invoice"
+                                    >
                                         {
                                             !createInvoiceLoading ?
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                                                </svg> :
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg> :
                                                 <Spinner />
                                         }
                                         {selected === "transfer_in" && "Начать Принять перемещение"}
@@ -1124,7 +1118,6 @@ export default function WareHouseIncome() {
                                 </div>
                             </div>
                         </div>
-
                     ) : (
                         ((invoiceMeta?.[mode]?.operation_type !== "return_in" && invoiceMeta?.[mode]?.operation_type !== "return_dis") && (
                             <div className="h-[65px] bg-white rounded-lg flex items-center gap-3 px-3 shadow-sm">
@@ -1161,22 +1154,22 @@ export default function WareHouseIncome() {
                     {/* Invoice info & body */}
                     {invoiceStarted?.[mode] && (
                         <>
-                            <div className="bg-white rounded-lg p-3 shadow-sm flex items-center gap-6">
+                            <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm flex items-center gap-6 transition-colors duration-200">
                                 <div>
-                                    <div className="text-xs text-gray-500">Отправитель</div>
-                                    <div className="font-medium">{invoiceMeta?.[mode]?.sender || "—"}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Отправитель</div>
+                                    <div className="font-medium text-gray-900 dark:text-gray-100">{invoiceMeta?.[mode]?.sender || "—"}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-gray-500">Получатель</div>
-                                    <div className="font-medium">{invoiceMeta?.[mode]?.receiver}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Получатель</div>
+                                    <div className="font-medium text-gray-900 dark:text-gray-100">{invoiceMeta?.[mode]?.receiver}</div>
                                 </div>
                                 <div>
-                                    <div className="text-xs text-gray-500">Время</div>
-                                    <div className="font-medium">{invoiceMeta?.[mode]?.time}</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Время</div>
+                                    <div className="font-medium text-gray-900 dark:text-gray-100">{invoiceMeta?.[mode]?.time}</div>
                                 </div>
                                 <div className="ml-auto text-right">
-                                    <div className="text-xs text-gray-500">Общая стоимость</div>
-                                    <div className="font-semibold text-lg">{(total || 0).toLocaleString()} сум</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Общая стоимость</div>
+                                    <div className="font-semibold text-lg text-gray-900 dark:text-gray-100">{(total || 0).toLocaleString()} сум</div>
                                 </div>
                             </div>
 
@@ -1229,7 +1222,7 @@ export default function WareHouseIncome() {
                             }
                             <div className="bg-white rounded-lg p-3 shadow-sm overflow-auto">
                                 <table className="min-w-full text-sm">
-                                    <thead className="text-left text-xs text-gray-500 border-b">
+                                    <thead className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-600">
                                         <tr>
                                             <th className="p-2">#</th>
                                             <th>Партия</th>
@@ -1246,36 +1239,57 @@ export default function WareHouseIncome() {
                                     </thead>
                                     <tbody>
                                         {(!mixData || mixData.length === 0) ? (
-                                            <tr><td colSpan={8} className="p-4 text-center text-gray-400">Mahsulotlar mavjud emas</td></tr>
+                                            <tr>
+                                                <td colSpan={8} className="p-4 text-center text-gray-400 dark:text-gray-500">
+                                                    Mahsulotlar mavjud emas
+                                                </td>
+                                            </tr>
                                         ) : mixData.map((it, idx) => {
                                             // compute stock available if provided
                                             const stockAvail = Number(it.return_quantity ?? Infinity);
                                             const qty = Number(it.quantity ?? 0);
                                             const qtyError = (invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") && Number.isFinite(stockAvail) && qty > stockAvail;
                                             return (
-                                                <tr key={it.id || idx} className="border-b">
-                                                    <td className="p-2 align-center">{idx + 1}</td>
+                                                <tr key={it.id || idx} className="border-b border-gray-200 dark:border-gray-600">
+                                                    <td className="p-2 align-center text-gray-900 dark:text-gray-100">{idx + 1}</td>
                                                     <td>
-                                                        {/* is_new_batch only relevant for incoming */}
                                                         {mode === "in" ? (
-                                                            <input checked={!!it.is_new_batch} onChange={(e) => updateBatchNew(idx, e.target.checked, it.price, it.origin_price)} type="checkbox" name="is_new_batch" />
+                                                            <input
+                                                                checked={!!it.is_new_batch}
+                                                                onChange={(e) => updateBatchNew(idx, e.target.checked, it.price, it.origin_price)}
+                                                                type="checkbox"
+                                                                name="is_new_batch"
+                                                                className="accent-blue-500 dark:accent-blue-400"
+                                                            />
                                                         ) : (
-                                                            <span className="text-xs text-gray-400">—</span>
+                                                            <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
                                                         )}
                                                     </td>
                                                     <td className="p-2 align-top">
-                                                        <div className="font-medium">{it?.name || "—"}</div>
-                                                        <div className="text-xs text-gray-500">{it.barcode}</div>
-                                                        <div className="text-xs text-gray-500 flex">Партия:
+                                                        <div className="font-medium text-gray-900 dark:text-gray-100">{it?.name || "—"}</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">{it.barcode}</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 flex">
+                                                            Партия:
                                                             {mode === "in" ? (
-                                                                it.is_new_batch ? (<div className="tex-xs text-blue-gray-700 ">Новая партия</div>) : (it.batch === null ? "Default" : it.batch)
+                                                                it.is_new_batch ? (
+                                                                    <div className="text-xs text-blue-gray-700 dark:text-blue-300">Новая партия</div>
+                                                                ) : (
+                                                                    it.batch === null ? "Default" : it.batch
+                                                                )
                                                             ) : (
                                                                 (it.batch === null ? "Default" : it.batch)
                                                             )}
                                                         </div>
                                                     </td>
                                                     <td className="p-2 align-center w-[140px]">
-                                                        <input type="number" step="any" value={it.price ?? ""} onChange={(e) => handleUpdatePrice(idx, e.target.value, it.origin_price)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it.product?.name || idx + 1}`} />
+                                                        <input
+                                                            type="number"
+                                                            step="any"
+                                                            value={it.price ?? ""}
+                                                            onChange={(e) => handleUpdatePrice(idx, e.target.value, it.origin_price)}
+                                                            className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+                                                            aria-label={`Price for ${it.product?.name || idx + 1}`}
+                                                        />
                                                     </td>
                                                     <td className="p-2 align-center w-[120px] min-w-[120px]">
                                                         <input type="number" step="1" min={0} max={(invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") ? (Number.isFinite(stockAvail) ? stockAvail : undefined) : Infinity} value={it.quantity === 0 ? "0" : (it.quantity ?? "")} onChange={(e) => handleUpdateQuantity(idx, e.target.value, it.return_quantity)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
@@ -1292,20 +1306,24 @@ export default function WareHouseIncome() {
                                                     <td className="p-2 align-center w-[120px] ">
                                                         {it?.unit || "-"}
                                                     </td>
-                                                    <td className="p-2 align-center">
+                                                    <td className="p-2 align-center text-gray-900 dark:text-gray-100">
                                                         {(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}
                                                     </td>
                                                     <td className="p-2 align-center">
                                                         <div className="flex gap-2 items-center">
                                                             <button
                                                                 onClick={() => handleRemoveItem(idx)}
-                                                                className="p-2 text-gray-800 hover:text-red-500 active:scale-90 transition-all duration-200"
+                                                                className="p-2 text-gray-800 dark:text-gray-200 hover:text-red-500 dark:hover:text-red-400 active:scale-90 transition-all duration-200"
                                                                 title="Remove row"
                                                                 aria-label={`Remove item ${idx + 1}`}
                                                             >
                                                                 <MinusCircle size={22} />
                                                             </button>
-                                                            {qtyError && <div className="text-xs text-red-600">Miqdor ombordagi ({stockAvail}) dan oshdi</div>}
+                                                            {qtyError && (
+                                                                <div className="text-xs text-red-600 dark:text-red-400">
+                                                                    Miqdor ombordagi ({stockAvail}) dan oshdi
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -1316,7 +1334,10 @@ export default function WareHouseIncome() {
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center gap-2">
-                                    <button onClick={openModal} className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] text-white text-[16px] rounded hover:opacity-95`}>
+                                    <button
+                                        onClick={openModal}
+                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white text-[16px] rounded hover:opacity-95 transition-colors duration-200`}
+                                    >
                                         <CheckSquare size={22} />
                                         Завершить
                                     </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Button,
     Dialog,
@@ -22,21 +22,40 @@ export default function WarehouseExpensesEdit({ data, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [cashes, setCashes] = useState([]);
+    const formRef = useRef(null); // 🔹 Для актуального состояния
 
     const [form, setForm] = useState({
-        amount: data?.amount
-            ? Math.floor(Number(data.amount))
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-            : "",
-        method: data?.method || "cash",
-        cash_id: data?.cash_id ? String(data.cash_id) : "",
-        note: data?.note || "",
-        location_id: data?.location_id || Cookies?.get("ul_nesw"),
+        amount: "",
+        method: "cash",
+        cash_id: "",
+        note: "",
+        location_id: Cookies?.get("ul_nesw"),
         created_by: Cookies?.get("us_nesw"),
     });
 
-    const handleOpen = () => setOpen(!open);
+    // 🔹 Синхронизируем ref с state
+    useEffect(() => {
+        formRef.current = form;
+    }, [form]);
+
+    const handleOpen = () => {
+        if (!open) {
+            // При открытии диалога заполняем форму данными
+            setForm({
+                amount: data?.amount
+                    ? Math.floor(Number(data.amount))
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                    : "",
+                method: data?.method || "cash",
+                cash_id: data?.cash?.id ? String(data.cash.id) : "",
+                note: data?.note || "",
+                location_id: data?.location_id || Cookies?.get("ul_nesw"),
+                created_by: Cookies?.get("us_nesw"),
+            });
+        }
+        setOpen(!open);
+    };
 
     const GetAllCash = async () => {
         try {
@@ -68,24 +87,39 @@ export default function WarehouseExpensesEdit({ data, refresh }) {
     };
 
     const handleEdit = async () => {
-        if (!form.cash_id) {
+        const currentForm = formRef.current; // 🔹 Берём актуальное состояние из ref
+
+        console.log("🔴 Current form from ref:", currentForm); // 🔹 Для отладки
+        console.log("🔴 cash_id from form:", currentForm.cash_id);
+
+        if (!currentForm.cash_id || currentForm.cash_id === "") {
             Alert("Выберите кассу!", "warning");
             return;
         }
 
         try {
             setLoading(true);
+
+            // 🔹 НЕ конвертируем cash_id в Number, оставляем как UUID string
             const payload = {
-                ...form,
-                amount: Number(form.amount.replace(/\s/g, "")) || 0,
-                cash_id: Number(form.cash_id),
+                amount: Number(currentForm.amount.replace(/\s/g, "")) || 0,
+                cash_id: currentForm.cash_id, // 🔹 ОСТАВЛЯЕМ СТРОКОЙ (UUID)
+                method: currentForm.method,
+                note: currentForm.note,
+                location_id: currentForm.location_id,
+                created_by: currentForm.created_by,
             };
+
+            console.log("🟢 Payload before sending:", JSON.stringify(payload, null, 2));
+            console.log("🟢 cash_id type:", typeof payload.cash_id);
+            console.log("🟢 cash_id value:", payload.cash_id);
 
             await Expenses.EditExpenses(payload, data.id);
             Alert("Расход успешно обновлён", "success");
             setOpen(false);
             refresh();
         } catch (error) {
+            console.error("🔴 Error:", error);
             Alert(
                 `Ошибка при обновлении: ${error?.response?.data?.message || error.message}`,
                 "error"
@@ -96,7 +130,9 @@ export default function WarehouseExpensesEdit({ data, refresh }) {
     };
 
     useEffect(() => {
-        if (open) GetAllCash();
+        if (open) {
+            GetAllCash();
+        }
     }, [open]);
 
     return (
@@ -107,8 +143,15 @@ export default function WarehouseExpensesEdit({ data, refresh }) {
                 </IconButton>
             </Tooltip>
 
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Редактировать расход</DialogHeader>
+            <Dialog
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+                open={open}
+                handler={handleOpen}
+                size="sm"
+            >
+                <DialogHeader className="dark:text-text-dark">
+                    Редактировать расход
+                </DialogHeader>
 
                 <DialogBody divider>
                     <div className="flex flex-col gap-4">
@@ -117,17 +160,35 @@ export default function WarehouseExpensesEdit({ data, refresh }) {
                             name="amount"
                             value={form.amount}
                             onChange={handleAmountChange}
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: "!text-text-light dark:!text-text-dark"
+                            }}
+                            color="blue-gray"
                         />
 
                         <Select
                             key={`cash-select-${form.cash_id}-${cashes.length}`}
+                            className="text-gray-900 dark:text-text-dark outline-none"
+                            labelProps={{
+                                className: "text-gray-700 dark:text-text-dark"
+                            }}
+                            menuProps={{
+                                className: "dark:bg-gray-800 dark:text-text-dark"
+                            }}
                             label="Выберите кассу"
-                            value={form.cash_id}
-                            onChange={(val) => setForm((p) => ({ ...p, cash_id: String(val) }))}
+                            value={form.cash_id || undefined}
+                            onChange={(val) => {
+                                console.log("Selected cash_id:", val, "Type:", typeof val); // 🔹 Отладка
+                                setForm((prev) => ({ ...prev, cash_id: val ? String(val) : "" }));
+                            }}
                         >
                             {cashes.map((cash) => (
                                 <Option key={cash.id} value={String(cash.id)}>
-                                    {`${cash.name}`}
+                                    {cash.name}
                                 </Option>
                             ))}
                         </Select>
@@ -135,7 +196,14 @@ export default function WarehouseExpensesEdit({ data, refresh }) {
                         <Select
                             label="Метод оплаты"
                             value={form.method}
-                            onChange={(val) => setForm((p) => ({ ...p, method: val }))}
+                            onChange={(val) => setForm((prev) => ({ ...prev, method: val }))}
+                            className="text-gray-900 dark:text-text-dark outline-none"
+                            labelProps={{
+                                className: "text-gray-700 dark:text-text-dark"
+                            }}
+                            menuProps={{
+                                className: "dark:bg-gray-800 dark:text-text-dark"
+                            }}
                         >
                             <Option value="cash">Наличные</Option>
                             <Option value="card">Карта</Option>
@@ -147,12 +215,20 @@ export default function WarehouseExpensesEdit({ data, refresh }) {
                             name="note"
                             value={form.note}
                             onChange={handleChange}
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: "!text-text-light dark:!text-text-dark"
+                            }}
+                            color="blue-gray"
                         />
                     </div>
                 </DialogBody>
 
                 <DialogFooter>
-                    <Button variant="text" color="gray" onClick={handleOpen} className="mr-2">
+                    <Button variant="text" color="red" onClick={handleOpen} className="mr-2">
                         Отмена
                     </Button>
                     <Button color="blue" onClick={handleEdit} disabled={loading}>

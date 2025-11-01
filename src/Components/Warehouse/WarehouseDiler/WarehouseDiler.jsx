@@ -1,19 +1,27 @@
 import {
     Building2,
-    User,
     MapPin,
     Phone,
     Mail,
     ChevronLeft,
     ChevronRight,
-    Search
+    Search,
 } from "lucide-react";
-import { Alert } from "../../../utils/Alert";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    CardFooter,
+    Typography,
+    Input,
+    IconButton,
+    Button,
+    Tooltip,
+} from "@material-tailwind/react";
+import { Alert } from "../../../utils/Alert";
 import Loading from "../../UI/Loadings/Loading";
-import { Button, Input } from "@material-tailwind/react";
-import { NavLink } from "react-router-dom";
 import EmptyData from "../../UI/NoData/EmptyData";
 import WarehouseDilerCreate from "./_components/WarehouseDilerCreate";
 import WarehouseDilerDelete from "./_components/WarehouseDilerDelete";
@@ -40,7 +48,7 @@ export default function WarehouseDiler() {
                 page: pageNumber,
                 search: searchTerm.trim() === "" ? "all" : searchTerm,
                 location_id: parent_id,
-                date: new Date().toISOString(), // <-- дата для backend
+                date: new Date().toISOString(),
             };
 
             const response = await Clients?.GetClients(data);
@@ -52,7 +60,7 @@ export default function WarehouseDiler() {
             setPage(Number(pagination.current_page) || pageNumber);
             setTotalCount(Number(pagination.total_count) || records.length);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             Alert("Xatolik yuz berdi ❌", "error");
         } finally {
             setLoading(false);
@@ -63,12 +71,11 @@ export default function WarehouseDiler() {
         GetAll(1);
     }, []);
 
-    // поиск при изменении
     useEffect(() => {
-        const delay = setTimeout(() => {
+        const timeout = setTimeout(() => {
             GetAll(1, searchValue);
-        }, 500); // задержка для удобства
-        return () => clearTimeout(delay);
+        }, 500);
+        return () => clearTimeout(timeout);
     }, [searchValue]);
 
     if (loading) return <Loading />;
@@ -77,101 +84,130 @@ export default function WarehouseDiler() {
         <div className="min-h-screen">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-                <h1 className="text-2xl font-semibold text-gray-800">
+                <Typography variant="h4" className="dark:text-text-dark text-black" >
                     Diler Maʼlumotlari
-                </h1>
+                </Typography>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="relative w-full md:w-64 bg-[white]">
+                    <div className="relative w-full md:w-72">
                         <Input
                             label="Qidiruv..."
-                            icon={<Search className="text-gray-500" size={18} />}
+                            icon={<Search size={18} />}
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
+                            color="blue-gray"
+                            crossOrigin=""
                         />
                     </div>
                     <WarehouseDilerCreate refresh={() => GetAll(page)} />
                 </div>
             </div>
 
+            {/* Контент */}
             {warehouses?.length > 0 ? (
                 <>
-                    {/* Warehouse Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {warehouses.map((w) => (
-                            <div
+                            <Card
                                 key={w.id}
-                                className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 hover:shadow-md transition"
+                                className="shadow-sm border  dark:bg-card-dark hover:shadow-md transition-all"
                             >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-3 bg-gray-100 rounded-xl">
-                                            <Building2 className="w-6 h-6 text-gray-700" />
+                                <CardHeader
+                                    floated={false}
+                                    shadow={false}
+                                    className="bg-blue-gray-50 flex items-center justify-between p-4 dark:bg-background-dark "
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                                            <Building2 className="w-6 h-6 text-blue-gray-700" />
                                         </div>
-                                        <h2 className="text-xl font-semibold text-gray-800">
+                                        <Typography
+                                            variant="h6"
+                                            color="blue-gray"
+                                            className="font-semibold dark:text-text-dark"
+                                        >
                                             {w.name}
-                                        </h2>
+                                        </Typography>
                                     </div>
-                                    <div className="flex items-center gap-[10px]">
-                                        <WarehouseDilerEdit
-                                            refresh={() => GetAll(page)}
-                                            diler={w}
-                                        />
-                                        <WarehouseDilerDelete
-                                            refresh={() => GetAll(page)}
-                                            dilerId={w?.id}
-                                        />
-                                    </div>
-                                </div>
 
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-gray-700">
+                                    <div className="flex items-center gap-2">
+                                        <Tooltip content="Tahrirlash">
+                                            <WarehouseDilerEdit
+                                                refresh={() => GetAll(page)}
+                                                diler={w}
+                                            />
+                                        </Tooltip>
+                                        <Tooltip content="O'chirish">
+                                            <WarehouseDilerDelete
+                                                refresh={() => GetAll(page)}
+                                                dilerId={w?.id}
+                                            />
+                                        </Tooltip>
+                                    </div>
+                                </CardHeader>
+
+                                <CardBody className="text-blue-gray-700 space-y-3">
+                                    <div className="flex items-center gap-2">
                                         <Mail className="w-5 h-5 text-gray-500" />
-                                        <span>{w.users?.[0]?.email || "—"}</span>
+                                        <Typography className=" dark:text-text-dark"
+                                            variant="small">
+                                            {w.users?.[0]?.email || "—"}
+                                        </Typography>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-gray-700">
+                                    <div className="flex items-center gap-2">
                                         <MapPin className="w-5 h-5 text-gray-500" />
-                                        <span>{w.address}</span>
+                                        <Typography className=" dark:text-text-dark" variant="small">
+                                            {w.address || "Manzil kiritilmagan"}
+                                        </Typography>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-gray-700">
+                                    <div className="flex items-center gap-2">
                                         <Phone className="w-5 h-5 text-gray-500" />
-                                        <span>{w.phone}</span>
+                                        <Typography className=" dark:text-text-dark" variant="small">
+                                            {w.phone || "Telefon mavjud emas"}
+                                        </Typography>
                                     </div>
-
-                                    {/* Дата создания */}
-                                    <div className="flex items-center gap-2 text-gray-700 text-sm">
-                                        <span className="font-medium">Yaratilgan sana:</span>
-                                        <span>
-                                            {new Date(w.createdAt).toLocaleDateString("uz-UZ")}
+                                    <Typography
+                                        variant="small"
+                                        color="gray"
+                                        className="flex items-center gap-1  dark:text-text-dark"
+                                    >
+                                        <span className="font-medium text-blue-gray-700 dark:text-text-dark">
+                                            Yaratilgan sana:
                                         </span>
-                                    </div>
-                                </div>
-                            </div>
+                                        {new Date(w.createdAt).toLocaleDateString("uz-UZ")}
+                                    </Typography>
+                                </CardBody>
+
+                            </Card>
                         ))}
                     </div>
 
                     {/* Pagination */}
                     {totalCount > 15 && (
                         <div className="flex justify-center mt-6 gap-4">
-                            <button
+                            <IconButton
+                                variant="text"
+                                color="blue-gray"
                                 onClick={() => GetAll(page - 1)}
                                 disabled={page <= 1}
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
                             >
                                 <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <span className="flex items-center px-2">
+                            </IconButton>
+
+                            <Typography variant="small" color="blue-gray" className="flex items-center">
                                 {page} / {totalPages}
-                            </span>
-                            <button
+                            </Typography>
+
+                            <IconButton
+                                variant="text"
+                                color="blue-gray"
                                 onClick={() => GetAll(page + 1)}
                                 disabled={page >= totalPages}
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
                             >
                                 <ChevronRight className="w-5 h-5" />
-                            </button>
+                            </IconButton>
                         </div>
                     )}
                 </>

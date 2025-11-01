@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./_components/login.css"
+import "./_components/login.css";
 import Eye from "../../Components/UI/Svg/Eye";
 import ClosedEye from "../../Components/UI/Svg/ClosedEye";
 import { Auth } from "../../utils/Controllers/Auth";
@@ -21,40 +21,56 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const emailRegex =
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const validate = () => {
     const em = email.trim();
     if (!em) return "Elektron pochta manzili kiriting.";
-    if (!emailRegex.test(em)) return "Iltimos, yaroqli elektron pochta manzili kiriting.";
+    if (!emailRegex.test(em))
+      return "Iltimos, yaroqli elektron pochta manzili kiriting.";
     if (!password) return "Parol kiriting.";
-    if (password.length < 6) return "Parol kamida 6 ta belgidan iborat boʻlishi kerak.";
+    if (password.length < 6)
+      return "Parol kamida 6 ta belgidan iborat boʻlishi kerak.";
     return "";
   };
 
-  // Функция для проверки статуса оферты
   const checkOffertaStatus = async (locationId) => {
     try {
       if (!locationId) return false;
-
       const response = await locationInfo?.GetInfo(locationId);
-      const data = response?.data;
-
-      return data
+      return response?.data;
     } catch (error) {
       console.log("Error checking offerta status:", error);
       return false;
     }
   };
 
-  // Функция для сохранения пользовательских данных
+  // ✅ Добавлено сохранение sell_access
+  // ✅ Функция для сохранения пользовательских данных
+  // ✅ Обновлённая функция сохранения пользовательских данных
   const saveUserData = (data) => {
     const { access_token, refresh_token } = data?.tokens || {};
-    const { id, role, location_id } = data?.newUser;
+    const { id, role, location_id, location } = data?.newUser || {};
 
+    // 🔍 Извлекаем значение sell_access из location_data
+    const sellAccessEntry = location?.location_data?.find(
+      (item) => item.key === "sell_access"
+    );
+    const sell_access_value = sellAccessEntry?.value;
+
+    // ✅ Приводим значение к булевому типу
+    const sell_access =
+      sell_access_value === true ||
+      sell_access_value === "true" ||
+      sell_access_value === 1 ||
+      sell_access_value === "1";
+
+    // ✅ Сохраняем токены
     Cookies.set("token", access_token);
     Cookies.set("refresh_token", refresh_token);
 
+    // ✅ Определяем роль
     const roleMap = {
       super_admin: "SPAfefefeUID",
       admin: "AutngergUID",
@@ -62,20 +78,28 @@ export default function Login() {
       company: "SefwfmgrUID",
       warehouse: "SesdsdfmgrUID",
       dealer: "SwedsdfmgrUID",
+      independent: "inedsdfmgrUID",
     };
 
     Cookies.set("nesw", roleMap[role] || "");
     Cookies.set("us_nesw", id);
     Cookies.set("ul_nesw", location_id);
-    Cookies.set("usd_nesw", data?.newUser?.location?.parent_id);
+    Cookies.set("usd_nesw", location?.parent_id);
 
-    // Сохраняем полные данные пользователя в состоянии
-    setUserData(data.newUser);
+    // ✅ Хешированное сохранение sell_access
+    const hashedValue = sell_access ? "terrwerwerw" : "fdqewfewf";
+    Cookies.set("sedqwdqdqwd", hashedValue);
 
-    return { locationId: location_id, userData: data.newUser, role: role };
+    // ✅ Добавляем sell_access в userData
+    const userWithAccess = { ...data.newUser, sell_access };
+    setUserData(userWithAccess);
+
+    return { locationId: location_id, userData: userWithAccess, role };
   };
 
-  // Редирект пользователя
+
+
+
   const redirectUser = (userData) => {
     if (!userData) return;
 
@@ -99,16 +123,15 @@ export default function Login() {
         { role: "warehouse", vektor: "/warehouse/dashboard" },
         { role: "dealer", vektor: "/diler/dashboard" },
         { role: "company", vektor: "/company/dashboard" },
+        { role: "independent", vektor: "/independent/dashboard" },
       ];
       const vektor_obj = roleLinks.find((item) => item.role === role);
       navigate(vektor_obj?.vektor || "/");
     }
   };
 
-  // Функция для проверки, нужно ли показывать оферту
   const shouldShowOfferta = (role) => {
-    // Не показывать оферту для super_admin и admin
-    return !["super_admin", "admin", 'warehouse', 'dealer'].includes(role);
+    return !["super_admin", "admin", "warehouse", "dealer"].includes(role);
   };
 
   const handleSubmit = async (e) => {
@@ -123,7 +146,6 @@ export default function Login() {
     try {
       setLoading(true);
       const base_data = await Auth.Login({ email, password });
-
       const { data } = base_data;
 
       if (base_data?.status === 401) {
@@ -131,28 +153,20 @@ export default function Login() {
         return;
       }
 
-      // Сохраняем данные пользователя и получаем locationId и роль
       const { locationId, userData, role } = saveUserData(data);
-
       notify.success("Login muvaffaqiyatli!");
 
-      // ✅ ПРОВЕРЯЕМ НУЖНО ЛИ ПОКАЗЫВАТЬ ОФЕРТУ ДЛЯ ДАННОЙ РОЛИ
       if (shouldShowOfferta(role)) {
-        // Для ролей, которым нужна оферта, проверяем статус
         const offertaAccepted = await checkOffertaStatus(locationId);
 
         if (!offertaAccepted) {
-          // Если оферта не принята, показываем модалку
           setShowOfferta(true);
         } else {
-          // Если оферта уже принята, сразу перенаправляем
           redirectUser(userData);
         }
       } else {
-        // Для super_admin и admin сразу перенаправляем без проверки оферты
         redirectUser(userData);
       }
-
     } catch (err) {
       setError(
         err?.message === "Request failed with status code 401"
@@ -166,13 +180,13 @@ export default function Login() {
 
   const handleOffertaClose = () => {
     setShowOfferta(false);
-    // При отмене оферты разлогиниваем пользователя
     Cookies.remove("token");
     Cookies.remove("refresh_token");
     Cookies.remove("nesw");
     Cookies.remove("us_nesw");
     Cookies.remove("ul_nesw");
     Cookies.remove("usd_nesw");
+    Cookies.remove("sedqwdqdqwd");
     setUserData(null);
     setEmail("");
     setPassword("");
@@ -180,83 +194,75 @@ export default function Login() {
 
   const handleOffertaAgree = () => {
     setShowOfferta(false);
-    // После согласия с офертой перенаправляем пользователя
-    if (userData) {
-      redirectUser(userData);
-    }
+    if (userData) redirectUser(userData);
   };
 
   return (
-    <div className="login-page flex items-center justify-center px-9 py-20 ">
-      <div className="login-card w-full max-w-[520px] rounded-[14px] p-[28px] border border-[#e6eef2]">
+    <div className="login-page flex items-center justify-center px-9 py-20 bg-white dark:bg-background-dark !important transition-colors duration-200 !important">
+      <div className="login-card w-full max-w-[520px] rounded-[14px] p-[28px] border border-[#e6eef2] dark:border-gray-700 !important bg-white dark:bg-card-dark !important shadow-lg dark:shadow-gray-900/20 !important transition-colors duration-200 !important">
         <div className="flex gap-3.5 items-center mb-4.5">
-          <div className="login-logo shadow-[0_8px_24px_rgba(19, 102, 214, 0.12)] w-16 h-16 rounded-[16px] flex items-center justify-center text-[#fff] font-bold text-[20px]" aria-hidden="true">KW</div>
+          <div className="login-logo shadow-[0_8px_24px_rgba(19,102,214,0.12)] dark:shadow-[0_8px_24px_rgba(19,102,214,0.2)] !important w-16 h-16 rounded-[16px] flex items-center justify-center text-[#fff] font-bold text-[20px] bg-blue-600 dark:bg-blue-700 !important">
+            KW
+          </div>
           <div className="flex flex-col gap-0.5">
-            <h1 id="login-heading" className="m-0 text-[18px] font-medium">KENWOOD</h1>
-            <p className="m-0 text-[#6b7280] text-[13px] ">Ombor nazorati — tez, aniq va ishonchli</p>
+            <h1 className="m-0 text-[18px] font-medium text-gray-900 dark:text-text-dark !important">KENWOOD</h1>
+            <p className="m-0 text-[#6b7280] dark:text-gray-400 !important text-[13px]">
+              Ombor nazorati — tez, aniq va ishonchli
+            </p>
           </div>
         </div>
 
-        <form
-          className="flex-col gap-3.5 mt-1.5"
-          onSubmit={handleSubmit}
-          noValidate
-        >
+        <form onSubmit={handleSubmit} noValidate className="flex-col gap-3.5 mt-1.5">
           {error && (
-            <div id="login-error" className="border-[rgba(239, 68, 68, 0.12)] text-[#ef4444] shadow-[0_6px_14px_rgba(239, 68, 68, 0.03)] px-2.5 py-3 rounded-[10px] text-[13px]">
+            <div className="border-[rgba(239,68,68,0.12)] dark:border-red-800/30 !important text-[#ef4444] dark:text-red-400 !important shadow-[0_6px_14px_rgba(239,68,68,0.03)] dark:shadow-red-900/10 !important px-2.5 py-3 rounded-[10px] text-[13px] bg-white dark:bg-red-900/10 !important">
               {error}
             </div>
           )}
 
           <label className="login-field" htmlFor="login-email">
-            <span className="login-label">Elektron pochta</span>
+            <span className="login-label text-gray-700 dark:text-gray-300 !important">Elektron pochta</span>
             <input
               id="login-email"
-              className="login-input"
+              className="login-input border border-gray-300 dark:border-gray-600 !important bg-white dark:bg-card-dark !important text-gray-900 dark:text-gray-100 !important placeholder-gray-500 dark:placeholder-gray-400 !important"
               type="email"
-              inputMode="email"
-              autoComplete="email"
               placeholder="misol: user@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
-              aria-required="true"
             />
           </label>
 
           <label className="login-field" htmlFor="login-password">
             <div className="login-field-top">
-              <span className="login-label">Parol</span>
+              <span className="login-label text-gray-700 dark:text-gray-300 !important">Parol</span>
             </div>
 
             <div className="relative flex items-center">
               <input
                 id="login-password"
-                className="login-input login-input-with-icon"
+                className="login-input login-input-with-icon border border-gray-300 dark:border-gray-600 !important bg-white dark:bg-gray-800 !important text-gray-900 dark:text-gray-100 !important placeholder-gray-500 dark:placeholder-gray-400 !important"
                 type={showPassword ? "text" : "password"}
                 placeholder="Parolingizni kiriting"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
                 disabled={loading}
-                aria-required="true"
               />
-
               <button
                 type="button"
-                className="login-toggle-icon absolute right-2 bg-transparent border-none h-8 w-8 inline-flex items-center justify-center rounded-[8px] text-[#6b7280]"
+                className="login-toggle-icon absolute right-2 bg-transparent border-none h-8 w-8 inline-flex items-center justify-center rounded-[8px] text-[#6b7280] dark:text-gray-400 !important hover:text-gray-900 dark:hover:text-gray-200 !important hover:bg-gray-100 dark:hover:bg-gray-700 !important transition-colors duration-200 !important"
                 onClick={() => setShowPassword((s) => !s)}
-                aria-pressed={showPassword}
-                aria-label={showPassword ? "Parolni yashirish" : "Parolni ko‘rsatish"}
-                disabled={loading}
               >
                 {showPassword ? <Eye /> : <ClosedEye />}
               </button>
             </div>
 
             <div className="flex justify-between mt-2">
-              <NavLink to={"/forgot-password"}>
-                <button type="button" className="login-forgot bg-[rgba(19, 102, 214, 0.06)] px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium" disabled={loading}>
+              <NavLink to="/forgot-password">
+                <button
+                  type="button"
+                  className="login-forgot bg-[rgba(19,102,214,0.06)] dark:bg-blue-900/20 !important px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium text-blue-600 dark:text-blue-400 !important hover:bg-blue-100 dark:hover:bg-blue-900/30 !important transition-colors duration-200 !important"
+                  disabled={loading}
+                >
                   Parolni unutdingizmi?
                 </button>
               </NavLink>
@@ -266,9 +272,8 @@ export default function Login() {
           <div className="flex gap-3 items-center mt-2">
             <button
               type="submit"
-              className="login-btn login-primary login-full"
+              className="login-btn login-primary login-full bg-blue-600 dark:bg-blue-700 !important hover:bg-blue-700 dark:hover:bg-blue-600 !important text-white disabled:bg-blue-400 dark:disabled:bg-blue-800 !important transition-colors duration-200 !important"
               disabled={loading}
-              aria-busy={loading}
             >
               {loading ? (
                 <>
@@ -282,8 +287,10 @@ export default function Login() {
           </div>
         </form>
 
-        <footer className="mt-4 text-center font-[3px] text-[#6b7280] " aria-hidden="true">
-          <small>© {new Date().getFullYear()}  KENWOOD Barcha huquqlar himoyalangan.</small>
+        <footer className="mt-4 text-center font-[3px] text-[#6b7280] dark:text-gray-400 !important">
+          <small>
+            © {new Date().getFullYear()} KENWOOD Barcha huquqlar himoyalangan.
+          </small>
         </footer>
       </div>
 

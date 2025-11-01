@@ -3,6 +3,7 @@ import FactoryDashboard from "../Components/Factory/FactoryDashboard/FactoryDash
 import FactoryProduct from "../Components/Factory/FactoryProduct/FactoryProduct";
 import FactoryReport from "../Components/Factory/FactoryReport/FactoryReport";
 import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
+import WarehouseAccess from "../Components/Factory/FactoryWarehouse/_components/WarehouseAccess";
 import FactoryWarehouse from "../Components/Factory/FactoryWarehouse/FactoryWarehouse";
 import WarehouseDetail from "../Components/Factory/WarehouseDetail/WarehouseDetail";
 import WarehouseUser from "../Components/Factory/WarehouseUser/WarehouseUser";
@@ -28,6 +29,11 @@ export const userRoutes = [
     path: "factory/warehouse/:id",
     name: 'Warehouse detail',
     element: <WarehouseDetail />
+  },
+  {
+    path: "factory/warehouse-access/:id",
+    name: 'Warehouse access',
+    element: <WarehouseAccess />
   },
   {
     path: "/profile",

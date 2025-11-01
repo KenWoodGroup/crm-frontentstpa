@@ -38,22 +38,21 @@ export default function WarehouseCashDelete({ id, refresh }) {
                 </IconButton>
             </Tooltip>
 
-            <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl">
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
+            <Dialog open={open} handler={handleOpen} className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark">
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:text-text-dark">
                     Удаления Кассы
                 </DialogHeader>
-                <DialogBody divider className="text-gray-700">
+                <DialogBody divider className="text-gray-700 dark:text-text-dark">
                     Вы действительно хотите удалить кассу ?
                 </DialogBody>
-                <DialogFooter className="border-t border-gray-200">
+                <DialogFooter className="border-t border-gray-200 ">
                     <Button
                         variant="text"
-                        color="gray"
+                        color="red"
                         onClick={handleOpen}
                         className="mr-2"
-                        disabled={loading}
                     >
-                        Отменить
+                        Отмена
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}

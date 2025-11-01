@@ -24,10 +24,10 @@ export default function WarehouseExpensesCreate({ refresh }) {
     const [form, setForm] = useState({
         amount: "",
         method: "cash",
-        location_id: Cookies?.get('ul_nesw'),
+        location_id: Cookies?.get("ul_nesw"),
         cash_id: "",
         note: "",
-        created_by: Cookies?.get('us_nesw'),
+        created_by: Cookies?.get("us_nesw"),
     });
 
     const handleOpen = () => setOpen(!open);
@@ -80,19 +80,19 @@ export default function WarehouseExpensesCreate({ refresh }) {
             const payload = {
                 ...form,
                 amount: Number(form.amount.replace(/\s/g, "")) || 0,
-                cash_id: form.cash_id
+                cash_id: form.cash_id,
             };
 
-            const response = await Expenses.CreateExpenses(payload);
+            await Expenses.CreateExpenses(payload);
             Alert("Muvaffaqiyatli yaratildi", "success");
             setOpen(false);
             setForm({
                 amount: "",
                 method: "cash",
-                location_id: Cookies?.get('ul_nesw'),
+                location_id: Cookies?.get("ul_nesw"),
                 cash_id: "",
                 note: "",
-                created_by: Cookies?.get('us_nesw'),
+                created_by: Cookies?.get("us_nesw"),
             });
             refresh();
         } catch (error) {
@@ -112,8 +112,13 @@ export default function WarehouseExpensesCreate({ refresh }) {
                 Создать Расход
             </Button>
 
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Создать новый расход</DialogHeader>
+            <Dialog
+                open={open}
+                handler={handleOpen}
+                size="sm"
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+            >
+                <DialogHeader className="dark:text-text-dark">Создать новый расход</DialogHeader>
                 <DialogBody divider>
                     <div className="flex flex-col gap-4">
                         <Input
@@ -122,13 +127,28 @@ export default function WarehouseExpensesCreate({ refresh }) {
                             value={form.amount}
                             onChange={handleAmountChange}
                             placeholder=""
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
+                            color="blue-gray"
                         />
 
                         <Select
-                            key={form.cash_id} // Добавьте эту строку
+                            key={form.cash_id}
                             label="Выберите кассу"
                             value={form.cash_id}
                             onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
+                            className="text-gray-900 dark:text-text-dark  outline-none"
+                            labelProps={{
+                                className: "text-gray-700 dark:text-text-dark"
+                            }}
+                            menuProps={{
+                                className: "dark:bg-gray-800 dark:text-text-dark"
+                            }}
                         >
                             {cashes.map((cash) => (
                                 <Option key={cash.id} value={String(cash.id)}>
@@ -139,11 +159,17 @@ export default function WarehouseExpensesCreate({ refresh }) {
                             ))}
                         </Select>
 
-
                         <Select
                             label="Метод оплаты"
                             value={form.method}
                             onChange={(val) => setForm((p) => ({ ...p, method: val }))}
+                            className="text-gray-900 dark:text-text-dark  outline-none"
+                            labelProps={{
+                                className: "text-gray-700 dark:text-text-dark"
+                            }}
+                            menuProps={{
+                                className: "dark:bg-gray-800 dark:text-text-dark"
+                            }}
                         >
                             <Option value="cash">Наличные</Option>
                             <Option value="card">Карта</Option>
@@ -155,12 +181,26 @@ export default function WarehouseExpensesCreate({ refresh }) {
                             name="note"
                             value={form.note}
                             onChange={handleChange}
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
+                            color="blue-gray"
                         />
                     </div>
                 </DialogBody>
 
                 <DialogFooter>
-                    <Button variant="text" color="gray" onClick={handleOpen} className="mr-2">
+                    <Button
+                        variant="text"
+                        color="red"
+                        onClick={handleOpen}
+                        className="mr-2"
+                        disabled={loading}
+                    >
                         Отмена
                     </Button>
                     <Button color="green" onClick={CreateExpenses} disabled={loading}>

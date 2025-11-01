@@ -5,7 +5,6 @@ import {
     Select,
     Option,
     Button,
-    Spinner,
 } from "@material-tailwind/react";
 import {
     Warehouse,
@@ -104,34 +103,35 @@ export default function FactoryDashboard() {
     ];
 
     if (loading) {
-        return (
-            <Loading />
-        );
+        return <Loading />;
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen">
             <div className="max-w-7xl mx-auto">
-                <Typography variant="h3" className="mb-8 font-bold text-gray-800">
-                    Zavod Boshqaruv Paneli
-                </Typography>
+                <div className="flex items-center justify-between mb-8">
+                    <Typography variant="h3" className="font-bold text-text  dark:text-text-dark text-[black]">
+                        Zavod Boshqaruv Paneli
+                    </Typography>
+
+                </div>
 
                 {/* === Statistik Cards === */}
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
                     {stats.map((item, index) => (
                         <Card
                             key={index}
-                            className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                            className="bg-card dark:bg-card-dark border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                         >
                             <CardBody className="flex items-center gap-4 p-6">
-                                <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl shadow-sm">
+                                <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl shadow-sm">
                                     {item.icon}
                                 </div>
                                 <div>
-                                    <Typography className="text-sm text-gray-600 font-medium mb-1">
+                                    <Typography className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1">
                                         {item.title}
                                     </Typography>
-                                    <Typography variant="h5" className="font-bold text-gray-900">
+                                    <Typography variant="h5" className="font-bold text-gray-900 dark:text-gray-100">
                                         {item.value}
                                     </Typography>
                                 </div>
@@ -140,13 +140,20 @@ export default function FactoryDashboard() {
                     ))}
                 </div>
 
-                <Card className="mb-[20px]">
+                <Card className="bg-card dark:bg-card-dark mb-[20px] transition-colors duration-300">
                     <CardBody className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="flex gap-4 w-full sm:w-auto">
                             <Select
                                 label="Yilni tanlang"
                                 value={year.toString()}
                                 onChange={(val) => setYear(val)}
+                                className="text-gray-900 dark:text-text-dark  outline-none"
+                                labelProps={{
+                                    className: "text-gray-700 dark:text-text-dark"
+                                }}
+                                menuProps={{
+                                    className: "dark:bg-gray-800 dark:text-text-dark"
+                                }}
                             >
                                 {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
                                     <Option key={y} value={y.toString()}>
@@ -155,9 +162,17 @@ export default function FactoryDashboard() {
                                 ))}
                             </Select>
 
+
                             <Select
                                 label="Oyni tanlang"
                                 value={month}
+                                className="text-gray-900 dark:text-text-dark  outline-none"
+                                labelProps={{
+                                    className: "text-gray-700 dark:text-text-dark"
+                                }}
+                                menuProps={{
+                                    className: "dark:bg-gray-800 dark:text-text-dark"
+                                }}
                                 onChange={(val) => setMonth(val)}
                             >
                                 {[
@@ -186,9 +201,7 @@ export default function FactoryDashboard() {
                             className="px-6"
                             onClick={() => {
                                 setLoading(true);
-                                Promise.all([GetProductCount(), GetProductSum()]).finally(() =>
-                                    setLoading(false)
-                                );
+                                fetchAllData().finally(() => setLoading(false));
                             }}
                         >
                             Filtrlash

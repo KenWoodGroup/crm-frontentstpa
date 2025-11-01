@@ -23,21 +23,18 @@ import { WarehouseProvider, useWarehouse } from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
 import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
+import Header from "../Components/UI/Header/Header";
 
 export default function WarehouseLayout() {
     const location = useLocation();
-    // const [sidebarOpen, setSidebarOpen] = useState(
-    //     sessionStorage.getItem("sidebar") === "true"
-    // );
-
-    // simple detection: agar path stockout ni o'z ichiga olsa => out, aks holda in
     const mode = location.pathname.includes("/warehouse/stockout")
         ? "out" : "in";
 
     return (
-        <div className={`transition-all bg-[#FAFAFA] min-h-screen duration-300 ml-[125px]`}>
+        <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
             <WarehouseSidebar />
-            <div className="p-6 bg-white">
+            <div className="pt-[10px] pr-[10px]">
+                <Header />
                 {/* pass mode to provider so provider can expose per-mode state */}
                 <WarehouseProvider mode={mode}>
                     <InnerGuard>
