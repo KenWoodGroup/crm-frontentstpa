@@ -19,8 +19,8 @@ class Stock {
         const response = await $api.get(`/stock/search/${data.locationId}/${data.fac_id}/${data.operation_type}/${data.search}`)
         return response;
     }
-    static getByBarcode = async (code) => {
-        const response = await $api.get(`/stock/barcode/${encodeURIComponent(code)}`)
+    static getByBarcode = async ({payload}) => {
+        const response = await $api.get(`/stock/barcode/${encodeURIComponent(payload.code)}/${payload.operation_type}`)
         return response;
     }
 

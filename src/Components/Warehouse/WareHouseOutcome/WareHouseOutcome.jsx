@@ -179,10 +179,13 @@ export default function WareHouseOutcome() {
     };
 
     useEffect(() => {
-        fetchCategories();
-        fetchLocations();
-        fetchStaffs();
-    }, []);
+        if (invoiceStarted?.[mode]) {
+            fetchCategories();
+        } else {
+            fetchLocations();
+            fetchStaffs();
+        }
+    }, [invoiceStarted]);
 
     // update invoiceMeta receiver for outgoing: receiver is selectedLocation, sender is current location
     useEffect(() => {
@@ -232,7 +235,7 @@ export default function WareHouseOutcome() {
                 note: "ok",
             };
             const res = await InvoicesApi.CreateInvoice(payload);
-            const invoice_id = res?.data?.location?.id || res?.data?.id || res?.data?.invoice_id;
+            const invoice_id = res?.data?.invoice?.id;
 
             if (res?.status === 200 || res?.status === 201) {
                 if (!invoice_id) {
@@ -312,9 +315,15 @@ export default function WareHouseOutcome() {
 
     const fetchByBarcode = async (code) => {
         const barcodeMode = localStorage.getItem("barcodeMode");
+        const operation_type = invoiceMeta?.[mode]?.operation_type
+        console.log(operation_type);
+        const payload = {
+            code,
+            operation_type,
+        }
         try {
             setBarcodeLoading(true);
-            let res = await Stock.getByBarcode(code);
+            let res = await Stock.getByBarcode({ payload });
             if (res?.status === 200 || res?.status === 201) {
                 const data = res.data;
                 if (!data || data.length === 0) {
@@ -365,6 +374,7 @@ export default function WareHouseOutcome() {
             batch: raw.batch ?? null,
             fixed_quantity: raw.fixed_quantity,
             discount: 0,
+            purchase_price: Number(raw.purchase_price || 0)
         };
     }
 
@@ -377,7 +387,7 @@ export default function WareHouseOutcome() {
     /// // ---------- recalcTotal ----------
     const total = useMemo(() => {
         const safeNum = (v) =>
-            v === "" || v == null || isNaN(Number(v)) ? 0 : Number(v);
+            v === "" || v == null || isNaN(Number(v)) || !v ? 0 : Number(v);
         return mixData.reduce(
             (sum, it) => sum + safeNum(it.price) * safeNum(it.quantity),
             0
@@ -454,6 +464,7 @@ export default function WareHouseOutcome() {
                     is_new_batch: false,
                     batch: it.batch || null,
                     discount: it.discount || 0,
+                    purchase_price: Number(it.purchase_price || 0)
                 })),
             };
 
@@ -851,9 +862,10 @@ export default function WareHouseOutcome() {
                                                                 min={0}
                                                                 max={20}
                                                                 onFocus={() => {
-                                                                    if(mixData?.length > 1) {                                                                        
-                                                                    setShowApplyAll(true);
-                                                                    setFocusedInput(idx);}
+                                                                    if (mixData?.length > 1) {
+                                                                        setShowApplyAll(true);
+                                                                        setFocusedInput(idx);
+                                                                    }
                                                                 }}
                                                                 onBlur={() => {
                                                                     // biroz kechikish tugmani bosganda yo‘qolmasin

@@ -34,26 +34,6 @@ export default function WarehouseLayout() {
     const mode = location.pathname.includes("/warehouse/stockout")
         ? "out" : "in";
 
-    // const links = [
-    //     { id: 1, label: "Home Page", path: "/warehouse/dashboard", icon: LayoutDashboard },
-    //     { id: 2, label: "Products", path: "/warehouse/product", icon: Package },
-
-    //     { id: 3, label: "Приём", path: "/warehouse/stockin", icon: PackagePlus },
-    //     { id: 4, label: "Отгрузки", path: "/warehouse/stockout", icon: PackageMinus },
-    //     { id: 5, label: "Chiqindi", path: "/warehouse/disposal", icon: Recycle },
-    //     { id: 6, label: "Операции Склада", path: "/warehouse/history", icon: Move },
-    //     { id: 6, label: "Dilers", path: "/warehouse/dilers", icon: User },
-    //     { id: 6, label: "Клиенты", path: "/warehouse/clients", icon: UsersRound },
-    //     { id: 6, label: "Оплата клиентов", path: "/warehouse/payment", icon: BanknoteArrowDown },
-    //     { id: 6, label: "Сверка клиентов", path: "/warehouse/revisen", icon: ChevronsLeftRight },
-    //     { id: 6, label: "Долги", path: "/warehouse/debtor", icon: UserPen },
-    //     { id: 6, label: "Касса", path: "/warehouse/kassa", icon: CreditCard },
-    //     { id: 6, label: "Расход", path: "/warehouse/expenses", icon: Blocks },
-    //     { id: 6, label: "Доставщик", path: "/warehouse/supplier", icon: Car },
-    //     { id: 7, label: "Settings", path: "/warehouse/settings", icon: Settings },
-    // ];
-
-
     return (
         <div className={`transition-all bg-[#FAFAFA] min-h-screen duration-300 ml-[125px]`}>
             <WarehouseSidebar />

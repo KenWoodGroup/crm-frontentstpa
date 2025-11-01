@@ -220,31 +220,6 @@ export default function WarehouseInvoiceHistory() {
         getLocations()
     }, []);
 
-    // loadOptions for AsyncSelect - uses cached list to avoid repeated server calls
-    // const loadLocations = async (inputValue) => {
-    //     if (!inputValue) return locationsCache;
-    //     const q = inputValue.toLowerCase();
-    //     return locationsCache.filter((o) => o.label.toLowerCase().includes(q));
-    // };
-
-    // Sender/Receiver auto-fill logic: if user selects receiver (not 'all') we set sender to current loc, and vice-versa
-    // useEffect(() => {
-    //     const baseId = Cookies.get("ul_nesw");
-    //     if (receiverFilter && receiverFilter.value && receiverFilter.value !== "all") {
-    //         // ensure sender is current warehouse
-    //         setSenderFilter({ value: baseId, label: locationsCache.find((l) => l.value === baseId)?.label || baseId });
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [receiverFilter]);
-
-    // useEffect(() => {
-    //     const baseId = Cookies.get("ul_nesw");
-    //     if (senderFilter && senderFilter.value && senderFilter.value !== "all") {
-    //         setReceiverFilter({ value: baseId, label: locationsCache.find((l) => l.value === baseId)?.label || baseId });
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [senderFilter]);
-
     // fetch invoices - payload must include all keys (send "all" when nothing selected)
     const fetchInvoices = useCallback(async (opts = {}) => {
         setLoading(true);
@@ -353,8 +328,9 @@ export default function WarehouseInvoiceHistory() {
     const closeEditItem = () => setEditingItem(null);
 
     async function saveInvoice(updated) {
+        const {id, ...rest} = updated
         try {
-            const res = await InvoicesApi.UpdateInvoice(updated.id, updated);
+            const res = await InvoicesApi.EditInvoice(updated.id, rest);
             if (!(res?.status === 200 || res?.status === 201)) throw new Error("Failed to save");
             await fetchInvoices();
             if (invoiceId === updated.id) {
@@ -715,35 +691,20 @@ export default function WarehouseInvoiceHistory() {
 }
 
 function EditInvoiceModal({ invoice, onClose, onSave }) {
-    const [form, setForm] = useState(() => ({ ...invoice, org_status: invoice?.status }));
+    const [form, setForm] = useState(() => ({ ...invoice}));
     useEffect(() => {
-        setForm(prev => ({ ...invoice, org_status: invoice?.status || prev.org_status }));
+        const {note, id} = invoice
+        setForm({note, id, changed_by:Cookies.get("us_nesw")});
     }, [invoice]);
-    const statusBase = [
-        { id: 1, value: "draft", label: "Draft" },
-        { id: 3, value: "cancelled", label: "Cancelled" },
-        { id: 4, value: "sent", label: "Sent" },
-        { id: 5, value: "received", label: "Received" }
-    ]
-    const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
-    const statusOptions = statusBase?.filter((st) => st.id > org_status_id)
+   
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
             <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
                 <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-lg font-semibold">Edit invoice</h3>
+                    <h3 className="text-lg font-semibold">Edit invoice comment</h3>
                     <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {/*  */}
-                    {/* <label className="flex flex-col">
-                        <span className="text-sm text-gray-600">Payment status</span>
-                        <select value={form.payment_status} onChange={(e) => setForm((p) => ({ ...p, payment_status: e.target.value }))} className="border rounded p-2">
-                            <option value="unpaid">unpaid</option>
-                            <option value="paid">paid</option>
-                        </select>
-                    </label> */}
-
                     {/* <label className="flex flex-col">
                         <span className="text-sm text-gray-600">Total sum</span>
                         <input type="text" value={form.total_sum} onChange={(e) => setForm((p) => ({ ...p, total_sum: e.target.value }))} className="border rounded p-2" />
