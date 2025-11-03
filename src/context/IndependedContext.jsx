@@ -1,9 +1,9 @@
 import React from "react";
 import { InventoryProvider } from "./InventoryContext";
 
-export function WarehouseProvider({ children, mode = "in" }) {
+export function IndependentProvider({ children, mode = "in" }) {
     return (
-        <InventoryProvider role="warehouse" mode={mode}>
+        <InventoryProvider role="independent" mode={mode}>
             {children}
         </InventoryProvider>
     );

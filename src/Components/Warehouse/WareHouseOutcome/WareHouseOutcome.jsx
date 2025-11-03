@@ -31,10 +31,10 @@ import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
-import { useWarehouse } from "../../../context/WarehouseContext";
 import OutgoingPanel from "./sectionsWhO/OutgoingPanel";
 import { Staff } from "../../../utils/Controllers/Staff";
 import CancelInvoiceButton from "./sectionsWhO/CancelInvoiceButton";
+import { useInventory } from "../../../context/InventoryContext";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -75,7 +75,7 @@ export default function WareHouseOutcome() {
         setIsDirty,
         saveSuccess,
         setSaveSuccess,
-    } = useWarehouse();
+    } = useInventory();
 
     // local UI
     const [sidebarMode, setSidebarMode] = useState(0);
@@ -837,7 +837,7 @@ export default function WareHouseOutcome() {
                                                         {/* <input type="number" step="any" value={it.price ?? ""} onChange={(e) => handleUpdatePrice(idx, e.target.value)} className="border rounded px-2 py-1 w-full" aria-label={`Price for ${it?.name || idx + 1}`} /> */}
                                                     </td>
                                                     <td className="p-2 align-center w-[120px]">
-                                                        <input type="number" step="any" value={it.quantity} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
+                                                        <input type="number" step="any" value={it.quantity} onChange={(e) => handleUpdateQuantity(idx, e.target.value)} className={`border rounded px-2 py-1 w-full min-w-[90px] ${qtyError ? "ring-2 ring-red-400" : ""}`} aria-label={`Quantity for ${it.product?.name || idx + 1}`} />
                                                     </td>
                                                     <td className="p-2 aligin-center text-green-900">
                                                         {Number.isFinite(stockAvail) && <div className="flex align-center">
@@ -958,13 +958,17 @@ export default function WareHouseOutcome() {
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.price || 0).toLocaleString()}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.quantity || 0)}</td>
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{String(it.unit || "birlik")}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.discount || 0)}</td>
+                                                    {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") && (
+                                                        <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.discount || 0)}</td>
+                                                    )}
                                                     <td style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
-                                                    <td className="p-2 align-center" style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0) * Number(100 - +it.discount) / 100).toLocaleString()}</td>
+                                                    {(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") && (
+                                                        <td className="p-2 align-center" style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0) * Number(100 - +it.discount) / 100).toLocaleString()}</td>
+                                                    )}
                                                 </tr>
                                             ))}
                                             <tr>
-                                                <td colSpan={7} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>Jami</td>
+                                                <td colSpan={(invoiceMeta?.[mode]?.operation_type !== "disposal" && invoiceMeta?.[mode]?.operation_type !== "transfer_out") ? 7 : 5} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>Jami</td>
                                                 <td style={{ border: "1px solid #333", padding: 6 }}>{Number(total || 0).toLocaleString()}</td>
                                                 <td style={{ border: "1px solid #333", padding: 6 }}>{Number(disTotal || 0).toLocaleString()}</td>
                                             </tr>

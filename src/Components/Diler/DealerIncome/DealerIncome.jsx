@@ -33,8 +33,8 @@ import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
-import { useDealer } from "../../../context/DealerContext";
 import { NavLink } from "react-router-dom";
+import { useInventory } from "../../../context/InventoryContext";
 
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -77,7 +77,7 @@ export default function DealerIncome() {
         setIsDirty, // fn (mode, value)
         saveSuccess, // object { in, out }
         setSaveSuccess, // fn (mode, value)
-    } = useDealer();
+    } = useInventory();
 
     // Local UI state
     const [sidebarMode, setSidebarMode] = useState(0); // 0=closed,1=25%,2=33.3%
