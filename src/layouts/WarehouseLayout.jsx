@@ -1,10 +1,30 @@
 // src/layouts/WarehouseLayout.jsx
 import { Outlet, useLocation } from "react-router-dom";
+import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
+import { useState } from "react";
+import {
+    LayoutDashboard,
+    Package,
+    PackagePlus,
+    PackageMinus,
+    Recycle,
+    Settings,
+    User,
+    Move,
+    BanknoteArrowDown,
+    ChevronsLeftRight,
+    UserPen,
+    Blocks,
+    UsersRound,
+    CreditCard,
+    Car,
+} from "lucide-react";
 import { WarehouseProvider, useWarehouse } from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
 import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
 import Header from "../Components/UI/Header/Header";
+import { useInventory } from "../context/InventoryContext";
 
 export default function WarehouseLayout() {
     const location = useLocation();
@@ -15,7 +35,7 @@ export default function WarehouseLayout() {
         <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
             <WarehouseSidebar />
             <div className="pt-[10px] pr-[10px]">
-                <Header />
+                {/* <Header /> */}
                 {/* pass mode to provider so provider can expose per-mode state */}
                 <WarehouseProvider mode={mode}>
                     <InnerGuard>
@@ -32,7 +52,7 @@ export default function WarehouseLayout() {
 */
 function InnerGuard({ children }) {
     const location = useLocation(); // optional, saqlab qoldik agar kerak bo'lsa
-    const { mode, isDirty, saveSuccess, resetMode } = useWarehouse();
+    const { mode, isDirty, saveSuccess, resetMode } = useInventory();
 
     // modalni ko'rsatish sharti: joriy mode da saqlanmagan o'zgarishlar mavjud va hali saveSuccess bo'lmagan
     const shouldPrompt = Boolean(isDirty?.[mode] && !saveSuccess?.[mode]);

@@ -3,8 +3,8 @@ import { FileX, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
-import { useWarehouse } from "../../../../context/WarehouseContext";
 import { notify } from "../../../../utils/toast";
+import { useInventory } from "../../../../context/InventoryContext";
 
 const CancelInvoiceButton = ({resetAll}) => {
     const [open, setOpen] = useState(false);
@@ -13,7 +13,7 @@ const CancelInvoiceButton = ({resetAll}) => {
     const {
         mode, // 'in' or 'out' provided by WarehouseLayout -> WarehouseProvider
         invoiceId, // object { in, out }
-    } = useWarehouse();
+    } = useInventory();
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
         resetAll(); // resets both modes per provider

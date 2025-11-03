@@ -15,7 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ForgotPassword from "./Components/ResetPassword/ForgotPassword";
 import WarehouseLayout from "./layouts/WarehouseLayout";
 import { warehouseRoutes } from "./routes/warehouseRoutes";
-import DilerLayout from "./layouts/DilerLayout";
+// import DilerLayout from "./layouts/DilerLayout";
 import { dilertoutes } from "./routes/dilerRoutes";
 import AppLayout from "./layouts/AppLayout";
 import CompanyLayout from "./layouts/CompanyLayout";
@@ -93,7 +93,7 @@ function App() {
                 )
               })}
             </Route>
-            <Route element={
+            {/* <Route element={
               <Dealer>
                 <DilerLayout />
               </Dealer>
@@ -103,7 +103,7 @@ function App() {
                   <Route key={r.name} path={r.path} element={r.element} />
                 )
               })}
-            </Route>
+            </Route> */}
             <Route element={
               <Independent>
                 <IndependentLayout />

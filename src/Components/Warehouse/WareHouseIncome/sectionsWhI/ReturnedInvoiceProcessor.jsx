@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, CheckCircle2, AlertCircle, RefreshCcw } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
-import { useWarehouse } from "../../../../context/WarehouseContext";
+import { useInventory } from "../../../../context/InventoryContext";
 
 const ReturnedInvoiceProcessor = () => {
     const [statuses, setStatuses] = useState({});
@@ -12,7 +12,7 @@ const ReturnedInvoiceProcessor = () => {
         returnInvoices,
         mixData,
         _dispatchIn
-    } = useWarehouse();
+    } = useInventory();
 
     useEffect(() => {
         if (returnInvoices?.length && mixData.length === 0) fetchAllInvoices();
@@ -125,7 +125,7 @@ const ReturnedInvoiceProcessor = () => {
                             : "hover:bg-blue-50 border-gray-300"}
                             `}
                     >
-                    <RefreshCcw
+                    <RefreshCw
                         size={22}
                         className={`transition-transform duration-300 ${mergingAll ? "animate-spin text-blue-600" : "text-blue-500"}`}
                     />
@@ -155,7 +155,7 @@ const ReturnedInvoiceProcessor = () => {
                                         {new Date(inv.createdAt).toLocaleString()}
                                     </p>
                                     <p className="font-semibold text-gray-700">
-                                        {inv.total}
+                                        {inv.total_sum  || "ok"}
                                     </p>
                                 </div>
                                 <div className="text-xs text-gray-400">

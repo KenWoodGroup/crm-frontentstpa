@@ -130,7 +130,7 @@ export default function WarehouseInvoiceHistory() {
 
     // small lists
     const statusesList = ["draft", "approved", "received", "cancelled"];
-    const typesList = ["transfer_in", "return_in", "return_dis", "outgoing", "transfer_out", "disposal"];
+    const typesList = ["transfer_in", "incoming", "return_in", "return_dis", "outgoing", "transfer_out", "disposal"];
 
     const nice = {
         type: {
