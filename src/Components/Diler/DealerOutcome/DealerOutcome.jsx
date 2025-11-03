@@ -29,8 +29,8 @@ import FolderOpenMessage from "../../UI/NoData/FolderOpen";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
+import { useInventory } from "../../../context/InventoryContext";
 
-import { useDealer } from "../../../context/DealerContext";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -70,7 +70,7 @@ export default function DealerOutcome() {
         setIsDirty,
         saveSuccess,
         setSaveSuccess,
-    } = useDealer();
+    } = useInventory();
 
     // local UI
     const [sidebarMode, setSidebarMode] = useState(0);

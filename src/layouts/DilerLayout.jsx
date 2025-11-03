@@ -7,7 +7,6 @@ import {
     Recycle,
 } from "lucide-react";
 
-import { DealerProvider, useDealer } from "../context/DealerContext";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 
@@ -74,36 +73,32 @@ export default function DilerLayout() {
             }`} >
             <SuperAdminSidebar links={links} role={"Diler"} onToggle={setSidebarOpen} />
             <div className="p-6">
-                <DealerProvider mode={mode}>
-                    <InnerGuard>
                         <Outlet />
-                    </InnerGuard>
-                </DealerProvider>
             </div>
         </div>
     );
 }
 
-function InnerGuard({ children }) {
-    const location = useLocation(); // optional, saqlab qoldik agar kerak bo'lsa
-    const { mode, isDirty, saveSuccess, resetMode } = useDealer();
+// function InnerGuard({ children }) {
+//     const location = useLocation(); // optional, saqlab qoldik agar kerak bo'lsa
+//     const { mode, isDirty, saveSuccess, resetMode } = useDealer();
 
-    // modalni ko'rsatish sharti: joriy mode da saqlanmagan o'zgarishlar mavjud va hali saveSuccess bo'lmagan
-    const shouldPrompt = Boolean(isDirty?.[mode] && !saveSuccess?.[mode]);
+//     // modalni ko'rsatish sharti: joriy mode da saqlanmagan o'zgarishlar mavjud va hali saveSuccess bo'lmagan
+//     const shouldPrompt = Boolean(isDirty?.[mode] && !saveSuccess?.[mode]);
 
-    const { showModal, handleConfirm, handleCancel } = useConfirmNavigation({
-        when: shouldPrompt,
-        clearAll: () => resetMode(mode) // confirm qilinsa joriy mode dagi state tozalanadi
-    });
+//     const { showModal, handleConfirm, handleCancel } = useConfirmNavigation({
+//         when: shouldPrompt,
+//         clearAll: () => resetMode(mode) // confirm qilinsa joriy mode dagi state tozalanadi
+//     });
 
-    return (
-        <>
-            {children}
-            <ConfirmModalNav
-                open={showModal}
-                onConfirm={handleConfirm}
-                onCancel={handleCancel}
-            />
-        </>
-    );
-}
+//     return (
+//         <>
+//             {children}
+//             <ConfirmModalNav
+//                 open={showModal}
+//                 onConfirm={handleConfirm}
+//                 onCancel={handleCancel}
+//             />
+//         </>
+//     );
+// }
