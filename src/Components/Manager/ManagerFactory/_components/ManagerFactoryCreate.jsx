@@ -29,7 +29,7 @@ export default function RegisterModal({ refresh }) {
             stir: "",
             accountNumber: "",
             legalAddress: "",
-            activityType: "",
+            activityType: "factory",
         });
         setErrors({});
     }
@@ -45,7 +45,7 @@ export default function RegisterModal({ refresh }) {
         stir: "",
         accountNumber: "",
         legalAddress: "",
-        activityType: "",
+        activityType: "factory",
     });
 
     const [errors, setErrors] = useState({});
