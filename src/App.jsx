@@ -7,7 +7,6 @@ import { userRoutes } from "./routes/userRoutes";
 
 import Login from "./Components/Login/Login";
 import ErrorPage from "./Components/ErrorPage/ErrorPage";
-import ProtectedRoute from "./Components/ProtectedRoute";
 import SuperAdminLayout from "./layouts/SuperAdminLayout";
 import MainLayout from "./layouts/MainLayout";
 
@@ -23,8 +22,6 @@ import CompanyLayout from "./layouts/CompanyLayout";
 import { companyRoutes } from "./routes/companyRoutes";
 import CompanyWarehouseLayout from "./layouts/CompanyWarehouseLayout";
 import { companyWarehouseRoutes } from "./routes/companyWarehouseRoutes";
-import CompanyDilerLayout from "./layouts/CompanyDilerLayout";
-import { companyDiler } from "./routes/companyDilerRoutes";
 import ManagerLayout from "./layouts/ManagerLayout";
 import { managerRoutes } from "./routes/managerRoutes";
 import Factory from "./Components/ProtectedRoutes/Factory";
@@ -35,6 +32,8 @@ import Dealer from "./Components/ProtectedRoutes/Dealer";
 import IndependentLayout from "./layouts/IndependentLayout";
 import { independentRoutes } from "./routes/independentRoutes";
 import Independent from "./Components/ProtectedRoutes/Independent";
+import Company from "./Components/ProtectedRoutes/Company";
+import CompanyWarehouse from "./Components/ProtectedRoutes/CompanyWarehouse";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -114,9 +113,10 @@ function App() {
                 )
               })}
             </Route>
-            {/* <Route element={
-              // <ProtectedUsersRoute>
-              <CompanyLayout />
+            <Route element={
+              <Company>
+                <CompanyLayout />
+              </Company>
               // </ProtectedUsersRoute>
             }>
               {companyRoutes?.map((r) => {
@@ -124,11 +124,11 @@ function App() {
                   <Route key={r.name} path={r.path} element={r.element} />
                 )
               })}
-            </Route> */}
-            {/* <Route element={
-              // <ProtectedUsersRoute>
-              <CompanyWarehouseLayout />
-              // </ProtectedUsersRoute>
+            </Route>
+            <Route element={
+              <CompanyWarehouse>
+                <CompanyWarehouseLayout />
+              </CompanyWarehouse>
             }>
               {companyWarehouseRoutes?.map((r) => {
                 return (
@@ -136,7 +136,7 @@ function App() {
                 )
               })}
             </Route>
-            <Route element={
+            {/* <Route element={
               // <ProtectedUsersRoute>
               <CompanyDilerLayout />
               // </ProtectedUsersRoute>

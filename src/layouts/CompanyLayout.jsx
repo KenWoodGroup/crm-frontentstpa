@@ -1,39 +1,23 @@
 import { Outlet } from "react-router-dom";
-import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
 import { useState } from "react";
-import { LayoutDashboard, Package, Warehouse, PackageMinus, ChartCandlestick, Settings, User } from "lucide-react";
+import CompanySidebar from "../Components/Company/CompanySidebar/CompanySidebar";
+import Header from "../Components/UI/Header/Header";
 
 export default function CompanyLayout() {
-    const [sidebarOpen, setSidebarOpen] = useState(
-        sessionStorage.getItem("sidebar") === "true"
-    );
-    const links = [
-        {
-            id: 1,
-            label: "Dashboard",
-            path: "/company/dashboard",
-            icon: LayoutDashboard
-        },
-        {
-            id: 2,
-            label: "Omborlar",
-            path: "/company/warehouse",
-            icon: Warehouse
-        },
-        {
-            id: 2,
-            label: "Hisobot",
-            path: "/company/finance",
-            icon: ChartCandlestick
-        },
-        { path: "/company/settings", label: "Settings", icon: Settings },
+    const [active, setActive] = useState(false); // true = открыт сайдбар
 
-    ]
     return (
-        <div className={`transition-all bg-[#FAFAFA] min-h-screen duration-300 ${sidebarOpen ? "ml-64" : "ml-20"
-            }`} >
-            <SuperAdminSidebar links={links} role={"Company"} onToggle={setSidebarOpen} />
-            <div className="p-6">
+        <div className="flex w-full overflow-hidden bg-background-light dark:bg-background-dark transition-colors relative min-h-screen">
+            <CompanySidebar
+                open={active}
+                onClose={() => setActive(false)}
+                active={() => setActive((s) => !s)} />
+            <div className="mt-[10px] pb-[30px] px-[15px] min-h-screen transition-all duration-300"
+                style={{
+                    marginLeft: !active ? "300px" : "110px",
+                    width: !active ? "calc(100% - 320px)" : "calc(100% - 120px)",
+                }}>
+                <Header />
                 <Outlet />
             </div>
         </div>

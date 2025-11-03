@@ -20,6 +20,7 @@ import {
     Car,
 } from "lucide-react";
 import { WarehouseProvider} from "../context/WarehouseContext";
+import { WarehouseProvider, useWarehouse } from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
 import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
