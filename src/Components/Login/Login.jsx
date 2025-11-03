@@ -80,6 +80,7 @@ export default function Login() {
       dealer: "SwedsdfmgrUID",
       independent: "inedsdfmgrUID",
       com_warehouse: "comedsdfmgrUID",
+      building: "builewweUID",
     };
 
     Cookies.set("nesw", roleMap[role] || "");
@@ -125,6 +126,7 @@ export default function Login() {
         { role: "company", vektor: "/company/dashboard" },
         { role: "independent", vektor: "/independent/dashboard" },
         { role: "com_warehouse", vektor: "/company-warehouse/dashboard" },
+        { role: "building", vektor: "/building/dashboard" },
       ];
       const vektor_obj = roleLinks.find((item) => item.role === role);
       navigate(vektor_obj?.vektor || "/");
@@ -132,7 +134,7 @@ export default function Login() {
   };
 
   const shouldShowOfferta = (role) => {
-    return !["super_admin", "admin", "warehouse", "dealer", "com_warehouse"].includes(role);
+    return !["super_admin", "admin", "warehouse", "dealer", "com_warehouse", "building"].includes(role);
   };
 
   const handleSubmit = async (e) => {

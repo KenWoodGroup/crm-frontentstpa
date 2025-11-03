@@ -6,8 +6,10 @@ import CompanyWarehouseDiler from "../Components/Company-Warehouse/CompanyWareho
 import CompanyWarehouseExpenses from "../Components/Company-Warehouse/CompanyWarehouseExpenses/CompanyWarehouseExpenses";
 import CompanyWarehouseFinance from "../Components/Company-Warehouse/CompanyWarehouseFinance/CompanyWarehouseFinance";
 import CompanyWarehouseStock from "../Components/Company-Warehouse/CompanyWarehouseStock/CompanyWarehouseStock";
+import CompanyWarehouseSupplierPayment from "../Components/Company-Warehouse/CompanyWarehouseSupplierPayment/CompanyWarehouseSupplierPayment";
 import CompanyWarehouseSverka from "../Components/Company-Warehouse/CompanyWarehouseSverka/CompanyWarehouseSverka";
 import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
+import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/SettingsWareHouse";
 
 export const companyWarehouseRoutes = [
     {
@@ -59,5 +61,15 @@ export const companyWarehouseRoutes = [
         path: '/company-warehouse/suppliers/sverka',
         name: "Company suppliers",
         element: <CompanyWarehouseSverka />
+    },
+    {
+        path: '/company-warehouse/suppliers/payment',
+        name: "Company suppliers",
+        element: <CompanyWarehouseSupplierPayment />
+    },
+    {
+        path: '/company-warehouse/settings',
+        name: "Company settings",
+        element: <SettingsWareHouse />
     }
 ]
