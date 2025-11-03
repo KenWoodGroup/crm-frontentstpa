@@ -16,7 +16,6 @@ export default function WarehouseDilerEdit({ diler, refresh }) {
     const [loading, setLoading] = useState(false);
     const [warehouseId, setWarehouseId] = useState(""); // сюда передаём id для редактирования
     const [data, setData] = useState({
-        type: "dealer",
         name: "",
         address: "",
         phone: "",
@@ -27,7 +26,6 @@ export default function WarehouseDilerEdit({ diler, refresh }) {
     useEffect(() => {
         if (diler) {
             setData({
-                type: diler.type || "dealer",
                 name: diler.name || "",
                 address: diler.address || "",
                 phone: diler.phone || "",

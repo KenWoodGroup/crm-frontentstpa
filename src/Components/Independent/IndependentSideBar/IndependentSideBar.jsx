@@ -38,7 +38,7 @@ export default function IndependentSideBar() {
         { id: 2, label: "Долги клиентов", path: "/independent/debtor", icon: UserPen, group: "clients" },
         { id: 3, label: "Сверка клиентов", path: "/independent/sverka", icon: ChevronsLeftRight, group: "clients" },
         { id: 4, label: "Доставщик", path: "/independent/carrier", icon: Truck, group: "suppliers" },
-        { id: 4, label: "Поставщик", path: "/independent/suppliers", icon: UsersRound, group: "suppliers" },
+        { id: 4, label: "Поставщик", path: "/dependent/suppliers", icon: UsersRound, group: "suppliers" },
         { id: 4, label: "Сверка Поставщиков", path: "/independent/suppliers/sverka", icon: ChevronsLeftRight, group: "suppliers" },
         { id: 4, label: "Оплата Поставщиков", path: "/independent/suppliers/payment", icon: BanknoteArrowDown, group: "suppliers" },
         { id: 6, label: "Расходы", path: "/independent/expenses", icon: Blocks, group: "others" },

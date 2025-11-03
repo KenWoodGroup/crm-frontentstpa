@@ -1,18 +1,33 @@
-import { Building2, User, MapPin, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
-// import WarehouseCreate from "./_components/WarehouseCreate";
-import { WarehouseApi } from "../../../utils/Controllers/WarehouseApi";
-import { Alert } from "../../../utils/Alert";
+import {
+    Building2,
+    MapPin,
+    Phone,
+    Mail,
+    ChevronLeft,
+    ChevronRight,
+    Search,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    CardFooter,
+    Typography,
+    Input,
+    IconButton,
+    Button,
+    Tooltip,
+} from "@material-tailwind/react";
+import { Alert } from "../../../utils/Alert";
 import Loading from "../../UI/Loadings/Loading";
-
-import { Button } from "@material-tailwind/react";
-import { NavLink } from "react-router-dom";
 import EmptyData from "../../UI/NoData/EmptyData";
-import CompanyWarehouseDilerCreate from "./_components/CompanyWarehouseDilerCreate";
-import CompanyWarehouseEdit from "./_components/CompanyWarehouseEdit";
-import CompanyWarehouseDilerDelete from "./_components/CompanyWarehouseDilerDelete";
 
+import { Clients } from "../../../utils/Controllers/Clients";
+import CompanyWarehouseDilerCreate from "./_components/CompanyWarehouseDilerCreate";
+import CompanyWarehouseDilerEdit from "./_components/CompanyWarehouseDilerEdit";
+import CompanyWarehouseDilerDelete from "./_components/CompanyWarehouseDilerDelete";
 
 export default function CompanyWarehouseDiler() {
     const [loading, setLoading] = useState(true);
@@ -20,120 +35,185 @@ export default function CompanyWarehouseDiler() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
+    const [searchValue, setSearchValue] = useState("");
 
-    const parent_id = Cookies.get('ul_nesw');
+    const parent_id = Cookies.get("ul_nesw");
 
-    const GetAll = async (pageNumber = 1) => {
+    const GetAll = async (pageNumber = 1, searchTerm = searchValue) => {
         if (!parent_id) return Alert("Parent ID topilmadi", "error");
         setLoading(true);
+
         try {
-            const response = await WarehouseApi.WarehouseGetAll({ id: parent_id, page: pageNumber });
+            const data = {
+                type: "building",
+                page: pageNumber,
+                search: searchTerm.trim() === "" ? "all" : searchTerm,
+                location_id: parent_id,
+                date: new Date().toISOString(),
+            };
+
+            const response = await Clients?.GetClients(data);
             const records = response.data?.data?.records || [];
             const pagination = response.data?.data?.pagination || {};
-            const filtered = records.filter(w => w.type !== "other" && w.type !== "disposal");
-            setWarehouses(filtered);
+
+            setWarehouses(records);
             setTotalPages(Number(pagination.total_pages) || 1);
-            setPage(Number(pagination.currentPage) || pageNumber);
-            setTotalCount(Number(pagination.total_count) || filtered.length);
+            setPage(Number(pagination.current_page) || pageNumber);
+            setTotalCount(Number(pagination.total_count) || records.length);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             Alert("Xatolik yuz berdi ❌", "error");
         } finally {
             setLoading(false);
         }
     };
 
-
+    useEffect(() => {
+        GetAll(1);
+    }, []);
 
     useEffect(() => {
-        GetAll(page);
-    }, []);
+        const timeout = setTimeout(() => {
+            GetAll(1, searchValue);
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [searchValue]);
 
     if (loading) return <Loading />;
 
     return (
         <div className="min-h-screen">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-2xl font-semibold text-gray-800">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                <Typography variant="h4" className="dark:text-text-dark text-black" >
                     Qurilish nuqtalari Maʼlumotlari
-                </h1>
-                <CompanyWarehouseDilerCreate refresh={() => GetAll(page)} />
+                </Typography>
+
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative w-full md:w-72">
+                        <Input
+                            label="Qidiruv..."
+                            icon={<Search size={18} />}
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            color="blue-gray"
+                            crossOrigin=""
+                        />
+                    </div>
+                    <CompanyWarehouseDilerCreate refresh={() => GetAll(page)} />
+                </div>
             </div>
+
+            {/* Контент */}
             {warehouses?.length > 0 ? (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {warehouses.map((w) => (
-                            <div key={w.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 hover:shadow-md transition">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-3 bg-gray-100 rounded-xl">
-                                            <Building2 className="w-6 h-6 text-gray-700" />
+                            <Card
+                                key={w.id}
+                                className="shadow-sm border  dark:bg-card-dark hover:shadow-md transition-all"
+                            >
+                                <CardHeader
+                                    floated={false}
+                                    shadow={false}
+                                    className="bg-blue-gray-50 flex items-center justify-between p-4 dark:bg-background-dark "
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                                            <Building2 className="w-6 h-6 text-blue-gray-700" />
                                         </div>
-                                        <h2 className="text-xl font-semibold text-gray-800">{w.name}</h2>
+                                        <Typography
+                                            variant="h6"
+                                            color="blue-gray"
+                                            className="font-semibold dark:text-text-dark"
+                                        >
+                                            {w.name}
+                                        </Typography>
                                     </div>
-                                    <div className="flex items-center gap-[10px]">
-                                        <CompanyWarehouseEdit refresh={() => GetAll(page)} warehouse={w} />
-                                        <CompanyWarehouseDilerDelete refresh={() => GetAll(page)} warehouseId={w?.id} />
-                                    </div>
-                                </div>
 
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-gray-700">
+                                    <div className="flex items-center gap-2">
+                                        <Tooltip content="Tahrirlash">
+                                            <CompanyWarehouseDilerEdit
+                                                refresh={() => GetAll(page)}
+                                                diler={w}
+                                            />
+                                        </Tooltip>
+                                        <Tooltip content="O'chirish">
+                                            <CompanyWarehouseDilerDelete
+                                                refresh={() => GetAll(page)}
+                                                dilerId={w?.id}
+                                            />
+                                        </Tooltip>
+                                    </div>
+                                </CardHeader>
+
+                                <CardBody className="text-blue-gray-700 space-y-3">
+                                    <div className="flex items-center gap-2">
                                         <Mail className="w-5 h-5 text-gray-500" />
-                                        <span>{w.users?.[0]?.email || "—"}</span>
+                                        <Typography className=" dark:text-text-dark"
+                                            variant="small">
+                                            {w.users?.[0]?.email || "—"}
+                                        </Typography>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-gray-700">
+                                    <div className="flex items-center gap-2">
                                         <MapPin className="w-5 h-5 text-gray-500" />
-                                        <span>{w.address}</span>
+                                        <Typography className=" dark:text-text-dark" variant="small">
+                                            {w.address || "Manzil kiritilmagan"}
+                                        </Typography>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-gray-700">
+                                    <div className="flex items-center gap-2">
                                         <Phone className="w-5 h-5 text-gray-500" />
-                                        <span>{w.phone}</span>
+                                        <Typography className=" dark:text-text-dark" variant="small">
+                                            {w.phone || "Telefon mavjud emas"}
+                                        </Typography>
                                     </div>
-                                    {/* <div className="flex flex-col md:flex-row gap-3">
-                                        <NavLink to={`/company/warehouse/user/${w?.id}`} className="flex-1">
-                                            <Button className="w-full flex items-center justify-center gap-2">
-                                                <User size={18} />
-                                                Users
-                                            </Button>
-                                        </NavLink>
-                                        <NavLink to={`/company/warehouse/${w?.id}`} className="flex-1">
-                                            <Button className="w-full flex items-center justify-center gap-2">
-                                                <Building2 size={18} />
-                                                Detail
-                                            </Button>
-                                        </NavLink>
-                                    </div> */}
-                                </div>
-                            </div>
+                                    <Typography
+                                        variant="small"
+                                        color="gray"
+                                        className="flex items-center gap-1  dark:text-text-dark"
+                                    >
+                                        <span className="font-medium text-blue-gray-700 dark:text-text-dark">
+                                            Yaratilgan sana:
+                                        </span>
+                                        {new Date(w.createdAt).toLocaleDateString("uz-UZ")}
+                                    </Typography>
+                                </CardBody>
+
+                            </Card>
                         ))}
                     </div>
-                    {/* Pagination только если больше 15 записей */}
+
+                    {/* Pagination */}
                     {totalCount > 15 && (
                         <div className="flex justify-center mt-6 gap-4">
-                            <button
+                            <IconButton
+                                variant="text"
+                                color="blue-gray"
                                 onClick={() => GetAll(page - 1)}
                                 disabled={page <= 1}
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
                             >
                                 <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <span className="flex items-center px-2"> {page} / {totalPages}</span>
-                            <button
+                            </IconButton>
+
+                            <Typography variant="small" color="blue-gray" className="flex items-center">
+                                {page} / {totalPages}
+                            </Typography>
+
+                            <IconButton
+                                variant="text"
+                                color="blue-gray"
                                 onClick={() => GetAll(page + 1)}
                                 disabled={page >= totalPages}
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 flex items-center justify-center"
                             >
                                 <ChevronRight className="w-5 h-5" />
-                            </button>
+                            </IconButton>
                         </div>
                     )}
                 </>
             ) : (
-                <EmptyData text={'Qurilish nuqtasi mavjud emas'} />
+                <EmptyData text={"Qurilish nuqtalari mavjud emas"} />
             )}
         </div>
     );

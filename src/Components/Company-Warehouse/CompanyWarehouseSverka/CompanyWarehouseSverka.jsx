@@ -12,9 +12,8 @@ import { FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
 import { Payment } from "../../../utils/Controllers/Payment";
-import Loading from "../../UI/Loadings/Loading";
 
-export default function IndependentSverka() {
+export default function CompanyWarehouseSverka() {
     const [clients, setClients] = useState([]);
     const [selectedClient, setSelectedClient] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -129,7 +128,7 @@ export default function IndependentSverka() {
             <Card className="w-[30%] border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
                     <Typography variant="h5" className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
-                        Клиенты
+                        Поставщики
                     </Typography>
                     <div className="relative mt-3">
                         <Input

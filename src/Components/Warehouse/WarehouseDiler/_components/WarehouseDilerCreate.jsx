@@ -183,7 +183,6 @@ export default function WarehouseDilerCreate({ refresh }) {
                     <Button
                         variant="text"
                         onClick={handleOpen}
-                        className="mr-2"
                         disabled={loading}
                         color="blue-gray"
                         className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
