@@ -1,24 +1,5 @@
 // src/layouts/WarehouseLayout.jsx
 import { Outlet, useLocation } from "react-router-dom";
-import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
-import { useState } from "react";
-import {
-    LayoutDashboard,
-    Package,
-    PackagePlus,
-    PackageMinus,
-    Recycle,
-    Settings,
-    User,
-    Move,
-    BanknoteArrowDown,
-    ChevronsLeftRight,
-    UserPen,
-    Blocks,
-    UsersRound,
-    CreditCard,
-    Car,
-} from "lucide-react";
 import { WarehouseProvider, useWarehouse } from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";

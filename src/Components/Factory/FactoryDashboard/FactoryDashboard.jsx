@@ -111,7 +111,7 @@ export default function FactoryDashboard() {
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <Typography variant="h3" className="font-bold text-text  dark:text-text-dark text-[black]">
-                        Zavod Boshqaruv Paneli
+                        Boshqaruv Paneli
                     </Typography>
 
                 </div>

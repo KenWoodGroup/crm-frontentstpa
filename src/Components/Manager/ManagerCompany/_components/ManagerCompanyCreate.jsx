@@ -11,13 +11,12 @@ import { location } from "../../../../utils/Controllers/location";
 import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 import { Alert } from "../../../../utils/Alert";
 
-export default function RegisterModal({ refresh }) {
+export default function ManagerCompanyCreate({ refresh }) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false);
 
     const handleOpen = () => {
         setOpen(!open)
-        // Сброс формы и ошибок при открытии/закрытии модального окна
         setForm({
             companyName: "",
             companyEmail: "",
@@ -29,7 +28,7 @@ export default function RegisterModal({ refresh }) {
             stir: "",
             accountNumber: "",
             legalAddress: "",
-            activityType: "factory",
+            activityType: "company",
         });
         setErrors({});
     }
@@ -45,7 +44,7 @@ export default function RegisterModal({ refresh }) {
         stir: "",
         accountNumber: "",
         legalAddress: "",
-        activityType: "factory",
+        activityType: "company",
     });
 
     const [errors, setErrors] = useState({});
@@ -295,7 +294,7 @@ export default function RegisterModal({ refresh }) {
             <Dialog open={open} handler={handleOpen} size="xl" className="max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="pb-2">
                     <Typography variant="h4" className="text-left text-gray-900">
-                        Factory yaratish
+                        Kompaniya yaratish
                     </Typography>
                 </DialogHeader>
 

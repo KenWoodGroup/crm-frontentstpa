@@ -1,41 +1,50 @@
-import { Outlet } from "react-router-dom";
-import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
-import { useState } from "react";
-import { LayoutDashboard, HardHat, DollarSign, Settings, User, Warehouse } from "lucide-react";
+// src/layouts/WarehouseLayout.jsx
+import { Outlet, useLocation } from "react-router-dom";
+import { WarehouseProvider, useWarehouse } from "../context/WarehouseContext";
+import useConfirmNavigation from "../hooks/useConfirmNavigation";
+import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
+import Header from "../Components/UI/Header/Header";
+import CompanyWarehouseSidebar from "../Components/Company-Warehouse/CompanyWarehouseSidebar/CompanyWarehouseSidebar";
 
 export default function CompanyWarehouseLayout() {
-    const [sidebarOpen, setSidebarOpen] = useState(
-        sessionStorage.getItem("sidebar") === "true"
-    );
-    const links = [
-        {
-            id: 1,
-            label: "Dashboard",
-            path: "/company-warehouse/dashboard",
-            icon: LayoutDashboard
-        },
-        {
-            id: 2,
-            label: "Ombor hona",
-            path: "/company-warehouse/stock",
-            icon: Warehouse
-        },
-        {
-            id: 2,
-            label: "Qurilish obekti",
-            path: "/company-warehouse/diler",
-            icon: HardHat
-        },
-        { path: "/company-warehouse/finance", label: "Hisobot", icon: DollarSign },
-        { path: "/company-warehouse/settings", label: "Settings", icon: Settings },
-    ]
+    const location = useLocation();
+    const mode = location.pathname.includes("/warehouse/stockout")
+        ? "out" : "in";
+
     return (
-        <div className={`transition-all bg-[#FAFAFA]  duration-300 ${sidebarOpen ? "ml-64" : "ml-20"
-            }`} >
-            <SuperAdminSidebar links={links} role={"Warehouse"} onToggle={setSidebarOpen} />
-            <div className="p-6">
+        <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
+            <CompanyWarehouseSidebar />
+            <div className="pt-[10px] pr-[10px]">
+                <Header />
                 <Outlet />
             </div>
         </div>
+    );
+}
+
+/* InnerGuard — confirm modalni hozirgi mode bo'yicha ishlatadi.
+   useConfirmNavigation ga `when` (true bo'lsa modal ko'rinadi) va `clearAll` (confirm qilinganda chaqiriladi) yuboriladi.
+*/
+function InnerGuard({ children }) {
+    const location = useLocation(); // optional, saqlab qoldik agar kerak bo'lsa
+    const { mode, isDirty, saveSuccess, resetMode } = useWarehouse();
+
+    // modalni ko'rsatish sharti: joriy mode da saqlanmagan o'zgarishlar mavjud va hali saveSuccess bo'lmagan
+    const shouldPrompt = Boolean(isDirty?.[mode] && !saveSuccess?.[mode]);
+
+    const { showModal, handleConfirm, handleCancel } = useConfirmNavigation({
+        when: shouldPrompt,
+        clearAll: () => resetMode(mode) // confirm qilinsa joriy mode dagi state tozalanadi
+    });
+
+    return (
+        <>
+            {children}
+            <ConfirmModalNav
+                open={showModal}
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+            />
+        </>
     );
 }

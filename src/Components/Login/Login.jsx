@@ -75,10 +75,11 @@ export default function Login() {
       super_admin: "SPAfefefeUID",
       admin: "AutngergUID",
       factory: "SefwfmgrUID",
-      company: "SefwfmgrUID",
+      company: "SeCfmgrUID",
       warehouse: "SesdsdfmgrUID",
       dealer: "SwedsdfmgrUID",
       independent: "inedsdfmgrUID",
+      com_warehouse: "comedsdfmgrUID",
     };
 
     Cookies.set("nesw", roleMap[role] || "");
@@ -86,7 +87,6 @@ export default function Login() {
     Cookies.set("ul_nesw", location_id);
     Cookies.set("usd_nesw", location?.parent_id);
 
-    // ✅ Хешированное сохранение sell_access
     const hashedValue = sell_access ? "terrwerwerw" : "fdqewfewf";
     Cookies.set("sedqwdqdqwd", hashedValue);
 
@@ -124,6 +124,7 @@ export default function Login() {
         { role: "dealer", vektor: "/diler/dashboard" },
         { role: "company", vektor: "/company/dashboard" },
         { role: "independent", vektor: "/independent/dashboard" },
+        { role: "com_warehouse", vektor: "/company-warehouse/dashboard" },
       ];
       const vektor_obj = roleLinks.find((item) => item.role === role);
       navigate(vektor_obj?.vektor || "/");
@@ -131,7 +132,7 @@ export default function Login() {
   };
 
   const shouldShowOfferta = (role) => {
-    return !["super_admin", "admin", "warehouse", "dealer"].includes(role);
+    return !["super_admin", "admin", "warehouse", "dealer", "com_warehouse"].includes(role);
   };
 
   const handleSubmit = async (e) => {

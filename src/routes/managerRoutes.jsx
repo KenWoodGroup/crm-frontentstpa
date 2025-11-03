@@ -1,3 +1,4 @@
+import ManagerCompany from "../Components/Manager/ManagerCompany/ManagerCompany";
 import ManagerDashboard from "../Components/Manager/ManagerDashboard/ManagerDashboard";
 import ManagerDealer from "../Components/Manager/ManagerDealer/ManagerDealer";
 import ManagerFactory from "../Components/Manager/ManagerFactory/ManagerFactory";
@@ -17,5 +18,10 @@ export const managerRoutes = [
         path: "/manager/dealer",
         name: "Dealer ",
         element: <ManagerDealer />
+    },
+    {
+        path: "/manager/company",
+        name: "Company ",
+        element: <ManagerCompany />
     },
 ]
