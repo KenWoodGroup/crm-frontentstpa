@@ -21,6 +21,7 @@ export default function Offerta({ isOpen, onClose, onAgree, locationId }) {
             { role: "SeCfmgrUID", vektor: "/company/dashboard" },
             { role: "inedsdfmgrUID", vektor: "/independent/dashboard" },
             { role: "comedsdfmgrUID", vektor: "/company-warehouse/dashboard" },
+            { role: "builewweUID", vektor: "/building/dashboard" },
 
         ];
 

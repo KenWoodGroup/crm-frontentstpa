@@ -34,6 +34,8 @@ import { independentRoutes } from "./routes/independentRoutes";
 import Independent from "./Components/ProtectedRoutes/Independent";
 import Company from "./Components/ProtectedRoutes/Company";
 import CompanyWarehouse from "./Components/ProtectedRoutes/CompanyWarehouse";
+import BuildingLayout from "./layouts/BuildingLayout";
+import { buildingRoutes } from "./routes/buildingRoutes";
 
 // React Query client
 const queryClient = new QueryClient();
@@ -136,17 +138,17 @@ function App() {
                 )
               })}
             </Route>
-            {/* <Route element={
+            <Route element={
               // <ProtectedUsersRoute>
-              <CompanyDilerLayout />
+              <BuildingLayout />
               // </ProtectedUsersRoute>
             }>
-              {companyDiler?.map((r) => {
+              {buildingRoutes?.map((r) => {
                 return (
                   <Route key={r.name} path={r.path} element={r.element} />
                 )
               })}
-            </Route> */}
+            </Route>
             <Route path="*" element={<ErrorPage />} />
           </Route>
         </Routes>

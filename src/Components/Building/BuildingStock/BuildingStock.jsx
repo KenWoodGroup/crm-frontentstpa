@@ -10,7 +10,7 @@ import { io } from "socket.io-client";
 import { Info } from "lucide-react";
 import Socket from "../../../utils/Socket";
 
-export default function CompanyWarehouseStock() {
+export default function BuildingStock() {
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [products, setProducts] = useState([]);
@@ -86,12 +86,6 @@ export default function CompanyWarehouseStock() {
                 <Typography variant="h4" className="font-semibold">
                     Ombordagi Mahsulotlar
                 </Typography>
-
-                {/* <NavLink to={"/warehouse/barcode/create"}>
-                    <Button className="bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600">
-                        Barcode qo‘shish
-                    </Button>
-                </NavLink> */}
             </div>
 
             {products?.length > 0 ? (
@@ -100,7 +94,7 @@ export default function CompanyWarehouseStock() {
                         <table className="w-full min-w-max table-auto text-left">
                             <thead>
                                 <tr className="bg-gray-100 dark:bg-card-dark">
-                                    {["№", "Mahsulot nomi", "Partiya", "Sotuv narxi", "Tan narxi", "Soni", "Draft soni", "Barcode", "Sana",].map((title) => (
+                                    {["№", "Mahsulot nomi", "Partiya", "Sotuv narxi", "Tan narxi", "Soni", "Draft soni", "Barcode", "Sana"].map((title) => (
                                         <th key={title} className="p-4 font-semibold text-gray-700 dark:text-text-dark">{title}</th>
                                     ))}
                                 </tr>

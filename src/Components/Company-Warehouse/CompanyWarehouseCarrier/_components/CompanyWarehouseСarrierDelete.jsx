@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@material-tailwind/react";
-import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Tooltip, IconButton } from "@material-tailwind/react";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
+import { Clients } from "../../../../utils/Controllers/Clients";
+import { Staff } from "../../../../utils/Controllers/Staff";
 
-export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
+export default function CompanyWarehouseСarrierDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -13,7 +14,7 @@ export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
     const handleDelete = async () => {
         try {
             setLoading(true);
-            await WarehouseApi.WarehouseDelete(dilerId);
+            await Staff.DeleteStaff(id);
             Alert("Muvaffaqiyatli o‘chirildi ", "success");
             refresh();
             setOpen(false);
@@ -27,30 +28,33 @@ export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
 
     return (
         <>
-            <Button
-                onClick={handleOpen}
-                className="bg-red-600 text-white hover:bg-red-700 normal-case p-[8px]"
-            >
-                <Delete size={20} />
-            </Button>
+            <Tooltip content="Удалить">
+                <IconButton
+                    onClick={handleOpen}
 
-            <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl dark:bg-card-dark">
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
-                    Omborni o‘chirish
-                </DialogHeader>
-                <DialogBody divider className="text-gray-700 dark:text-text-dark dark:bg-card-dark"
+                    variant="text"
+                    color="red"
                 >
-                    Siz haqiqatdan ham bu omborni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
+                    <Delete size={20} />
+                </IconButton>
+            </Tooltip>
+
+            <Dialog open={open} handler={handleOpen} className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark">
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:text-text-dark">
+                    Удаления Доствшика
+                </DialogHeader>
+                <DialogBody divider className="text-gray-700 dark:text-text-dark">
+                    Вы действительно хотите удалить Доствшика ?
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
                         variant="text"
-                        color="gray"
+                        color="red"
                         onClick={handleOpen}
-                        className="dark:text-text-dark mr-2"
+                        className="mr-2"
                         disabled={loading}
                     >
-                        Отмена
+                        Отменить
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -79,11 +83,11 @@ export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "O‘chirish"
+                            "Удалить"
                         )}
                     </Button>
                 </DialogFooter>
-            </Dialog >
+            </Dialog>
         </>
     );
 }

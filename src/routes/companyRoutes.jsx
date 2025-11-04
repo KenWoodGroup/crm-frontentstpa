@@ -35,5 +35,6 @@ export const companyRoutes = [
         path: '/company/finance',
         name: "Company finance",
         element: <CompanyFinance />
-    }
+    },
+
 ]

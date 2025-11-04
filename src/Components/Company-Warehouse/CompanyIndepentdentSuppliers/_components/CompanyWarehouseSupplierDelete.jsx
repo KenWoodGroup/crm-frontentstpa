@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@material-tailwind/react";
-import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Tooltip, IconButton } from "@material-tailwind/react";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
+import { Clients } from "../../../../utils/Controllers/Clients";
 
-export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
+export default function CompanyWarehouseSupplierDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -13,7 +13,7 @@ export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
     const handleDelete = async () => {
         try {
             setLoading(true);
-            await WarehouseApi.WarehouseDelete(dilerId);
+            await Clients.DeleteClient(id);
             Alert("Muvaffaqiyatli o‘chirildi ", "success");
             refresh();
             setOpen(false);
@@ -27,39 +27,46 @@ export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
 
     return (
         <>
-            <Button
-                onClick={handleOpen}
-                className="bg-red-600 text-white hover:bg-red-700 normal-case p-[8px]"
-            >
-                <Delete size={20} />
-            </Button>
+            <Tooltip content="Удалить">
+                <IconButton
+                    onClick={handleOpen}
 
-            <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl dark:bg-card-dark">
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
-                    Omborni o‘chirish
-                </DialogHeader>
-                <DialogBody divider className="text-gray-700 dark:text-text-dark dark:bg-card-dark"
+                    variant="text"
+                    color="red"
                 >
-                    Siz haqiqatdan ham bu omborni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
+                    <Delete size={20} />
+                </IconButton>
+            </Tooltip>
+
+            <Dialog className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300"
+                open={open} handler={handleOpen}>
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
+                    Удаления поставшика
+                </DialogHeader>
+                <DialogBody divider className="text-gray-700 dark:text-text-dark dark:bg-card-dark">
+                    Вы действительно хотите удалить поставшика ?
                 </DialogBody>
-                <DialogFooter className="border-t border-gray-200">
+                <DialogFooter className="border-t border-gray-200 dark:border-gray-700 dark:bg-card-dark">
                     <Button
                         variant="text"
                         color="gray"
                         onClick={handleOpen}
-                        className="dark:text-text-dark mr-2"
+                        className="dark:text-gray-300"
                         disabled={loading}
                     >
                         Отмена
                     </Button>
+
                     <Button
-                        className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                         onClick={handleDelete}
                         disabled={loading}
+                        color="red"
+                        className={`bg-red-600 text-white hover:bg-red-700  flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
+                            }`}
                     >
                         {loading ? (
                             <svg
-                                className="animate-spin h-5 w-5 text-white"
+                                className="animate-spin h-5 w-5 text-white dark:text-black"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -79,11 +86,11 @@ export default function CompanyWarehouseDilerDelete({ dilerId, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "O‘chirish"
+                            "Удалить"
                         )}
                     </Button>
                 </DialogFooter>
-            </Dialog >
+            </Dialog>
         </>
     );
 }

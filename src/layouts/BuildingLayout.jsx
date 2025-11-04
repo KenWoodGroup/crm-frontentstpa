@@ -1,47 +1,22 @@
 // src/layouts/WarehouseLayout.jsx
 import { Outlet, useLocation } from "react-router-dom";
-import { useState } from "react";
-import {
-    LayoutDashboard,
-    Package,
-    PackagePlus,
-    PackageMinus,
-    Recycle,
-    Settings,
-    User,
-    Move,
-    BanknoteArrowDown,
-    ChevronsLeftRight,
-    UserPen,
-    Blocks,
-    UsersRound,
-    CreditCard,
-    Car,
-} from "lucide-react";
-
-import { WarehouseProvider} from "../context/WarehouseContext";
+import { useWarehouse } from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
-import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
 import Header from "../Components/UI/Header/Header";
-import { useInventory } from "../context/InventoryContext";
+import BuildingSidebar from "../Components/Building/BuildingSidebar/BuildingSidebar";
 
-export default function WarehouseLayout() {
+export default function BuildingLayout() {
     const location = useLocation();
     const mode = location.pathname.includes("/warehouse/stockout")
-        ? "out" : location.pathname.includes("/warehouse/stockin") ? "in" : "m_other";
+        ? "out" : "in";
 
     return (
         <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
-            <WarehouseSidebar />
+            <BuildingSidebar />
             <div className="pt-[10px] pr-[10px]">
-                {/* <Header /> */}
-                {/* pass mode to provider so provider can expose per-mode state */}
-                <WarehouseProvider mode={mode}>
-                    <InnerGuard>
-                        <Outlet />
-                    </InnerGuard>
-                </WarehouseProvider>
+                <Header />
+                <Outlet />
             </div>
         </div>
     );
@@ -52,7 +27,7 @@ export default function WarehouseLayout() {
 */
 function InnerGuard({ children }) {
     const location = useLocation(); // optional, saqlab qoldik agar kerak bo'lsa
-    const { mode, isDirty, saveSuccess, resetMode } = useInventory();
+    const { mode, isDirty, saveSuccess, resetMode } = useWarehouse();
 
     // modalni ko'rsatish sharti: joriy mode da saqlanmagan o'zgarishlar mavjud va hali saveSuccess bo'lmagan
     const shouldPrompt = Boolean(isDirty?.[mode] && !saveSuccess?.[mode]);

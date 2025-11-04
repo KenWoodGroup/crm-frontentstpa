@@ -15,7 +15,7 @@ export default function CompanyWarehouseDilerCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
-        type: "dealer",
+        type: "building",
         name: "",
         full_name: "",
         address: "",
@@ -55,7 +55,7 @@ export default function CompanyWarehouseDilerCreate({ refresh }) {
             setLoading(true);
             const res = await WarehouseApi.CreateWarehouse(data);
 
-            Alert("Muvaffaqiyatli yaratildi ", "success");
+            Alert("Ombor muvaffaqiyatli yaratildi ", "success");
             setOpen(false);
             setData({
                 type: "warehouse",
@@ -79,76 +79,124 @@ export default function CompanyWarehouseDilerCreate({ refresh }) {
         <>
             <Button
                 onClick={handleOpen}
-                className="bg-black text-white normal-case hover:bg-gray-800"
+                className="bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
             >
-                + Yangi qurilish nuqtasi
+                + Yangi Diler
             </Button>
 
             <Dialog
                 open={open}
                 handler={handleOpen}
-                className="bg-white text-gray-900 rounded-xl"
+                className="bg-white text-gray-900 rounded-xl dark:bg-card-dark"
             >
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
-                    Qurilish nuqtasi maʼlumotlari
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
+                    Diler maʼlumotlari
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
                         label="Nomi"
-                        color="gray"
                         name="name"
                         value={data.name}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                     />
                     <Input
                         label="To‘liq ism"
-                        color="gray"
                         name="full_name"
                         value={data.full_name}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                     />
                     <Input
                         label="Manzil"
-                        color="gray"
                         name="address"
                         value={data.address}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                     />
                     <Input
                         label="Telefon raqam"
-                        color="gray"
                         name="phone"
                         value={data.phone}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                     />
                     <Input
                         label="Email"
-                        color="gray"
                         name="email"
                         value={data.email}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                     />
                     <Input
                         label="Parol"
-                        color="gray"
                         type="password"
                         name="password"
                         value={data.password}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                     />
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
                         variant="text"
-                        color="gray"
                         onClick={handleOpen}
-                        className="mr-2"
                         disabled={loading}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark `
+                        }}
                     >
                         Bekor qilish
                     </Button>
                     <Button
-                        className={`bg-black text-white normal-case hover:bg-gray-800 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
+                        className={`bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
                             }`}
                         onClick={CreateWarehouse}
                         disabled={loading}

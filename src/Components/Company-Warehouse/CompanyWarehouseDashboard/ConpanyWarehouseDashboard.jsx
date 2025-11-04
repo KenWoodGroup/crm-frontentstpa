@@ -72,7 +72,7 @@ export default function CompanyWarehouseDashboard() {
 
     return (
         <div className="min-h-screen">
-            <div className="max-w-7xl mx-auto">
+            <div className="mx-auto">
                 <Typography variant="h3" className="mb-8 font-bold text-gray-800">
                     Ombor Boshqaruv Paneli
                 </Typography>
