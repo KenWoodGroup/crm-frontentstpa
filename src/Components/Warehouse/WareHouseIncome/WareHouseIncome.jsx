@@ -78,7 +78,6 @@ export default function WareHouseIncome() {
         updatePrice,
         updateBatch,
         removeItem,
-        resetAll,
         resetMode,
         invoiceStarted, // object { in, out }
         setInvoiceStarted, // fn (mode, value)
@@ -758,7 +757,7 @@ export default function WareHouseIncome() {
 
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
-        resetAll();
+        resetMode(mode)
         setSelectedLocation({ value: null, label: "Укажите отправителя", type: "default" });
         setOtherLocationName("");
         setSearchResults([]);
@@ -783,7 +782,7 @@ export default function WareHouseIncome() {
                                         "Unknown"
                     )}
                 </h2>
-                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>}
+                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} appearance={"btn"} id={invoiceId?.[mode]}/> : <span></span>}
 
             </div>
 

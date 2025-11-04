@@ -60,10 +60,8 @@ export default function WareHouseOutcome() {
         mixData,
         addItem,
         updateQty,
-        updatePrice,
         updateDiscount,
         removeItem,
-        resetAll,
         resetMode,
         invoiceStarted,
         setInvoiceStarted,
@@ -586,7 +584,7 @@ export default function WareHouseOutcome() {
     const touchBtn = "min-h-[44px] px-4 py-3";
 
     function resetAllBaseForNewInvoice() {
-        resetAll();
+        resetMode(mode)
         setSelectedLocation("");
         setOtherLocationName("");
         setSearchResults([]);
@@ -605,7 +603,7 @@ export default function WareHouseOutcome() {
                             invoiceMeta?.out?.operation_type === "return_out" ? "Ombordan vozvrat" :
                                 invoiceMeta?.out?.operation_type === "disposal" ? "Утилизация" : "Unkown"
                     )}</h2>
-                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} /> : <span></span>}
+                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} appearance={"btn"} id={invoiceId?.[mode]} /> : <span></span>}
 
             </div>
 

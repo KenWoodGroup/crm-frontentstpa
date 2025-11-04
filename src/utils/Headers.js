@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export const BASE_URL = "https://dev.usderp.uz/crm";
+export const BASE_URL = "https://api.usderp.uz/crm";
 
 export const $api = axios.create({
     baseURL: `${BASE_URL}/api`,
