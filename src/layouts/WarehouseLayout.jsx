@@ -1,6 +1,5 @@
 // src/layouts/WarehouseLayout.jsx
 import { Outlet, useLocation } from "react-router-dom";
-import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
 import { useState } from "react";
 import {
     LayoutDashboard,
@@ -19,7 +18,8 @@ import {
     CreditCard,
     Car,
 } from "lucide-react";
-import { WarehouseProvider, useWarehouse } from "../context/WarehouseContext";
+
+import { WarehouseProvider} from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
 import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
@@ -29,7 +29,7 @@ import { useInventory } from "../context/InventoryContext";
 export default function WarehouseLayout() {
     const location = useLocation();
     const mode = location.pathname.includes("/warehouse/stockout")
-        ? "out" : "in";
+        ? "out" : location.pathname.includes("/warehouse/stockin") ? "in" : "m_other";
 
     return (
         <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>

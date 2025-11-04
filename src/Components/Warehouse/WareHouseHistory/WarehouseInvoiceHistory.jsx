@@ -7,6 +7,7 @@ import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
 import { notify } from "../../../utils/toast";
 import Select from "react-select";
+import CancelInvoiceButton from "../WareHouseOutcome/sectionsWhO/CancelInvoiceButton";
 /*
   WarehouseInvoiceHistory.jsx
   - Keeps full original logic but modernized and fixed per requirements
@@ -328,7 +329,7 @@ export default function WarehouseInvoiceHistory() {
     const closeEditItem = () => setEditingItem(null);
 
     async function saveInvoice(updated) {
-        const {id, ...rest} = updated
+        const { id, ...rest } = updated
         try {
             const res = await InvoicesApi.EditInvoice(updated.id, rest);
             if (!(res?.status === 200 || res?.status === 201)) throw new Error("Failed to save");
@@ -558,7 +559,11 @@ export default function WarehouseInvoiceHistory() {
                                                 {columns.actions && <td className="py-3 px-2 text-sm">
                                                     <div className="flex items-center gap-2">
                                                         <button onClick={() => openDetail(inv.id)} className="text-sm px-2 py-1 rounded bg-blue-50 border">Open</button>
-                                                        <button onClick={() => openEditInvoice(inv)} className="p-1 rounded hover:bg-gray-100"><Pencil size={14} /></button>
+                                                        {Number(inv?.total_sum) === 0 ?
+                                                            <CancelInvoiceButton resetAll={() => fetchInvoices()} appearance="icn" id={inv?.id} />
+                                                            :
+                                                            <noscript></noscript>
+                                                        }
                                                     </div>
                                                 </td>}
                                             </tr>
@@ -691,12 +696,12 @@ export default function WarehouseInvoiceHistory() {
 }
 
 function EditInvoiceModal({ invoice, onClose, onSave }) {
-    const [form, setForm] = useState(() => ({ ...invoice}));
+    const [form, setForm] = useState(() => ({ ...invoice }));
     useEffect(() => {
-        const {note, id} = invoice
-        setForm({note, id, changed_by:Cookies.get("us_nesw")});
+        const { note, id } = invoice
+        setForm({ note, id, changed_by: Cookies.get("us_nesw") });
     }, [invoice]);
-   
+
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
             <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
