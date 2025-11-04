@@ -50,7 +50,6 @@ export default function SAusers() {
         try {
             const { data } = await location.GetAll();
             console.log(data);
-
             setLocations(data || []);
         } catch (err) {
             notify.error("Locationlarni olishda xatolik", "error");
