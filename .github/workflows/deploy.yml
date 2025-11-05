@@ -1,4 +1,4 @@
-name: Deploy to Server
+name: Frontend CI/CD
 
 on:
   push:
@@ -6,13 +6,14 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to Server via SSH
+      - name: Deploy and build on server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -21,5 +22,6 @@ jobs:
           script: |
             cd /var/www/crm-frontentstpa
             git pull origin main
-            chmod +x deploy.sh
-            ./deploy.sh
+            npm install
+            npm run build
+            sudo systemctl reload nginx
