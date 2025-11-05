@@ -19,7 +19,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
         name: "",
         address: "",
         phone: "",
-        email: "",
         password: "",
     });
 
@@ -29,7 +28,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                 name: warehouse.name || "",
                 address: warehouse.address || "",
                 phone: warehouse.phone || "",
-                email: warehouse?.email || "",
             });
             setWarehouseId(warehouse?.id)
         }
@@ -49,8 +47,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
             return Alert("Iltimos, manzilni kiriting ❗", "warning");
         if (!data.phone.trim())
             return Alert("Iltimos, telefon raqam kiriting ❗", "warning");
-        if (!data.email.trim())
-            return Alert("Iltimos, email kiriting ❗", "warning");
         return true;
     };
 
@@ -119,18 +115,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                         color="gray"
                         name="phone"
                         value={data.phone}
-                        onChange={handleChange}
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        labelProps={{
-                            className: "!text-text-light dark:!text-text-dark"
-                        }}
-                        crossOrigin={undefined}
-                    />
-                    <Input
-                        label="Email"
-                        color="gray"
-                        name="email"
-                        value={data.email}
                         onChange={handleChange}
                         className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
                         labelProps={{
