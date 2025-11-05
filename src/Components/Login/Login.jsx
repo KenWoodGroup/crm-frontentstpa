@@ -11,7 +11,7 @@ import Spinner from "../../Components/UI/spinner/Spinner";
 import Offerta from "./_components/Offerta";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -21,14 +21,9 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const emailRegex =
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
   const validate = () => {
-    const em = email.trim();
-    if (!em) return "Elektron pochta manzili kiriting.";
-    if (em.trim().length <= 2)
-      return "Iltimos, yaroqli login kiriting.";
+    const un = username.trim();
+    if (!un) return "Username kiriting.";
     if (!password) return "Parol kiriting.";
     if (password.length < 6)
       return "Parol kamida 6 ta belgidan iborat boʻlishi kerak.";
@@ -46,31 +41,24 @@ export default function Login() {
     }
   };
 
-  // ✅ Добавлено сохранение sell_access
-  // ✅ Функция для сохранения пользовательских данных
-  // ✅ Обновлённая функция сохранения пользовательских данных
   const saveUserData = (data) => {
     const { access_token, refresh_token } = data?.tokens || {};
     const { id, role, location_id, location } = data?.newUser || {};
 
-    // 🔍 Извлекаем значение sell_access из location_data
     const sellAccessEntry = location?.location_data?.find(
       (item) => item.key === "sell_access"
     );
     const sell_access_value = sellAccessEntry?.value;
 
-    // ✅ Приводим значение к булевому типу
     const sell_access =
       sell_access_value === true ||
       sell_access_value === "true" ||
       sell_access_value === 1 ||
       sell_access_value === "1";
 
-    // ✅ Сохраняем токены
     Cookies.set("token", access_token);
     Cookies.set("refresh_token", refresh_token);
 
-    // ✅ Определяем роль
     const roleMap = {
       super_admin: "SPAfefefeUID",
       admin: "AutngergUID",
@@ -91,19 +79,14 @@ export default function Login() {
     const hashedValue = sell_access ? "terrwerwerw" : "fdqewfewf";
     Cookies.set("sedqwdqdqwd", hashedValue);
 
-    // ✅ Добавляем sell_access в userData
     const userWithAccess = { ...data.newUser, sell_access };
     setUserData(userWithAccess);
 
     return { locationId: location_id, userData: userWithAccess, role };
   };
 
-
-
-
   const redirectUser = (userData) => {
     if (!userData) return;
-
     const role = userData.role;
 
     if (
@@ -148,11 +131,11 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const base_data = await Auth.Login({ username:email, password });
+      const base_data = await Auth.Login({ username, password });
       const { data } = base_data;
 
       if (base_data?.status === 401) {
-        setError("Email yoki Parol xato");
+        setError("Username yoki Parol xato");
         return;
       }
 
@@ -173,7 +156,7 @@ export default function Login() {
     } catch (err) {
       setError(
         err?.message === "Request failed with status code 401"
-          ? "Email yoki Parol xato"
+          ? "Username yoki Parol xato"
           : "Tizim xatosi yuz berdi."
       );
     } finally {
@@ -191,7 +174,7 @@ export default function Login() {
     Cookies.remove("usd_nesw");
     Cookies.remove("sedqwdqdqwd");
     setUserData(null);
-    setEmail("");
+    setUsername("");
     setPassword("");
   };
 
@@ -222,15 +205,15 @@ export default function Login() {
             </div>
           )}
 
-          <label className="login-field" htmlFor="login-email">
-            <span className="login-label text-gray-700 dark:text-gray-300 !important">Elektron pochta</span>
+          <label className="login-field" htmlFor="login-username">
+            <span className="login-label text-gray-700 dark:text-gray-300 !important">Username</span>
             <input
-              id="login-email"
+              id="login-username"
               className="login-input border border-gray-300 dark:border-gray-600 !important bg-white dark:bg-card-dark !important text-gray-900 dark:text-gray-100 !important placeholder-gray-500 dark:placeholder-gray-400 !important"
               type="text"
-              placeholder="User name or Company name"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Username kiriting"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               disabled={loading}
             />
           </label>
@@ -297,7 +280,6 @@ export default function Login() {
         </footer>
       </div>
 
-      {/* Модальное окно оферты */}
       <Offerta
         locationId={userData?.location_id}
         isOpen={showOfferta}
