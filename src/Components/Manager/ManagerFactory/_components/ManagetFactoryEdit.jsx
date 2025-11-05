@@ -20,7 +20,6 @@ export default function ManagerFactoryEdit({ refresh, data }) {
 
     const [form, setForm] = useState({
         companyName: data?.name || "",
-        companyEmail: data?.email || "",
         companyPhone: data?.phone || "",
         legalAddress: data?.address || "",
     });
@@ -40,7 +39,6 @@ export default function ManagerFactoryEdit({ refresh, data }) {
             const readyData = {
                 name: form.companyName,
                 full_name: form.fullName,
-                email: form.companyEmail,
                 phone: form.companyPhone,
                 address: form.legalAddress,
             };
@@ -87,13 +85,6 @@ export default function ManagerFactoryEdit({ refresh, data }) {
                                 onChange={handleChange}
                             />
                             <Input
-                                label="Kompaniya emaili"
-                                name="companyEmail"
-                                value={form.companyEmail}
-                                onChange={handleChange}
-                                type="email"
-                            />
-                            <Input
                                 label="Telefon raqam"
                                 name="companyPhone"
                                 value={form.companyPhone}
@@ -101,7 +92,7 @@ export default function ManagerFactoryEdit({ refresh, data }) {
                                 type="tel"
                             />
                             <Input
-                                label="Yuridik manzil"
+                                label="Manzil"
                                 name="legalAddress"
                                 value={form.legalAddress}
                                 onChange={handleChange}
