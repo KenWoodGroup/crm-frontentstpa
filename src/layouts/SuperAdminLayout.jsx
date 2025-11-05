@@ -7,7 +7,6 @@ import {
     Settings,
     BarChart3,
     UserCog,
-    User
 } from "lucide-react";
 import SuperAdminSidebar from "../Components/SuperAdminSidebar/SuperAdminSidebar";
 
@@ -19,7 +18,7 @@ export default function SuperAdminLayout() {
     const links = [
         { path: "/", label: "Dashboard", icon: Home },
         { path: "/managers", label: "Managers", icon: UserCog },
-        {path:"/users", label:"Users", icon:User}
+        {path:"/users", label:"Users", icon:Users}
         // { path: "/users", label: "Users", icon: Users },
         // { path: "/reports", label: "Reports", icon: ClipboardList },
         // { path: "/stats", label: "Statistics", icon: BarChart3 },
