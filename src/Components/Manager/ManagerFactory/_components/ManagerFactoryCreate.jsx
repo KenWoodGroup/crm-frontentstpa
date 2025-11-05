@@ -95,8 +95,10 @@ export default function RegisterModal({ refresh }) {
                 name: form.companyName,
                 full_name: form.companyName,
                 username: form.username,
-                phone: '+99897026868',
+                phone: '998901234567',
                 password: form.password,
+                address: 'Berilmagan',
+                type: "factory",
             };
 
             const response = await location.Post(payload);
