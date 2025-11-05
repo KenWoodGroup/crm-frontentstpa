@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Card,
-  CardHeader,
   CardBody,
   Input,
   Button,
@@ -24,7 +23,7 @@ const SAmanagers = () => {
   const [managers, setManagers] = useState([]);
   const [formData, setFormData] = useState({
     full_name: "",
-    email: "",
+    username: "",
     password: "",
     role: "admin",
   });
@@ -63,7 +62,7 @@ const SAmanagers = () => {
         await user.Post(formData);
         notify.success("Yangi manager qo‘shildi!");
       }
-      setFormData({ full_name: "", email: "", password: "", role: "admin" });
+      setFormData({ full_name: "", username: "", password: "", role: "admin" });
       setEditId(null);
       fetchManagers();
     } catch (error) {
@@ -75,7 +74,7 @@ const SAmanagers = () => {
   const handleEdit = (m) => {
     setFormData({
       full_name: m.full_name,
-      email: m.email,
+      username: m.username,
       password: "",
       role: m.role,
     });
@@ -97,7 +96,7 @@ const SAmanagers = () => {
   };
 
   return (
-    <div className=" min-h-screen">
+    <div className="min-h-screen">
       {/* --- Заголовок --- */}
       <div className="flex items-center gap-3 mb-6">
         <UserGroupIcon className="h-8 w-8 text-blue-600" />
@@ -122,10 +121,9 @@ const SAmanagers = () => {
           />
           <Input
             color="blue"
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
+            label="Username"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             required
           />
@@ -168,9 +166,11 @@ const SAmanagers = () => {
               <thead>
                 <tr className="bg-blue-50 text-blue-gray-600">
                   <th className="py-3 px-4 font-semibold">Full Name</th>
-                  <th className="py-3 px-4 font-semibold">Email</th>
+                  <th className="py-3 px-4 font-semibold">Username</th>
                   <th className="py-3 px-4 font-semibold">Role</th>
-                  <th className="py-3 px-4 text-center font-semibold">Amallar</th>
+                  <th className="py-3 px-4 text-center font-semibold">
+                    Amallar
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -181,7 +181,7 @@ const SAmanagers = () => {
                       } hover:bg-blue-50 transition`}
                   >
                     <td className="py-2 px-4">{m.full_name}</td>
-                    <td className="py-2 px-4">{m.email}</td>
+                    <td className="py-2 px-4">{m.username}</td>
                     <td className="py-2 px-4 capitalize">{m.role}</td>
                     <td className="py-2 px-4 flex items-center justify-center gap-2">
                       <Tooltip content="Tahrirlash">
