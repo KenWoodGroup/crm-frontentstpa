@@ -27,8 +27,8 @@ export default function Login() {
   const validate = () => {
     const em = email.trim();
     if (!em) return "Elektron pochta manzili kiriting.";
-    if (!emailRegex.test(em))
-      return "Iltimos, yaroqli elektron pochta manzili kiriting.";
+    if (em.trim().length <= 2)
+      return "Iltimos, yaroqli login kiriting.";
     if (!password) return "Parol kiriting.";
     if (password.length < 6)
       return "Parol kamida 6 ta belgidan iborat boʻlishi kerak.";
@@ -148,7 +148,7 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const base_data = await Auth.Login({ email, password });
+      const base_data = await Auth.Login({ username:email, password });
       const { data } = base_data;
 
       if (base_data?.status === 401) {
@@ -227,8 +227,8 @@ export default function Login() {
             <input
               id="login-email"
               className="login-input border border-gray-300 dark:border-gray-600 !important bg-white dark:bg-card-dark !important text-gray-900 dark:text-gray-100 !important placeholder-gray-500 dark:placeholder-gray-400 !important"
-              type="email"
-              placeholder="misol: user@example.com"
+              type="text"
+              placeholder="User name or Company name"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
