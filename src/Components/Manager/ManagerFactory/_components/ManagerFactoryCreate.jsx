@@ -17,7 +17,6 @@ export default function RegisterModal({ refresh }) {
 
     const handleOpen = () => {
         setOpen(!open)
-        // Сброс формы и ошибок при открытии/закрытии модального окна
         setForm({
             companyName: "",
             companyEmail: "",
@@ -25,9 +24,7 @@ export default function RegisterModal({ refresh }) {
             fullName: "",
             password: "",
             confirmPassword: "",
-            bank: "",
             stir: "",
-            accountNumber: "",
             legalAddress: "",
             activityType: "factory",
         });
@@ -41,9 +38,7 @@ export default function RegisterModal({ refresh }) {
         fullName: "",
         password: "",
         confirmPassword: "",
-        bank: "",
         stir: "",
-        accountNumber: "",
         legalAddress: "",
         activityType: "factory",
     });
@@ -103,12 +98,6 @@ export default function RegisterModal({ refresh }) {
                 }
                 break;
 
-            case "bank":
-                if (!value.trim()) {
-                    error = "Bank nomi majburiy";
-                }
-                break;
-
             case "stir":
                 if (!value.trim()) {
                     error = "STIR/INN majburiy";
@@ -117,17 +106,9 @@ export default function RegisterModal({ refresh }) {
                 }
                 break;
 
-            case "accountNumber":
-                if (!value.trim()) {
-                    error = "Hisob raqami majburiy";
-                } else if (!/^\d{16}$/.test(value.replace(/\s/g, ''))) {
-                    error = "Hisob raqami 16 raqamdan iborat bo'lishi kerak";
-                }
-                break;
-
             case "legalAddress":
                 if (!value.trim()) {
-                    error = "Yuridik manzil majburiy";
+                    error = "Manzil majburiy";
                 } else if (value.trim().length < 10) {
                     error = "Yuridik manzil kamida 10 belgidan iborat bo'lishi kerak";
                 }
@@ -171,10 +152,6 @@ export default function RegisterModal({ refresh }) {
             processedValue = formatPhoneNumber(value);
         }
 
-        // Форматирование номера счета (добавление пробелов каждые 4 цифры)
-        if (name === "accountNumber") {
-            processedValue = formatAccountNumber(value);
-        }
 
         // Форматирование STIR (только цифры)
         if (name === "stir") {
@@ -219,11 +196,7 @@ export default function RegisterModal({ refresh }) {
         return value;
     };
 
-    // Функция форматирования номера счета
-    const formatAccountNumber = (value) => {
-        const numbers = value.replace(/\D/g, '').slice(0, 16);
-        return numbers.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -241,7 +214,6 @@ export default function RegisterModal({ refresh }) {
             const cleanData = {
                 ...form,
                 companyPhone: form.companyPhone.replace(/\s/g, ''),
-                accountNumber: form.accountNumber.replace(/\s/g, ''),
                 stir: form.stir.replace(/\s/g, '')
             };
 
@@ -260,10 +232,7 @@ export default function RegisterModal({ refresh }) {
             if (base_data.status === 201) {
                 const readyLocationInfo = {
                     list: [
-                        { location_id: base_data.data.location.id, key: "bank", value: cleanData.bank },
                         { location_id: base_data.data.location.id, key: "stir", value: cleanData.stir },
-                        { location_id: base_data.data.location.id, key: "account_number", value: cleanData.accountNumber },
-                        { location_id: base_data.data.location.id, key: "terms_accepted", value: String(cleanData.termsAccepted) },
                     ],
                 };
 
@@ -406,26 +375,9 @@ export default function RegisterModal({ refresh }) {
                                         </Typography>
                                     )}
                                 </div>
-
                                 <div>
                                     <Input
-                                        label="Bank *"
-                                        name="bank"
-                                        value={form.bank}
-                                        onChange={handleChange}
-                                        placeholder="Bank nomi"
-                                        error={!!errors.bank}
-                                    />
-                                    {errors.bank && (
-                                        <Typography variant="small" color="red" className="mt-1 text-xs">
-                                            {errors.bank}
-                                        </Typography>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <Input
-                                        label="STIR / INN *"
+                                        label="INN *"
                                         name="stir"
                                         value={form.stir}
                                         onChange={handleChange}
@@ -438,47 +390,23 @@ export default function RegisterModal({ refresh }) {
                                         </Typography>
                                     )}
                                 </div>
+                                <div>
+                                    <Input
+                                        label="Manzil*"
+                                        name="legalAddress"
+                                        value={form.legalAddress}
+                                        onChange={handleChange}
+                                        placeholder="Viloyat, shahar, ko'cha, uy"
+                                        error={!!errors.legalAddress}
+                                    />
+                                    {errors.legalAddress && (
+                                        <Typography variant="small" color="red" className="mt-1 text-xs">
+                                            {errors.legalAddress}
+                                        </Typography>
+                                    )}
+                                </div>
                             </div>
                         </div>
-
-                        {/* Нижние поля */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <Input
-                                    label="Hisob raqami *"
-                                    name="accountNumber"
-                                    value={form.accountNumber}
-                                    onChange={handleChange}
-                                    placeholder="1234 5678 9101 1121"
-                                    error={!!errors.accountNumber}
-                                />
-                                {errors.accountNumber && (
-                                    <Typography variant="small" color="red" className="mt-1 text-xs">
-                                        {errors.accountNumber}
-                                    </Typography>
-                                )}
-                            </div>
-
-                            <div>
-                                <Input
-                                    label="Yuridik manzil *"
-                                    name="legalAddress"
-                                    value={form.legalAddress}
-                                    onChange={handleChange}
-                                    placeholder="Viloyat, shahar, ko'cha, uy"
-                                    error={!!errors.legalAddress}
-                                />
-                                {errors.legalAddress && (
-                                    <Typography variant="small" color="red" className="mt-1 text-xs">
-                                        {errors.legalAddress}
-                                    </Typography>
-                                )}
-                            </div>
-                        </div>
-
-
-
-
                         {/* Кнопка отправки */}
                         <div className="space-y-4">
                             <div className="flex flex-col sm:flex-row gap-3 items-center justify-between pt-4">
