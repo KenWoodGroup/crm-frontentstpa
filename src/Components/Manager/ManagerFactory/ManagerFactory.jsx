@@ -102,7 +102,7 @@ export default function ManagerFactory() {
                                     <span className="font-medium">Telefon:</span> {factory.phone || "—"}
                                 </Typography>
                                 <Typography className="text-gray-600 dark:text-gray-300 text-sm mb-1">
-                                    <span className="font-medium">Email:</span> {factory.email || "—"}
+                                    <span className="font-medium">Login:</span> {factory?.users[0]?.username || "—"}
                                 </Typography>
                             </Card>
                         ))}

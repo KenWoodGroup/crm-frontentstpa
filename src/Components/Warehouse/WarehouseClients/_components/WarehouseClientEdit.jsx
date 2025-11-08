@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Button,
     Dialog,
@@ -8,20 +8,29 @@ import {
     Input,
     Tooltip,
     IconButton,
+    Spinner,
 } from "@material-tailwind/react";
 import { Clients } from "../../../../utils/Controllers/Clients";
+import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { Edit } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseClientEdit({ data, refresh, id }) {
     const [open, setOpen] = useState(false);
+    const [clientCategories, setClientCategories] = useState([]);
+    const { t } = useTranslation();
+    const [loading, setLoading] = useState(false);
+
+
+
     const [form, setForm] = useState({
-        type: "client",
         name: data?.name || "",
         address: data?.address || "",
         phone: data?.phone || "+998",
         parent_id: Cookies.get(`ul_nesw`),
+        client_type_id: data?.client_type?.id || "",
     });
 
     const handleOpen = () => setOpen(!open);
@@ -31,30 +40,62 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
+    const getClientCategory = async () => {
+        try {
+            const response = await ClientCategory.GetClientCategory(Cookies.get(`ul_nesw`));
+            const categories = response?.data || [];
+            setClientCategories(categories);
+        } catch (error) {
+            console.log(error);
+            setClientCategories([]);
+        }
+    }
+
     const handleSubmit = async () => {
+        setLoading(true);
+
+        if (!form.client_type_id) {
+            Alert("Выберите категорию клиента!", "warning");
+            return;
+        }
+
         try {
             await Clients?.EditClient(id, form);
-            Alert("Muvaffaqiyatli", "success");
-
+            Alert(`${t(`success`)}`, "success");
             setForm({
-                type: "client",
                 name: "",
                 address: "",
                 phone: "+998",
                 parent_id: Cookies.get(`ul_nesw`),
+                client_type_id: "",
             });
 
             handleOpen();
             refresh();
         } catch (error) {
-            Alert("Xato", "error");
+            Alert(`${t('Error_occurred')}`, "error");
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    useEffect(() => {
+        if (open) {
+            getClientCategory();
+            // Устанавливаем данные при открытии диалога
+            setForm({
+                name: data?.name || "",
+                address: data?.address || "",
+                phone: data?.phone || "+998",
+                parent_id: Cookies.get(`ul_nesw`),
+                client_type_id: data?.client_type?.id || "",
+            });
+        }
+    }, [open, data]);
     return (
         <div>
-            <Tooltip content="Изменить">
+            <Tooltip content={t('Edit')}>
                 <IconButton
                     variant="text"
                     color="blue"
@@ -71,7 +112,7 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
                 className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
             >
                 <DialogHeader className="flex justify-between items-center dark:text-text-dark">
-                    Изменение клиента
+                    {t('Client_Edit')}
                 </DialogHeader>
 
                 <DialogBody
@@ -79,7 +120,7 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
                     className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
                 >
                     <Input
-                        label="Имя клиента"
+                        label={t('Firstname')}
                         name="name"
                         value={form.name}
                         onChange={handleChange}
@@ -94,7 +135,7 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
                     />
 
                     <Input
-                        label="Адрес"
+                        label={t('Address')}
                         name="address"
                         value={form.address}
                         onChange={handleChange}
@@ -109,7 +150,7 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
                     />
 
                     <Input
-                        label="Телефон"
+                        label={t('Phone')}
                         name="phone"
                         value={form.phone}
                         onChange={handleChange}
@@ -122,6 +163,22 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
                             className: `!text-text-light dark:!text-text-dark`,
                         }}
                     />
+
+                    {/* Select для категории клиента */}
+                    <div className="flex flex-col gap-1">
+                        <select
+                            value={form.client_type_id}
+                            onChange={(e) => setForm((p) => ({ ...p, client_type_id: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        >
+                            <option value="">{t('select_type_client')}</option>
+                            {clientCategories.map((category) => (
+                                <option key={category.id} value={String(category.id)}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </DialogBody>
 
                 <DialogFooter className="flex justify-end gap-2 dark:bg-card-dark">
@@ -131,13 +188,16 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
                         onClick={handleOpen}
                         className="dark:text-gray-300"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={handleSubmit}
-                        className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
+                        disabled={loading}
+                        className={`flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors ${loading ? "opacity-70 cursor-not-allowed" : ""
+                            }`}
                     >
-                        Сохранить
+                        {loading && <Spinner className="h-4 w-4" />}
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

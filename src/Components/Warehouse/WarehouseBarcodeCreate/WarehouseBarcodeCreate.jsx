@@ -10,12 +10,15 @@ import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseBarcodeModal from "./_components/WarehouseBarcodeCreateModal";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseBarcodeCreate() {
     const [miniCategories, setMiniCategories] = useState([]);
     const [openAccordions, setOpenAccordions] = useState([]);
     const [productsData, setProductsData] = useState({});
     const [loading, setLoading] = useState(true);
+    const { t } = useTranslation();
+
 
     const GetMiniCategory = async () => {
         setLoading(true);
@@ -74,7 +77,7 @@ export default function WarehouseBarcodeCreate() {
                     variant="h2"
                     className="mb-6 font-bold text-left text-gray-900 dark:text-text-dark"
                 >
-                    Mahsulotlar ro'yxati
+                    {t('products')}
                 </Typography>
 
                 <div className="space-y-4">
@@ -127,7 +130,7 @@ export default function WarehouseBarcodeCreate() {
                                                 variant="small"
                                                 className="text-gray-500 dark:text-gray-400 italic"
                                             >
-                                                Hozircha mahsulotlar yo‘q.
+                                                {t('Empty_data')}
                                             </Typography>
                                         )
                                     ) : (

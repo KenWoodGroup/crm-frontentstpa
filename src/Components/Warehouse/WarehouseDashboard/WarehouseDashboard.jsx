@@ -19,9 +19,11 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import WarehouseMonyChart from "../../Factory/FactoryDashboard/_components/WarehouseMonyChart";
 import WarehouseProduct from "../../Factory/FactoryDashboard/_components/WarehouseProduct";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseDashboard() {
     const locationId = Cookies.get("ul_nesw");
+    const { t } = useTranslation();
     const currentDate = new Date();
     const [year, setYear] = useState(currentDate.getFullYear());
     const [month, setMonth] = useState(String(currentDate.getMonth() + 1).padStart(2, "0"));
@@ -54,37 +56,37 @@ export default function WarehouseDashboard() {
 
     const stats = [
         {
-            title: "Dilerlar",
+            title: t("dilers"),
             value: CardData ? CardData.countDealer : "...",
             icon: <Users className="w-6 h-6 text-green-600 dark:text-green-400" />,
         },
         {
-            title: "Mahsulotlar",
+            title: t("products"),
             value: CardData ? CardData.countProduct : "...",
             icon: <Package className="w-6 h-6 text-purple-600 dark:text-purple-400" />,
         },
         {
-            title: "Umumiy Qiymat",
+            title: t("Total_Value"),
             value: CardData ? `${CardData.sumProduct?.toLocaleString()} so'm` : "...",
             icon: <DollarSign className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />,
         },
         {
-            title: "Kirim (joriy oy uchun)",
+            title: t("Receipts_in_month"),
             value: CardData ? `${CardData.transferIn?.toLocaleString()} so'm` : "...",
             icon: <BanknoteArrowDown className="w-6 h-6 text-green-600 dark:text-green-400" />,
         },
         {
-            title: "Chiqim (joriy oy uchun)",
+            title: t("Output_in_mont"),
             value: CardData ? `${CardData.transferOut?.toLocaleString()} so'm` : "...",
             icon: <BanknoteArrowUp className="w-6 h-6 text-red-600 dark:text-red-400" />,
         },
         {
-            title: "Sotuv (joriy oy uchun)",
+            title: t('Sells_inMonth'),
             value: CardData ? `${CardData.income?.toLocaleString()} so'm` : "...",
             icon: <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />,
         },
         {
-            title: "Utilizatsiya (joriy oy uchun)",
+            title: t('Cash_inMonth'),
             value: CardData ? `${CardData.sumDisposal?.toLocaleString()} so'm` : "...",
             icon: <Trash className="w-6 h-6 text-red-600 dark:text-red-400" />,
         },
@@ -123,7 +125,7 @@ export default function WarehouseDashboard() {
                 <CardBody className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex gap-4 w-full sm:w-auto">
                         <Select
-                            label="Yilni tanlang"
+                            label={t("Select_yers")}
                             value={year.toString()}
                             onChange={(val) => setYear(val)}
                             className="text-gray-900 dark:text-text-dark  outline-none"
@@ -142,7 +144,7 @@ export default function WarehouseDashboard() {
                         </Select>
 
                         <Select
-                            label="Oyni tanlang"
+                            label={t("Select_month")}
                             value={month}
                             onChange={(val) => setMonth(val)}
                             className="text-gray-900 dark:text-text-dark  outline-none"
@@ -179,7 +181,7 @@ export default function WarehouseDashboard() {
                         className="px-6 normal-case"
                         onClick={fetchAllData}
                     >
-                        Filtrlash
+                        {t("Search")}
                     </Button>
                 </CardBody>
             </Card>

@@ -10,6 +10,7 @@ class location {
         const response = await $api.put(`/locations/${id}`, data)
         return response;
     }
+
     static Get = async (id) => {
         const response = await $api.get(`/locations/${id}`)
         return response;

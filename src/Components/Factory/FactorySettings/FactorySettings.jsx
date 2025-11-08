@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { Card, CardBody, Typography, Button, Switch } from "@material-tailwind/react";
-import { Plus, Minus, Moon, Sun } from "lucide-react";
+import { Card, CardBody, Typography, Button } from "@material-tailwind/react";
+import { Plus, Minus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function FactorySettings() {
+    const { t } = useTranslation();
+
     const [zoom, setZoom] = useState(100);
     const [fontScale, setFontScale] = useState(100);
     const [darkMode, setDarkMode] = useState(false);
@@ -72,7 +75,6 @@ export default function FactorySettings() {
         localStorage.setItem("textFontScale", 100);
     };
 
-    // ✅ Переключатель тёмного режима
     const toggleDarkMode = () => {
         const newMode = !darkMode;
         setDarkMode(newMode);
@@ -86,28 +88,18 @@ export default function FactorySettings() {
     };
 
     return (
-        <div className="transition-colors duration-300 bg-background-light dark:bg-background-dark min-h-screen p-6">
+        <div className="transition-colors duration-300 bg-background-light dark:bg-background-dark min-h-screen">
             <div className="flex justify-between items-center mb-6">
                 <Typography variant="h2" className="font-semibold text-text-light dark:text-text-dark">
-                    Sozlamalar
+                    {t("Settings")}
                 </Typography>
-
-                <Button
-                    color="blue-gray"
-                    variant="outlined"
-                    onClick={toggleDarkMode}
-                    className="flex items-center gap-2"
-                >
-                    {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-                    {darkMode ? "Yorug‘ rejim" : "Tungi rejim"}
-                </Button>
             </div>
 
             {/* --- Масштаб экрана --- */}
             <Card className="shadow-md rounded-2xl mb-6 bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <CardBody className="p-6 flex flex-col gap-4">
                     <Typography variant="h6" className="text-text-light dark:text-text-dark">
-                        Ekran masshtabi
+                        {t("Screen_Zoom")}
                     </Typography>
 
                     <div className="flex items-center gap-4">
@@ -142,7 +134,7 @@ export default function FactorySettings() {
             <Card className="shadow-md rounded-2xl bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <CardBody className="p-6 flex flex-col gap-6">
                     <Typography variant="h6" className="text-text-light dark:text-text-dark">
-                        Matn hajmi
+                        {t("Text_Size")}
                     </Typography>
 
                     <div className="flex items-center gap-4">
@@ -188,17 +180,16 @@ export default function FactorySettings() {
                         }}
                     >
                         <Typography className="mb-2 font-medium text-text-light dark:text-text-dark">
-                            Sinov matni (test text)
+                            {t("Sample_Text")}
                         </Typography>
                         <p className="text-text-light dark:text-text-dark">
-                            Bu joyda matn hajmini sinab ko‘rishingiz mumkin. Har safar siz qiymатni
-                            o‘zgartirsangiz, matn darhol kattalashadi yoki kichrayadi.
+                            {t("Text_Size_Description")}
                         </p>
                     </div>
 
                     <div className="flex justify-end gap-3">
                         <Button color="blue" onClick={resetAll}>
-                            Tiklash hammasini
+                            {t("Reset_All")}
                         </Button>
                     </div>
                 </CardBody>

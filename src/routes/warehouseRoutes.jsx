@@ -16,6 +16,10 @@ import WarehouseClients from "../Components/Warehouse/WarehouseClients/Warehouse
 import WarehouseClientDetail from "../Components/Warehouse/WarehouseClientDetail/WarehouseClientDetail";
 import WarehouseCash from "../Components/Warehouse/WarehouseCash/WarehouseCash";
 import WarehouseСarrier from "../Components/Warehouse/WarehouseСarrier/WarehouseСarrier";
+import WarehousePaymentType from "../Components/Warehouse/WarehousePaymentType/WarehousePaymentType";
+import WarehouseClientCategory from "../Components/Warehouse/WarehouseClientCategory/WarehouseClientCategory";
+import WarehousePriceType from "../Components/Warehouse/WarehousePriceType/WarehousePriceType";
+import Profile from "../Components/Profile/Profile";
 
 export const warehouseRoutes = [
     {
@@ -44,11 +48,11 @@ export const warehouseRoutes = [
         element: <WareHouseOutcome />
     },
     {
-        path:"/warehouse/history",
-        name:"warehouse history",
-        element:<WarehouseInvoiceHistory/>
+        path: "/warehouse/history",
+        name: "warehouse history",
+        element: <WarehouseInvoiceHistory />
     },
-  
+
     {
         path: "/warehouse/history/:invoiceId",
         name: "warehouse detail history by id",
@@ -103,6 +107,26 @@ export const warehouseRoutes = [
         path: "/warehouse/carrier",
         name: "Warehouse carrier ",
         element: <WarehouseСarrier />
+    },
+    {
+        path: "/warehouse/peyment/type",
+        name: "Warehouse payment type ",
+        element: <WarehousePaymentType />
+    },
+    {
+        path: "/warehouse/client/category",
+        name: "Warehouse Client category ",
+        element: <WarehouseClientCategory />
+    },
+    {
+        path: "/warehouse/price-type",
+        name: "Warehouse price type ",
+        element: <WarehousePriceType />
+    },
+    {
+        path: "/profile",
+        name: "Warehouse profile ",
+        element: <Profile />
     },
 
 ];

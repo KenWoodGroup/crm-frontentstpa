@@ -19,12 +19,13 @@ import {
     Car,
 } from "lucide-react";
 
-import { WarehouseProvider} from "../context/WarehouseContext";
+import { WarehouseProvider } from "../context/WarehouseContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
 import WarehouseSidebar from "../Components/Warehouse/WarehouseSideBar/WarehouseSidebar";
 import Header from "../Components/UI/Header/Header";
 import { useInventory } from "../context/InventoryContext";
+import AdminHeader from "../Components/UI/Header/AdminHeader";
 
 export default function WarehouseLayout() {
     const location = useLocation();
@@ -34,8 +35,8 @@ export default function WarehouseLayout() {
     return (
         <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
             <WarehouseSidebar />
-            <div className="pt-[10px] pr-[10px]">
-                {/* <Header /> */}
+            <div className="pt-[100px] pr-[10px]">
+                <AdminHeader />
                 {/* pass mode to provider so provider can expose per-mode state */}
                 <WarehouseProvider mode={mode}>
                     <InnerGuard>

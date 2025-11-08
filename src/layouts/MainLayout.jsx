@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useState } from "react";
 import FactorySidebar from "../Components/Factory/FactorySidebar/FactorySidebar";
 import Header from "../Components/UI/Header/Header";
+import AdminHeader from "../Components/UI/Header/AdminHeader";
 
 export default function MainLayout() {
     const [active, setActive] = useState(false); // true = открыт сайдбар
@@ -14,13 +15,13 @@ export default function MainLayout() {
                 active={() => setActive((s) => !s)}
             />
             <div
-                className="mt-[10px] pb-[30px] px-[15px] min-h-screen transition-all duration-300"
+                className="mt-[95px] pb-[30px] px-[15px] min-h-screen transition-all duration-300"
                 style={{
                     marginLeft: !active ? "300px" : "110px",
                     width: !active ? "calc(100% - 320px)" : "calc(100% - 120px)",
                 }}
             >
-                <Header />
+                <AdminHeader sidebarOpen={!active} />
                 <Outlet />
             </div>
         </div>

@@ -28,11 +28,9 @@ export default function CompanyWarehouseSverka() {
     // 🔹 Получаем первый и последний день текущего месяца
     const getCurrentMonthDates = () => {
         const now = new Date();
-        // Добавляем смещение часового пояса для корректной даты
         const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        // Форматируем даты с учетом локального времени
         const formatDate = (date) => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -247,47 +245,59 @@ export default function CompanyWarehouseSverka() {
                                     </thead>
                                     <tbody>
                                         {
-                                            history.map((item, index) => (
-                                                <tr
-                                                    key={item.id}
-                                                    className={`${index % 2 === 0
-                                                        ? "bg-white dark:bg-gray-800"
-                                                        : "bg-gray-50 dark:bg-gray-700/50"
-                                                        } hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200`}
-                                                >
-                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                                        {new Date(item.createdAt).toLocaleDateString('ru-RU')}
-                                                    </td>
-                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                                        {item.payer?.name || '-'}
-                                                    </td>
-                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                                        {item.receiver?.name || '-'}
-                                                    </td>
-                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-green-600 dark:text-green-400 font-semibold transition-colors duration-200">
-                                                        {parseFloat(item.amount).toLocaleString('ru-RU')} сум
-                                                    </td>
-                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                                        {item.method === 'cash' ? 'Наличные' :
-                                                            item.method === 'card' ? 'Карта' :
-                                                                item.method === 'transfer' ? 'Перевод' : item.method}
-                                                    </td>
-                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
-                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${item.status === 'confirmed'
-                                                            ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                            : item.status === 'pending'
-                                                                ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'
-                                                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                                            } transition-colors duration-200`}>
-                                                            {item.status === 'confirmed' ? 'Подтверждено' :
-                                                                item.status === 'pending' ? 'В ожидании' : item.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 transition-colors duration-200">
-                                                        {item.note || "-"}
-                                                    </td>
-                                                </tr>
-                                            ))
+                                            history.map((item, index) => {
+                                                // Безопасное извлечение значений
+                                                const payerName = item?.payer?.name || '-';
+                                                const receiverName = item?.receiver?.name || '-';
+                                                const methodName = typeof item?.method === 'object' && item?.method?.name
+                                                    ? item.method.name
+                                                    : (item?.method || '-');
+                                                const amount = item?.amount ? parseFloat(item.amount).toLocaleString('ru-RU') : '0';
+                                                const note = item?.note || '-';
+                                                const createdDate = item?.createdAt
+                                                    ? new Date(item.createdAt).toLocaleDateString('ru-RU')
+                                                    : '-';
+
+                                                return (
+                                                    <tr
+                                                        key={item.id}
+                                                        className={`${index % 2 === 0
+                                                            ? "bg-white dark:bg-gray-800"
+                                                            : "bg-gray-50 dark:bg-gray-700/50"
+                                                            } hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200`}
+                                                    >
+                                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                                            {createdDate}
+                                                        </td>
+                                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                                            {payerName}
+                                                        </td>
+                                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                                            {receiverName}
+                                                        </td>
+                                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-green-600 dark:text-green-400 font-semibold transition-colors duration-200">
+                                                            {amount} сум
+                                                        </td>
+                                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                                            {methodName}
+                                                        </td>
+                                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+                                                            <span className={`px-2 py-1 rounded text-xs font-medium ${item.status === 'confirmed'
+                                                                ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                                : item.status === 'pending'
+                                                                    ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'
+                                                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                                                } transition-colors duration-200`}>
+                                                                {item.status === 'confirmed' ? 'Подтверждено' :
+                                                                    item.status === 'pending' ? 'В ожидании' : item.status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                                                            {note}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
                                         }
                                     </tbody>
                                 </table>

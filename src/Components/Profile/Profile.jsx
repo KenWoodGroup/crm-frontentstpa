@@ -1,61 +1,118 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Card,
     CardHeader,
     CardBody,
-    Input,
-    Button,
     Typography,
+    Spinner,
 } from "@material-tailwind/react";
+import Cookies from "js-cookie";
+import { location } from "../../utils/Controllers/location";
+import { MapPin, Phone, Package, Calendar, RefreshCw } from "lucide-react";
+import Loading from "../UI/Loadings/Loading";
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const { t } = useTranslation();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log({ name, email, password });
-        // Здесь можно добавить отправку данных на backend
+
+    const getProfiler = async () => {
+        setLoading(true)
+        try {
+            const response = await location?.Get(Cookies.get("ul_nesw"));
+            setProfile(response?.data);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getProfiler();
+    }, []);
+
+    if (loading) {
+        <Loading />
+    }
+
+    if (!profile) {
+        return (
+            <div className="flex justify-center items-center h-screen bg-background-light dark:bg-background-dark">
+                <Typography
+                    variant="h5"
+                    className="text-text-light dark:text-text-dark"
+                >
+                    Профиль не найден
+                </Typography>
+            </div>
+        );
+    }
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString("ru-RU", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
+    const formatNumber = (number) => {
+        return Number(number).toLocaleString("ru-RU");
     };
 
     return (
-        <div className="flex justify-center mt-10">
-            <Card className="w-full max-w-md shadow-lg">
+        <div className="flex bg-background-light dark:bg-background-dark transition-colors duration-300 p-4">
+            <Card className="w-full max-w-xl shadow-lg rounded-2xl bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <CardHeader
-                    color="blue"
-                    className="mb-4 p-4 text-center"
+                    floated={false}
+                    shadow={false}
+                    className="p-6 rounded-t-2xl bg-card-light dark:bg-background-dark"
                 >
-                    <Typography variant="h5" color="white">
-                        Profile
+                    <Typography variant="h4" className="text-text-light dark:text-text-dark font-semibold flex items-center gap-2">
+                        <Package className="w-6 h-6" /> {profile.name}
                     </Typography>
                 </CardHeader>
-                <CardBody className="flex flex-col gap-4">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        <Input
-                            label="Name"
-                            size="lg"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                        <Input
-                            type="email"
-                            label="Email"
-                            size="lg"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <Input
-                            type="password"
-                            label="Password"
-                            size="lg"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <Button type="submit" color="blue" size="lg" className="mt-2">
-                            Save
-                        </Button>
-                    </form>
+
+                <CardBody className="p-6 space-y-4">
+                    <div className="flex flex-col gap-3">
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                            <Package className="w-5 h-5" /> {t(`Type`)}: <span className="font-normal">{profile.type}</span>
+                        </Typography>
+
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                            <MapPin className="w-5 h-5" /> {t('Address')}: <span className="font-normal">{profile.address}</span>
+                        </Typography>
+
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                            <Phone className="w-5 h-5" /> {t('Phone')}: <span className="font-normal">{profile.phone}</span>
+                        </Typography>
+
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                            <Package className="w-5 h-5" /> {t('Balance')}:{" "}
+                            <span
+                                className={`font-bold ${Number(profile.balance) < 0
+                                    ? "text-red-500"
+                                    : "text-green-500"
+                                    }`}
+                            >
+                                {formatNumber(profile.balance)} UZS
+                            </span>
+                        </Typography>
+
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                            <Calendar className="w-5 h-5" /> {t('Created')}: <span className="font-normal">{formatDate(profile.createdAt)}</span>
+                        </Typography>
+
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                            <RefreshCw className="w-5 h-5" /> {t('Updated')}: <span className="font-normal">{formatDate(profile.updatedAt)}</span>
+                        </Typography>
+                    </div>
                 </CardBody>
             </Card>
         </div>

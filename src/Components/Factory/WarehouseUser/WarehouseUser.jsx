@@ -51,7 +51,7 @@ export default function WarehouseUser() {
                     {users.map((u) => (
                         <Card
                             key={u.id}
-                            className="shadow-sm hover:shadow-md transition rounded-2xl border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-300"
+                            className="shadow-sm hover:shadow-md  rounded-2xl border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-300"
                         >
                             <CardBody className="space-y-3 pt-[5px]">
                                 {/* Имя и кнопки */}
@@ -72,7 +72,7 @@ export default function WarehouseUser() {
                                 <div className="flex items-center gap-2">
                                     <Mail className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                                     <span className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
-                                        {u.email}
+                                        {u.username}
                                     </span>
                                 </div>
 

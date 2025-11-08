@@ -70,7 +70,7 @@ export default function FactoryWarehouse() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-semibold">
-                    {t("warehouse_info")}
+                    {t("Warehouses")}
                 </h1>
                 <WarehouseCreate refresh={() => GetAll(page)} />
             </div>
@@ -108,7 +108,7 @@ export default function FactoryWarehouse() {
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2">
                                         <Mail className="w-5 h-5 opacity-70" />
-                                        <span>{w?.email || "—"}</span>
+                                        <span>{w?.users[0]?.username || "—"}</span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
@@ -128,7 +128,7 @@ export default function FactoryWarehouse() {
                                         >
                                             <Button className="w-full flex items-center justify-center gap-2 bg-background-dark dark:bg-background-light  dark:text-text-light  text-white transition-colors">
                                                 <User size={18} />
-                                                {t("users")}
+                                                {t("workers")}
                                             </Button>
                                         </NavLink>
                                         <NavLink
@@ -137,7 +137,7 @@ export default function FactoryWarehouse() {
                                         >
                                             <Button className="w-full flex items-center justify-center gap-2 bg-background-dark dark:bg-background-light  dark:text-text-light  text-white transition-colors">
                                                 <User size={18} />
-                                                {t("Access")}
+                                                {t("Detail")}
                                             </Button>
                                         </NavLink>
                                     </div>

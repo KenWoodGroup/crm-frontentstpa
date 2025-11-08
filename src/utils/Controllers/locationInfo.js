@@ -17,6 +17,10 @@ class locationInfo {
         const response = await $api.get(`/location-info/offer/${id}`)
         return response;
     }
+    static GetLocationInfo = async (id) => {
+        const response = await $api.get(`/location-info/${id}`)
+        return response;
+    }
     static Get = async (id) => {
         const response = await axios.get(`${BASE_URL}/api/location-info/${id}`)
         return response;

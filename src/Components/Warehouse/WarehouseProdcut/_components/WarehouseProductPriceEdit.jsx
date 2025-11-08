@@ -12,11 +12,14 @@ import {
 import { Stock } from "../../../../utils/Controllers/Stock";
 import { Alert } from "../../../../utils/Alert";
 import { formatNumber, unformatNumber } from "../../../../utils/Helpers/Formater";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseEdit({ data }) {
     const [open, setOpen] = useState(false);
     const [price, setPrice] = useState(formatNumber(data?.sale_price || 0));
     const [fixedQuantity, setFixedQuantity] = useState(!!data?.fixed_quantity);
+    const { t } = useTranslation();
+
 
     const handleOpen = () => setOpen(!open);
 
@@ -57,19 +60,19 @@ export default function WarehouseEdit({ data }) {
                 onClick={handleOpen}
 
             >
-                Narx o‘zgartirish
+                {t('Edit_Price')}
             </Button>
 
             <Dialog className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark" open={open} handler={handleOpen} size="xs">
                 <DialogHeader>
                     <Typography variant="h6" className="dark:text-text-dark" color="blue-gray">
-                        Ma'lumotlarni tahrirlash
+                        {t('Edit_Product')}
                     </Typography>
                 </DialogHeader>
 
                 <DialogBody className="flex flex-col gap-4">
                     <Input
-                        label="Yangi narx"
+                        label={t('New_price')}
                         type="text"
                         value={price}
                         onChange={handleChange}
@@ -85,14 +88,14 @@ export default function WarehouseEdit({ data }) {
 
                     <div className="flex items-center justify-between">
                         <Typography variant="small" className="dark:text-text-dark" color="blue-gray">
-                            Cheklangan (fixed_quantity)
+                            {t('dixed')}
                         </Typography>
                         <Switch
-                            className="dark:text-text-dark" color="blue-gray"
-                            color="blue"
+                            className="dark:text-text-dark"
+                            color="blue-gray"
                             checked={fixedQuantity}
                             onChange={(e) => setFixedQuantity(e.target.checked)}
-                            label={fixedQuantity ? "Cheklangan" : "Cheklanmagan"}
+                            label={fixedQuantity ? `${t('dixed')}` : `${t('dixed_of')}`}
                         />
                     </div>
                 </DialogBody>
@@ -104,7 +107,7 @@ export default function WarehouseEdit({ data }) {
                         onClick={handleOpen}
                         className="mr-2 rounded-lg"
                     >
-                        Bekor qilish
+                        {t('Cancel')}
                     </Button>
                     <Button
                         variant="filled"
@@ -112,7 +115,7 @@ export default function WarehouseEdit({ data }) {
                         onClick={handleSave}
                         className="rounded-lg"
                     >
-                        Saqlash
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

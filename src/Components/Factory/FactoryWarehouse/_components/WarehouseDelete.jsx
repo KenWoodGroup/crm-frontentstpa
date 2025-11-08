@@ -3,8 +3,10 @@ import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@materia
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseDelete({ warehouseId, refresh }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -14,12 +16,12 @@ export default function WarehouseDelete({ warehouseId, refresh }) {
         try {
             setLoading(true);
             await WarehouseApi.WarehouseDelete(warehouseId);
-            Alert("Ombor muvaffaqiyatli o'chirildi ", "success");
+            Alert(t("Warehouse_deleted_success"), "success");
             refresh();
             setOpen(false);
         } catch (error) {
             console.error(error);
-            Alert("Xatolik yuz berdi ", "error");
+            Alert(t("Error_occurred"), "error");
         } finally {
             setLoading(false);
         }
@@ -40,10 +42,10 @@ export default function WarehouseDelete({ warehouseId, refresh }) {
                 className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300"
             >
                 <DialogHeader className="text-lg dark:text-text-dark font-semibold border-b border-gray-200 dark:border-gray-700 pb-4 bg-card-light dark:bg-card-dark rounded-t-xl">
-                    Omborni o'chirish
+                    {t("Delete_Warehouse")}
                 </DialogHeader>
                 <DialogBody divider className="text-text-light dark:text-text-dark py-6">
-                    Siz haqiqatdan ham bu omborni o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi!
+                    {t("Delete_Warehouse_confirm")}
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <Button
@@ -56,7 +58,7 @@ export default function WarehouseDelete({ warehouseId, refresh }) {
                                   transition-colors duration-200 font-medium"
                         disabled={loading}
                     >
-                        Bekor qilish
+                        {t("Cancel")}
                     </Button>
                     <Button
                         variant="gradient"
@@ -87,10 +89,10 @@ export default function WarehouseDelete({ warehouseId, refresh }) {
                                         d="M4 12a8 8 0 018-8v8H4z"
                                     ></path>
                                 </svg>
-                                O'chirilmoqda...
+                                {t("Deleting")}...
                             </>
                         ) : (
-                            "O'chirish"
+                            t("Delete")
                         )}
                     </Button>
                 </DialogFooter>

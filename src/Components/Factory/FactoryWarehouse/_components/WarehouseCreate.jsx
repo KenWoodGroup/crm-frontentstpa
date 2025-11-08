@@ -10,11 +10,15 @@ import {
 import { Alert } from "../../../../utils/Alert";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import Cookies from "js-cookie";
+import Regions from "../../../../utils/Regions/regions.json";
+import Districts from "../../../../utils/Regions/districts.json";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
+    const { t } = useTranslation();
 
     const initialData = {
         name: "",
@@ -23,9 +27,16 @@ export default function WarehouseCreate({ refresh }) {
         phone: "+998",
         password: "",
         confirm_password: "",
+        region_id: "",
+        district_id: "",
     };
 
     const [data, setData] = useState(initialData);
+
+    const getDistrictsByRegion = (regionId) => {
+        if (!regionId) return [];
+        return Districts.filter((district) => district.region_id === parseInt(regionId));
+    };
 
     const handleOpen = () => {
         setOpen(!open);
@@ -36,10 +47,9 @@ export default function WarehouseCreate({ refresh }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Простое форматирование номера
         let val = value;
         if (name === "phone") {
-            val = value.replace(/[^\d+]/g, ""); // оставляем только цифры и +
+            val = value.replace(/[^\d+]/g, "");
         }
 
         setData((prev) => ({ ...prev, [name]: val }));
@@ -49,20 +59,45 @@ export default function WarehouseCreate({ refresh }) {
         }
     };
 
+    const handleRegionChange = (e) => {
+        const value = e.target.value;
+        setData({
+            ...data,
+            region_id: value,
+            district_id: "", // Сбрасываем район при смене региона
+        });
+
+        if (errors.region_id) {
+            setErrors((prev) => ({ ...prev, region_id: "" }));
+        }
+    };
+
+    const handleDistrictChange = (e) => {
+        const value = e.target.value;
+        setData({
+            ...data,
+            district_id: value,
+        });
+
+        if (errors.district_id) {
+            setErrors((prev) => ({ ...prev, district_id: "" }));
+        }
+    };
+
     const validateFields = () => {
         const newErrors = {};
 
-        if (!data.name.trim()) newErrors.name = "Iltimos, ombor nomini kiriting";
-        if (!data.username.trim()) newErrors.username = "Iltimos, username kiriting";
-        if (!data.full_name.trim()) newErrors.full_name = "Iltimos, to'liq ism kiriting";
-        if (!data.phone.trim()) newErrors.phone = "Iltimos, telefon raqam kiriting";
-        else if (!/^\+998\d{9}$/.test(data.phone)) newErrors.phone = "Telefon raqam noto'g'ri formatda (+998xxxxxxxxx)";
-
-        if (!data.password.trim()) newErrors.password = "Iltimos, parol kiriting";
-        else if (data.password.length < 6) newErrors.password = "Parol kamida 6 belgidan iborat bo'lishi kerak";
-
-        if (!data.confirm_password.trim()) newErrors.confirm_password = "Iltimos, parolni tasdiqlang";
-        else if (data.password !== data.confirm_password) newErrors.confirm_password = "Parollar mos kelmadi";
+        if (!data.name.trim()) newErrors.name = t("Field_required", { field: t("Warehouse_name") });
+        if (!data.username.trim()) newErrors.username = t("Field_required", { field: t("Warehouse_login") });
+        if (!data.full_name.trim()) newErrors.full_name = t("Field_required", { field: t("Warehouse_owner_name") });
+        if (!data.phone.trim()) newErrors.phone = t("Field_required", { field: t("Phone_number") });
+        else if (!/^\+998\d{9}$/.test(data.phone)) newErrors.phone = t("Phone_format_error");
+        if (!data.password.trim()) newErrors.password = t("Field_required", { field: t("Password") });
+        else if (data.password.length < 6) newErrors.password = t("Password_min_error");
+        if (!data.confirm_password.trim()) newErrors.confirm_password = t("Field_required", { field: t("Confirm_password") });
+        else if (data.password !== data.confirm_password) newErrors.confirm_password = t("Passwords_not_match");
+        if (!data.region_id) newErrors.region_id = t("Field_required", { field: t("Region") });
+        if (!data.district_id) newErrors.district_id = t("Field_required", { field: t("District") });
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -74,6 +109,9 @@ export default function WarehouseCreate({ refresh }) {
         try {
             setLoading(true);
 
+            const selectedRegion = Regions.find((region) => region.id === parseInt(data.region_id));
+            const selectedDistrict = Districts.find((district) => district.id === parseInt(data.district_id));
+
             const payload = {
                 name: data.name,
                 username: data.username,
@@ -81,14 +119,13 @@ export default function WarehouseCreate({ refresh }) {
                 phone: data.phone,
                 password: data.password,
                 type: "warehouse",
-                address: 'Korsatilmagan',
+                address: `${selectedRegion?.name_uz || ""}, ${selectedDistrict?.name_uz || ""},`,
                 parent_id: Cookies.get("ul_nesw") || "",
-
             };
 
             await WarehouseApi.CreateWarehouse(payload);
 
-            Alert("Ombor muvaffaqiyatli yaratildi", "success");
+            Alert(t("success"), "success");
             handleOpen();
             refresh();
         } catch (error) {
@@ -98,21 +135,23 @@ export default function WarehouseCreate({ refresh }) {
         }
     };
 
+    const availableDistricts = getDistrictsByRegion(data.region_id);
+
     return (
         <>
             <Button
                 onClick={handleOpen}
                 className="bg-black text-white normal-case hover:bg-gray-800 active:bg-gray-900 transition-colors duration-200 shadow-md hover:shadow-lg"
             >
-                + Yangi Ombor
+                {t("New_Warehouse")}
             </Button>
 
             <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>Ombor yaratish</DialogHeader>
-                <DialogBody divider className="space-y-4">
+                <DialogHeader>{t("Create_Warehouse")}</DialogHeader>
+                <DialogBody divider className="space-y-4 overflow-y-auto h-[500px]">
                     <div>
                         <Input
-                            label="Ombor nomi *"
+                            label={t("Warehouse_name")}
                             name="name"
                             value={data.name}
                             onChange={handleChange}
@@ -123,7 +162,7 @@ export default function WarehouseCreate({ refresh }) {
 
                     <div>
                         <Input
-                            label="Ombor logini *"
+                            label={t("Warehouse_login")}
                             name="username"
                             value={data.username}
                             onChange={handleChange}
@@ -134,7 +173,7 @@ export default function WarehouseCreate({ refresh }) {
 
                     <div>
                         <Input
-                            label="Omborchi ismi *"
+                            label={t("Warehouse_owner_name")}
                             name="full_name"
                             value={data.full_name}
                             onChange={handleChange}
@@ -145,7 +184,7 @@ export default function WarehouseCreate({ refresh }) {
 
                     <div>
                         <Input
-                            label="Telefon raqam *"
+                            label={t("Phone_number")}
                             name="phone"
                             value={data.phone}
                             onChange={handleChange}
@@ -154,9 +193,49 @@ export default function WarehouseCreate({ refresh }) {
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
 
+                    {/* Выбор региона */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t("Region")}</label>
+                        <select
+                            value={data.region_id}
+                            onChange={handleRegionChange}
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black focus:border-black"
+                                }`}
+                        >
+                            <option value="">{t("Select_region")}</option>
+                            {Regions.map((region) => (
+                                <option key={region.id} value={region.id}>
+                                    {region.name_uz}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.region_id && <p className="text-red-500 text-xs mt-1">{errors.region_id}</p>}
+                    </div>
+
+                    {/* Выбор района */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t("District")}</label>
+                        <select
+                            value={data.district_id}
+                            onChange={handleDistrictChange}
+                            disabled={!data.region_id}
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.district_id ? "border-red-500 focus:border-red-500" : "border-black focus:border-black"
+                                }`}
+                        >
+                            <option value="">{t("Select_district")}</option>
+                            {availableDistricts.map((district) => (
+                                <option key={district.id} value={district.id}>
+                                    {district.name_uz}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.district_id && <p className="text-red-500 text-xs mt-1">{errors.district_id}</p>}
+                        {!data.region_id && <p className="text-gray-500 text-xs mt-1">{t("Select_region_first")}</p>}
+                    </div>
+
                     <div>
                         <Input
-                            label="Parol *"
+                            label={t("Password")}
                             name="password"
                             type="password"
                             value={data.password}
@@ -168,7 +247,7 @@ export default function WarehouseCreate({ refresh }) {
 
                     <div>
                         <Input
-                            label="Parolni tasdiqlash *"
+                            label={t("Confirm_password")}
                             name="confirm_password"
                             type="password"
                             value={data.confirm_password}
@@ -181,14 +260,14 @@ export default function WarehouseCreate({ refresh }) {
 
                 <DialogFooter className="flex justify-end gap-2">
                     <Button variant="text" color="gray" onClick={handleOpen} disabled={loading}>
-                        Bekor qilish
+                        {t("Cancel")}
                     </Button>
                     <Button
                         onClick={createWarehouse}
                         disabled={loading}
                         className={`bg-black text-white ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                     >
-                        {loading ? "Saqlanmoqda..." : "Saqlash"}
+                        {loading ? t("Saving") : t("Save")}
                     </Button>
                 </DialogFooter>
             </Dialog>

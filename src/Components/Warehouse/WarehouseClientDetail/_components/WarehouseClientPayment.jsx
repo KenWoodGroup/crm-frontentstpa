@@ -9,6 +9,8 @@ import {
 import { BanknotesIcon, CheckCircleIcon, ClockIcon, CreditCardIcon, CurrencyDollarIcon, ReceiptRefundIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { Payment } from "../../../../utils/Controllers/Payment";
 import { CalendarSearchIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import Loading from "../../../UI/Loadings/Loading";
 
 
 export default function WarehouseClientPayment({ clientData, refreshKey }) {
@@ -16,6 +18,8 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
     const [pagination, setPagination] = useState({});
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
+    const { t } = useTranslation();
+
 
     const CashIcon = (props) => (
         <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,9 +134,7 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
     return (
         <>
             {loading ? (
-                <div className="text-center py-10 text-text-light dark:text-text-dark transition-colors duration-200">
-                    Загрузка...
-                </div>
+                <Loading />
             ) : payments.length > 0 ? (
                 <div className="space-y-4">
                     {payments.map((payment) => (
@@ -149,7 +151,7 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                                                 color="blue-gray"
                                                 className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                             >
-                                                Платёж #{payment.id.slice(-8)}
+                                                {t("f_payment")} #{payment.id.slice(-8)}
                                             </Typography>
                                             <div className="flex gap-2">
                                                 <Chip
@@ -176,7 +178,7 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                                                     color="blue-gray"
                                                     className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                                 >
-                                                    Сумма платежа
+                                                    {t('Price_payment')}
                                                 </Typography>
                                                 <Typography
                                                     variant="paragraph"
@@ -191,7 +193,7 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                                                     color="blue-gray"
                                                     className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                                 >
-                                                    Метод оплаты
+                                                    {t('Payment_method')}
                                                 </Typography>
                                                 <Typography
                                                     variant="paragraph"
@@ -207,7 +209,8 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                                                     color="blue-gray"
                                                     className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                                 >
-                                                    Дата платежа
+                                                    {t('Created')}
+
                                                 </Typography>
                                                 <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
                                                     {formatInvoiceDate(payment.createdAt)}
@@ -220,7 +223,7 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                                                         color="blue-gray"
                                                         className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                                     >
-                                                        Примечание
+                                                        {t('Comment')}
                                                     </Typography>
                                                     <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
                                                         {payment.note}
@@ -247,8 +250,8 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                                 onClick={() => handlePageChange(page - 1)}
                                 disabled={page === 1}
                                 className={`px-3 py-1 border rounded transition-colors duration-200 ${page === 1
-                                        ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
-                                        : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
+                                    : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                             >
                                 ←
@@ -262,8 +265,8 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                                 onClick={() => handlePageChange(page + 1)}
                                 disabled={page === pagination.total_pages}
                                 className={`px-3 py-1 border rounded transition-colors duration-200 ${page === pagination.total_pages
-                                        ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
-                                        : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
+                                    : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                             >
                                 →
@@ -275,14 +278,14 @@ export default function WarehouseClientPayment({ clientData, refreshKey }) {
                 <div className="text-center py-8">
                     <ReceiptRefundIcon className="h-16 w-16 text-blue-gray-300 dark:text-gray-600 mx-auto mb-4 transition-colors duration-200" />
                     <Typography variant="h6" color="blue-gray" className="mb-2 text-text-light dark:text-text-dark transition-colors duration-200">
-                        Нет истории платежей
+                        {t('Payment_EmtyData')}
                     </Typography>
                     <Typography
                         variant="paragraph"
                         color="blue-gray"
                         className="opacity-70 text-text-light dark:text-text-dark transition-colors duration-200"
                     >
-                        У этого клиента пока нет истории платежей
+                        {t('Payment_EmtyData_text')}
                     </Typography>
                 </div>
             )}

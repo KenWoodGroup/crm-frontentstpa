@@ -8,14 +8,19 @@ import Cookies from "js-cookie";
 import { Payment } from "../../../../utils/Controllers/Payment";
 import { Alert } from "../../../../utils/Alert";
 import { Cash } from "../../../../utils/Controllers/Cash";
+import { PaymentMethodApi } from "../../../../utils/Controllers/PaymentMethodApi";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseClientPayment({ client, refresh }) {
     const [open, setOpen] = useState(false);
     const [cashes, setCashes] = useState([]);
+    const [paymentMethods, setPaymentMethods] = useState([]);
+    const { t } = useTranslation();
+
 
     const [form, setForm] = useState({
         amount: "",
-        method: "cash",
+        method_id: "",
         status: "confirmed",
         payer_id: client?.id,
         receiver_id: Cookies?.get("ul_nesw"),
@@ -31,13 +36,33 @@ export default function WarehouseClientPayment({ client, refresh }) {
             const response = await Cash?.GetKassa(Cookies.get("ul_nesw"));
             const data = response?.data || [];
             setCashes(data);
-
-            if (data.length > 0 && !form.cash_id) {
-                setForm((prev) => ({ ...prev, cash_id: String(data[0].id) }));
+            if (data.length > 0) {
+                setForm((prev) => ({
+                    ...prev,
+                    cash_id: prev.cash_id || String(data[0].id)
+                }));
             }
         } catch (error) {
             console.log(error);
             setCashes([]);
+        }
+    };
+
+    const getAllPaymentMethod = async () => {
+        try {
+            const response = await PaymentMethodApi.PaymentTypeGet(Cookies?.get("ul_nesw"));
+            const methods = response?.data || [];
+            setPaymentMethods(methods);
+
+            if (methods.length > 0) {
+                setForm((prev) => ({
+                    ...prev,
+                    method_id: prev.method_id || String(methods[0].id)
+                }));
+            }
+        } catch (error) {
+            console.log(error);
+            setPaymentMethods([]);
         }
     };
 
@@ -61,21 +86,27 @@ export default function WarehouseClientPayment({ client, refresh }) {
             Alert("Выберите кассу!", "warning");
             return;
         }
+        if (!form.method_id) {
+            Alert("Выберите метод оплаты!", "warning");
+            return;
+        }
         try {
             const numericAmount = Number(form.amount.replace(/\s/g, ""));
             const payload = {
                 ...form,
                 amount: numericAmount,
                 cash_id: form.cash_id,
+                method_id: form.method_id,
             };
 
             await Payment.Payment(payload);
-            Alert("Оплата успешно создана", "success");
+            Alert(`${t(`success`)}`, "success");
 
             handleOpen();
+            // Сбрасываем форму после успешной отправки
             setForm({
                 amount: "",
-                method: "cash",
+                method_id: "",
                 status: "confirmed",
                 payer_id: client?.id,
                 receiver_id: Cookies?.get("ul_nesw"),
@@ -87,17 +118,32 @@ export default function WarehouseClientPayment({ client, refresh }) {
             if (refresh) refresh();
         } catch (error) {
             console.log("Ошибка:", error);
-            Alert("Ошибка при создании оплаты", "error");
+            Alert(`${t('Error_occurred')}`, "error");
         }
     };
 
     useEffect(() => {
-        if (open) GetAllCash();
+        if (open) {
+            GetAllCash();
+            getAllPaymentMethod();
+        } else {
+            // Сбрасываем форму при закрытии диалога
+            setForm({
+                amount: "",
+                method_id: "",
+                status: "confirmed",
+                payer_id: client?.id,
+                receiver_id: Cookies?.get("ul_nesw"),
+                cash_id: "",
+                note: "",
+                created_by: Cookies?.get("us_nesw"),
+            });
+        }
     }, [open]);
 
     return (
         <>
-            <Tooltip content="Сделать оплату">
+            <Tooltip content={t('Create_Payment')}>
                 <IconButton
                     variant="text"
                     color="green"
@@ -114,7 +160,7 @@ export default function WarehouseClientPayment({ client, refresh }) {
                 className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300"
             >
                 <DialogHeader className="flex justify-between items-center dark:text-text-dark border-b border-gray-200 dark:border-gray-700">
-                    Создать оплату
+                    {t('Create_Payment')}
                 </DialogHeader>
 
                 <DialogBody
@@ -122,7 +168,7 @@ export default function WarehouseClientPayment({ client, refresh }) {
                     className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
                 >
                     <Input
-                        label="Сумма (so'm)"
+                        label={t('Price__sum')}
                         name="amount"
                         value={form.amount}
                         onChange={handleChange}
@@ -134,11 +180,10 @@ export default function WarehouseClientPayment({ client, refresh }) {
                     />
 
                     <Select
-                        key={form.cash_id}
-                        label="Выберите кассу"
+                        label={t('Kassa')}
                         value={form.cash_id}
                         onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
-                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        className="text-gray-900 dark:text-text-dark outline-none"
                         labelProps={{
                             className: "text-gray-700 dark:text-text-dark"
                         }}
@@ -148,22 +193,16 @@ export default function WarehouseClientPayment({ client, refresh }) {
                     >
                         {cashes.map((cash) => (
                             <Option key={cash.id} value={String(cash.id)}>
-                                {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm (${new Date(
-                                    cash.createdAt
-                                ).toLocaleDateString("ru-RU", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                })})`}
+                                {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm`}
                             </Option>
                         ))}
                     </Select>
 
                     <Select
-                        label="Метод оплаты"
-                        value={form.method}
-                        onChange={(val) => setForm((p) => ({ ...p, method: val }))}
-                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        label={t('Payment_type')}
+                        value={form.method_id}
+                        onChange={(val) => setForm((p) => ({ ...p, method_id: val }))}
+                        className="text-gray-900 dark:text-text-dark outline-none"
                         labelProps={{
                             className: "text-gray-700 dark:text-text-dark"
                         }}
@@ -171,13 +210,15 @@ export default function WarehouseClientPayment({ client, refresh }) {
                             className: "dark:bg-gray-800 dark:text-text-dark"
                         }}
                     >
-                        <Option value="cash">Naqd (Cash)</Option>
-                        <Option value="transfer">O'tkazma (Transfer)</Option>
-                        <Option value="card">Karta orqali</Option>
+                        {paymentMethods.map((method) => (
+                            <Option key={method.id} value={String(method.id)}>
+                                {method.name || `Метод ${method.id}`}
+                            </Option>
+                        ))}
                     </Select>
 
                     <Textarea
-                        label="Izoh"
+                        label={t('Comment')}
                         name="note"
                         value={form.note}
                         onChange={handleChange}
@@ -196,14 +237,14 @@ export default function WarehouseClientPayment({ client, refresh }) {
                         onClick={handleOpen}
                         className="dark:text-gray-300"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         color="green"
                         onClick={handleSubmit}
                         className="bg-green-600 text-white hover:bg-green-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
                     >
-                        Сохранить
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

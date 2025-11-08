@@ -11,10 +11,13 @@ import {
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { Clients } from "../../../../utils/Controllers/Clients";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseClientDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
+
 
     const handleOpen = () => setOpen(!open);
 
@@ -22,12 +25,12 @@ export default function WarehouseClientDelete({ id, refresh }) {
         try {
             setLoading(true);
             await Clients.DeleteClient(id);
-            Alert("Muvaffaqiyatli o‘chirildi", "success");
+            Alert(`${t(`success`)}`, "success");
             refresh();
             setOpen(false);
         } catch (error) {
             console.error(error);
-            Alert("Xatolik yuz berdi", "error");
+            Alert(`${t('Error_occurred')}`, "error");
         } finally {
             setLoading(false);
         }
@@ -35,7 +38,7 @@ export default function WarehouseClientDelete({ id, refresh }) {
 
     return (
         <>
-            <Tooltip content="Удалить">
+            <Tooltip content={t("Delete")}>
                 <IconButton
                     onClick={handleOpen}
                     variant="text"
@@ -53,14 +56,14 @@ export default function WarehouseClientDelete({ id, refresh }) {
                 className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300"
             >
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
-                    Удаление клиента
+                    {t('Delete_Client')}
                 </DialogHeader>
 
                 <DialogBody
                     divider
                     className="text-gray-700 dark:text-text-dark dark:bg-card-dark"
                 >
-                    Вы действительно хотите удалить клиента?
+                    {t('Delete_Client_text')}
                 </DialogBody>
 
                 <DialogFooter className="border-t border-gray-200 dark:border-gray-700 dark:bg-card-dark">
@@ -71,7 +74,7 @@ export default function WarehouseClientDelete({ id, refresh }) {
                         className="dark:text-gray-300"
                         disabled={loading}
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
 
                     <Button
@@ -103,7 +106,7 @@ export default function WarehouseClientDelete({ id, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "Удалить"
+                            t('Delete')
                         )}
                     </Button>
                 </DialogFooter>

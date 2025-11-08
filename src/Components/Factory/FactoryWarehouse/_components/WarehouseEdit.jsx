@@ -10,62 +10,127 @@ import {
 import { Alert } from "../../../../utils/Alert";
 import Edit from "../../../UI/Icons/Edit";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
+import Regions from "../../../../utils/Regions/regions.json";
+import Districts from "../../../../utils/Regions/districts.json";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseEdit({ warehouse, refresh }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [warehouseId, setWarehouseId] = useState("");
+    const [errors, setErrors] = useState({});
+
     const [data, setData] = useState({
         name: "",
-        address: "",
         phone: "",
         password: "",
+        region_id: "",
+        district_id: "",
     });
+
+    // Разбор адреса "Район, Регион"
+    const parseAddress = (address) => {
+        if (!address) return { region_id: "", district_id: "" };
+        const parts = address.split(', ');
+        if (parts.length !== 2) return { region_id: "", district_id: "" };
+        const [districtName, regionName] = parts;
+
+        const region = Regions.find(r =>
+            r.name_uz === regionName ||
+            r.name_ru === regionName ||
+            r.name_oz === regionName
+        );
+
+        const district = Districts.find(d =>
+            (d.name_uz === districtName || d.name_ru === districtName || d.name_oz === districtName) &&
+            d.region_id === region?.id
+        );
+
+        return {
+            region_id: region?.id?.toString() || "",
+            district_id: district?.id?.toString() || ""
+        };
+    };
 
     useEffect(() => {
         if (warehouse) {
+            const addressParts = parseAddress(warehouse.address);
             setData({
                 name: warehouse.name || "",
-                address: warehouse.address || "",
                 phone: warehouse.phone || "",
+                password: "",
+                region_id: addressParts.region_id,
+                district_id: addressParts.district_id,
             });
-            setWarehouseId(warehouse?.id)
+            setWarehouseId(warehouse?.id);
         }
     }, [warehouse]);
 
-    const handleOpen = () => setOpen(!open);
+    // Получение районов выбранного региона
+    const getDistrictsByRegion = (regionId) => {
+        if (!regionId) return [];
+        return Districts.filter(d => d.region_id === parseInt(regionId));
+    };
+
+    const handleOpen = () => {
+        setOpen(!open);
+        setErrors({});
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setData((prev) => ({ ...prev, [name]: value }));
+        setData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
+    };
+
+    const handleRegionChange = (e) => {
+        const value = e.target.value;
+        setData(prev => ({ ...prev, region_id: value, district_id: "" }));
+        if (errors.region_id) setErrors(prev => ({ ...prev, region_id: "" }));
+    };
+
+    const handleDistrictChange = (e) => {
+        const value = e.target.value;
+        setData(prev => ({ ...prev, district_id: value }));
+        if (errors.district_id) setErrors(prev => ({ ...prev, district_id: "" }));
     };
 
     const validateFields = () => {
-        if (!data.name.trim())
-            return Alert("Iltimos, ombor nomini kiriting ❗", "warning");
-        if (!data.address.trim())
-            return Alert("Iltimos, manzilni kiriting ❗", "warning");
-        if (!data.phone.trim())
-            return Alert("Iltimos, telefon raqam kiriting ❗", "warning");
-        return true;
+        const newErrors = {};
+        if (!data.name.trim()) newErrors.name = t("Field_required", { field: t("Warehouse_name") });
+        if (!data.phone.trim()) newErrors.phone = t("Field_required", { field: t("Phone_number") });
+        if (!data.region_id) newErrors.region_id = t("Field_required", { field: t("Region") });
+        if (!data.district_id) newErrors.district_id = t("Field_required", { field: t("District") });
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const EditWarehouse = async () => {
-        if (validateFields() !== true) return;
-
+        if (!validateFields()) return;
         try {
             setLoading(true);
-            await WarehouseApi.WarehouseEdit(data, warehouseId);
-            Alert("Ombor muvaffaqiyatli yangilandi ", "success");
+            const selectedRegion = Regions.find(r => r.id === parseInt(data.region_id));
+            const selectedDistrict = Districts.find(d => d.id === parseInt(data.district_id));
+            const payload = {
+                name: data.name,
+                phone: data.phone,
+                address: `${selectedDistrict?.name_uz || ''}, ${selectedRegion?.name_uz || ''}`,
+                ...(data.password && { password: data.password })
+            };
+            await WarehouseApi.WarehouseEdit(payload, warehouseId);
+            Alert(t("success"), "success");
             setOpen(false);
             refresh();
         } catch (error) {
             console.error(error);
-            Alert(`Xatolik yuz berdi ${error?.response?.data?.message || ""}`, "error");
+            Alert(`${t("Error_occurred")}: ${error?.response?.data?.message || error.message}`, "error");
         } finally {
             setLoading(false);
         }
     };
+
+    const availableDistricts = getDistrictsByRegion(data.region_id);
 
     return (
         <>
@@ -76,105 +141,75 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                 <Edit size={20} />
             </Button>
 
-            <Dialog
-                open={open}
-                handler={handleOpen}
-                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300"
-            >
-                <DialogHeader className="text-lg dark:text-text-dark font-semibold border-b border-gray-200 dark:border-gray-700 pb-4 bg-card-light dark:bg-card-dark rounded-t-xl">
-                    Ombor maʼlumotlarini tahrirlash
-                </DialogHeader>
+            <Dialog open={open} handler={handleOpen} size="sm">
+                <DialogHeader>{t("Warehouse_Edit")}</DialogHeader>
+                <DialogBody divider className="space-y-4">
+                    <div>
+                        <Input
+                            label={t("Warehouse_name")}
+                            name="name"
+                            value={data.name}
+                            onChange={handleChange}
+                            error={!!errors.name}
+                        />
+                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                    </div>
 
-                <DialogBody divider className="space-y-4 py-6">
-                    <Input
-                        label="Nomi"
-                        color="gray"
-                        name="name"
-                        value={data.name}
-                        onChange={handleChange}
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        labelProps={{
-                            className: "!text-text-light dark:!text-text-dark"
-                        }}
-                        crossOrigin={undefined}
-                    />
-                    <Input
-                        label="Manzil"
-                        color="gray"
-                        name="address"
-                        value={data.address}
-                        onChange={handleChange}
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        labelProps={{
-                            className: "!text-text-light dark:!text-text-dark"
-                        }}
-                        crossOrigin={undefined}
-                    />
-                    <Input
-                        label="Telefon raqam"
-                        color="gray"
-                        name="phone"
-                        value={data.phone}
-                        onChange={handleChange}
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        labelProps={{
-                            className: "!text-text-light dark:!text-text-dark"
-                        }}
-                        crossOrigin={undefined}
-                    />
+                    <div>
+                        <Input
+                            label={t("Phone_number")}
+                            name="phone"
+                            value={data.phone}
+                            onChange={handleChange}
+                            error={!!errors.phone}
+                        />
+                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">{t("Region")} *</label>
+                        <select
+                            value={data.region_id}
+                            onChange={handleRegionChange}
+                            className={`w-full p-3 border rounded-lg ${errors.region_id ? "border-red-500" : "border-gray-300"}`}
+                        >
+                            <option value="">{t("Select_region")}</option>
+                            {Regions.map(r => (
+                                <option key={r.id} value={r.id}>{r.name_uz}</option>
+                            ))}
+                        </select>
+                        {errors.region_id && <p className="text-red-500 text-xs mt-1">{errors.region_id}</p>}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">{t("District")} *</label>
+                        <select
+                            value={data.district_id}
+                            onChange={handleDistrictChange}
+                            disabled={!data.region_id}
+                            className={`w-full p-3 border rounded-lg ${errors.district_id ? "border-red-500" : "border-gray-300"}`}
+                        >
+                            <option value="">{t("Select_district")}</option>
+                            {availableDistricts.map(d => (
+                                <option key={d.id} value={d.id}>{d.name_uz}</option>
+                            ))}
+                        </select>
+                        {errors.district_id && <p className="text-red-500 text-xs mt-1">{errors.district_id}</p>}
+                        {!data.region_id && <p className="text-gray-500 text-xs mt-1">{t("Select_region_first")}</p>}
+                    </div>
+
                 </DialogBody>
 
-                <DialogFooter className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                    <Button
-                        variant="text"
-                        color="gray"
-                        onClick={handleOpen}
-                        className="mr-2 text-text-light dark:text-text-dark 
-                                  hover:bg-gray-100 dark:hover:bg-gray-700 
-                                  active:bg-gray-200 dark:active:bg-gray-600
-                                  transition-colors duration-200 font-medium"
-                        disabled={loading}
-                    >
-                        Bekor qilish
+                <DialogFooter className="flex justify-end gap-2">
+                    <Button variant="text" color="gray" onClick={handleOpen} disabled={loading}>
+                        {t("Cancel")}
                     </Button>
                     <Button
-                        className={`bg-black text-white normal-case 
-                                  hover:bg-gray-800 active:bg-gray-900
-                                  dark:bg-white dark:text-black 
-                                  dark:hover:bg-gray-200 dark:active:bg-gray-300
-                                  flex items-center gap-2 transition-colors duration-200 
-                                  font-medium shadow-md hover:shadow-lg active:shadow-sm
-                                  ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                         onClick={EditWarehouse}
                         disabled={loading}
+                        className={`bg-black text-white ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                     >
-                        {loading ? (
-                            <>
-                                <svg
-                                    className="animate-spin h-5 w-5 text-current"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v8H4z"
-                                    ></path>
-                                </svg>
-                                Saqlanmoqda...
-                            </>
-                        ) : (
-                            "Saqlash"
-                        )}
+                        {loading ? t("Saving") : t("Save")}
                     </Button>
                 </DialogFooter>
             </Dialog>

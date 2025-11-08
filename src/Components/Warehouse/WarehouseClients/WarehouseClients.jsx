@@ -17,8 +17,10 @@ import EmptyData from "../../UI/NoData/EmptyData";
 import Cookies from "js-cookie";
 import WarehouseClientPayment from "./_components/WarehouseClientPayment";
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseClients() {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [clients, setClients] = useState([]);
     const [search, setSearch] = useState("");
@@ -66,7 +68,7 @@ export default function WarehouseClients() {
             {/* Заголовок и кнопки */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <Typography variant="h4" className="font-semibold">
-                    Клиенты
+                    {t('Clients')}
                 </Typography>
 
                 <div className="flex items-center gap-3">
@@ -78,7 +80,7 @@ export default function WarehouseClients() {
             <Card className="p-3 mb-5 bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <form onSubmit={handleSearch} className="flex items-center gap-3 w-full">
                     <Input
-                        label="Поиск по имени"
+                        label={t('Search_name')}
                         icon={<Search />}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -92,14 +94,14 @@ export default function WarehouseClients() {
                         }}
                     />
                     <Button color={'blue'} type="submit">
-                        Поиск
+                        {t('Search')}
                     </Button>
                 </form>
             </Card>
 
             {/* Если нет клиентов */}
             {clients.length <= 0 ? (
-                <EmptyData text="Клиентов нет" />
+                <EmptyData text={t('Empty_Data')} />
             ) : (
                 <>
                     <Card className="overflow-hidden bg-card-light dark:bg-card-dark transition-colors duration-300">
@@ -107,12 +109,13 @@ export default function WarehouseClients() {
                             <table className="w-full min-w-max text-left">
                                 <thead>
                                     <tr className="bg-blue-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
-                                        <th className="p-3">Имя</th>
-                                        <th className="p-3">Телефон</th>
-                                        <th className="p-3">Адрес</th>
-                                        <th className="p-3">Баланс</th>
-                                        <th className="p-3">Дата создания</th>
-                                        <th className="p-3 text-center">Настройки</th>
+                                        <th className="p-3">{t('Name')}</th>
+                                        <th className="p-3">{t('Phone')}</th>
+                                        <th className="p-3">{t(`Address`)}</th>
+                                        <th className="p-3">{t('Client_type')}</th>
+                                        <th className="p-3">{t('Balance')}</th>
+                                        <th className="p-3">{t('Created')}</th>
+                                        <th className="p-3 text-center">{t('columnActions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -134,8 +137,9 @@ export default function WarehouseClients() {
                                             </td>
                                             <td className="p-3 dark:text-text-dark">{client.phone}</td>
                                             <td className="p-3 dark:text-text-dark">{client.address}</td>
+                                            <td className="p-3 dark:text-text-dark">{client.client_type?.name}</td>
                                             <td className="p-3 dark:text-text-dark">
-                                                {Number(client.balance).toLocaleString()} so'm
+                                                {Number(client.balance).toLocaleString()} UZS
                                             </td>
                                             <td className="p-3 dark:text-text-dark">
                                                 {new Date(client.createdAt).toLocaleDateString()}

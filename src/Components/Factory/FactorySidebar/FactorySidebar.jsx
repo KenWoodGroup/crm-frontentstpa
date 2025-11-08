@@ -1,19 +1,21 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
 import { Card, Typography } from "@material-tailwind/react";
 import Cookies from "js-cookie";
+import { useTranslation } from "react-i18next";
 
-export default function FactorySidebar({ onClose, active, open }) {
+export default function FactorySidebar({ active, open }) {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation();
+
 
     const groupedMenuItems = [
         {
-            section: "Asosiy",
+            section: `${t(`main`)}`,
             items: [
                 {
                     id: 1,
-                    title: "Bosh sahifa",
+                    title: `${t("dashboard")}`,
                     path: "/factory/dashboard",
                     icon: (
                         <svg
@@ -33,7 +35,7 @@ export default function FactorySidebar({ onClose, active, open }) {
                 },
                 {
                     id: 2,
-                    title: "Warehouse",
+                    title: `${t(`Warehouses`)}`,
                     path: "/factory/warehouse",
                     icon: (
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
@@ -45,8 +47,16 @@ export default function FactorySidebar({ onClose, active, open }) {
                     ),
                 },
                 {
+                    id: 2,
+                    title: `${t(`partner`)}`,
+                    path: "/factory/partner",
+                    icon: (
+                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16"><path fill="currentColor" fillRule="evenodd" d="M8.716.315a1 1 0 0 0-1.432 0L6.646.97a1 1 0 0 1-.988.265l-.88-.248a1 1 0 0 0-1.24.716l-.226.886a1 1 0 0 1-.723.723l-.886.225a1 1 0 0 0-.716 1.24l.248.881a1 1 0 0 1-.265.988l-.655.638a1 1 0 0 0 0 1.432l.655.639a1 1 0 0 1 .265.987l-.248.88a1 1 0 0 0 .716 1.24l.886.226a1 1 0 0 1 .723.723l.225.886a1 1 0 0 0 1.24.717l.881-.248a1 1 0 0 1 .988.264l.638.655a1 1 0 0 0 1.432 0l.639-.655a1 1 0 0 1 .987-.264l.88.248a1 1 0 0 0 1.24-.717l.226-.886a1 1 0 0 1 .723-.723l.886-.225a1 1 0 0 0 .717-1.24l-.248-.88a1 1 0 0 1 .264-.988l.655-.639a1 1 0 0 0 0-1.432l-.655-.638a1 1 0 0 1-.264-.988l.248-.88a1 1 0 0 0-.717-1.24l-.886-.226a1 1 0 0 1-.723-.723l-.225-.886a1 1 0 0 0-1.24-.716l-.88.248A1 1 0 0 1 9.354.97zm3.057 5.975a.75.75 0 0 0-1.042-1.08L6.597 9.202L5.28 7.887A.75.75 0 0 0 4.22 8.95l1.839 1.834a.75.75 0 0 0 1.05.01z" clipRule="evenodd"></path></svg>
+                    ),
+                },
+                {
                     id: 3,
-                    title: "Ishlab chiqarish",
+                    title: `${t(`Production`)}`,
                     path: "/factory/product",
                     icon: (
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
@@ -59,7 +69,7 @@ export default function FactorySidebar({ onClose, active, open }) {
                 },
                 {
                     id: 4,
-                    title: "Hisobot",
+                    title: `${t(`Report`)}`,
                     path: "/factory/report",
                     icon: (
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -72,7 +82,7 @@ export default function FactorySidebar({ onClose, active, open }) {
                 },
                 {
                     id: 5,
-                    title: "Tovar analizi",
+                    title: `${t(`Product_analysis`)}`,
                     path: "/factory/produt-analiz",
                     icon: (
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -89,7 +99,7 @@ export default function FactorySidebar({ onClose, active, open }) {
                 },
                 {
                     id: 6,
-                    title: "Sozlamalar",
+                    title: `${t(`Settings`)}`,
                     path: "/factory/settings",
                     icon: (
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -170,22 +180,6 @@ export default function FactorySidebar({ onClose, active, open }) {
                         </div>
                     ))}
                 </div>
-            </div>
-
-            {/* Logout */}
-            <div className="mt-6">
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all"
-                >
-                    <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path
-                            fill="currentColor"
-                            d="M377.9 105.9c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 221H192c-17.7 0-32 14.3-32 32s14.3 32 32 32h210.7l-70.1 69.8c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3zM96 64h128c17.7 0 32-14.3 32-32S241.7 0 224 0H96C43 0 0 43 0 96v320c0 53 43 96 96 96h128c17.7 0 32-14.3 32-32s-14.3-32-32-32H96c-17.6 0-32-14.4-32-32V96c0-17.6 14.4-32 32-32z"
-                        />
-                    </svg>
-                    {!open && <span>Logout</span>}
-                </button>
             </div>
         </Card>
     );

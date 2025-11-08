@@ -27,8 +27,10 @@ import WarehouseDilerCreate from "./_components/WarehouseDilerCreate";
 import WarehouseDilerDelete from "./_components/WarehouseDilerDelete";
 import WarehouseDilerEdit from "./_components/WarehouseDilerEdit";
 import { Clients } from "../../../utils/Controllers/Clients";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseDiler() {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [warehouses, setWarehouses] = useState([]);
     const [page, setPage] = useState(1);
@@ -85,13 +87,13 @@ export default function WarehouseDiler() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                 <Typography variant="h4" className="dark:text-text-dark text-black" >
-                    Diler Maʼlumotlari
+                    {t('dilers')}
                 </Typography>
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     <div className="relative w-full md:w-72">
                         <Input
-                            label="Qidiruv..."
+                            label={t('Search_name')}
                             icon={<Search size={18} />}
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}

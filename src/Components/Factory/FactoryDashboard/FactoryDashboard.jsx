@@ -16,14 +16,14 @@ import {
 } from "lucide-react";
 import WarehouseMonyChart from "./_components/WarehouseMonyChart";
 import WarehouseProduct from "./_components/WarehouseProduct";
-import AllMinusPlusChart from "./_components/AllMinusPlusChart";
-import AllDilerChart from "./_components/AllDilerChart";
 import Cookies from "js-cookie";
 import { Statistik } from "../../../utils/Controllers/Statistik";
 import { useEffect, useState } from "react";
 import Loading from "../../UI/Loadings/Loading";
+import { useTranslation } from "react-i18next";
 
 export default function FactoryDashboard() {
+    const { t } = useTranslation();
     const locationId = Cookies.get("ul_nesw");
     const currentDate = new Date();
     const [year, setYear] = useState(currentDate.getFullYear());
@@ -71,32 +71,32 @@ export default function FactoryDashboard() {
 
     const stats = [
         {
-            title: "Omborlar",
+            title: t("Warehouses"),
             value: CardData ? CardData.countWarehouse : "...",
             icon: <Warehouse className="w-6 h-6 text-blue-600" />,
         },
         {
-            title: "Dilerlar",
+            title: t("dilers"),
             value: CardData ? CardData.countDealer : "...",
             icon: <Users className="w-6 h-6 text-green-600" />,
         },
         {
-            title: "Mahsulotlar",
+            title: t("products"),
             value: CardData ? CardData.countProduct : "...",
             icon: <Package className="w-6 h-6 text-purple-600" />,
         },
         {
-            title: "Umumiy Qiymat",
+            title: t("Total_Value"),
             value: CardData ? `${CardData.sumProduct.toLocaleString()} so'm` : "...",
             icon: <DollarSign className="w-6 h-6 text-yellow-600" />,
         },
         {
-            title: "Kirim (joriy oy uchun)",
+            title: t("Receipts_in_month"),
             value: CardData ? `${CardData.income.toLocaleString()} so'm` : "...",
             icon: <BanknoteArrowDown className="w-6 h-6 text-green-600" />,
         },
         {
-            title: "Chiqim (joriy oy uchun)",
+            title: t("Output_in_mont"),
             value: CardData ? `${CardData.sumDisposal.toLocaleString()} so'm` : "...",
             icon: <BanknoteArrowUp className="w-6 h-6 text-red-600" />,
         },
@@ -108,12 +108,14 @@ export default function FactoryDashboard() {
 
     return (
         <div className="min-h-screen">
-            <div className="max-w-7xl mx-auto">
+            <div className="mx-auto">
                 <div className="flex items-center justify-between mb-8">
-                    <Typography variant="h3" className="font-bold text-text  dark:text-text-dark text-[black]">
-                        Boshqaruv Paneli
+                    <Typography
+                        variant="h3"
+                        className="font-bold text-text dark:text-text-dark text-[black]"
+                    >
+                        {t("Dashboard_page")}
                     </Typography>
-
                 </div>
 
                 {/* === Statistik Cards === */}
@@ -131,7 +133,10 @@ export default function FactoryDashboard() {
                                     <Typography className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1">
                                         {item.title}
                                     </Typography>
-                                    <Typography variant="h5" className="font-bold text-gray-900 dark:text-gray-100">
+                                    <Typography
+                                        variant="h5"
+                                        className="font-bold text-gray-900 dark:text-gray-100"
+                                    >
                                         {item.value}
                                     </Typography>
                                 </div>
@@ -140,19 +145,20 @@ export default function FactoryDashboard() {
                     ))}
                 </div>
 
+                {/* === Filter === */}
                 <Card className="bg-card dark:bg-card-dark mb-[20px] transition-colors duration-300">
                     <CardBody className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="flex gap-4 w-full sm:w-auto">
                             <Select
-                                label="Yilni tanlang"
+                                label={t("Select_yers")}
                                 value={year.toString()}
                                 onChange={(val) => setYear(val)}
-                                className="text-gray-900 dark:text-text-dark  outline-none"
+                                className="text-gray-900 dark:text-text-dark outline-none"
                                 labelProps={{
-                                    className: "text-gray-700 dark:text-text-dark"
+                                    className: "text-gray-700 dark:text-text-dark",
                                 }}
                                 menuProps={{
-                                    className: "dark:bg-gray-800 dark:text-text-dark"
+                                    className: "dark:bg-gray-800 dark:text-text-dark",
                                 }}
                             >
                                 {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
@@ -162,16 +168,15 @@ export default function FactoryDashboard() {
                                 ))}
                             </Select>
 
-
                             <Select
-                                label="Oyni tanlang"
+                                label={t("Select_month")}
                                 value={month}
-                                className="text-gray-900 dark:text-text-dark  outline-none"
+                                className="text-gray-900 dark:text-text-dark outline-none"
                                 labelProps={{
-                                    className: "text-gray-700 dark:text-text-dark"
+                                    className: "text-gray-700 dark:text-text-dark",
                                 }}
                                 menuProps={{
-                                    className: "dark:bg-gray-800 dark:text-text-dark"
+                                    className: "dark:bg-gray-800 dark:text-text-dark",
                                 }}
                                 onChange={(val) => setMonth(val)}
                             >
@@ -204,7 +209,7 @@ export default function FactoryDashboard() {
                                 fetchAllData().finally(() => setLoading(false));
                             }}
                         >
-                            Filtrlash
+                            {t("Search")}
                         </Button>
                     </CardBody>
                 </Card>
@@ -214,9 +219,9 @@ export default function FactoryDashboard() {
                     <WarehouseMonyChart data={productSum} />
                     <WarehouseProduct data={productCount} />
                 </div>
-
+{/* 
                 <AllDilerChart data={dilerData} />
-                <AllMinusPlusChart data={sumData} year={sumYer} filter={setSumYer} />
+                <AllMinusPlusChart data={sumData} year={sumYer} filter={setSumYer} /> */}
             </div>
         </div>
     );

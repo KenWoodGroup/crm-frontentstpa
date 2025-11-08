@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LogOut, User, ChevronDown, Moon, Sun, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@material-tailwind/react";
+import { Button, Option, Select } from "@material-tailwind/react";
+import { useTranslation } from "react-i18next";
 
 export default function AdminHeader({ active, sidebarOpen, ...props }) {
     const navigate = useNavigate();
@@ -9,6 +10,8 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const menuRef = useRef(null);
+    const { t } = useTranslation();
+    const { i18n } = useTranslation();
 
     // Инициализация темы
     useEffect(() => {
@@ -56,10 +59,14 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
         };
     }, []);
 
+    const changeLanguage = (lng) => {
+        if (lng) i18n.changeLanguage(lng);
+    };
+
     return (
         <div
             className={`fixed top-[10px] z-30 flex justify-between items-center 
-                       mb-6 px-6 py-4 rounded-2xl border shadow-lg 
+                       mb-6 px-3 py-2 rounded-2xl border shadow-lg 
                        transition-all duration-500 ${isDarkMode
                     ? "bg-gray-900 backdrop-blur-md border-gray-700 shadow-gray-900/20"
                     : "bg-white backdrop-blur-md border-gray-200"
@@ -72,19 +79,40 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
             {/* Левая часть - кнопка меню */}
             <div className="flex items-center gap-[20px]">
                 <Button
-                    onClick={active}
-                    className={`px-4 py-3 rounded-xl transition-all duration-300 ${isDarkMode
+                    onClick={() => navigate(-1)}
+                    className={`px-4 py-[5px] rounded-xl transition-all duration-300 ${isDarkMode
                         ? "bg-gray-800 hover:bg-gray-700 text-white"
-                        : "bg-blue-500 hover:bg-blue-600 text-white"
+                        : "bg-black hover:bg-black text-white"
                         }`}
                 >
-                    <Menu className="w-5 h-5" />
+                    <svg className="text-[25px]" xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16"><path fill="currentColor" fillRule="evenodd" d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z" clipRule="evenodd"></path></svg>
                 </Button>
             </div>
-
-            {/* Правая часть - переключатель темы + профиль */}
             <div className="flex items-center gap-4">
-                {/* Переключатель темы с улучшенной анимацией */}
+                <div className="w-36 bg-white dark:bg-card-dark px-[10px] py-[5px] rounded-[10px] shadow-lg">
+                    <Select
+                        label={`${t(`language`)}`}
+                        value={i18n.language}
+                        onChange={(lng) => changeLanguage(lng)}
+                        size="md"
+                        color="blue"
+                        containerProps={{
+                            className: "!min-w-0 !w-full",
+                        }}
+
+                        className="text-gray-900 dark:text-text-dark  outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark"
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark"
+                        }}
+                    >
+                        <Option value="ru">Русский</Option>
+                        <Option value="en">English</Option>
+                        <Option value="uz">O‘zbek</Option>
+                    </Select>
+                </div>
                 <button
                     onClick={toggleDarkMode}
                     onMouseEnter={() => setIsHovered(true)}
@@ -105,6 +133,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
 
                 {/* Профиль с улучшенным дизайном */}
                 <div className="relative flex items-center gap-4" ref={menuRef}>
+
                     <button
                         onClick={() => setOpenMenu(!openMenu)}
                         className={`flex items-center gap-3 px-4 py-1 rounded-xl border 
@@ -119,7 +148,6 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                             }`}>
                             <User className="w-4 h-4" />
                         </div>
-                        <span>Admin</span>
                         <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openMenu ? "rotate-180" : ""}`} />
                     </button>
 

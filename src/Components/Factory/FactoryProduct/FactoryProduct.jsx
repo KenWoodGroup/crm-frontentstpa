@@ -10,8 +10,10 @@ import { EyeIcon } from "@heroicons/react/24/outline";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import FactoryProductModal from "./_component/FactoryProductModal";
 import Cookies from "js-cookie";
+import { useTranslation } from "react-i18next";
 
 export default function FactoryProduct() {
+    const { t } = useTranslation();
     const [categories, setCategories] = useState([]);
     const [openAccordions, setOpenAccordions] = useState([]);
     const [productsData, setProductsData] = useState({});
@@ -24,7 +26,6 @@ export default function FactoryProduct() {
             const response = await ProductApi.GetAllCategory();
             setCategories(response.data || []);
         } catch (error) {
-            console.log("Kategoriyalarni yuklashda xato:", error);
         }
     };
 
@@ -137,7 +138,7 @@ export default function FactoryProduct() {
                     variant="h2"
                     className="mb-8 text-gray-900 dark:text-gray-100 font-bold transition-colors duration-300"
                 >
-                    Mahsulotlar katalogi
+                    {t('Product_catalog')}
                 </Typography>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -152,8 +153,8 @@ export default function FactoryProduct() {
                                     <AccordionHeader
                                         onClick={() => handleAccordion(category.id)}
                                         className={`p-4 border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 ${openAccordions.includes(category.id)
-                                                ? "bg-blue-50 dark:bg-blue-900/30"
-                                                : ""
+                                            ? "bg-blue-50 dark:bg-blue-900/30"
+                                            : ""
                                             }`}
                                     >
                                         <div className="flex justify-between items-center w-full">
@@ -192,8 +193,8 @@ export default function FactoryProduct() {
                                                                             <div
                                                                                 key={product.id}
                                                                                 className={`flex items-center p-2 rounded border cursor-pointer transition-all duration-300 transform hover:translate-x-1 ${isSelected
-                                                                                        ? "bg-blue-100 dark:bg-blue-900/50 border-blue-500 scale-[1.02]"
-                                                                                        : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600"
+                                                                                    ? "bg-blue-100 dark:bg-blue-900/50 border-blue-500 scale-[1.02]"
+                                                                                    : "bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600"
                                                                                     }`}
                                                                                 onClick={() =>
                                                                                     handleProductSelect(product)
@@ -201,8 +202,8 @@ export default function FactoryProduct() {
                                                                             >
                                                                                 <div
                                                                                     className={`w-2 h-2 rounded-full mr-3 transition-colors duration-300 ${isSelected
-                                                                                            ? "bg-blue-500"
-                                                                                            : "bg-gray-400 dark:bg-gray-500"
+                                                                                        ? "bg-blue-500"
+                                                                                        : "bg-gray-400 dark:bg-gray-500"
                                                                                         }`}
                                                                                 ></div>
                                                                                 <Typography

@@ -15,8 +15,11 @@ import { Payment } from "../../../utils/Controllers/Payment";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
+import { useTranslation } from "react-i18next";
 
 export default function WarehousePayment() {
+    const { t } = useTranslation();
+
     // Получаем начало и конец текущего месяца
     const getDefaultDates = () => {
         const now = new Date();
@@ -100,7 +103,7 @@ export default function WarehousePayment() {
                     variant="h4"
                     className="font-semibold text-text-light dark:text-text-dark"
                 >
-                    Оплата клиентов
+                    {t('Clients_Payment')}
                 </Typography>
                 <WarehousePaymentCreate />
             </div>
@@ -109,11 +112,10 @@ export default function WarehousePayment() {
             <Card className="p-4 mb-6 border border-gray-200 dark:border-gray-700 shadow-sm bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <div className="flex items-center gap-[10px]">
                     <Input
-                        label="Поиск по клиенту"
+                        label={t('Srearch_by_Clients')}
 
                         value={filters.searchName}
                         onChange={(e) => handleChange("searchName", e.target.value)}
-                        placeholder="Введите имя клиента..."
                         color="blue-gray"
                         className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
                         containerProps={{
@@ -126,7 +128,7 @@ export default function WarehousePayment() {
 
                     <Input
                         type="date"
-                        label="Start Date"
+                        label={t('StartDate')}
                         value={filters.startDate}
                         onChange={(e) => handleChange("startDate", e.target.value)}
                         color="blue-gray"
@@ -141,7 +143,7 @@ export default function WarehousePayment() {
 
                     <Input
                         type="date"
-                        label="End Date"
+                        label={t('EndDate')}
                         value={filters.endDate}
                         onChange={(e) => handleChange("endDate", e.target.value)}
                         color="blue-gray"
@@ -155,7 +157,7 @@ export default function WarehousePayment() {
                     />
 
                     <Select
-                        label="Способ оплаты"
+                        label={t('Payment_type')}
                         value={filters.method}
                         onChange={(val) => handleChange("method", val)}
                         className="text-gray-900 dark:text-text-dark  outline-none"
@@ -174,10 +176,9 @@ export default function WarehousePayment() {
 
                     <Input
                         type="number"
-                        label="Сумма оплаты (от)"
+                        label={t('Payment_price')}
                         value={filters.amount}
                         onChange={(e) => handleChange("amount", e.target.value)}
-                        placeholder="Введите сумму..."
                         color="blue-gray"
                         className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
                         containerProps={{
@@ -196,7 +197,7 @@ export default function WarehousePayment() {
                         onClick={GetFilter}
                         disabled={loading}
                     >
-                        {loading ? "Загрузка..." : "Применить фильтр"}
+                        {loading ? `${t('loadingMoreText')}` : `${t('Search')}`}
                     </Button>
                 </div>
             </Card>
@@ -207,25 +208,33 @@ export default function WarehousePayment() {
                     <table className="w-full text-left min-w-max">
                         <thead>
                             <tr className="bg-blue-50 dark:bg-blue-900/30 transition-colors duration-200">
-                                {[
-                                    "Дата оплаты",
-                                    "Клиент",
-                                    "Баланс",
-                                    "Способ оплаты",
-                                    "Сумма",
-                                    "Касса",
-                                    "Создал",
-                                    "Примечание",
-                                ].map((header, idx) => (
-                                    <th
-                                        key={idx}
-                                        className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200"
-                                    >
-                                        {header}
-                                    </th>
-                                ))}
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('payment_date')}
+                                </th>
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('Clients')}
+                                </th>
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('Balance')}
+                                </th>
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('Payment_type')}
+                                </th>
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('Payment_price')}
+                                </th>
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('Kasa')}
+                                </th>
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('Creater')}
+                                </th>
+                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                    {t('Comment')}
+                                </th>
                             </tr>
                         </thead>
+
 
                         <tbody>
                             {payments.length > 0 ? (
@@ -293,7 +302,7 @@ export default function WarehousePayment() {
                         onClick={() => handlePageChange(filters.page - 1)}
                         className="dark:border-blue-400 dark:text-blue-400"
                     >
-                        ← Пред
+                        ←
                     </Button>
                     <Typography className="text-gray-700 dark:text-gray-300 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded transition-colors duration-200">
                         {pagination.currentPage} / {pagination.total_pages}
@@ -306,7 +315,7 @@ export default function WarehousePayment() {
                         onClick={() => handlePageChange(filters.page + 1)}
                         className="dark:border-blue-400 dark:text-blue-400"
                     >
-                        След →
+                        →
                     </Button>
                 </div>
             )}
@@ -317,12 +326,12 @@ export default function WarehousePayment() {
                     variant="h6"
                     className="font-semibold text-gray-800 dark:text-gray-200 transition-colors duration-200"
                 >
-                    Итоги:{" "}
+                    {t('Over')}:{" "}
                     <span className="text-green-600 dark:text-green-400 transition-colors duration-200">
                         {payments
                             .reduce((sum, p) => sum + Number(p.amount || 0), 0)
                             .toLocaleString()}{" "}
-                        so'm
+                        uzs
                     </span>
                 </Typography>
             </div>

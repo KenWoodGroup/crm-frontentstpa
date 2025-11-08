@@ -2,22 +2,18 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardBody, Typography, Chip } from "@material-tailwind/react";
 import { CheckCircleIcon, ClockIcon, DocumentTextIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
-import { CheckCircle2Icon } from "lucide-react";
 import WarehouseClientReturnInvoiceDetail from "./WarehouseClientReturnInvoiceDetail";
+import { useTranslation } from "react-i18next";
+import Loading from "../../../UI/Loadings/Loading";
 
 export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }) {
     const [invoices, setInvoices] = useState([]);
     const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const { t } = useTranslation();
 
-    const formatBalance = (balance) => {
-        const amount = parseFloat(balance)
-        return new Intl.NumberFormat('ru-RU', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount) + ' UZS'
-    }
+
 
     const formatNumber = (number) => {
         const amount = parseFloat(number)
@@ -114,9 +110,7 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
     return (
         <>
             {loading ? (
-                <div className="text-center py-10 text-text-light dark:text-text-dark transition-colors duration-200">
-                    Загрузка...
-                </div>
+                <Loading />
             ) : invoices.length > 0 ? (
                 <div className="space-y-4">
                     {invoices.map((invoice) => (
@@ -133,7 +127,7 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                                                 color="blue-gray"
                                                 className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                             >
-                                                Накладная #{invoice.invoice_number}
+                                                {t('Invoice')} #{invoice.invoice_number}
                                             </Typography>
                                             {/* <Chip
                                         value={getPaymentStatusText(invoice.payment_status)}
@@ -151,7 +145,7 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                                                     color="blue-gray"
                                                     className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                                 >
-                                                    Общая сумма
+                                                    {t('Total_price')}
                                                 </Typography>
                                                 <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
                                                     {formatNumber(invoice.total_sum)} UZS
@@ -163,7 +157,7 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                                                     color="blue-gray"
                                                     className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                                 >
-                                                    Статус:
+                                                    {t('Status')}:
                                                 </Typography>
                                                 <Chip
                                                     value={getInvoiceStatusText(invoice.status)}
@@ -179,7 +173,7 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                                                     color="blue-gray"
                                                     className="font-semibold text-text-light dark:text-text-dark transition-colors duration-200"
                                                 >
-                                                    Дата создания
+                                                    {t('Created')}
                                                 </Typography>
                                                 <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
                                                     {formatInvoiceDate(invoice.createdAt)}
@@ -203,8 +197,8 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                                 onClick={() => handlePageChange(page - 1)}
                                 disabled={page === 1}
                                 className={`px-3 py-1 border rounded transition-colors duration-200 ${page === 1
-                                        ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
-                                        : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
+                                    : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                             >
                                 ←
@@ -218,8 +212,8 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                                 onClick={() => handlePageChange(page + 1)}
                                 disabled={page === pagination.total_pages}
                                 className={`px-3 py-1 border rounded transition-colors duration-200 ${page === pagination.total_pages
-                                        ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
-                                        : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    ? "opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-500"
+                                    : "border-gray-300 dark:border-gray-600 text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                             >
                                 →
@@ -231,14 +225,14 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                 <div className="text-center py-8">
                     <DocumentTextIcon className="h-16 w-16 text-blue-gray-300 dark:text-gray-600 mx-auto mb-4 transition-colors duration-200" />
                     <Typography variant="h6" color="blue-gray" className="mb-2 text-text-light dark:text-text-dark transition-colors duration-200">
-                        Нет полученных накладных
+                        {t('Empty_invoice')}
                     </Typography>
                     <Typography
                         variant="paragraph"
                         color="blue-gray"
                         className="opacity-70 text-text-light dark:text-text-dark transition-colors duration-200"
                     >
-                        У этого клиента пока нет полученных накладных
+                        {t('Empty_invoice_client')}
                     </Typography>
                 </div>
             )}

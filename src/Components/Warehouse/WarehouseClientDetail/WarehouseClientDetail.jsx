@@ -27,9 +27,11 @@ import WarehouseClientInvoices from "./_components/WarehouseClientInvoices"
 import WarehouseClientPayment from "./_components/WarehouseClientPayment"
 import WarehousesClientInvoiceReturn from "./_components/WarehousesClientInvoiceReturn"
 import Socket from "../../../utils/Socket"
+import { useTranslation } from "react-i18next"
 
 export default function WarehouseClientDetail() {
     const { id } = useParams()
+    const { t } = useTranslation();
     const [clientData, setClientData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState("invoices")
@@ -123,7 +125,7 @@ export default function WarehouseClientDetail() {
     }
 
     return (
-        <div className="mx-auto space-y-6 bg-background-light dark:bg-background-dark min-h-screen p-4 transition-colors duration-200">
+        <div className="mx-auto space-y-6 bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-200">
             {/* Основная информация о клиенте */}
             <Card className="shadow-lg rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <CardBody className="p-8">
@@ -170,7 +172,7 @@ export default function WarehouseClientDetail() {
                                             className="mb-4 flex items-center gap-2 text-text-light dark:text-text-dark transition-colors duration-200"
                                         >
                                             <UserCircleIcon className="h-5 w-5 text-blue-500 dark:text-blue-400 transition-colors duration-200" />
-                                            Контактная информация
+                                            {t('Contact_info')}
                                         </Typography>
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-3">
@@ -206,7 +208,7 @@ export default function WarehouseClientDetail() {
                                             className="mb-4 flex items-center gap-2 text-text-light dark:text-text-dark transition-colors duration-200"
                                         >
                                             <CurrencyDollarIcon className="h-5 w-5 text-blue-500 dark:text-blue-400 transition-colors duration-200" />
-                                            Финансы
+                                            {t('Finance')}
                                         </Typography>
                                         <Typography
                                             variant="h5"
@@ -230,15 +232,15 @@ export default function WarehouseClientDetail() {
                                             className="mb-4 flex items-center gap-2 text-text-light dark:text-text-dark transition-colors duration-200"
                                         >
                                             <CalendarDaysIcon className="h-5 w-5 text-blue-500 dark:text-blue-400 transition-colors duration-200" />
-                                            Статистика
+                                            {t('Statictik')}
                                         </Typography>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
-                                                Регистрация:{" "}
+                                                {t('Register')}:{" "}
                                                 {formatDate(clientData.createdAt)}
                                             </Typography>
                                             <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
-                                                Обновление:{" "}
+                                                {t('Updated')}:{" "}
                                                 {formatDate(clientData.updatedAt)}
                                             </Typography>
                                             <Typography variant="paragraph" className="text-text-light dark:text-text-dark transition-colors duration-200">
@@ -267,39 +269,39 @@ export default function WarehouseClientDetail() {
                                 value="invoices"
                                 onClick={() => setActiveTab("invoices")}
                                 className={`font-medium transition-all duration-200 ${activeTab === "invoices"
-                                        ? "text-white"
-                                        : "text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400"
+                                    ? "text-white"
+                                    : "text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400"
                                     }`}
                             >
                                 <div className="flex items-center gap-[10px]">
                                     <DocumentTextIcon className="h-5 w-5" />
-                                    Накладные
+                                    {t('inVoice')}
                                 </div>
                             </Tab>
                             <Tab
                                 value="returns"
                                 onClick={() => setActiveTab("returns")}
                                 className={`font-medium transition-all duration-200 ${activeTab === "returns"
-                                        ? "text-white"
-                                        : "text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400"
+                                    ? "text-white"
+                                    : "text-gray-700 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400"
                                     }`}
                             >
                                 <div className="flex items-center gap-[10px]">
                                     <ReceiptRefundIcon className="h-5 w-5" />
-                                    Возвраты
+                                    {t('Return')}
                                 </div>
                             </Tab>
                             <Tab
                                 value="payments"
                                 onClick={() => setActiveTab("payments")}
                                 className={`font-medium transition-all duration-200 ${activeTab === "payments"
-                                        ? "text-white"
-                                        : "text-gray-700 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400"
+                                    ? "text-white"
+                                    : "text-gray-700 dark:text-gray-300 hover:text-green-500 dark:hover:text-green-400"
                                     }`}
                             >
                                 <div className="flex items-center gap-[10px]">
                                     <ReceiptRefundIcon className="h-5 w-5" />
-                                    История оплаты
+                                    {t('Payment_History')}
                                 </div>
                             </Tab>
                         </TabsHeader>

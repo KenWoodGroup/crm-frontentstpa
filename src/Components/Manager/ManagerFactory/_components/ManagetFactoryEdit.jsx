@@ -20,6 +20,7 @@ export default function ManagerFactoryEdit({ refresh, data }) {
 
     const [form, setForm] = useState({
         companyName: data?.name || "",
+        Username: data?.users[0]?.username || "",
         companyPhone: data?.phone || "",
         legalAddress: data?.address || "",
     });
@@ -38,6 +39,7 @@ export default function ManagerFactoryEdit({ refresh, data }) {
             setLoading(true);
             const readyData = {
                 name: form.companyName,
+                Username: form.Username,
                 full_name: form.fullName,
                 phone: form.companyPhone,
                 address: form.legalAddress,
@@ -82,6 +84,12 @@ export default function ManagerFactoryEdit({ refresh, data }) {
                                 label="Kompaniya nomi"
                                 name="companyName"
                                 value={form.companyName}
+                                onChange={handleChange}
+                            />
+                            <Input
+                                label="Login"
+                                name="Username"
+                                value={form.Username}
                                 onChange={handleChange}
                             />
                             <Input

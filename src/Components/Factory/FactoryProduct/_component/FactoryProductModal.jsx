@@ -12,6 +12,7 @@ import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
 
 export default function FactoryProductModal({
     showModal,
@@ -22,11 +23,12 @@ export default function FactoryProductModal({
 }) {
     const [loading, setLoading] = useState(false);
     const location_id = Cookies.get('ul_nesw');
+    const { t } = useTranslation();
+
 
     const PostProduct = async () => {
         try {
             setLoading(true);
-
             // Формируем данные в нужном формате
             const dataToSend = {
                 list: selectedProducts.map((product) => ({
@@ -68,7 +70,7 @@ export default function FactoryProductModal({
             }}
         >
             <DialogHeader className="flex justify-between rounded-xl items-center border-b border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark">
-                <span className="font-semibold text-lg dark:text-text-dark">Tanlangan mahsulotlar</span>
+                <span className="font-semibold text-lg dark:text-text-dark">{t('Select_product')}</span>
                 <IconButton
                     color="red"
                     variant="text"
@@ -102,7 +104,7 @@ export default function FactoryProductModal({
                                         onClick={() => removeSingleProduct(product.id)}
                                         className="mt-2 text-xs"
                                     >
-                                        Olib tashlash
+                                        {t('deletet')}
                                     </Button>
                                 </div>
                             </div>
@@ -127,7 +129,7 @@ export default function FactoryProductModal({
                     onClick={clearSelectedProducts}
                     disabled={selectedProducts.length === 0}
                 >
-                    Hammasini tozalash
+                    {t("clear_all")}
                 </Button>
                 <div className="flex gap-2">
                     <Button
@@ -135,7 +137,7 @@ export default function FactoryProductModal({
                         color="gray"
                         onClick={() => setShowModal(false)}
                     >
-                        Yopish
+                        {t("Cancel")}
                     </Button>
                     <Button
                         color="blue"
@@ -143,7 +145,7 @@ export default function FactoryProductModal({
                         disabled={selectedProducts.length === 0 || loading}
                         className="flex items-center gap-2"
                     >
-                        {loading ? "Yuborilmoqda..." : "Yuborish"}
+                        {loading ? t("Saving") : t("Save")}
                     </Button>
                 </div>
             </DialogFooter>

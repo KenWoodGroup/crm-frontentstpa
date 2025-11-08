@@ -15,10 +15,11 @@ import {
     RefreshCw,
     Shield,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // форматирование чисел 70000 → 70 000
 const formatNumber = (num) => {
-    if (!num) return "0";
+    if (num === null || num === undefined || num === "") return "0";
     const [intPart, decimalPart] = String(num).split(".");
     return (
         intPart.replace(/\B(?=(\d{3})+(?!\d))/g, " ") +
@@ -26,12 +27,36 @@ const formatNumber = (num) => {
     );
 };
 
+// надёжный парсер "булева" из разных представлений
+const parseBoolean = (v) => {
+    if (v === true || v === false) return v;
+    if (v === 1 || v === "1") return true;
+    if (v === 0 || v === "0") return false;
+    if (typeof v === "string") {
+        const low = v.toLowerCase().trim();
+        if (low === "true") return true;
+        if (low === "false") return false;
+    }
+    return false;
+};
+
+// Приводим ответ к единому массиву записей
+const normalizeList = (responseData) => {
+    if (!responseData) return [];
+    if (Array.isArray(responseData)) return responseData;
+    if (responseData.list && Array.isArray(responseData.list)) return responseData.list;
+    // Если пришёл одиночный объект (как в вашем примере)
+    return [responseData];
+};
+
 export default function WarehouseAccess() {
+    const { t } = useTranslation();
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [warehouse, setWarehouse] = useState(null);
-    const [access, setAccess] = useState(null);
+    const [access, setAccess] = useState([]);
     const [sellAccess, setSellAccess] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const GetWarehouse = async () => {
         try {
@@ -44,71 +69,97 @@ export default function WarehouseAccess() {
 
     const GetAccess = async () => {
         try {
-            const response = await locationInfo.GetInfo(id);
+            const response = await locationInfo.GetLocationInfo(id);
             if (response?.status === 200) {
-                setAccess(response.data);
-                const found = response.data?.list?.find(
-                    (item) => item.key === "sell_access"
-                );
-                if (found)
-                    setSellAccess(found.value === true || found.value === "true");
+                // Приводим ответ к массиву элементов
+                const list = normalizeList(response.data);
+                setAccess(list);
+                const found = list.find((item) => item.key === "sell_access");
+                if (found) {
+                    setSellAccess(parseBoolean(found.value));
+                } else {
+                    setSellAccess(false);
+                }
             }
         } catch (error) {
             console.log("Access error:", error);
         }
     };
 
+    // Обновление разрешения продажи
     const UpdateSellAccess = async (newValue) => {
+        // оптимистично блокируем переключатель и сохраняем старое значение
+        const prev = sellAccess;
+        setSellAccess(newValue);
+        setSaving(true);
         try {
             const data = {
                 list: [
                     {
                         location_id: id,
                         key: "sell_access",
+                        // отправляем булево значение (не строку)
                         value: String(newValue),
                     },
                 ],
             };
             const response = await locationInfo.Create(data);
             if (response?.status === 200 || response?.status === 201) {
-                setSellAccess(newValue);
+                // Если бэкенд вернул актуальные данные, можно обновить access
+                const updatedList = normalizeList(response.data) || [];
+                // Если ответ не содержит список, оставим локальный state как есть
+                if (updatedList.length > 0) setAccess(updatedList);
+                // уже установили sellAccess оптимистично
+            } else {
+                // неуспешный код — откатываем
+                setSellAccess(prev);
+                console.log("Update sell_access unexpected status:", response?.status);
             }
         } catch (error) {
+            // при ошибке откатываем и логируем
+            setSellAccess(prev);
             console.log("Update sell_access error:", error);
+        } finally {
+            setSaving(false);
         }
     };
 
     useEffect(() => {
+        let mounted = true;
         const fetchAll = async () => {
+            if (!id) return;
             setLoading(true);
             await Promise.all([GetWarehouse(), GetAccess()]);
-            setLoading(false);
+            if (mounted) setLoading(false);
         };
         fetchAll();
-    }, []);
+        return () => {
+            mounted = false;
+        };
+    }, [id]);
 
     if (loading) return <Loading />;
 
     return (
-        <div className="flex justify-start items-start py-10 px-4 bg-background-light dark:bg-background-dark transition-colors duration-300">
+        <div className="flex justify-start items-start pb-[30px] bg-background-light dark:bg-background-dark transition-colors duration-300">
             <Card className="w-full max-w-2xl p-8 shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <Typography
                     variant="h5"
                     className="mb-6 font-semibold text-center text-text-light dark:text-text-dark"
                 >
-                    Информация о складе
+                    {t("Warehouse_Info")}
                 </Typography>
 
                 {warehouse ? (
                     <div className="space-y-4">
-                        <Info icon={<Building2 size={18} />} label="Название" value={warehouse.name} />
-                        <Info icon={<Package size={18} />} label="Тип" value={warehouse.type} />
-                        <Info icon={<MapPin size={18} />} label="Адрес" value={warehouse.address} />
-                        <Info icon={<Phone size={18} />} label="Телефон" value={warehouse.phone} />
-                        <Info icon={<Mail size={18} />} label="Email" value={warehouse.email} />
+                        <Info icon={<Building2 size={18} />} label={t("Name")} value={warehouse.name} />
+                        <Info icon={<Package size={18} />} label={t("Type")} value={warehouse.type} />
+                        <Info icon={<MapPin size={18} />} label={t("Address")} value={warehouse.address} />
+                        <Info icon={<Phone size={18} />} label={t("Phone")} value={warehouse.phone} />
+                        <Info icon={<Mail size={18} />} label={t("Email")} value={warehouse?.users?.[0]?.username} />
                         <Info
                             icon={<Wallet size={18} />}
-                            label="Баланс"
+                            label={t("Balance")}
                             value={`${formatNumber(warehouse.balance)} UZS`}
                             color={
                                 parseFloat(warehouse.balance) < 0
@@ -118,18 +169,18 @@ export default function WarehouseAccess() {
                         />
                         <Info
                             icon={<Calendar size={18} />}
-                            label="Создано"
-                            value={new Date(warehouse.createdAt).toLocaleString("ru-RU")}
+                            label={t("Created")}
+                            value={warehouse.createdAt ? new Date(warehouse.createdAt).toLocaleString() : "-"}
                         />
                         <Info
                             icon={<RefreshCw size={18} />}
-                            label="Обновлено"
-                            value={new Date(warehouse.updatedAt).toLocaleString("ru-RU")}
+                            label={t("Updated")}
+                            value={warehouse.updatedAt ? new Date(warehouse.updatedAt).toLocaleString() : "-"}
                         />
                     </div>
                 ) : (
                     <Typography className="text-center mt-4 text-gray-600 dark:text-gray-400">
-                        Нет данных о складе
+                        {t("No_Warehouse_Data")}
                     </Typography>
                 )}
 
@@ -141,18 +192,19 @@ export default function WarehouseAccess() {
                             variant="h6"
                             className="font-semibold text-text-light dark:text-text-dark"
                         >
-                            Разрешения
+                            {t("Permissions")}
                         </Typography>
                     </div>
 
                     <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                         <Typography className="font-medium text-gray-700 dark:text-gray-300">
-                            Разрешение для продаж
+                            {t("Sell_Access")}
                         </Typography>
                         <Switch
                             color="green"
                             checked={sellAccess}
                             onChange={(e) => UpdateSellAccess(e.target.checked)}
+                            disabled={saving}
                         />
                     </div>
                 </div>
@@ -176,8 +228,7 @@ function Info({ icon, label, value, color }) {
             </div>
             <Typography
                 variant="small"
-                className={`font-semibold ${color || "text-text-light dark:text-text-dark"
-                    }`}
+                className={`font-semibold ${color || "text-text-light dark:text-text-dark"}`}
             >
                 {value || "-"}
             </Typography>

@@ -10,6 +10,7 @@ import { formatNumber } from "../../../utils/Helpers/Formater";
 import { io } from "socket.io-client";
 import { Info } from "lucide-react";
 import Socket from "../../../utils/Socket";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseProduct() {
     const [loading, setLoading] = useState(false);
@@ -17,15 +18,13 @@ export default function WarehouseProduct() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const { t } = useTranslation();
 
     const locationId = Cookies?.get("ul_nesw");
 
     const GetAllProduct = async (pageNum = 1, append = false) => {
-        if (pageNum === 1) {
-            setLoading(true);
-        } else {
-            setLoadingMore(true);
-        }
+        if (pageNum === 1) setLoading(true);
+        else setLoadingMore(true);
 
         try {
             const response = await Stock.StockGetByLocationId({
@@ -38,11 +37,8 @@ export default function WarehouseProduct() {
 
             setTotalPages(total);
 
-            if (append) {
-                setProducts((prev) => [...prev, ...newProducts]);
-            } else {
-                setProducts(newProducts);
-            }
+            if (append) setProducts((prev) => [...prev, ...newProducts]);
+            else setProducts(newProducts);
         } catch (error) {
             console.log("Mahsulotlarni olishda xatolik:", error);
         } finally {
@@ -63,9 +59,7 @@ export default function WarehouseProduct() {
         socket.emit("joinLocation", locationId);
 
         socket.on("stockUpdate", (data) => {
-            if (data.location_id === locationId) {
-                GetAllProduct(1);
-            }
+            if (data.location_id === locationId) GetAllProduct(1);
         });
 
         return () => socket.disconnect();
@@ -85,12 +79,12 @@ export default function WarehouseProduct() {
         <div className="min-h-screen text-text-light dark:text-text-dark">
             <div className="flex items-center justify-between mb-5">
                 <Typography variant="h4" className="font-semibold">
-                    Ombordagi Mahsulotlar
+                    {t("warehouseTitle")}
                 </Typography>
 
                 <NavLink to={"/warehouse/barcode/create"}>
                     <Button className="bg-blue-600 dark:bg-blue-500 text-white dark:text-white hover:bg-blue-700 dark:hover:bg-blue-600">
-                        Barcode qo‘shish
+                        {t("addBarcodeButton")}
                     </Button>
                 </NavLink>
             </div>
@@ -99,19 +93,25 @@ export default function WarehouseProduct() {
                 <>
                     <Card className="overflow-x-auto shadow-sm border border-gray-200 dark:border-card-dark bg-card-light dark:bg-card-dark">
                         <table className="w-full min-w-max table-auto text-left">
-                            <thead>
-                                <tr className="bg-gray-100 dark:bg-card-dark">
-                                    {["№", "Mahsulot nomi", "Partiya", "Sotuv narxi", "Tan narxi", "Soni", "Draft soni", "Barcode", "Sana", "Amallar"].map((title) => (
-                                        <th key={title} className="p-4 font-semibold text-gray-700 dark:text-text-dark">{title}</th>
-                                    ))}
+                            <thead className="bg-gray-100 dark:bg-card-dark">
+                                <tr>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">№</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnProductName")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBatch")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnSalePrice")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnPurchasePrice")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnQuantity")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDraftQuantity")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBarcode")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDate")}</th>
+                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnActions")}</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {products.map((item, index) => {
                                     const date = item?.createdAt;
-                                    const formattedDate = date
-                                        ? new Date(date).toLocaleDateString("uz-UZ")
-                                        : null;
+                                    const formattedDate = date ? new Date(date).toLocaleDateString("uz-UZ") : null;
 
                                     return (
                                         <tr
@@ -124,15 +124,15 @@ export default function WarehouseProduct() {
                                                 {item.batch || (
                                                     <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                                                         <Info size={16} />
-                                                        <span>—</span>
+                                                        <span>{t("noData")}</span>
                                                     </span>
                                                 )}
                                             </td>
                                             <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {item.sale_price ? `${formatNumber(item.sale_price)} so‘m` : "—"}
+                                                {item.sale_price ? `${formatNumber(item.sale_price)} UZS` : t("noData")}
                                             </td>
                                             <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {item.purchase_price ? `${formatNumber(item.purchase_price)} so‘m` : "—"}
+                                                {item.purchase_price ? `${formatNumber(item.purchase_price)} UZS` : t("noData")}
                                             </td>
                                             <td className="p-4 text-gray-700 dark:text-text-dark">{item.quantity}</td>
                                             <td className="p-4 text-gray-700 dark:text-text-dark">{item.draft_quantity}</td>
@@ -141,7 +141,7 @@ export default function WarehouseProduct() {
                                                 {formattedDate || (
                                                     <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                                                         <Info size={16} />
-                                                        <span>Дата отсутствует</span>
+                                                        <span>{t("dateMissingMessage")}</span>
                                                     </span>
                                                 )}
                                             </td>
@@ -165,13 +165,13 @@ export default function WarehouseProduct() {
                                 disabled={loadingMore}
                                 className="rounded-full border-gray-400 dark:border-card-dark text-gray-800 dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
-                                {loadingMore ? "Yuklanmoqda..." : "Yana ko‘rish"}
+                                {loadingMore ? t("loadingMoreText") : t("loadMoreButton")}
                             </Button>
                         </div>
                     )}
                 </>
             ) : (
-                <EmptyData text={"Omborda mahsulot mavjud emas"} />
+                <EmptyData text={t("noProductsMessage")} />
             )}
         </div>
     );

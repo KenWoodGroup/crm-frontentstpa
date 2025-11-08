@@ -7,8 +7,11 @@ import {
     ResponsiveContainer,
     Tooltip as ReTooltip,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseMonyChart({ data = [] }) {
+    const { t } = useTranslation();
+
     const COLORS_WAREHOUSE = [
         "#3b82f6", // blue
         "#ef4444", // red
@@ -66,7 +69,7 @@ export default function WarehouseMonyChart({ data = [] }) {
                 className="mb-6 font-bold text-text-light dark:text-text-dark flex items-center gap-2"
             >
                 <Warehouse className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                Omborlardagi Pul Holati
+                {t("Warehouse_money")}
             </Typography>
 
             {omborPieData.length > 0 ? (
@@ -111,7 +114,7 @@ export default function WarehouseMonyChart({ data = [] }) {
                 <div className="flex flex-col items-center justify-center h-[350px] text-gray-500 dark:text-gray-400">
                     <Package className="w-12 h-12 mb-3 text-gray-400 dark:text-gray-500" />
                     <Typography variant="h6" className="text-text-light dark:text-text-dark">
-                        Ma'lumot yo‘q
+                        {t("Empty_data")}
                     </Typography>
                 </div>
             )}
@@ -120,13 +123,17 @@ export default function WarehouseMonyChart({ data = [] }) {
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="text-center">
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Eng ko'p</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                {t("The_most")}
+                            </p>
                             <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                                 {maxValue.toLocaleString()} so‘m
                             </p>
                         </div>
                         <div className="text-center">
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Umumiy</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                {t("General")}
+                            </p>
                             <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                                 {totalSum.toLocaleString()} so‘m
                             </p>
@@ -135,6 +142,5 @@ export default function WarehouseMonyChart({ data = [] }) {
                 </div>
             )}
         </Card>
-
     );
 }

@@ -52,7 +52,6 @@ function App() {
               <SuperAdmin>
                 <SuperAdminLayout />
               </SuperAdmin>
-
             }>
               {supperAdminRoutes.map((r) => {
                 return (

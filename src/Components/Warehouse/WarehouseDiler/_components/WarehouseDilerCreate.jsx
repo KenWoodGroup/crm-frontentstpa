@@ -10,8 +10,10 @@ import {
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseDilerCreate({ refresh }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState({
@@ -81,7 +83,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
             >
-                + Yangi Diler
+                + {t("Add")}
             </Button>
 
             <Dialog
@@ -90,11 +92,11 @@ export default function WarehouseDilerCreate({ refresh }) {
                 className="bg-white text-gray-900 rounded-xl dark:bg-card-dark"
             >
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
-                    Diler maʼlumotlari
+                    {t('Create_Diler')}
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
-                        label="Nomi"
+                        label={t('Name')}
                         name="name"
                         value={data.name}
                         onChange={handleChange}
@@ -108,7 +110,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                         }}
                     />
                     <Input
-                        label="To‘liq ism"
+                        label={t('Firstname')}
                         name="full_name"
                         value={data.full_name}
                         onChange={handleChange}
@@ -122,7 +124,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                         }}
                     />
                     <Input
-                        label="Manzil"
+                        label={t('Address')}
                         name="address"
                         value={data.address}
                         onChange={handleChange}
@@ -136,7 +138,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                         }}
                     />
                     <Input
-                        label="Telefon raqam"
+                        label={t("Phone")}
                         name="phone"
                         value={data.phone}
                         onChange={handleChange}

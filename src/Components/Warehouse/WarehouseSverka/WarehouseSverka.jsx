@@ -269,9 +269,8 @@ export default function WarehouseSverka() {
                                                         {parseFloat(item.amount).toLocaleString('ru-RU')} сум
                                                     </td>
                                                     <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                                        {item.method === 'cash' ? 'Наличные' :
-                                                            item.method === 'card' ? 'Карта' :
-                                                                item.method === 'transfer' ? 'Перевод' : item.method}
+                                                        {item.method?.name || '-'}
+
                                                     </td>
                                                     <td className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
                                                         <span className={`px-2 py-1 rounded text-xs font-medium ${item.status === 'confirmed'

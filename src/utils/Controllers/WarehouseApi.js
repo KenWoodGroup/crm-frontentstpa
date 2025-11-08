@@ -12,7 +12,7 @@ class WarehouseApi {
     }
 
     static WarehouseGetAll = async (data) => {
-        const response = await $api.get(`/locations/${data?.id}/page?page=${data?.page}`)
+        const response = await $api.get(`/locations/warehouse/${data?.id}/page?page=${data?.page}`)
         return response;
     }
     static WarehouseDelete = async (id) => {

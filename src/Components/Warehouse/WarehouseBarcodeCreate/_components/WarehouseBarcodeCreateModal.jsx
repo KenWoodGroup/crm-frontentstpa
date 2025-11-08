@@ -13,8 +13,11 @@ import Cookies from "js-cookie";
 import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 import { Stock } from "../../../../utils/Controllers/Stock";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
 
 export default function MahsulotQoshishModal({ productId, data, refresh }) {
+    const { t } = useTranslation();
+
 
     const [open, setOpen] = useState(false);
     const [factoryCode, setFactoryCode] = useState("0000");
@@ -282,12 +285,12 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                 onClick={handleOpen}
                 className="text-white px-6 py-2 rounded-xl transition"
             >
-                {data?.barcode || isEdit ? "Barcode tahrirlash" : "Barcode qo'shish"}
+                {data?.barcode || isEdit ? `${t('Edit_Barcode')}` : `${t('add_Barcode')}`}
             </Button>
             <Dialog open={open} handler={handleOpen} className="p-2 max-w-2xl bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark" >
                 <DialogHeader>
                     <Typography variant="h5" className="text-gray-800 font-semibold dark:text-text-dark">
-                        {isEdit && !editMode ? "Barcode" : isEdit ? "Barcode tahrirlash" : "Barcode yaratish"}
+                        {isEdit && !editMode ? "Barcode" : isEdit ? `${t('Edit_Barcode')}` : `${t('add_Barcode')}`}
                     </Typography>
                 </DialogHeader>
                 <DialogBody className="flex flex-col gap-4">
@@ -320,7 +323,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                             className="w-full bg-blue-500 text-white rounded-lg"
                             disabled={(isEdit && !editMode) || (isSaved && !editMode)}
                         >
-                            Yangi barcode generatsiya qilish
+                            {t('generate_barcode')}
                         </Button>
                     </div>
 
@@ -334,7 +337,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
 
                             {data?.createdAt && (
                                 <Typography className="mt-2 text-gray-500 text-sm">
-                                    Yaratilgan: {formatDate(data.createdAt)}
+                                    {t('Created')}: {formatDate(data.createdAt)}
                                 </Typography>
                             )}
                         </div>
@@ -349,13 +352,13 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                                     onClick={handleEdit}
                                     className="flex-1 bg-orange-500 text-white rounded-lg"
                                 >
-                                    Tahrirlash
+                                    {t('Edit')}
                                 </Button>
                                 <Button
                                     onClick={handlePrint}
                                     className="flex-1 bg-green-500 text-white rounded-lg"
                                 >
-                                    Chop etish
+                                    {t('Print')}
                                 </Button>
                             </>
                         )}
@@ -374,7 +377,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                                         onClick={handleCancelEdit}
                                         className="flex-1 bg-gray-500 text-white rounded-lg"
                                     >
-                                        Bekor qilish
+                                        {t('Cancel')}
                                     </Button>
                                 )}
                             </>
@@ -387,13 +390,13 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                                     onClick={handlePrint}
                                     className="flex-1 bg-green-500 text-white rounded-lg"
                                 >
-                                    Chop etish
+                                    {t('prinr')}
                                 </Button>
                                 <Button
                                     onClick={resetForm}
                                     className="flex-1 bg-blue-500 text-white rounded-lg"
                                 >
-                                    Yana yaratish
+                                    {t('Again_create')}
                                 </Button>
                             </>
                         )}
@@ -408,7 +411,7 @@ export default function MahsulotQoshishModal({ productId, data, refresh }) {
                         onClick={handleOpen}
                         className="rounded-xl"
                     >
-                        Yopish
+                        {t('Close')}
                     </Button>
                 </DialogFooter>
             </Dialog>
