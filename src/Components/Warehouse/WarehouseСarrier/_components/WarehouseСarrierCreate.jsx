@@ -14,7 +14,7 @@ import { Staff } from "../../../../utils/Controllers/Staff";
 import { useTranslation } from "react-i18next";
 import { Plus, PlusIcon } from "lucide-react";
 
-export default function WarehouseCarrierCreate({ refresh, apperance = true }) {
+export default function WarehouseCarrierCreate({ refresh, apperance = false }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({
@@ -41,7 +41,7 @@ export default function WarehouseCarrierCreate({ refresh, apperance = true }) {
                 phone: "+998",
                 location_id: Cookies.get("ul_nesw"),
             });
-            handleOpen();
+            handleOpen(); 
             refresh();
         } catch (error) {
             Alert("Xato", "error");
@@ -62,7 +62,7 @@ export default function WarehouseCarrierCreate({ refresh, apperance = true }) {
                 </Button>
             ) : (
                 <>
-                    <button className="dark:text-text-dark text-text-light" onClick={handleOpen}>
+                    <button className="flex items-center justify-center dark:text-text-dark text-text-light" onClick={handleOpen}>
                         <PlusIcon />
                     </button>
                 </>

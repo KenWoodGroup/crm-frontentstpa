@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
-import { select, Spinner } from "@material-tailwind/react";
+import { button, select, Spinner } from "@material-tailwind/react";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
 import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
@@ -50,6 +50,7 @@ import { data } from "autoprefixer";
 import { border, style } from "@mui/system";
 import ReturnedInvoiceProcessor from "./sectionsWhI/ReturnedInvoiceProcessor";
 import { useInventory } from "../../../context/InventoryContext";
+import WarehouseCarrierCreate from "../WarehouseСarrier/_components/WarehouseСarrierCreate";
 
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -777,7 +778,7 @@ export default function WareHouseIncome() {
         return (
             <components.DropdownIndicator {...props}>
                 {menuIsOpen ? (
-                    <PlusIcon
+                    <button
                         onMouseDown={(e) => {
                             e.preventDefault(); // Select fokusini yo‘qotmasin
                             e.stopPropagation(); // Dropdown yopilmasin
@@ -785,8 +786,11 @@ export default function WareHouseIncome() {
                                 props.selectProps.onAddNew(); // modalni ochish
                             }, 50);
                         }}
-                        className="w-5 h-5 text-blue-600 hover:text-blue-800 transition-all cursor-pointer"
-                    />
+                        className="w-5 h-5 flex items-center justify-center text-blue-600 hover:text-blue-800 transition-all cursor-pointer"
+                    >
+                        <WarehouseCarrierCreate apperance = {true} />
+                    </button>
+
                 ) : (
                     <ChevronDown className="w-5 h-5 text-gray-500" />
                 )}
