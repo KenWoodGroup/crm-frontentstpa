@@ -9,15 +9,15 @@ import {
     Tooltip,
     IconButton,
 } from "@material-tailwind/react";
-import { Clients } from "../../../../utils/Controllers/Clients";
-import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { Edit } from "lucide-react";
 import { Cash } from "../../../../utils/Controllers/Cash";
+import { useTranslation } from "react-i18next";
 
 
 export default function WarehouseCashEdit({ data, refresh, id }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation()
     const [form, setForm] = useState({
         name: data?.name || '',
     });
@@ -32,12 +32,12 @@ export default function WarehouseCashEdit({ data, refresh, id }) {
     const handleSubmit = async () => {
         try {
             const response = await Cash?.EditKassa(id, form);
-            Alert("Muvaffaqiyatli", "success");
+            Alert(`${t('success')}`, "success");
 
             handleOpen();
             refresh();
         } catch (error) {
-            Alert("Xato", "error");
+            Alert(`${'Error'}`, "error");
             console.log(error);
         }
     };
@@ -45,7 +45,7 @@ export default function WarehouseCashEdit({ data, refresh, id }) {
 
     return (
         <div className="">
-            <Tooltip content="Изменить">
+            <Tooltip content={t('Edit')}>
                 <IconButton
                     variant="text"
                     color="blue"
@@ -56,11 +56,11 @@ export default function WarehouseCashEdit({ data, refresh, id }) {
             </Tooltip>
             <Dialog open={open} handler={handleOpen} size="sm" className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
             >
-                <DialogHeader className="dark:text-text-dark">Изменения Кассы</DialogHeader>
+                <DialogHeader className="dark:text-text-dark">{t('Edit_Cash')}</DialogHeader>
                 <DialogBody divider className="flex flex-col gap-4">
                     <div>
                         <Input
-                            label="Имя клиента"
+                            label={t('Name')}
                             name="name"
                             value={form.name}
                             onChange={handleChange}
@@ -84,11 +84,11 @@ export default function WarehouseCashEdit({ data, refresh, id }) {
                         onClick={handleOpen}
                         className="mr-2"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button className="bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
                         onClick={handleSubmit}>
-                        Сохранить
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

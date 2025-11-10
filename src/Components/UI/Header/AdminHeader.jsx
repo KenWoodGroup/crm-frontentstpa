@@ -3,6 +3,8 @@ import { LogOut, User, ChevronDown, Moon, Sun, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button, Option, Select } from "@material-tailwind/react";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie";
+
 
 export default function AdminHeader({ active, sidebarOpen, ...props }) {
     const navigate = useNavigate();
@@ -61,6 +63,23 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
 
     const changeLanguage = (lng) => {
         if (lng) i18n.changeLanguage(lng);
+    };
+
+    const handleLangChange = (value) => {
+        setLang(value);
+        localStorage.setItem("lang", value);
+    };
+
+    const handleProfile = () => {
+        const nesw = Cookies.get("nesw"); // получаем значение из Cookies
+
+        if (nesw === "SefwfmgrUID") {
+            navigate("/factory/profile");
+        } else if (nesw === "SesdsdfmgrUID") {
+            navigate("/warehouse/profile");
+        } else {
+            navigate("/profile"); // если значение другое
+        }
     };
 
     return (
@@ -166,7 +185,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                                 }`}></div>
 
                             <button
-                                onClick={() => navigate("/profile")}
+                                onClick={handleProfile}
                                 className={`w-full px-4 py-3 text-left text-sm transition-all duration-200 flex items-center gap-2 ${isDarkMode
                                     ? "text-white hover:bg-gray-700"
                                     : "text-gray-700 hover:bg-gray-100"

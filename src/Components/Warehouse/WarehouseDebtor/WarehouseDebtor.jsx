@@ -10,8 +10,10 @@ import { FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { location } from "../../../utils/Controllers/location";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseDebtor() {
+    const { t } = useTranslation();
     const [data, setData] = useState([]);
     const [filterName, setFilterName] = useState("");
     const [page, setPage] = useState(1);
@@ -65,21 +67,21 @@ export default function WarehouseDebtor() {
     }
 
     return (
-        <div className="bg-background-light dark:bg-background-dark min-h-screen p-4 transition-colors duration-200">
+        <div className="bg-background-light dark:bg-background-dark min-h-screen  transition-colors duration-200">
             {/* 🔹 Заголовок + фильтры */}
             <div className="flex flex-wrap items-end justify-between mb-5 gap-4">
                 <Typography
                     variant="h5"
                     className="font-semibold text-blue-gray-700 dark:text-text-dark mb-2 transition-colors duration-200"
                 >
-                    Общая таблица долгов клиентов
+                    {t('Debtor_title')}
                 </Typography>
 
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="relative">
 
                         <Input
-                            label="Фильтр по имени..."
+                            label={t('Search_name')}
                             value={filterName}
                             onChange={(e) => setFilterName(e.target.value)}
                             color="blue-gray"
@@ -102,7 +104,7 @@ export default function WarehouseDebtor() {
                         }}
                         disabled={loading}
                     >
-                        {loading ? "Поиск..." : "Поиск"}
+                        {loading ? `${t('Searching')}` : `${t('Search')}`}
                     </Button>
                 </div>
             </div>
@@ -117,16 +119,16 @@ export default function WarehouseDebtor() {
                                     №
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
-                                    Имя клиента
+                                    {t('Firstname')}
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
-                                    Фабрика
+                                    {t('Factory')}
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
-                                    Телефон
+                                    {t("Phone")}
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-right transition-colors duration-200">
-                                    Долг (so'm)
+                                    {t('Debt')}
                                 </th>
                             </tr>
                         </thead>
@@ -163,17 +165,17 @@ export default function WarehouseDebtor() {
                             <tfoot className="bg-blue-50 dark:bg-card-dark sticky bottom-0 transition-colors duration-200">
                                 <tr>
                                     <td colSpan={4} className="p-3 font-semibold text-right text-text-light dark:text-text-dark transition-colors duration-200">
-                                        Общий долг:
+                                        {t('Total_debt')}
                                     </td>
                                     <td className="p-3 font-semibold text-red-600 dark:text-red-400 text-right transition-colors duration-200">
-                                        {formatNumber(totalDebt)} so'm
+                                        {formatNumber(totalDebt)} uzs
                                     </td>
                                 </tr>
                             </tfoot>
                         )}
                     </table>
                 ) : (
-                    <EmptyData text={'Нет данных'} />
+                    <EmptyData text={t('Empty_data')} />
                 )}
             </div>
 
@@ -194,7 +196,7 @@ export default function WarehouseDebtor() {
                     </IconButton>
 
                     <Typography className="text-gray-700 dark:text-gray-300 font-medium transition-colors duration-200">
-                        Страница {pagination.currentPage} из {pagination.total_pages}
+                        {pagination.currentPage} / {pagination.total_pages}
                     </Typography>
 
                     <IconButton

@@ -4,9 +4,11 @@ import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { Clients } from "../../../../utils/Controllers/Clients";
 import { Cash } from "../../../../utils/Controllers/Cash";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseCashDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation()
     const [loading, setLoading] = useState(false);
 
     const handleOpen = () => setOpen(!open);
@@ -15,12 +17,12 @@ export default function WarehouseCashDelete({ id, refresh }) {
         try {
             setLoading(true);
             await Cash.DeleteKassa(id);
-            Alert("Muvaffaqiyatli o‘chirildi ", "success");
+            Alert(`${t('succesы')}`, "success");
             refresh();
             setOpen(false);
         } catch (error) {
             console.error(error);
-            Alert("Xatolik yuz berdi ", "error");
+            Alert(`${t('Error')}`, "error");
         } finally {
             setLoading(false);
         }
@@ -28,7 +30,7 @@ export default function WarehouseCashDelete({ id, refresh }) {
 
     return (
         <>
-            <Tooltip content="Удалить">
+            <Tooltip content={t('Delete')}>
                 <IconButton
                     onClick={handleOpen}
                     variant="text"
@@ -40,10 +42,10 @@ export default function WarehouseCashDelete({ id, refresh }) {
 
             <Dialog open={open} handler={handleOpen} className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark">
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:text-text-dark">
-                    Удаления Кассы
+                    {t('Delet_Cash')}
                 </DialogHeader>
                 <DialogBody divider className="text-gray-700 dark:text-text-dark">
-                    Вы действительно хотите удалить кассу ?
+                    {t('Delet_Cash_text')}
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200 ">
                     <Button
@@ -52,7 +54,7 @@ export default function WarehouseCashDelete({ id, refresh }) {
                         onClick={handleOpen}
                         className="mr-2"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -81,7 +83,7 @@ export default function WarehouseCashDelete({ id, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "Удалить"
+                            t('Delete')
                         )}
                     </Button>
                 </DialogFooter>

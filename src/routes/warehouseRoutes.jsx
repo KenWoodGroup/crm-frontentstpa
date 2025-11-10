@@ -124,7 +124,7 @@ export const warehouseRoutes = [
         element: <WarehousePriceType />
     },
     {
-        path: "/profile",
+        path: "/warehouse/profile",
         name: "Warehouse profile ",
         element: <Profile />
     },

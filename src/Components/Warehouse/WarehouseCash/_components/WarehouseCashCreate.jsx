@@ -10,8 +10,10 @@ import {
 import Cookies from "js-cookie";
 import { Cash } from "../../../../utils/Controllers/Cash";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseCashCreate({ refresh }) {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
@@ -29,10 +31,10 @@ export default function WarehouseCashCreate({ refresh }) {
             setOpen(false);
             setName("");
             refresh();
-            Alert("Muvaffaqiyatli yaratildi", "success");
+            Alert(`${t('success')}`, "success");
         } catch (error) {
             console.log("Ошибка при создании кассы:", error);
-            Alert("Xato", "error");
+            Alert(`${t('Error_occurred')}`, "error");
         } finally {
             setLoading(false);
         }
@@ -44,7 +46,7 @@ export default function WarehouseCashCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
-                Создать кассу
+                + {t('Add')}
             </Button>
 
             <Dialog
@@ -54,11 +56,11 @@ export default function WarehouseCashCreate({ refresh }) {
                 className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
             >
                 <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
-                    Создание кассы
+                    {t('Create_Cash')}
                 </DialogHeader>
                 <DialogBody className="flex flex-col gap-4">
                     <Input
-                        label="Название кассы"
+                        label={t('Name')}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         color="blue-gray"
@@ -78,14 +80,14 @@ export default function WarehouseCashCreate({ refresh }) {
                         onClick={handleOpen}
                         className="mr-2 normal-case text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={CreateCash}
                         disabled={loading}
                         className="bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
                     >
-                        {loading ? "Создание..." : "Создать"}
+                        {loading ? `${t('Saving')}` : `${t('Save')}`}
                     </Button>
                 </DialogFooter>
             </Dialog>

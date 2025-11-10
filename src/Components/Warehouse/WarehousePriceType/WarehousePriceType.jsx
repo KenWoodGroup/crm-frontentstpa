@@ -15,10 +15,12 @@ import { PriceType } from "../../../utils/Controllers/PriceType";
 import WarehousePriceTypeCreate from "./_components/WarehousePriceTypeCreate";
 import WarehousePriceTypeDelete from "./_components/WarehousePriceTypeDelete";
 import WarehousePriceTypeEdit from "./_components/WarehousePriceTypeEdit";
+import { useTranslation } from "react-i18next";
 
 export default function WarehousePriceType() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true)
+    const { t } = useTranslation()
 
     const getAllPriceType = async () => {
         setLoading(true)
@@ -52,14 +54,14 @@ export default function WarehousePriceType() {
         >
             <div className="flex items-center justify-between mb-6">
                 <Typography variant="h4" className="font-semibold">
-                    Типы цены
+                    {t('Price_type')}
                 </Typography>
                 <WarehousePriceTypeCreate refresh={getAllPriceType} />
             </div>
 
             {/* Если данных нет */}
             {(!data || data.length === 0) ? (
-                <EmptyData text={"Тип цены нет"} />
+                <EmptyData text={t('Empty_data')} />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.map((item) => (

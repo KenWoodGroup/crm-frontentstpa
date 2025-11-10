@@ -4,10 +4,12 @@ import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { Expenses } from "../../../../utils/Controllers/Expenses";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseExpensesDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation()
 
     const handleOpen = () => setOpen(!open);
 
@@ -15,12 +17,12 @@ export default function WarehouseExpensesDelete({ id, refresh }) {
         try {
             setLoading(true);
             await Expenses.DeleteExpenses(id);
-            Alert("Muvaffaqiyatli o‘chirildi ", "success");
+            Alert(`${t('success')}`, "success");
             refresh();
             setOpen(false);
         } catch (error) {
             console.error(error);
-            Alert("Xatolik yuz berdi ", "error");
+            Alert(`${t("Error")}`, "error");
         } finally {
             setLoading(false);
         }
@@ -28,7 +30,7 @@ export default function WarehouseExpensesDelete({ id, refresh }) {
 
     return (
         <>
-            <Tooltip content="Удалить">
+            <Tooltip content={t('Delete')}>
                 <IconButton
                     onClick={handleOpen}
 
@@ -41,10 +43,10 @@ export default function WarehouseExpensesDelete({ id, refresh }) {
 
             <Dialog open={open} handler={handleOpen} className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark">
                 <DialogHeader className="dark:text-text-dark">
-                    Удалить расход
+                    {t('Delete_exp')}
                 </DialogHeader>
                 <DialogBody divider className="text-gray-700 dark:text-text-dark">
-                    Вы точно хотите удалить расход ?
+                    {t('Delete_exp_text')}
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
@@ -54,7 +56,7 @@ export default function WarehouseExpensesDelete({ id, refresh }) {
                         className="mr-2"
                         disabled={loading}
                     >
-                        Отменить
+                        {t('Cancel')}
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -83,7 +85,7 @@ export default function WarehouseExpensesDelete({ id, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "Удалить"
+                            t('Delete')
                         )}
                     </Button>
                 </DialogFooter>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card, CardBody, Typography, Button } from "@material-tailwind/react";
 import { Plus, Minus, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsWareHouse() {
     const [zoom, setZoom] = useState(100);
+    const { t } = useTranslation();
     const [fontScale, setFontScale] = useState(100);
     const [barcodeMode, setBarcodeMode] = useState("auto"); // 'auto' | 'modal'
 
@@ -67,14 +69,14 @@ export default function SettingsWareHouse() {
                 variant="h2"
                 className="mb-6 font-semibold text-gray-800 dark:text-gray-100"
             >
-                Sozlamalar
+                {t('Settings')}
             </Typography>
 
             {/* --- Ekran masshtabi --- */}
             <Card className="shadow-md rounded-2xl mb-6 bg-card-light dark:bg-card-dark transition-colors ">
                 <CardBody className="p-6 flex flex-col gap-4">
                     <Typography variant="h6" className="text-gray-700 dark:text-gray-200">
-                        Ekran masshtabi
+                        {t('Mon_mash')}
                     </Typography>
                     <div className="flex items-center gap-4">
                         <Button
@@ -109,7 +111,7 @@ export default function SettingsWareHouse() {
             <Card className="shadow-md rounded-2xl mb-6 bg-card-light dark:bg-card-dark transition-colors">
                 <CardBody className="p-6 flex flex-col gap-6">
                     <Typography variant="h6" className="text-gray-700 dark:text-gray-200">
-                        Matn hajmi
+                        {t('Text_size')}
                     </Typography>
                     <div className="flex items-center gap-4">
                         <Button
@@ -156,11 +158,10 @@ export default function SettingsWareHouse() {
                         }}
                     >
                         <Typography className="mb-2 font-medium text-gray-800 dark:text-gray-100">
-                            Sinov matni (test text)
+                            {t('Test_text')}
                         </Typography>
                         <p className="text-gray-600 dark:text-gray-300">
-                            Bu joyda matn hajmini sinab ko‘rishingiz mumkin. Har safar siz qiymatni
-                            o‘zgartirsangiz, matn darhol kattalashadi yoki kichrayadi.
+                            {t('Test_text2')}
                         </p>
                     </div>
 
@@ -170,7 +171,7 @@ export default function SettingsWareHouse() {
                             onClick={resetAll}
                             className="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
                         >
-                            Tiklash hammasini
+                            {t('restart')}
                         </Button>
                     </div>
                 </CardBody>
@@ -180,7 +181,7 @@ export default function SettingsWareHouse() {
             <Card className="shadow-md rounded-2xl bg-card-light dark:bg-card-dark transition-colors">
                 <CardBody className="p-6 flex flex-col gap-5">
                     <Typography variant="h6" className="text-gray-700 dark:text-gray-200">
-                        Shtrix bilan ishlash usuli
+                        {t("Qr_text")}
                     </Typography>
 
                     <div className="flex gap-4">
@@ -191,7 +192,7 @@ export default function SettingsWareHouse() {
                                 : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
                                 }`}
                         >
-                            Avtomatik oxirgi partiyani tanlash
+                            {t('Qr_text2')}
                             {barcodeMode === "auto" && <Check size={18} className="inline ml-2" />}
                         </Button>
 
@@ -202,7 +203,7 @@ export default function SettingsWareHouse() {
                                 : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
                                 }`}
                         >
-                            Modal orqali tanlash
+                            {t('Qr_text3')}
                             {barcodeMode === "modal" && <Check size={18} className="inline ml-2" />}
                         </Button>
                     </div>
@@ -210,13 +211,11 @@ export default function SettingsWareHouse() {
                     <div className="text-gray-600 dark:text-gray-300 text-sm border-t border-gray-200 dark:border-gray-700 pt-3">
                         {barcodeMode === "auto" ? (
                             <p>
-                                Shtrix urilganda tizim avtomatik tarzda oxirgi partiyani tanlaydi va
-                                invoice-ga qo‘shadi. Tezroq ishlash uchun qulay.
+                                {t('Qr_text4')}
                             </p>
                         ) : (
                             <p>
-                                Shtrix urilganda tizim partiyalarni ro‘yxat ko‘rinishida chiqaradi va
-                                siz keraklisini qo‘lda tanlaysiz. Aniqlik uchun qulay.
+                                {t('Qr_text5')}
                             </p>
                         )}
                     </div>

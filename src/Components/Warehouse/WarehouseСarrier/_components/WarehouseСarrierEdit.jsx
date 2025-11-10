@@ -13,9 +13,11 @@ import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { Staff } from "../../../../utils/Controllers/Staff";
 import Edit from "../../../UI/Icons/Edit";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseСarrierEdit({ refresh, data, id }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         role: "carrier",
@@ -60,7 +62,7 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
 
     return (
         <div>
-            <Tooltip content="Изменить">
+            <Tooltip content={t('Edit')}>
                 <IconButton
                     variant="text"
                     color="blue"
@@ -77,13 +79,13 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
                 size="sm"
             >
                 <DialogHeader className="dark:text-text-dark">
-                    Редактирование Доставщика
+                    {t('Edit_Kurier')}
                 </DialogHeader>
 
                 <DialogBody divider className="flex flex-col gap-4">
                     <div>
                         <Input
-                            label="Имя Доставщика"
+                            label={t('Firstname')}
                             name="full_name"
                             value={form.full_name}
                             onChange={handleChange}
@@ -101,7 +103,7 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
 
                     <div>
                         <Input
-                            label="Телефон"
+                            label={t('Phone')}
                             name="phone"
                             value={form.phone}
                             onChange={handleChange}
@@ -126,12 +128,12 @@ export default function WarehouseСarrierEdit({ refresh, data, id }) {
                         className="mr-2"
                         disabled={loading}
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button onClick={handleSubmit} className="bg-text-light text-card-light normal-case hover:bg-gray-800
                                    dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300
                                    transition-colors" disabled={loading} >
-                        {loading ? "Сохранение..." : "Сохранить изменения"}
+                        {loading ? `${t('Saving')}` : `${t("Save")}`}
                     </Button>
                 </DialogFooter>
             </Dialog>

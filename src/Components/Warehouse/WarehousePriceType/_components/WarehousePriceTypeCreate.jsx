@@ -10,9 +10,12 @@ import {
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { PriceType } from "../../../../utils/Controllers/PriceType";
+import { useTranslation } from "react-i18next";
+
 
 export default function WarehousePriceTypeCreate({ refresh }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation();
     const [form, setForm] = useState({
         location_id: Cookies.get("ul_nesw") || "",
         name: "",
@@ -29,7 +32,7 @@ export default function WarehousePriceTypeCreate({ refresh }) {
     const handleSubmit = async () => {
         try {
             await PriceType.PriceTypeCreatee(form);
-            Alert("Тип цены успешно создан", "success");
+            Alert(`${t('success')}`, "success");
             setForm({
                 location_id: Cookies.get("ul_nesw") || "",
                 name: "",
@@ -38,7 +41,7 @@ export default function WarehousePriceTypeCreate({ refresh }) {
             handleOpen();
             refresh && refresh();
         } catch (error) {
-            Alert("Ошибка при создании", "error");
+            Alert(`${t('Error')}`, "error");
             console.log(error);
         }
     };
@@ -50,7 +53,7 @@ export default function WarehousePriceTypeCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
             >
-                Создать тип цены
+                + {t('Add')}
             </Button>
 
             {/* Модалка */}
@@ -61,7 +64,7 @@ export default function WarehousePriceTypeCreate({ refresh }) {
                 className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
             >
                 <DialogHeader className="flex justify-between items-center dark:text-text-dark">
-                    Создание типа цены
+                    {t('Type_Price')}
                 </DialogHeader>
 
                 <DialogBody
@@ -69,7 +72,7 @@ export default function WarehousePriceTypeCreate({ refresh }) {
                     className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
                 >
                     <Input
-                        label="Название типа цены"
+                        label={t('Name')}
                         name="name"
                         value={form.name}
                         onChange={handleChange}
@@ -84,7 +87,7 @@ export default function WarehousePriceTypeCreate({ refresh }) {
                     />
 
                     <Input
-                        label="Примечание"
+                        label={t('Comment')}
                         name="note"
                         value={form.note}
                         onChange={handleChange}
@@ -106,13 +109,13 @@ export default function WarehousePriceTypeCreate({ refresh }) {
                         onClick={handleOpen}
                         className="dark:text-gray-300"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
                     >
-                        Сохранить
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

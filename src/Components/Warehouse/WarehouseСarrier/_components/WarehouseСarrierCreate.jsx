@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
     Button,
     Dialog,
-    DialogHeader,   
+    DialogHeader,
     DialogBody,
     DialogFooter,
     Input,
@@ -10,8 +10,10 @@ import {
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { Staff } from "../../../../utils/Controllers/Staff";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseCarrierCreate({ refresh }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({
         role: "carrier",
@@ -54,7 +56,7 @@ export default function WarehouseCarrierCreate({ refresh }) {
                            dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300
                            transition-colors"
             >
-                + Добавить Доставщика
+                + {t('Add')}
             </Button>
 
             {/* Модальное окно */}
@@ -65,7 +67,7 @@ export default function WarehouseCarrierCreate({ refresh }) {
                 className="bg-card-light text-text-light dark:bg-card-dark dark:text-text-dark"
             >
                 <DialogHeader className="text-text-light dark:text-text-dark">
-                    Создание Доставщика
+                    {t('Create_Kurier')}
                 </DialogHeader>
 
                 <DialogBody
@@ -73,7 +75,7 @@ export default function WarehouseCarrierCreate({ refresh }) {
                     className="flex flex-col gap-4 bg-background-light dark:bg-background-dark"
                 >
                     <Input
-                        label="Имя Доставщика"
+                        label={t('Firstname')}
                         name="full_name"
                         value={form.full_name}
                         onChange={handleChange}
@@ -87,7 +89,7 @@ export default function WarehouseCarrierCreate({ refresh }) {
                         }}
                     />
                     <Input
-                        label="Телефон"
+                        label={t('Phone')}
                         name="phone"
                         value={form.phone}
                         onChange={handleChange}
@@ -109,7 +111,7 @@ export default function WarehouseCarrierCreate({ refresh }) {
                         onClick={handleOpen}
                         className="mr-2 normal-case text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={handleSubmit}
@@ -117,7 +119,7 @@ export default function WarehouseCarrierCreate({ refresh }) {
                                    dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300
                                    transition-colors"
                     >
-                        Сохранить
+                        {t("Save")}
                     </Button>
                 </DialogFooter>
             </Dialog>

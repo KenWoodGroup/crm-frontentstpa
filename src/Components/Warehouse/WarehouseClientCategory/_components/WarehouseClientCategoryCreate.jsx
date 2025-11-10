@@ -11,9 +11,11 @@ import {
 import Cookies from "js-cookie";
 import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseClientCategoryCreate({ refresh }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation()
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         location_id: Cookies.get("ul_nesw") || "",
@@ -32,7 +34,7 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
         setLoading(true);
         try {
             await ClientCategory.ClientCategoryCreate(form);
-            Alert("Категория успешно создана", "success");
+            Alert(`${'success'}`, "success");
 
             setForm({
                 location_id: Cookies.get("ul_nesw") || "",
@@ -44,7 +46,7 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
             refresh && refresh();
         } catch (error) {
             console.log(error);
-            Alert("Ошибка при создании категории", "error");
+            Alert(`${'Error'}`, "error");
         } finally {
             setLoading(false);
         }
@@ -57,7 +59,7 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
             >
-                + Добавить категорию клиента
+                + {t('Add')}
             </Button>
 
             {/* Модалка */}
@@ -68,7 +70,7 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
                 className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
             >
                 <DialogHeader className="flex justify-between items-center dark:text-text-dark">
-                    Создание категории клиента
+                    {t('Category_Client_Create')}
                 </DialogHeader>
 
                 <DialogBody
@@ -76,11 +78,11 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
                     className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
                 >
                     <Input
-                        label="Название категории"
+                        label={t("Name")}
                         name="name"
                         value={form.name}
                         onChange={handleChange}
-                        disabled={loading} // ✅ блокируем во время загрузки
+                        disabled={loading}
                         color="blue-gray"
                         className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
                         labelProps={{
@@ -89,7 +91,7 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
                     />
 
                     <Textarea
-                        label="Заметка"
+                        label={t('Comment')}
                         name="note"
                         value={form.note}
                         onChange={handleChange}
@@ -111,7 +113,7 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
                         className={`dark:text-gray-300 ${loading ? "opacity-50 cursor-not-allowed" : ""
                             }`}
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
 
                     <Button
@@ -124,10 +126,10 @@ export default function WarehouseClientCategoryCreate({ refresh }) {
                     >
                         {loading ? (
                             <>
-                                Сохранение...
+                                {t('Saving')}
                             </>
                         ) : (
-                            "Сохранить"
+                            t('Save')
                         )}
                     </Button>
                 </DialogFooter>

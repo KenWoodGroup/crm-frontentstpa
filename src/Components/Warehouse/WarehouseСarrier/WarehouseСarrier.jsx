@@ -11,8 +11,10 @@ import { Staff } from "../../../utils/Controllers/Staff";
 import Cookies from "js-cookie";
 import WarehouseSupplierDelete from "./_components/WarehouseСarrierDelete";
 import WarehouseSupplierEdit from "./_components/WarehouseСarrierEdit";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseСarrier() {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [clients, setClients] = useState([]);
 
@@ -41,7 +43,7 @@ export default function WarehouseСarrier() {
                     variant="h4"
                     className="font-semibold text-text-light dark:text-text-dark"
                 >
-                    Доставшики
+                    {t('Kurier')}
                 </Typography>
                 <WarehouseSupplierCreate refresh={GetStaff} />
             </div>
@@ -54,10 +56,10 @@ export default function WarehouseСarrier() {
                         <table className="w-full min-w-max text-left">
                             <thead>
                                 <tr className="bg-blue-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
-                                    <th className="p-3">Имя</th>
-                                    <th className="p-3">Телефон</th>
-                                    <th className="p-3">Дата создания</th>
-                                    <th className="p-3 text-center">Настройки</th>
+                                    <th className="p-3">{t('Firstname')}</th>
+                                    <th className="p-3">{t('Phone')}</th>
+                                    <th className="p-3">{t('Created')}</th>
+                                    <th className="p-3 text-center">{t('columnActions')}</th>
                                 </tr>
                             </thead>
                             <tbody>

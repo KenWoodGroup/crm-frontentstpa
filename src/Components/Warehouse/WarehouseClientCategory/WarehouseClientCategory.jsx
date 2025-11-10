@@ -15,10 +15,13 @@ import EmptyData from "../../UI/NoData/EmptyData";
 import WarehouseClientCategoryCreate from "./_components/WarehouseClientCategoryCreate";
 import WarehouseClientCategoryDelete from "./_components/WarehouseClientCategoryDelete";
 import WarehouseClientCategoryEdit from "./_components/WarehouseClientCategoryEdit";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseClientCategory() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation()
+
 
     // 🔹 Получаем все категории клиентов
     const getAllCategoryClient = async () => {
@@ -52,7 +55,7 @@ export default function WarehouseClientCategory() {
                     variant="h5"
                     className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200"
                 >
-                    Категории клиентов
+                    {t('Category_Client')}
                 </Typography>
                 <WarehouseClientCategoryCreate refresh={getAllCategoryClient} />
             </div>
@@ -67,16 +70,16 @@ export default function WarehouseClientCategory() {
                                     №
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700">
-                                    Название категории
+                                    {t('Name')}
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700">
-                                    Заметка
+                                    {t('Comment')}
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-right">
-                                    Дата создания
+                                    {t('Created')}
                                 </th>
                                 <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-right">
-                                    Настройки
+                                    {t('columnActions')}
                                 </th>
                             </tr>
                         </thead>
@@ -113,7 +116,7 @@ export default function WarehouseClientCategory() {
                         </tbody>
                     </table>
                 ) : (
-                    <EmptyData text="Нет данных по категориям клиентов" />
+                    <EmptyData text={t('Empty_Data')} />
                 )}
             </div>
         </div>

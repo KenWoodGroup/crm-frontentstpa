@@ -12,9 +12,11 @@ import {
 import { PaymentMethodApi } from "../../../../utils/Controllers/PaymentMethodApi";
 import { Alert } from "../../../../utils/Alert";
 import Edit from "../../../UI/Icons/Edit";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentTypeEdit({ item, refresh }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation()
     const [form, setForm] = useState({
         id: item?.id || "",
         name: item?.name || "",
@@ -42,18 +44,18 @@ export default function PaymentTypeEdit({ item, refresh }) {
                 name: form.name,
                 note: form.note,
             });
-            Alert("Тип оплаты успешно обновлён", "success");
+            Alert(`${'success'}`, "success");
             handleOpen();
             refresh && refresh();
         } catch (error) {
-            Alert("Ошибка при обновлении", "error");
+            Alert(`${'Error'}`, "error");
             console.log(error);
         }
     };
 
     return (
         <>
-            <Tooltip content="Изменить">
+            <Tooltip content={'Edit'}>
                 <IconButton
                     variant="text"
                     color="blue"
@@ -70,7 +72,7 @@ export default function PaymentTypeEdit({ item, refresh }) {
                 className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
             >
                 <DialogHeader className="flex justify-between items-center dark:text-text-dark">
-                    Изменить тип оплаты
+                    {t('Payment_type_Edit')}
                 </DialogHeader>
 
                 <DialogBody
@@ -78,7 +80,7 @@ export default function PaymentTypeEdit({ item, refresh }) {
                     className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
                 >
                     <Input
-                        label="Название типа оплаты"
+                        label={t('Name')}
                         name="name"
                         value={form.name}
                         onChange={handleChange}
@@ -93,7 +95,7 @@ export default function PaymentTypeEdit({ item, refresh }) {
                     />
 
                     <Input
-                        label="Примечание"
+                        label={t("Comment")}
                         name="note"
                         value={form.note}
                         onChange={handleChange}
@@ -115,13 +117,13 @@ export default function PaymentTypeEdit({ item, refresh }) {
                         onClick={handleOpen}
                         className="dark:text-gray-300"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
                     >
-                        Сохранить
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

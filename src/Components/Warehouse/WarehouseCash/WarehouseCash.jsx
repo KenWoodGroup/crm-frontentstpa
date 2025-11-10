@@ -12,8 +12,10 @@ import Cookies from "js-cookie";
 import { Cash } from "../../../utils/Controllers/Cash";
 import WarehouseCashDelete from "./_components/WarehouseCashDelete";
 import WarehouseCashEdit from "./_components/WarehouseCashEdit";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseCash() {
+    const { t } = useTranslation()
     const [loading, setLoading] = useState(true);
     const [cashes, setCashes] = useState([]);
 
@@ -42,24 +44,24 @@ export default function WarehouseCash() {
             {/* Заголовок + кнопка */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <Typography variant="h4" className="font-semibold">
-                    Кассы
+                    {t("Kassa")}
                 </Typography>
                 <WarehouseCashCreate refresh={GetAllCash} />
             </div>
 
             {/* Если нет касс */}
             {cashes.length <= 0 ? (
-                <EmptyData text={"Касс нет"} />
+                <EmptyData text={t('Empty_data')} />
             ) : (
                 <Card className="overflow-hidden bg-card-light dark:bg-card-dark">
                     <CardBody className="p-0 overflow-auto">
                         <table className="w-full min-w-max text-left">
                             <thead className="bg-blue-gray-50 dark:bg-gray-700 text-gray-700 dark:text-text-dark">
                                 <tr>
-                                    <th className="p-3">Название</th>
-                                    <th className="p-3">Баланс</th>
-                                    <th className="p-3">Дата создания</th>
-                                    <th className="p-3 text-center">Действия</th>
+                                    <th className="p-3">{t('Name')}</th>
+                                    <th className="p-3">{t('Balance')}</th>
+                                    <th className="p-3">{t('Created')}</th>
+                                    <th className="p-3 text-center">{t('columnActions')}</th>
                                 </tr>
                             </thead>
                             <tbody>

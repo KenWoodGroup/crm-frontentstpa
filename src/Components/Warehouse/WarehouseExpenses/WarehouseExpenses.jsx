@@ -7,6 +7,7 @@ import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
 import WarehouseExpensesDelete from "./_components/WarehouseExpensesDelete";
 import WarehouseExpensesEdit from "./_components/WarehouseExpensesEdit";
+import { useTranslation } from "react-i18next";
 
 const getDefaultDates = () => {
     const now = new Date();
@@ -19,8 +20,9 @@ const getDefaultDates = () => {
 };
 
 export default function WarehouseExpenses() {
-    const { first, last } = getDefaultDates();
 
+    const { t } = useTranslation();
+    const { first, last } = getDefaultDates();
     const [data, setData] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -75,7 +77,7 @@ export default function WarehouseExpenses() {
             {/* Заголовок + фильтры */}
             <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
                 <h1 className="text-2xl font-bold">
-                    Расходы склада
+                    {t('Warehouse_Exp')}
                 </h1>
 
                 <div className="flex items-center gap-3 flex-wrap">
@@ -123,7 +125,7 @@ export default function WarehouseExpenses() {
                                        bg-text-light text-card-light hover:bg-gray-800 
                                        dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                         >
-                            {loading ? "Загрузка..." : "Применить"}
+                            {loading ? `${t('loadingMoreText')}` : `${t('Search')}`}
                         </button>
                     </div>
 
@@ -144,19 +146,19 @@ export default function WarehouseExpenses() {
                                             №
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-semibold border-b">
-                                            Дата
+                                            {t('Date')}
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-semibold border-b">
-                                            Метод оплаты
+                                            {t('Payment_method')}
                                         </th>
                                         <th className="px-4 py-3 text-right text-xs font-semibold border-b">
-                                            Сумма
+                                            {t('Summ')}
                                         </th>
                                         <th className="px-4 py-3 text-left text-xs font-semibold border-b">
-                                            Комментарий
+                                            {t('Comment')}
                                         </th>
                                         <th className="px-1 py-3 text-left text-xs font-semibold border-b w-[80px]">
-                                            Действие
+                                            {t('columnActions')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -179,7 +181,7 @@ export default function WarehouseExpenses() {
                                             </td>
                                             <td className="px-4 py-3 text-sm">
                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
-                                                    {item.method || "-"}
+                                                    {item.method?.name}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-sm text-right font-semibold">
@@ -208,7 +210,7 @@ export default function WarehouseExpenses() {
                         </div>
                     </div>
                 ) : (
-                    <EmptyData text="Нет расходов" />
+                    <EmptyData text={t('Empty_data')} />
                 )}
             </div>
 
@@ -224,11 +226,10 @@ export default function WarehouseExpenses() {
                     </button>
 
                     <div className="flex items-center gap-2">
-                        <span className="text-sm">Страница</span>
                         <span className="px-3 py-1 bg-blue-600 text-white rounded-lg font-semibold text-sm min-w-[40px] text-center">
                             {filter.page}
                         </span>
-                        <span className="text-sm">из {totalPages}</span>
+                        <span className="text-sm">{totalPages}</span>
                     </div>
 
                     <button

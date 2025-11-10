@@ -13,9 +13,11 @@ import { Edit } from "lucide-react";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseClientCategoryEdit({ data, refresh, id }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation()
     const [form, setForm] = useState({
         location_id: Cookies.get("ul_nesw"),
         name: data?.name || "",
@@ -32,19 +34,19 @@ export default function WarehouseClientCategoryEdit({ data, refresh, id }) {
     const handleSubmit = async () => {
         try {
             await ClientCategory.EditClientCategory(id, form);
-            Alert("Категория успешно изменена", "success");
+            Alert(`${t('success')}`, "success");
 
             handleOpen();
             refresh();
         } catch (error) {
-            Alert("Ошибка при изменении", "error");
+            Alert(`${t('Error')}`, "error");
             console.error(error);
         }
     };
 
     return (
         <div>
-            <Tooltip content="Изменить категорию">
+            <Tooltip content={t('Edit')}>
                 <IconButton
                     variant="text"
                     color="blue"
@@ -61,7 +63,7 @@ export default function WarehouseClientCategoryEdit({ data, refresh, id }) {
                 className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
             >
                 <DialogHeader className="flex justify-between items-center dark:text-text-dark">
-                    Изменение категории
+                    {t('Category_Client_Edit')}
                 </DialogHeader>
 
                 <DialogBody
@@ -69,7 +71,7 @@ export default function WarehouseClientCategoryEdit({ data, refresh, id }) {
                     className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark"
                 >
                     <Input
-                        label="Название категории"
+                        label={t('Name')}
                         name="name"
                         value={form.name}
                         onChange={handleChange}
@@ -84,7 +86,7 @@ export default function WarehouseClientCategoryEdit({ data, refresh, id }) {
                     />
 
                     <Input
-                        label="Заметка"
+                        label={t('Comment')}
                         name="note"
                         value={form.note}
                         onChange={handleChange}
@@ -106,13 +108,13 @@ export default function WarehouseClientCategoryEdit({ data, refresh, id }) {
                         onClick={handleOpen}
                         className="dark:text-gray-300"
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
                     >
-                        Сохранить
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

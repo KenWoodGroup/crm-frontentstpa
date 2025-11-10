@@ -13,8 +13,10 @@ import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
 import { Payment } from "../../../utils/Controllers/Payment";
 import Loading from "../../UI/Loadings/Loading";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseSverka() {
+    const { t } = useTranslation();
     const [clients, setClients] = useState([]);
     const [selectedClient, setSelectedClient] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -129,11 +131,11 @@ export default function WarehouseSverka() {
             <Card className="w-[30%] border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
                     <Typography variant="h5" className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
-                        Клиенты
+                        {t("Clients")}
                     </Typography>
                     <div className="relative mt-3">
                         <Input
-                            label="Поиск"
+                            label={t('Search')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             color="blue-gray"
@@ -172,7 +174,7 @@ export default function WarehouseSverka() {
                                 ) : (
                                     <div className="h-[400px] flex items-center justify-center">
                                         <Typography className="p-4 text-center text-gray-500 dark:text-gray-400 transition-colors duration-200">
-                                            Не найдено
+                                            {t('Empty_data')}
                                         </Typography>
                                     </div>
                                 )}
@@ -188,14 +190,14 @@ export default function WarehouseSverka() {
                     <div className="flex flex-wrap items-center justify-between mb-5 gap-3">
                         <Typography variant="h5" className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
                             {selectedClient
-                                ? `История клиента: ${selectedClient.name}`
-                                : "Выберите клиента"}
+                                ? `${t('History_Clients')} ${selectedClient.name}`
+                                : `${t('Select_clients')}`}
                         </Typography>
 
                         <div className="flex items-center gap-3">
                             <Input
                                 type="date"
-                                label="C даты"
+                                label={t('StartDate')}
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 color="blue-gray"
@@ -207,7 +209,7 @@ export default function WarehouseSverka() {
                             />
                             <Input
                                 type="date"
-                                label="По дату"
+                                label={t('EndDate')}
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 color="blue-gray"
@@ -222,7 +224,7 @@ export default function WarehouseSverka() {
                                 onClick={handleApplyFilter}
                                 className="w-[200px]! flex items-center justify-center"
                             >
-                                Применить
+                                {t('Search')}
                             </Button>
                         </div>
                     </div>
@@ -237,13 +239,13 @@ export default function WarehouseSverka() {
                                 <table className="w-full text-left min-w-max">
                                     <thead className="bg-blue-50 dark:bg-blue-900/30 text-gray-700 dark:text-gray-300 text-sm sticky top-0 z-10 transition-colors duration-200">
                                         <tr>
-                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Дата</th>
-                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Плательщик</th>
-                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Получатель</th>
-                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Сумма</th>
-                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Метод</th>
-                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Статус</th>
-                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">Комментарий</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">{t('Date')}</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">{t('Paymenter')}</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">{t('Taker')}</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">{t('Price__sum')}</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">{t('Method')}</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">{t("Status")}</th>
+                                            <th className="p-3 border-b border-gray-200 dark:border-gray-700 font-semibold transition-colors duration-200">{t('Comment')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -266,7 +268,7 @@ export default function WarehouseSverka() {
                                                         {item.receiver?.name || '-'}
                                                     </td>
                                                     <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-green-600 dark:text-green-400 font-semibold transition-colors duration-200">
-                                                        {parseFloat(item.amount).toLocaleString('ru-RU')} сум
+                                                        {parseFloat(item.amount).toLocaleString('ru-RU')} uzs
                                                     </td>
                                                     <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
                                                         {item.method?.name || '-'}

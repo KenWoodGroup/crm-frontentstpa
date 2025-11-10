@@ -14,9 +14,11 @@ import EmptyData from "../../UI/NoData/EmptyData";
 import Loading from "../../UI/Loadings/Loading";
 import PaymentTypeDelete from "./_components/PaymentTypeDelete";
 import PaymentTypeEdit from "./_components/PaymentTypeEdit";
+import { useTranslation } from "react-i18next";
 
 export default function WarehousePaymentType() {
     const [data, setData] = useState([]);
+    const { t } = useTranslation()
     const [loading, setLoading] = useState(true)
 
     const GetAllPaymentMethod = async () => {
@@ -51,14 +53,14 @@ export default function WarehousePaymentType() {
         >
             <div className="flex items-center justify-between mb-6">
                 <Typography variant="h4" className="font-semibold">
-                    Типы оплат
+                    {t('Payment_type')}
                 </Typography>
                 <PaymentTypeCreate refresh={GetAllPaymentMethod} />
             </div>
 
             {/* Если данных нет */}
             {(!data || data.length === 0) ? (
-                <EmptyData text={"Тип цены нет"} />
+                <EmptyData text={t('Empty_data')} />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.map((item) => (
@@ -76,7 +78,7 @@ export default function WarehousePaymentType() {
                                         </Typography>
                                     </div>
                                     <div className="flex items-center gap-[10px]">
-                                        <PaymentTypeEdit item={item} refresh={GetAllPaymentMethod}/>
+                                        <PaymentTypeEdit item={item} refresh={GetAllPaymentMethod} />
                                         <PaymentTypeDelete id={item?.id} refresh={GetAllPaymentMethod} />
                                     </div>
                                 </div>

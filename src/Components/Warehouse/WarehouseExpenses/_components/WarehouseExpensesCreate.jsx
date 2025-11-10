@@ -15,15 +15,20 @@ import Cookies from "js-cookie";
 import { Expenses } from "../../../../utils/Controllers/Expenses";
 import { Cash } from "../../../../utils/Controllers/Cash";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
+import { PaymentMethodApi } from "../../../../utils/Controllers/PaymentMethodApi"; // 🔹 добавлено
 
 export default function WarehouseExpensesCreate({ refresh }) {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [cashes, setCashes] = useState([]);
 
+    const [paymentMethods, setPaymentMethods] = useState([]); // 🔹 новое состояние
+
     const [form, setForm] = useState({
         amount: "",
-        method: "cash",
+        method_id: "", // 🔹 теперь хранится ID метода
         location_id: Cookies?.get("ul_nesw"),
         cash_id: "",
         note: "",
@@ -38,7 +43,6 @@ export default function WarehouseExpensesCreate({ refresh }) {
             const data = response?.data || [];
             setCashes(data);
 
-            // Автоматически выбираем первую кассу
             if (data.length > 0 && !form.cash_id) {
                 setForm((prev) => ({ ...prev, cash_id: String(data[0].id) }));
             }
@@ -48,9 +52,28 @@ export default function WarehouseExpensesCreate({ refresh }) {
         }
     };
 
+    // 🔹 Получение списка методов оплаты с backend
+    const getAllPaymentMethod = async () => {
+        try {
+            const response = await PaymentMethodApi.PaymentTypeGet(Cookies?.get("ul_nesw"));
+            const methods = response?.data || [];
+            setPaymentMethods(methods);
+
+            if (methods.length > 0) {
+                setForm((prev) => ({
+                    ...prev,
+                    method_id: prev.method_id || String(methods[0].id),
+                }));
+            }
+        } catch (error) {
+            console.log(error);
+            setPaymentMethods([]);
+        }
+    };
+
     // 🔹 форматирование чисел с пробелами
     const formatNumber = (value) => {
-        const cleaned = value.replace(/\D/g, ""); // удаляем всё, кроме цифр
+        const cleaned = value.replace(/\D/g, "");
         if (!cleaned) return "";
         return cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     };
@@ -75,20 +98,26 @@ export default function WarehouseExpensesCreate({ refresh }) {
             return;
         }
 
+        if (!form.method_id) {
+            Alert("Выберите метод оплаты!", "warning");
+            return;
+        }
+
         try {
             setLoading(true);
             const payload = {
                 ...form,
                 amount: Number(form.amount.replace(/\s/g, "")) || 0,
                 cash_id: form.cash_id,
+                method_id: form.method_id,
             };
 
             await Expenses.CreateExpenses(payload);
-            Alert("Muvaffaqiyatli yaratildi", "success");
+            Alert(`${t('success')}`, "success");
             setOpen(false);
             setForm({
                 amount: "",
-                method: "cash",
+                method_id: "",
                 location_id: Cookies?.get("ul_nesw"),
                 cash_id: "",
                 note: "",
@@ -96,20 +125,23 @@ export default function WarehouseExpensesCreate({ refresh }) {
             });
             refresh();
         } catch (error) {
-            Alert(`Xatolik yuz berdi ${error?.response?.data?.message}`, "error");
+            Alert(`${t('Error')} ${error?.response?.data?.message}`, "error");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (open) GetAllCash();
+        if (open) {
+            GetAllCash();
+            getAllPaymentMethod(); // 🔹 добавлено
+        }
     }, [open]);
 
     return (
         <>
             <Button color="green" onClick={handleOpen}>
-                Создать Расход
+                + {t('Add')}
             </Button>
 
             <Dialog
@@ -118,80 +150,80 @@ export default function WarehouseExpensesCreate({ refresh }) {
                 size="sm"
                 className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
             >
-                <DialogHeader className="dark:text-text-dark">Создать новый расход</DialogHeader>
+                <DialogHeader className="dark:text-text-dark">
+                    {t('Create_Exp')}
+                </DialogHeader>
+
                 <DialogBody divider>
                     <div className="flex flex-col gap-4">
                         <Input
-                            label="Сумма (so'm)"
+                            label={t('Summ')}
                             name="amount"
                             value={form.amount}
                             onChange={handleAmountChange}
-                            placeholder=""
                             className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
                             labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
+                                className: "!text-text-light dark:!text-text-dark",
                             }}
                             color="blue-gray"
                         />
 
                         <Select
-                            key={form.cash_id}
-                            label="Выберите кассу"
+                            label={t('Kassa')}
                             value={form.cash_id}
                             onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
-                            className="text-gray-900 dark:text-text-dark  outline-none"
+                            className="text-gray-900 dark:text-text-dark outline-none"
                             labelProps={{
-                                className: "text-gray-700 dark:text-text-dark"
+                                className: "text-gray-700 dark:text-text-dark",
                             }}
                             menuProps={{
-                                className: "dark:bg-gray-800 dark:text-text-dark"
+                                className: "dark:bg-gray-800 dark:text-text-dark",
                             }}
                         >
                             {cashes.map((cash) => (
                                 <Option key={cash.id} value={String(cash.id)}>
-                                    {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm (${new Date(
-                                        cash.createdAt
-                                    ).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" })})`}
-                                </Option>
-                            ))}
-                        </Select>
+                                    {`${cash.name} — ${Number(cash.balance).toLocaleString()
+                                        } so'm`}
+                                </Option >
+                            ))
+                            }
+                        </Select >
 
-                        <Select
-                            label="Метод оплаты"
-                            value={form.method}
-                            onChange={(val) => setForm((p) => ({ ...p, method: val }))}
-                            className="text-gray-900 dark:text-text-dark  outline-none"
+                        {/* 🔹 методы оплаты, полученные с backend */}
+                        < Select
+                            label={t("Payment_method")}
+                            value={form.method_id}
+                            onChange={(val) => setForm((p) => ({ ...p, method_id: val }))}
+                            className="text-gray-900 dark:text-text-dark outline-none"
                             labelProps={{
-                                className: "text-gray-700 dark:text-text-dark"
+                                className: "text-gray-700 dark:text-text-dark",
                             }}
                             menuProps={{
-                                className: "dark:bg-gray-800 dark:text-text-dark"
+                                className: "dark:bg-gray-800 dark:text-text-dark",
                             }}
                         >
-                            <Option value="cash">Наличные</Option>
-                            <Option value="card">Карта</Option>
-                            <Option value="transfer">Банк</Option>
-                        </Select>
+                            {
+                                paymentMethods.map((method) => (
+                                    <Option key={method.id} value={String(method.id)}>
+                                        {method.name || `Метод ${method.id}`}
+                                    </Option>
+                                ))
+                            }
+                        </Select >
 
                         <Textarea
-                            label="Комментарий"
+                            label={t('Comment')}
                             name="note"
                             value={form.note}
                             onChange={handleChange}
                             className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
                             labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
+                                className: "!text-text-light dark:!text-text-dark",
                             }}
                             color="blue-gray"
                         />
-                    </div>
-                </DialogBody>
+                    </div >
+                </DialogBody >
 
                 <DialogFooter>
                     <Button
@@ -201,13 +233,13 @@ export default function WarehouseExpensesCreate({ refresh }) {
                         className="mr-2"
                         disabled={loading}
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button color="green" onClick={CreateExpenses} disabled={loading}>
-                        {loading ? "Создание..." : "Создать"}
+                        {loading ? `${t('Saving')}` : `${t('Save')}`}
                     </Button>
                 </DialogFooter>
-            </Dialog>
+            </Dialog >
         </>
     );
 }

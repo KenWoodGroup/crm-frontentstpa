@@ -4,10 +4,12 @@ import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { Clients } from "../../../../utils/Controllers/Clients";
 import { Staff } from "../../../../utils/Controllers/Staff";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseСarrierDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
     const handleOpen = () => setOpen(!open);
 
@@ -28,7 +30,7 @@ export default function WarehouseСarrierDelete({ id, refresh }) {
 
     return (
         <>
-            <Tooltip content="Удалить">
+            <Tooltip content={t('Delete')}>
                 <IconButton
                     onClick={handleOpen}
 
@@ -41,10 +43,10 @@ export default function WarehouseСarrierDelete({ id, refresh }) {
 
             <Dialog open={open} handler={handleOpen} className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark">
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:text-text-dark">
-                    Удаления Доствшика
+                    {t('Delete_Kurier')}
                 </DialogHeader>
                 <DialogBody divider className="text-gray-700 dark:text-text-dark">
-                    Вы действительно хотите удалить Доствшика ?
+                    {t('Delete_Kurier__text')}
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
@@ -54,7 +56,7 @@ export default function WarehouseСarrierDelete({ id, refresh }) {
                         className="mr-2"
                         disabled={loading}
                     >
-                        Отменить
+                        {t('Cancel')}
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -83,7 +85,7 @@ export default function WarehouseСarrierDelete({ id, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "Удалить"
+                            t('Delete')
                         )}
                     </Button>
                 </DialogFooter>
