@@ -6,13 +6,15 @@ import {
     DialogBody,
     DialogFooter,
     Input,
+    button,
 } from "@material-tailwind/react";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { Staff } from "../../../../utils/Controllers/Staff";
 import { useTranslation } from "react-i18next";
+import { Plus, PlusIcon } from "lucide-react";
 
-export default function WarehouseCarrierCreate({ refresh }) {
+export default function WarehouseCarrierCreate({ refresh, apperance = true }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({
@@ -49,15 +51,22 @@ export default function WarehouseCarrierCreate({ refresh }) {
 
     return (
         <div>
-            {/* Кнопка открытия */}
-            <Button
-                onClick={handleOpen}
-                className="bg-text-light text-card-light normal-case hover:bg-gray-800
+            {apperance === false ? (
+                <Button
+                    onClick={handleOpen}
+                    className="bg-text-light text-card-light normal-case hover:bg-gray-800
                            dark:bg-text-dark dark:text-card-dark dark:hover:bg-gray-300
                            transition-colors"
-            >
-                + {t('Add')}
-            </Button>
+                >
+                    + {t('Add')}
+                </Button>
+            ) : (
+                <>
+                    <button className="dark:text-text-dark text-text-light" onClick={handleOpen}>
+                        <PlusIcon />
+                    </button>
+                </>
+            )}
 
             {/* Модальное окно */}
             <Dialog
