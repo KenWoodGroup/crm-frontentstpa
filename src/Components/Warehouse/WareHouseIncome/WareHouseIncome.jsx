@@ -1,7 +1,7 @@
 // src/Components/Warehouse/WareHousePages/WareHouseIncome.jsx
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Cookies from "js-cookie";
-import Select from "react-select";
+import Select, { components } from "react-select";
 import { motion, AnimatePresence } from "framer-motion";
 
 // import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, HeadingLevel, AlignmentType, VerticalAlign } from "docx";
@@ -15,12 +15,14 @@ import {
     ChevronRight,
     ChevronLeft,
     ChevronsRight,
+    ChevronDown,
     FolderOpen,
     Download,
     Search as SearchIcon,
     Barcode as BarcodeIcon,
     Eraser,
     MinusCircle,
+    PlusIcon,
     PlusCircle,
     CheckSquare,
     CheckCircle,
@@ -131,7 +133,7 @@ export default function WareHouseIncome() {
 
     const [selected, setSelected] = useState("incoming");
     const [sendToTrash, setSendToTrash] = useState(false);
-    const operationLocations = (selected === "incoming" ? locations?.filter((loc) => loc.type === "factory" || loc.type === "default") : selected === "transfer_in" ? locations?.filter((loc) => loc.type === "warehouse" || loc.type === "default") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client" || loc.type === "default")) || []
+    const operationLocations = (selected === "incoming" ? locations?.filter((loc) => loc.type === "partner" || loc.type === "default") : selected === "transfer_in" ? locations?.filter((loc) => loc.type === "warehouse" || loc.type === "default") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client" || loc.type === "default")) || []
 
     // search & barcode (local UI)
     const [searchQuery, setSearchQuery] = useState("");
@@ -768,6 +770,30 @@ export default function WareHouseIncome() {
     }
 
     // ---------- UI ----------
+    // 🔽 Custom DropdownIndicator
+    const DropdownIndicator = (props) => {
+        const { menuIsOpen } = props.selectProps;
+
+        return (
+            <components.DropdownIndicator {...props}>
+                {menuIsOpen ? (
+                    <PlusIcon
+                        onMouseDown={(e) => {
+                            e.preventDefault(); // Select fokusini yo‘qotmasin
+                            e.stopPropagation(); // Dropdown yopilmasin
+                            setTimeout(() => {
+                                props.selectProps.onAddNew(); // modalni ochish
+                            }, 50);
+                        }}
+                        className="w-5 h-5 text-blue-600 hover:text-blue-800 transition-all cursor-pointer"
+                    />
+                ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                )}
+            </components.DropdownIndicator>
+        );
+    };
+
 
 
     return (
@@ -782,7 +808,7 @@ export default function WareHouseIncome() {
                                         "Unknown"
                     )}
                 </h2>
-                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} appearance={"btn"} id={invoiceId?.[mode]}/> : <span></span>}
+                {invoiceStarted?.[mode] ? <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} appearance={"btn"} id={invoiceId?.[mode]} /> : <span></span>}
 
             </div>
 
@@ -1095,9 +1121,13 @@ export default function WareHouseIncome() {
                                             options={staffs}
                                             value={selectedStaff}
                                             onChange={(st) => setSelectedStaff(st)}
+                                            components={{ DropdownIndicator }}
+                                            menuPlacement="auto"
+                                            
                                             isClearable
                                             isSearchable
                                             isOptionDisabled={staffs.find((it) => it.value === 0)}
+                                            className="min-w-[80px]"
                                         />
                                     )
                                     }
