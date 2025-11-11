@@ -17,6 +17,10 @@ class UserApi {
         const response = await $api.put(`/user/${id}`, data)
         return response;
     }
+    static ResetPassword = async (data, id) => {
+        const response = await $api.post(`/user/reset-password/${id}`, data)
+        return response;
+    }
 
 
 }

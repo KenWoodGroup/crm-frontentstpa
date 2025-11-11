@@ -35,11 +35,11 @@ export default function WarehouseUserDelete({ id, refresh }) {
                 <Delete size={20} />
             </Button>
 
-            <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl">
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
+            <Dialog open={open} handler={handleOpen} className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark">
+                <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
                     Xodim o‘chirish
                 </DialogHeader>
-                <DialogBody divider className="text-gray-700">
+                <DialogBody divider className="text-text-light dark:text-text-dark py-6">
                     Siz haqiqatdan ham bu xodimni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
@@ -47,7 +47,10 @@ export default function WarehouseUserDelete({ id, refresh }) {
                         variant="text"
                         color="gray"
                         onClick={handleOpen}
-                        className="mr-2"
+                        className="mr-2 text-text-light dark:text-text-dark 
+                                  hover:bg-gray-100 dark:hover:bg-gray-700 
+                                  active:bg-gray-200 dark:active:bg-gray-600
+                                  transition-colors duration-200 font-medium"
                         disabled={loading}
                     >
                         Bekor qilish

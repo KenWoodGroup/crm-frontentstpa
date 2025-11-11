@@ -14,22 +14,21 @@ import { useParams } from "react-router-dom";
 
 export default function WarehouseUserEdit({ user, refresh }) {
     const [open, setOpen] = useState(false);
-    const { id } = useParams()
+    const { id } = useParams();
     const [loading, setLoading] = useState(false);
-    const [userId, setUserId] = useState(""); // id пользователя
+    const [userId, setUserId] = useState("");
     const [data, setData] = useState({
         full_name: "",
-        email: "",
-        role: "warehouse", // всегда warehouse
+        username: "",
+        new_password: "",
     });
 
     useEffect(() => {
         if (user) {
             setData({
-                location_id: id,
                 full_name: user.full_name || "",
-                email: user.email || "",
-                role: "warehouse",
+                username: user.username || "",
+                new_password: "",
             });
             setUserId(user.id);
         }
@@ -45,8 +44,8 @@ export default function WarehouseUserEdit({ user, refresh }) {
     const validateFields = () => {
         if (!data.full_name.trim())
             return Alert("Iltimos, to‘liq ismni kiriting ❗", "warning");
-        if (!data.email.trim())
-            return Alert("Iltimos, email kiriting ❗", "warning");
+        if (!data.username.trim())
+            return Alert("Iltimos, username kiriting ❗", "warning");
         return true;
     };
 
@@ -55,13 +54,33 @@ export default function WarehouseUserEdit({ user, refresh }) {
 
         try {
             setLoading(true);
-            await UserApi.UserEdit(data, userId);
+
+            // 1️⃣ Обновляем основные данные пользователя
+            await UserApi.UserEdit(
+                {
+                    full_name: data.full_name,
+                    username: data.username,
+                },
+                userId
+            );
+
+            // 2️⃣ Если поле пароля не пустое — отправляем запрос на смену пароля
+            if (data.new_password.trim() !== "") {
+                await UserApi.ResetPassword(
+                    { new_password: data.new_password },
+                    userId
+                );
+            }
+
             Alert("Foydalanuvchi muvaffaqiyatli yangilandi ✅", "success");
             setOpen(false);
             refresh();
         } catch (error) {
             console.error(error);
-            Alert(`Xatolik yuz berdi ${error?.response?.data?.message || ""}`, "error");
+            Alert(
+                `Xatolik yuz berdi ${error?.response?.data?.message || ""}`,
+                "error"
+            );
         } finally {
             setLoading(false);
         }
@@ -79,34 +98,54 @@ export default function WarehouseUserEdit({ user, refresh }) {
             <Dialog
                 open={open}
                 handler={handleOpen}
-                className="bg-white text-gray-900 rounded-xl"
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
             >
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
+                <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
                     Foydalanuvchi maʼlumotlarini tahrirlash
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
                         label="To‘liq ism"
-                        color="gray"
+                        color="blue-gray"
                         name="full_name"
                         value={data.full_name}
                         onChange={handleChange}
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: "!text-text-light dark:!text-text-dark",
+                        }}
                     />
                     <Input
-                        label="Email"
-                        color="gray"
-                        name="email"
-                        value={data.email}
+                        label="Username"
+                        color="blue-gray"
+                        name="username"
+                        value={data.username}
                         onChange={handleChange}
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: "!text-text-light dark:!text-text-dark",
+                        }}
+                    />
+                    {/* Поле для изменения пароля */}
+                    <Input
+                        label="Yangi parol (ixtiyoriy)"
+                        type="password"
+                        color="blue-gray"
+                        name="new_password"
+                        value={data.new_password}
+                        onChange={handleChange}
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: "!text-text-light dark:!text-text-dark",
+                        }}
                     />
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
+                        className="text-text-light dark:text-text-dark"
                         variant="text"
-                        color="gray"
+                        color="red"
                         onClick={handleOpen}
-                        className="mr-2"
-                        disabled={loading}
                     >
                         Bekor qilish
                     </Button>

@@ -29,7 +29,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
         district_id: "",
     });
 
-    // Разбор адреса "Район, Регион"
     const parseAddress = (address) => {
         if (!address) return { region_id: "", district_id: "" };
         const parts = address.split(', ');
@@ -67,7 +66,6 @@ export default function WarehouseEdit({ warehouse, refresh }) {
         }
     }, [warehouse]);
 
-    // Получение районов выбранного региона
     const getDistrictsByRegion = (regionId) => {
         if (!regionId) return [];
         return Districts.filter(d => d.region_id === parseInt(regionId));
@@ -136,13 +134,20 @@ export default function WarehouseEdit({ warehouse, refresh }) {
         <>
             <Button
                 onClick={handleOpen}
-                className="bg-yellow-600 text-white hover:bg-yellow-700 active:bg-yellow-800 normal-case p-[8px] transition-colors duration-200"
+                className="bg-yellow-600 dark:bg-yellow-500 p-[8px]  text-white dark:text-text-dark hover:bg-yellow-700 dark:hover:bg-yellow-600 active:bg-yellow-800 transition-colors"
             >
                 <Edit size={20} />
             </Button>
 
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>{t("Warehouse_Edit")}</DialogHeader>
+            <Dialog
+                open={open}
+                handler={handleOpen}
+                size="sm"
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+            >
+                <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
+                    {t("Warehouse_Edit")}
+                </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <div>
                         <Input
@@ -151,6 +156,14 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                             value={data.name}
                             onChange={handleChange}
                             error={!!errors.name}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
@@ -162,6 +175,14 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                             value={data.phone}
                             onChange={handleChange}
                             error={!!errors.phone}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
@@ -171,7 +192,7 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                         <select
                             value={data.region_id}
                             onChange={handleRegionChange}
-                            className={`w-full p-3 border rounded-lg ${errors.region_id ? "border-red-500" : "border-gray-300"}`}
+                            className={`w-full p-3 border rounded-lg bg-white dark:bg-card-dark text-text-light dark:text-text-dark ${errors.region_id ? "border-red-500" : "border-gray-300 dark:border-gray-600"}`}
                         >
                             <option value="">{t("Select_region")}</option>
                             {Regions.map(r => (
@@ -187,7 +208,7 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                             value={data.district_id}
                             onChange={handleDistrictChange}
                             disabled={!data.region_id}
-                            className={`w-full p-3 border rounded-lg ${errors.district_id ? "border-red-500" : "border-gray-300"}`}
+                            className={`w-full p-3 border rounded-lg bg-white dark:bg-card-dark text-text-light dark:text-text-dark ${errors.district_id ? "border-red-500" : "border-gray-300 dark:border-gray-600"}`}
                         >
                             <option value="">{t("Select_district")}</option>
                             {availableDistricts.map(d => (
@@ -195,19 +216,24 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                             ))}
                         </select>
                         {errors.district_id && <p className="text-red-500 text-xs mt-1">{errors.district_id}</p>}
-                        {!data.region_id && <p className="text-gray-500 text-xs mt-1">{t("Select_region_first")}</p>}
+                        {!data.region_id && <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">{t("Select_region_first")}</p>}
                     </div>
-
                 </DialogBody>
 
-                <DialogFooter className="flex justify-end gap-2">
-                    <Button variant="text" color="gray" onClick={handleOpen} disabled={loading}>
+                <DialogFooter className="border-t border-gray-200 dark:border-gray-600 flex justify-end gap-2">
+                    <Button
+                        variant="text"
+                        color="gray"
+                        onClick={handleOpen}
+                        disabled={loading}
+                        className="text-text-light dark:text-text-dark"
+                    >
                         {t("Cancel")}
                     </Button>
                     <Button
                         onClick={EditWarehouse}
                         disabled={loading}
-                        className={`bg-black text-white ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+                        className={`bg-black dark:bg-gray-800 text-white dark:text-text-dark ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                     >
                         {loading ? t("Saving") : t("Save")}
                     </Button>

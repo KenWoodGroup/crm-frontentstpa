@@ -14,7 +14,7 @@ import { Staff } from "../../../../utils/Controllers/Staff";
 import { useTranslation } from "react-i18next";
 import { Plus, PlusIcon } from "lucide-react";
 
-export default function WarehouseCarrierCreate({ refresh, apperance = true }) {
+export default function WarehouseCarrierCreate({ refresh, apperance = false }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({
@@ -62,7 +62,7 @@ export default function WarehouseCarrierCreate({ refresh, apperance = true }) {
                 </Button>
             ) : (
                 <>
-                    <button className="dark:text-text-dark text-text-light" onClick={handleOpen}>
+                    <button className="dark:text-text-dark text-text-light flex items-center justify-center" onClick={handleOpen}>
                         <PlusIcon />
                     </button>
                 </>

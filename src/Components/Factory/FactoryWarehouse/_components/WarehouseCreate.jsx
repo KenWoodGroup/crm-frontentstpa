@@ -141,13 +141,15 @@ export default function WarehouseCreate({ refresh }) {
         <>
             <Button
                 onClick={handleOpen}
-                className="bg-black text-white normal-case hover:bg-gray-800 active:bg-gray-900 transition-colors duration-200 shadow-md hover:shadow-lg"
+                className="bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
                 {t("New_Warehouse")}
             </Button>
 
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>{t("Create_Warehouse")}</DialogHeader>
+            <Dialog
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+                open={open} handler={handleOpen} size="sm">
+                <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">{t("Create_Warehouse")}</DialogHeader>
                 <DialogBody divider className="space-y-4 overflow-y-auto h-[500px]">
                     <div>
                         <Input
@@ -156,6 +158,14 @@ export default function WarehouseCreate({ refresh }) {
                             value={data.name}
                             onChange={handleChange}
                             error={!!errors.name}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
@@ -167,6 +177,14 @@ export default function WarehouseCreate({ refresh }) {
                             value={data.username}
                             onChange={handleChange}
                             error={!!errors.username}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
                         {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
                     </div>
@@ -178,6 +196,14 @@ export default function WarehouseCreate({ refresh }) {
                             value={data.full_name}
                             onChange={handleChange}
                             error={!!errors.full_name}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
                         {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
                     </div>
@@ -189,17 +215,25 @@ export default function WarehouseCreate({ refresh }) {
                             value={data.phone}
                             onChange={handleChange}
                             error={!!errors.phone}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
 
                     {/* Выбор региона */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t("Region")}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-text-dark ">{t("Region")}</label>
                         <select
                             value={data.region_id}
                             onChange={handleRegionChange}
-                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black focus:border-black"
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black dark:border-text-dark focus:border-black"
                                 }`}
                         >
                             <option value="">{t("Select_region")}</option>
@@ -214,12 +248,12 @@ export default function WarehouseCreate({ refresh }) {
 
                     {/* Выбор района */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t("District")}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-text-dark">{t("District")}</label>
                         <select
                             value={data.district_id}
                             onChange={handleDistrictChange}
                             disabled={!data.region_id}
-                            className={`w-full p-3 border rounded-lg outline-none ${errors.district_id ? "border-red-500 focus:border-red-500" : "border-black focus:border-black"
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black dark:border-text-dark focus:border-black"
                                 }`}
                         >
                             <option value="">{t("Select_district")}</option>
@@ -240,6 +274,14 @@ export default function WarehouseCreate({ refresh }) {
                             type="password"
                             value={data.password}
                             onChange={handleChange}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                             error={!!errors.password}
                         />
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
@@ -252,6 +294,14 @@ export default function WarehouseCreate({ refresh }) {
                             type="password"
                             value={data.confirm_password}
                             onChange={handleChange}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                             error={!!errors.confirm_password}
                         />
                         {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password}</p>}
@@ -259,13 +309,14 @@ export default function WarehouseCreate({ refresh }) {
                 </DialogBody>
 
                 <DialogFooter className="flex justify-end gap-2">
-                    <Button variant="text" color="gray" onClick={handleOpen} disabled={loading}>
+                    <Button variant="text" color="gray" onClick={handleOpen} disabled={loading} className="mr-2 normal-case text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
                         {t("Cancel")}
                     </Button>
                     <Button
                         onClick={createWarehouse}
                         disabled={loading}
-                        className={`bg-black text-white ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+                        className={`bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
                     >
                         {loading ? t("Saving") : t("Save")}
                     </Button>

@@ -10,72 +10,129 @@ import {
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
+import Regions from "../../../../utils/Regions/regions.json";
+import Districts from "../../../../utils/Regions/districts.json";
 import { useTranslation } from "react-i18next";
 
 export default function WarehouseDilerCreate({ refresh }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState({
-        type: "dealer",
-        name: "",
-        full_name: "",
-        address: "",
-        phone: "",
-        email: "",
-        parent_id: Cookies.get('ul_nesw'),
-        password: "",
-    });
+    const [errors, setErrors] = useState({});
 
-    const handleOpen = () => setOpen(!open);
+    const initialData = {
+        name: "",
+        username: "",
+        full_name: "",
+        phone: "+998",
+        password: "",
+        confirm_password: "",
+        region_id: "",
+        district_id: "",
+    };
+
+    const [data, setData] = useState(initialData);
+
+    const handleOpen = () => {
+        setOpen(!open);
+        setErrors({});
+        setData(initialData);
+    };
+
+    const getDistrictsByRegion = (regionId) => {
+        if (!regionId) return [];
+        return Districts.filter((district) => district.region_id === parseInt(regionId));
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setData((prev) => ({ ...prev, [name]: value }));
+        let val = value;
+
+        if (name === "phone") {
+            val = value.replace(/[^\d+]/g, "");
+        }
+
+        setData((prev) => ({ ...prev, [name]: val }));
+
+        if (errors[name]) {
+            setErrors((prev) => ({ ...prev, [name]: "" }));
+        }
+    };
+
+    const handleRegionChange = (e) => {
+        const value = e.target.value;
+        setData({
+            ...data,
+            region_id: value,
+            district_id: "",
+        });
+        if (errors.region_id) {
+            setErrors((prev) => ({ ...prev, region_id: "" }));
+        }
+    };
+
+    const handleDistrictChange = (e) => {
+        const value = e.target.value;
+        setData({
+            ...data,
+            district_id: value,
+        });
+        if (errors.district_id) {
+            setErrors((prev) => ({ ...prev, district_id: "" }));
+        }
     };
 
     const validateFields = () => {
-        if (!data.name.trim())
-            return Alert("Iltimos, ombor nomini kiriting ❗", "warning");
-        if (!data.full_name.trim())
-            return Alert("Iltimos, to‘liq ismni kiriting ❗", "warning");
-        if (!data.address.trim())
-            return Alert("Iltimos, manzilni kiriting ❗", "warning");
-        if (!data.phone.trim())
-            return Alert("Iltimos, telefon raqam kiriting ❗", "warning");
-        if (!data.email.trim())
-            return Alert("Iltimos, email kiriting ❗", "warning");
-        if (!data.password.trim())
-            return Alert("Iltimos, parolni kiriting ❗", "warning");
-        return true;
+        const newErrors = {};
+        if (!data.name.trim()) newErrors.name = t("Field_required", { field: t("Dealer_name") });
+        if (!data.username.trim()) newErrors.username = t("Field_required", { field: t("Dealer_login") });
+        if (!data.full_name.trim()) newErrors.full_name = t("Field_required", { field: t("Dealer_fullname") });
+        if (!data.phone.trim()) newErrors.phone = t("Field_required", { field: t("Phone_number") });
+        else if (!/^\+998\d{9}$/.test(data.phone)) newErrors.phone = t("Phone_format_error");
+        if (!data.password.trim()) newErrors.password = t("Field_required", { field: t("Password") });
+        else if (data.password.length < 6) newErrors.password = t("Password_min_error");
+        if (!data.confirm_password.trim()) newErrors.confirm_password = t("Field_required", { field: t("Confirm_password") });
+        else if (data.password !== data.confirm_password) newErrors.confirm_password = t("Passwords_not_match");
+        if (!data.region_id) newErrors.region_id = t("Field_required", { field: t("Region") });
+        if (!data.district_id) newErrors.district_id = t("Field_required", { field: t("District") });
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
-    const CreateWarehouse = async () => {
-        if (validateFields() !== true) return;
+    const createDealer = async () => {
+        if (!validateFields()) return;
 
         try {
             setLoading(true);
-            const res = await WarehouseApi.CreateWarehouse(data);
 
-            Alert("Ombor muvaffaqiyatli yaratildi ", "success");
-            setOpen(false);
-            setData({
-                type: "warehouse",
-                name: "",
-                full_name: "",
-                address: "",
-                phone: "",
-                email: "",
-                password: "",
-            });
-            refresh()
+            const selectedRegion = Regions.find((region) => region.id === parseInt(data.region_id));
+            const selectedDistrict = Districts.find((district) => district.id === parseInt(data.district_id));
+
+            const payload = {
+                name: data.name,
+                username: data.username,
+                full_name: data.full_name,
+                phone: data.phone,
+                password: data.password,
+                type: "dealer",
+                address: `${selectedRegion?.name_uz || ""}, ${selectedDistrict?.name_uz || ""},`,
+                parent_id: Cookies.get("ul_nesw") || "",
+            };
+
+            await WarehouseApi.CreateWarehouse(payload);
+            Alert(t("success"), "success");
+            handleOpen();
+            refresh();
         } catch (error) {
             console.error("Xatolik:", error);
-            Alert(`Xatolik yuz berdi ${error?.response?.data?.message}`, "error");
+            Alert(`Xatolik yuz berdi: ${error?.response?.data?.message || error.message}`, "error");
         } finally {
             setLoading(false);
         }
     };
+
+    const availableDistricts = getDistrictsByRegion(data.region_id);
 
     return (
         <>
@@ -83,150 +140,148 @@ export default function WarehouseDilerCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
             >
-                + {t("Add")}
+                + {t("Add_Dealer")}
             </Button>
 
             <Dialog
+                className="bg-white dark:bg-card-dark text-gray-900 dark:text-text-dark"
                 open={open}
                 handler={handleOpen}
-                className="bg-white text-gray-900 rounded-xl dark:bg-card-dark"
+                size="sm"
             >
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
-                    {t('Create_Diler')}
+                <DialogHeader className="border-b border-gray-200 dark:border-gray-600">
+                    {t("Create_Diler")}
                 </DialogHeader>
-                <DialogBody divider className="space-y-4">
-                    <Input
-                        label={t('Name')}
-                        name="name"
-                        value={data.name}
-                        onChange={handleChange}
-                        color="blue-gray"
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        containerProps={{
-                            className: "!min-w-0",
-                        }}
-                        labelProps={{
-                            className: `!text-text-light dark:!text-text-dark `
-                        }}
-                    />
-                    <Input
-                        label={t('Firstname')}
-                        name="full_name"
-                        value={data.full_name}
-                        onChange={handleChange}
-                        color="blue-gray"
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        containerProps={{
-                            className: "!min-w-0",
-                        }}
-                        labelProps={{
-                            className: `!text-text-light dark:!text-text-dark `
-                        }}
-                    />
-                    <Input
-                        label={t('Address')}
-                        name="address"
-                        value={data.address}
-                        onChange={handleChange}
-                        color="blue-gray"
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        containerProps={{
-                            className: "!min-w-0",
-                        }}
-                        labelProps={{
-                            className: `!text-text-light dark:!text-text-dark `
-                        }}
-                    />
-                    <Input
-                        label={t("Phone")}
-                        name="phone"
-                        value={data.phone}
-                        onChange={handleChange}
-                        color="blue-gray"
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        containerProps={{
-                            className: "!min-w-0",
-                        }}
-                        labelProps={{
-                            className: `!text-text-light dark:!text-text-dark `
-                        }}
-                    />
-                    <Input
-                        label="Email"
-                        name="email"
-                        value={data.email}
-                        onChange={handleChange}
-                        color="blue-gray"
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        containerProps={{
-                            className: "!min-w-0",
-                        }}
-                        labelProps={{
-                            className: `!text-text-light dark:!text-text-dark `
-                        }}
-                    />
-                    <Input
-                        label="Parol"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        onChange={handleChange}
-                        color="blue-gray"
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        containerProps={{
-                            className: "!min-w-0",
-                        }}
-                        labelProps={{
-                            className: `!text-text-light dark:!text-text-dark `
-                        }}
-                    />
+                <DialogBody divider className="space-y-4 overflow-y-auto h-[500px]">
+                    {/* Name */}
+                    <div>
+                        <Input
+                            label={t("Dealer_name")}
+                            name="name"
+                            value={data.name}
+                            onChange={handleChange}
+                            error={!!errors.name}
+                        />
+                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                    </div>
+
+                    {/* Username */}
+                    <div>
+                        <Input
+                            label={t("Dealer_login")}
+                            name="username"
+                            value={data.username}
+                            onChange={handleChange}
+                            error={!!errors.username}
+                        />
+                        {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+                    </div>
+
+                    {/* Full name */}
+                    <div>
+                        <Input
+                            label={t("Dealer_fullname")}
+                            name="full_name"
+                            value={data.full_name}
+                            onChange={handleChange}
+                            error={!!errors.full_name}
+                        />
+                        {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
+                    </div>
+
+                    {/* Phone */}
+                    <div>
+                        <Input
+                            label={t("Phone_number")}
+                            name="phone"
+                            value={data.phone}
+                            onChange={handleChange}
+                            error={!!errors.phone}
+                        />
+                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    </div>
+
+                    {/* Region */}
+                    <div>
+                        <label className="block text-sm font-medium mb-1">{t("Region")}</label>
+                        <select
+                            value={data.region_id}
+                            onChange={handleRegionChange}
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500" : "border-black"}`}
+                        >
+                            <option value="">{t("Select_region")}</option>
+                            {Regions.map((region) => (
+                                <option key={region.id} value={region.id}>
+                                    {region.name_uz}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.region_id && <p className="text-red-500 text-xs mt-1">{errors.region_id}</p>}
+                    </div>
+
+                    {/* District */}
+                    <div>
+                        <label className="block text-sm font-medium mb-1">{t("District")}</label>
+                        <select
+                            value={data.district_id}
+                            onChange={handleDistrictChange}
+                            disabled={!data.region_id}
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.district_id ? "border-red-500" : "border-black"}`}
+                        >
+                            <option value="">{t("Select_district")}</option>
+                            {availableDistricts.map((district) => (
+                                <option key={district.id} value={district.id}>
+                                    {district.name_uz}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.district_id && <p className="text-red-500 text-xs mt-1">{errors.district_id}</p>}
+                    </div>
+
+                    {/* Password */}
+                    <div>
+                        <Input
+                            label={t("Password")}
+                            name="password"
+                            type="password"
+                            value={data.password}
+                            onChange={handleChange}
+                            error={!!errors.password}
+                        />
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                    </div>
+
+                    {/* Confirm password */}
+                    <div>
+                        <Input
+                            label={t("Confirm_password")}
+                            name="confirm_password"
+                            type="password"
+                            value={data.confirm_password}
+                            onChange={handleChange}
+                            error={!!errors.confirm_password}
+                        />
+                        {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password}</p>}
+                    </div>
                 </DialogBody>
-                <DialogFooter className="border-t border-gray-200">
+
+                <DialogFooter className="flex justify-end gap-2 border-t border-gray-200 dark:border-gray-700">
                     <Button
                         variant="text"
+                        color="gray"
                         onClick={handleOpen}
                         disabled={loading}
-                        color="blue-gray"
-                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                        containerProps={{
-                            className: "!min-w-0",
-                        }}
-                        labelProps={{
-                            className: `!text-text-light dark:!text-text-dark `
-                        }}
+                        className="normal-case hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
-                        Bekor qilish
+                        {t("Cancel")}
                     </Button>
                     <Button
-                        className={`bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
-                            }`}
-                        onClick={CreateWarehouse}
+                        onClick={createDealer}
                         disabled={loading}
+                        className={`bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 ${loading ? "opacity-70 cursor-not-allowed" : ""
+                            }`}
                     >
-                        {loading ? (
-                            <svg
-                                className="animate-spin h-5 w-5 text-white"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                ></circle>
-                                <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8v8H4z"
-                                ></path>
-                            </svg>
-                        ) : (
-                            "Saqlash"
-                        )}
+                        {loading ? t("Saving") : t("Save")}
                     </Button>
                 </DialogFooter>
             </Dialog>

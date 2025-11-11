@@ -117,7 +117,7 @@ export default function Login() {
   };
 
   const shouldShowOfferta = (role) => {
-    return !["super_admin", "admin", "warehouse", "dealer", "com_warehouse", "building"].includes(role);
+    return ["factory"].includes(role);
   };
 
   const handleSubmit = async (e) => {

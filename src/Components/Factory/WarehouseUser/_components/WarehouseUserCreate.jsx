@@ -50,36 +50,72 @@ export default function WarehouseUserCreate({ refresh }) {
                 Yangi foydalanuvchi
             </Button>
 
-            <Dialog open={open} handler={handleOpen}>
-                <DialogHeader>Foydalanuvchi yaratish</DialogHeader>
+            <Dialog className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+                open={open} handler={handleOpen}>
+                <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
+                    Foydalanuvchi yaratish
+                </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
                         label="To‘liq ism"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
                     />
                     <Input
                         label="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
                     />
                     <Input
                         label="Password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
                     />
                     <Select
                         label="Role"
                         value={role}
                         onChange={(value) => setRole(value)}
+                        className="text-gray-900 dark:text-text-dark outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark",
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark",
+                        }}
                     >
                         <Option value="cashier">Кассир</Option>
                         <Option value="warehouse">Менеджер</Option>
+                        <Option value="storekeeper">Складчик</Option>
                     </Select>
                 </DialogBody>
                 <DialogFooter>
-                    <Button variant="text" color="red" onClick={handleOpen}>
+                    <Button className="text-text-light dark:text-text-dark"
+                        variant="text" color="red" onClick={handleOpen}>
                         Bekor qilish
                     </Button>
                     <Button color="blue" onClick={handleCreate}>
