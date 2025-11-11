@@ -41,7 +41,7 @@ export default function WarehouseCarrierCreate({ refresh, apperance = false }) {
                 phone: "+998",
                 location_id: Cookies.get("ul_nesw"),
             });
-            handleOpen(); 
+            handleOpen();
             refresh();
         } catch (error) {
             Alert("Xato", "error");
@@ -62,7 +62,7 @@ export default function WarehouseCarrierCreate({ refresh, apperance = false }) {
                 </Button>
             ) : (
                 <>
-                    <button className="flex items-center justify-center dark:text-text-dark text-text-light" onClick={handleOpen}>
+                    <button className="dark:text-text-dark text-text-light flex items-center justify-center" onClick={handleOpen}>
                         <PlusIcon />
                     </button>
                 </>
@@ -112,6 +112,7 @@ export default function WarehouseCarrierCreate({ refresh, apperance = false }) {
                         }}
                     />
                 </DialogBody>
+
 
                 <DialogFooter className="bg-card-light dark:bg-card-dark rounded-b-lg">
                     <Button

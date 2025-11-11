@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Select from "react-select";
+import Select, { components } from "react-select";
 import Spinner from "../../../UI/spinner/Spinner";
+import { customSelectStyles } from "../../WareHouseModals/ThemedReactTagsStyles";
+import { ChevronDown, Plus } from "lucide-react";
+import CarrierCreateModal from "../../WareHouseModals/CarrierCreateModal";
 
-const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver }) => {
+const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver }) => {
     const [operationType, setOperationType] = useState("outgoing");
     const [status, setStatus] = useState("draft");
     // const [receiver, setReceiver] = useState(null);
@@ -44,7 +47,7 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
         label: loc.full_name,
     })
     )
-    
+
     const changeReceiver = (value) => {
         // setReceiver(value);
         selectReceiver(value);
@@ -68,91 +71,146 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
 
     const activeLabel = comboLabels[`${status}_${operationType}`];
 
+    // ---------- UI ----------
+    const [carrierModalOpen, setCarrierModalOpen] = useState(false);
+    // --- Custom DropdownIndicator ---
+    const DropdownIndicator = (props) => {
+        const { selectProps } = props;
+        const { setCarrierModalOpen } = selectProps;
+
+        return (
+            <components.DropdownIndicator {...props}>
+                <div className="flex items-center gap-1">
+                    {/* Yangi kuryer qo‘shish tugmasi */}
+                    <div
+                        onMouseDown={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            document.activeElement.blur(); // react-select fokusni olib tashlaydi
+                            setCarrierModalOpen(true);
+                        }}
+                        className="flex items-center justify-center text-blue-600 dark:text-blue-400 hover:scale-110 transition-transform cursor-pointer"
+                        title="Yangi kuryer qo‘shish"
+                    >
+                        <Plus size={18} />
+                    </div>
+
+                    {/* Oddiy pastga strelka */}
+                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                </div>
+            </components.DropdownIndicator>
+        );
+    };
+
     return (
         <motion.div
-            className="w-full max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-6 border border-gray-200"
+            className="w-full max-w-3xl mx-auto mt-10 
+               bg-card-light dark:bg-card-dark 
+               text-text-light dark:text-text-dark 
+               shadow-lg rounded-2xl p-6 
+               border border-gray-200 dark:border-gray-700 
+               transition-colors duration-300"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
         >
-            <fieldset className="border border-gray-300 rounded-xl p-5">
-                <legend className="px-3 text-lg font-semibold text-gray-700">
+            <fieldset className="border border-gray-300 dark:border-gray-600 rounded-xl p-5 transition-colors duration-300">
+                <legend className="px-3 text-lg font-semibold text-gray-700 dark:text-gray-200">
                     📦 Отгрузка / Перемещение
                 </legend>
 
                 {/* Operation Type */}
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                         Тип операции:
                     </label>
                     <Select
                         options={typeOptions}
                         value={typeOptions.find(t => t.value === operationType)}
                         onChange={opt => changeOprType(opt.value)}
-                        className="text-sm"
-                        styles={{
-                            control: base => ({
-                                ...base,
-                                borderRadius: "0.75rem",
-                                borderColor: "#d1d5db",
-                                padding: "2px",
-                            }),
-                        }}
+                        className="text-sm dark:text-gray-200"
+                        styles={customSelectStyles()}
                     />
                 </div>
 
                 {/* Status */}
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                         Статус:
                     </label>
                     <Select
-                        options={operationType === "disposal" ? statusOptions.filter((st)=> st.value === "received") :statusOptions.filter((st)=> st.value !== "received")}
+                        options={
+                            operationType === "disposal"
+                                ? statusOptions.filter(st => st.value === "received")
+                                : statusOptions.filter(st => st.value !== "received")
+                        }
                         value={statusOptions.find(s => s.value === status)}
                         onChange={opt => changeOprSatatus(opt.value)}
-                        className="text-sm"
+                        className="text-sm dark:text-gray-200"
+                        styles={customSelectStyles()}
                     />
                 </div>
 
                 {/* Receiver */}
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                         Получатель:
                     </label>
                     <Select
                         options={receiverOptions.filter(r =>
                             operationType === "outgoing"
                                 ? r.type === "client" || r.type === "dealer"
-                                : operationType === "transfer_out" ? r.type === "warehouse"
+                                : operationType === "transfer_out"
+                                    ? r.type === "warehouse"
                                     : r.type === "disposal"
                         )}
-                        value={selectedReceiver ? receiverOptions?.find((loc) => loc.value === selectedReceiver) : null}
+                        value={
+                            selectedReceiver
+                                ? receiverOptions?.find(loc => loc.value === selectedReceiver)
+                                : null
+                        }
                         onChange={opt => changeReceiver(opt.value)}
                         isSearchable
                         placeholder="Выберите..."
-                        className="text-sm"
+                        className="text-sm dark:text-gray-200"
+                        styles={customSelectStyles()}
                     />
                 </div>
+
+                {/* Driver */}
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
                         Driver:
                     </label>
-                    <Select
-                        options={staffOptions}
-                        value={staffOptions?.find((loc) => loc.value === selectedStaff)}
-                        onChange={opt => selectStaff(opt.value)}
-                        isSearchable
-                        placeholder="Выберите получателя..."
-                        className="text-sm"
-                    />
+                    <>
+                        <Select
+                            options={staffOptions}
+                            value={staffOptions?.find(loc => loc.value === selectedStaff)}
+                            onChange={opt => selectStaff(opt.value)}
+                            isSearchable
+                            components={{ DropdownIndicator }}
+                            menuPlacement="auto"
+                            fetchStaffs={getStaffs}
+                            setCarrierModalOpen={setCarrierModalOpen}
+                            placeholder="Выберите получателя..."
+                            className="text-sm dark:text-gray-200"
+                            styles={customSelectStyles()}
+                        />
+                        {carrierModalOpen && (
+                            <CarrierCreateModal onClose={() => setCarrierModalOpen(false)} refresh={(id) => getStaffs(id, true)} />
+                        )}
+                    </>
+
                 </div>
 
                 {/* Summary */}
                 <motion.div
-                    className="mt-6 bg-gray-50 border border-gray-200 rounded-xl p-4 text-center"
+                    className="mt-6 bg-gray-50 dark:bg-gray-800 
+                   border border-gray-200 dark:border-gray-700 
+                   rounded-xl p-4 text-center transition-colors duration-300"
                     whileHover={{ scale: 1.02 }}
                 >
-                    <p className="text-gray-700 font-semibold text-base">
+                    <p className="text-gray-700 dark:text-gray-200 font-semibold text-base">
                         {activeLabel?.ru}
                     </p>
                 </motion.div>
@@ -161,7 +219,9 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
                 <div className="mt-6 flex justify-end">
                     <motion.button
                         whileTap={{ scale: 0.95 }}
-                        className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-5 rounded-xl transition-all flex gap-2 items-center"
+                        className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 
+                     text-white font-medium py-2 px-5 rounded-xl 
+                     transition-all flex gap-2 items-center"
                         onClick={startOperation}
                     >
                         {isLoading && <Spinner />}
@@ -171,6 +231,110 @@ const OutgoingPanel = ({ receiverLocations, staffs, selectStaff, selectedStaff, 
             </fieldset>
         </motion.div>
     );
+
+    // return (
+    //     <motion.div
+    //         className="w-full max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-6 border border-gray-200"
+    //         initial={{ opacity: 0, y: 20 }}
+    //         animate={{ opacity: 1, y: 0 }}
+    //         transition={{ duration: 0.4 }}
+    //     >
+    //         <fieldset className="border border-gray-300 rounded-xl p-5">
+    //             <legend className="px-3 text-lg font-semibold text-gray-700">
+    //                 📦 Отгрузка / Перемещение
+    //             </legend>
+
+    //             {/* Operation Type */}
+    //             <div className="mb-4">
+    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
+    //                     Тип операции:
+    //                 </label>
+    //                 <Select
+    //                     options={typeOptions}
+    //                     value={typeOptions.find(t => t.value === operationType)}
+    //                     onChange={opt => changeOprType(opt.value)}
+    //                     className="text-sm"
+    //                     styles={{
+    //                         control: base => ({
+    //                             ...base,
+    //                             borderRadius: "0.75rem",
+    //                             borderColor: "#d1d5db",
+    //                             padding: "2px",
+    //                         }),
+    //                     }}
+    //                 />
+    //             </div>
+
+    //             {/* Status */}
+    //             <div className="mb-4">
+    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
+    //                     Статус:
+    //                 </label>
+    //                 <Select
+    //                     options={operationType === "disposal" ? statusOptions.filter((st)=> st.value === "received") :statusOptions.filter((st)=> st.value !== "received")}
+    //                     value={statusOptions.find(s => s.value === status)}
+    //                     onChange={opt => changeOprSatatus(opt.value)}
+    //                     className="text-sm"
+    //                 />
+    //             </div>
+
+    //             {/* Receiver */}
+    //             <div className="mb-4">
+    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
+    //                     Получатель:
+    //                 </label>
+    //                 <Select
+    //                     options={receiverOptions.filter(r =>
+    //                         operationType === "outgoing"
+    //                             ? r.type === "client" || r.type === "dealer"
+    //                             : operationType === "transfer_out" ? r.type === "warehouse"
+    //                                 : r.type === "disposal"
+    //                     )}
+    //                     value={selectedReceiver ? receiverOptions?.find((loc) => loc.value === selectedReceiver) : null}
+    //                     onChange={opt => changeReceiver(opt.value)}
+    //                     isSearchable
+    //                     placeholder="Выберите..."
+    //                     className="text-sm"
+    //                 />
+    //             </div>
+    //             <div className="mb-4">
+    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
+    //                     Driver:
+    //                 </label>
+    //                 <Select
+    //                     options={staffOptions}
+    //                     value={staffOptions?.find((loc) => loc.value === selectedStaff)}
+    //                     onChange={opt => selectStaff(opt.value)}
+    //                     isSearchable
+    //                     placeholder="Выберите получателя..."
+    //                     className="text-sm"
+    //                 />
+    //             </div>
+
+    //             {/* Summary */}
+    //             <motion.div
+    //                 className="mt-6 bg-gray-50 border border-gray-200 rounded-xl p-4 text-center"
+    //                 whileHover={{ scale: 1.02 }}
+    //             >
+    //                 <p className="text-gray-700 font-semibold text-base">
+    //                     {activeLabel?.ru}
+    //                 </p>
+    //             </motion.div>
+
+    //             {/* Start Button */}
+    //             <div className="mt-6 flex justify-end">
+    //                 <motion.button
+    //                     whileTap={{ scale: 0.95 }}
+    //                     className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-5 rounded-xl transition-all flex gap-2 items-center"
+    //                     onClick={startOperation}
+    //                 >
+    //                     {isLoading && <Spinner />}
+    //                     Начать операцию
+    //                 </motion.button>
+    //             </div>
+    //         </fieldset>
+    //     </motion.div>
+    // );
 };
 
 export default OutgoingPanel;
