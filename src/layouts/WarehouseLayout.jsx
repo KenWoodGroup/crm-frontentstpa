@@ -35,8 +35,9 @@ export default function WarehouseLayout() {
     return (
         <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
             <WarehouseSidebar />
-            <div className="pt-[100px] pr-[10px]">
-                <AdminHeader />
+            <div className={`${mode === "m_other" ? "pt-[100px]" :"pt-[40px]"} pr-[10px]`}>
+                {mode === "m_other" ? <AdminHeader /> : ""}  
+
                 {/* pass mode to provider so provider can expose per-mode state */}
                 <WarehouseProvider mode={mode}>
                     <InnerGuard>

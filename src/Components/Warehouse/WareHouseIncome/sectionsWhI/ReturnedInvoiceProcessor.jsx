@@ -105,7 +105,7 @@ const ReturnedInvoiceProcessor = () => {
     };
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 dark:bg-card-dark">
             <div className="flex justify-between w-full">
                 <h2 className="text-xl font-semibold text-gray-800">
                     Returned Invoices Progress
@@ -142,7 +142,7 @@ const ReturnedInvoiceProcessor = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
-                            className={`border rounded-2xl p-4 shadow-sm transition-all duration-300 hover:shadow-lg ${getCardStyle(
+                            className={`border rounded-2xl p-4 shadow-sm transition-all duration-300 hover:shadow-lg dark:hover:shadow-card-dark  dark:bg-card-dark ${getCardStyle(
                                 status
                             )}`}
                         >

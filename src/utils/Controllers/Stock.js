@@ -20,7 +20,7 @@ class Stock {
         return response;
     }
     static getByBarcode = async ({payload}) => {
-        const response = await $api.get(`/stock/barcode/${encodeURIComponent(payload.code)}/${payload.operation_type}`)
+        const response = await $api.get(`/stock/barcode/${encodeURIComponent(payload.operation_type)}/${payload.code}`)
         return response;
     }
 

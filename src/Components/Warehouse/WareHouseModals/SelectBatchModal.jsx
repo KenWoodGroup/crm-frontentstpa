@@ -26,7 +26,7 @@ export default function SelectBatchModal({ isOpen, onClose, products = [], addIt
                     {products.map((item, idx) => (
                         <Card
                             key={idx}
-                            className="cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 border border-gray-200 rounded-xl"
+                            className="cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-800 dark:bg-card-dark border border-gray-200 rounded-xl"
                             onClick={() => handleSelect(item)}
                         >
                             <CardBody className="flex justify-between items-center">
