@@ -5,8 +5,10 @@ import { createPortal } from "react-dom";
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
 import { notify } from "../../../../utils/toast";
 import { useInventory } from "../../../../context/InventoryContext";
+import { useTranslation } from "react-i18next";
 
 const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     // Restart invoices after success saved last
@@ -19,19 +21,19 @@ const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
     function resetModeBaseForNewInvoice() {
         if (id === invoiceId?.[mode] && appearance === "btn") {
             resetAll();
-            return notify.success("Invoicese successfully deleted")
+            return notify.success(t("invoiceDeleted"))
         } else if (appearance === "icn") {
             if (id === invoiceId?.in) {
                 resetMode("in"); // reset mode provider
                 resetAll()
-                return notify.success("Invoicese successfully deleted")
+                return notify.success(t("invoiceDeleted"))
             } else if (id === invoiceId?.out) {
                 resetAll()
                 resetMode("out");
-                return notify.success("Invoicese successfully deleted")
+                return notify.success(t("invoiceDeleted"))
             } else {
                 resetAll()
-                return notify.success("Invoicese successfully deleted")
+                return notify.success(t("invoiceDeleted"))
             }
         }
     };
@@ -46,7 +48,7 @@ const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
                 setOpen(false);
             }
         } catch (err) {
-            console.error("Failed to cancel invoice", err);
+            console.error(t("failedToCancelInvoice"), err);
         } finally {
             setLoading(false);
         }
@@ -68,10 +70,10 @@ const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
                         className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-sm dark:bg-card-dark dark:border-white dark:border-[1px]"
                     >
                         <h2 className="text-lg font-semibold text-gray-800 mb- dark:text-text-dark">
-                            Cancel this invoice?
+                            {t("cancelThisInvoice")}
                         </h2>
                         <p className="text-gray-600 text-sm mb-6">
-                            All invoice items will be removed. This action cannot be undone.
+                            {t("cancelWarning")}
                         </p>
 
                         <div className="flex justify-end gap-3">
@@ -80,7 +82,7 @@ const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
                                 disabled={loading}
                                 className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 transition-all dark:bg-card-dark dark:border-white dark:border-[1px]"
                             >
-                                Close
+                                {t("close")}
                             </button>
 
                             <button
@@ -91,10 +93,10 @@ const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
                                 {loading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Canceling...</span>
+                                        <span>{t("canceling")}...</span>
                                     </>
                                 ) : (
-                                    <span>Yes, Cancel</span>
+                                    <span>{t("yesCancel")}</span>
                                 )}
                             </button>
                         </div>
@@ -114,13 +116,13 @@ const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
                     className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl shadow-md transition-all duration-200"
                 >
                     <FileX className="w-5 h-5" />
-                    <span>Cancel Invoice</span>
+                    <span>{t("cancelInvoice")}</span>
                 </motion.button>
                 :
                 <motion.button
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 1.08 }}
-                    onClick={()=>setOpen(true)}
+                    onClick={() => setOpen(true)}
                     className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 shadow-sm transition-all duration-200 flex items-center justify-center"
                 >
                     <Trash2 className="w-5 h-5" />

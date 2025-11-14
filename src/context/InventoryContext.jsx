@@ -45,7 +45,9 @@ function mixReducer(state, action) {
                     fixed_qty: item.fixed_quantity ?? true,
                     discount: item.discount || 0,
                     purchase_price: Number(item.purchase_price || 0),
-                    is_returning: item.is_returning
+                    is_returning: item.is_returning,
+                    s_price_types: item.s_price_types,
+                    s_price: item.s_price || 0
                 };
                 return [...state, newItem];
             }
@@ -74,6 +76,8 @@ function mixReducer(state, action) {
             return state.map((it, i) => (i === action.index ? { ...it, quantity: action.value === "0" ? 0 : (action.value || "") } : it));
         case "UPDATE_PRICE":
             return state.map((it, i) => (i === action.index ? { ...it, price: Math.max(0, Number(action.value)) || "" } : it));
+        case "UPDATE_S_PRICE":
+            return state.map((it, i) => (i === action.index ? { ...it, s_price: Math.max(0, Number(action.value)) || "" } : it));
         case "UPDATE_BATCH":
             return state.map((it, i) => (i === action.index ? { ...it, is_new_batch: action.value || false } : it))
         case "UPDATE_DISCOUNT":
@@ -97,10 +101,11 @@ export function InventoryProvider({ children, role = "warehouse", mode = "in" })
     const [isDirty, setIsDirty] = useState({ in: false, out: false, });
     const [saveSuccess, setSaveSuccess] = useState({ in: false, out: false, });
     const [invoiceMeta, setInvoiceMeta] = useState({
-        in: { sender: null, receiver: "Me", operation_type: null, time: new Date().toLocaleString() },
-        out: { sender: "Me", receiver: null, operation_type: null, time: new Date().toLocaleString() },
+        in: { sender: null, receiver: "Me", operation_type: null, time: null },
+        out: { sender: "Me", receiver: null, operation_type: null, time: null },
     });
-    const [returnInvoices, setReturnInvoices] = useState([])
+    const [returnInvoices, setReturnInvoices] = useState([]);
+    const [selectedSalePriceType, setSelectedSalePriceType] = useState({ in: null, out: null });
 
     const [invoiceStarted, setInvoiceStartedRaw] = useState({ in: false, out: false, });
     const [invoiceId, setInvoiceIdRaw] = useState({ in: null, out: null });
@@ -173,7 +178,11 @@ export function InventoryProvider({ children, role = "warehouse", mode = "in" })
         getDispatch(m)({ type: "UPDATE_PRICE", index, value: parsed });
         setIsDirty(prev => ({ ...prev, [m]: true }));
     }, [getDispatch, mode]);
-
+    const updateSPrice = useCallback((index, value, m = mode) => {
+        const parsed = value === "" ? "" : Math.max(0, Number(value));
+        getDispatch(m)({ type: "UPDATE_S_PRICE", index, value: parsed });
+        setIsDirty(prev => ({ ...prev, [m]: true }));
+    }, [getDispatch, mode]);
     const updateBatch = useCallback((index, value, m = mode) => {
         // outgoing UI shouldn't call this; leave support for incoming
         getDispatch(m)({ type: "UPDATE_BATCH", index, value });
@@ -225,6 +234,7 @@ export function InventoryProvider({ children, role = "warehouse", mode = "in" })
         addItemPlusQty,
         updateQty,
         updatePrice,
+        updateSPrice,
         updateBatch,
         updateDiscount,
         removeItem,
@@ -234,6 +244,13 @@ export function InventoryProvider({ children, role = "warehouse", mode = "in" })
         setInvoiceStarted,
         returnInvoices,
         setReturnInvoices,
+        selectedSalePriceType,
+        setSelectedSalePriceType: (m, v) => {
+            setSelectedSalePriceType(prev => ({
+                ...prev,
+                [m]: v
+            }))
+        },
         invoiceId,
         setInvoiceId,
         invoiceMeta,
@@ -249,7 +266,7 @@ export function InventoryProvider({ children, role = "warehouse", mode = "in" })
         setSaveSuccess: (m, v) => setSaveSuccess(prev => ({ ...prev, [m]: v })),
         _dispatchIn: dispatchIn,
         _dispatchOut: dispatchOut,
-    }), [role, mode, mixIn, mixOut, isDirty, saveSuccess, invoiceMeta, invoiceStarted, invoiceId, returnInvoices]);
+    }), [role, mode, mixIn, mixOut, isDirty, saveSuccess, invoiceMeta, invoiceStarted, invoiceId, returnInvoices, selectedSalePriceType]);
 
     return (
         <InventoryContext.Provider value={value}>{children}</InventoryContext.Provider>
