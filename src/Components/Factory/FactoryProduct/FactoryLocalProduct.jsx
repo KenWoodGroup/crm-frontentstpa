@@ -51,10 +51,10 @@ export default function FactoryLocalProduct() {
         <div className=" bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
             <div className="flex items-center justify-between mb-4">
                 <Typography variant="h2" className="text-gray-900 dark:text-gray-100 font-bold">
-                    {t('Product_catalog')}
+                    {t('Product')}
                 </Typography>
                 <NavLink to={`/factory/product/create`}>
-                    <Button>Yaratish</Button>
+                    <Button color="blue">{t('Add')}</Button>
                 </NavLink>
             </div>
             {loading ? (
@@ -76,9 +76,6 @@ export default function FactoryLocalProduct() {
                                         <FactoryProductEditModal oldData={product} refresh={() => GetAllLocalProduct(currentPage)} />
                                     </div>
                                 </div>
-                                <Typography className="text-gray-700 dark:text-gray-300 text-sm">
-                                    Unit: {product.unit}
-                                </Typography>
                             </CardBody>
                         </Card>
                     ))}
