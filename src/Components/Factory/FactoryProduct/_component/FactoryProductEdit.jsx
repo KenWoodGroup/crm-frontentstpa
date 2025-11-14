@@ -63,9 +63,13 @@ export default function FactoryProductEditModal({ oldData, refresh }) {
                 <PencilSquareIcon className="w-5 h-5" />
             </Button>
 
-            <Dialog open={open} size="md" handler={handleOpen}>
-                <DialogHeader>
-                    {t("Edit Product")}
+            <Dialog
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+                open={open} size="md" handler={handleOpen}>
+                <DialogHeader
+                    className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
+                >
+                    {t("Edit_product")}
                     <IconButton
                         variant="text"
                         color="red"
@@ -78,16 +82,31 @@ export default function FactoryProductEditModal({ oldData, refresh }) {
 
                 <DialogBody divider className="space-y-4">
                     <Input
-                        label={t("Product name")}
+                        label={t("Name")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
                     />
 
                     {/* 🟩 Исправленный Select */}
                     <Select
-                        label={t("Select unit")}
+                        label={t("Select_unit")}
                         value={unit || ""}   // не даём undefined
                         onChange={(val) => setUnit(val)}
+                        className="text-gray-900 dark:text-text-dark outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark",
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark",
+                        }}
                     >
                         {units.map((u) => (
                             <Option key={u} value={u}>

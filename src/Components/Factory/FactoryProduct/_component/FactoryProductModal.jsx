@@ -52,11 +52,15 @@ export default function FactoryProductModal() {
 
     return (
         <>
-            <Button onClick={toggleOpen}>Yangi</Button>
+            <Button color="blue" onClick={toggleOpen}>{t('Add')}</Button>
 
-            <Dialog open={open} size="md" handler={toggleOpen}>
-                <DialogHeader>
-                    {t("Create Product")}
+            <Dialog
+                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+                open={open} size="md" handler={toggleOpen}>
+                <DialogHeader
+                    className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
+                >
+                    {t("Create_product")}
                     <IconButton
                         variant="text"
                         color="red"
@@ -68,15 +72,30 @@ export default function FactoryProductModal() {
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
-                        label={t("Product name")}
+                        label={t("Name")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder={t("Type product name")}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        containerProps={{
+                            className: "!min-w-0",
+                        }}
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark  `
+                        }}
                     />
                     <Select
-                        label={t("Select unit")}
+                        label={t("Select_unit")}
                         value={unit}
                         onChange={(value) => setUnit(value)}
+                        className="text-gray-900 dark:text-text-dark outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark",
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark",
+                        }}
                     >
                         {units.map((u) => (
                             <Option key={u} value={u}>
@@ -94,7 +113,7 @@ export default function FactoryProductModal() {
                         onClick={createProduct}
                         disabled={!name || !unit}
                     >
-                        {t("Create")}
+                        {t("Save")}
                     </Button>
                 </DialogFooter>
             </Dialog>

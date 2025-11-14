@@ -210,7 +210,7 @@ export default function FactoryProductCreate() {
                 <div className="flex items-center justify-between mx-auto">
                     <div className="max-w-[500px] w-full">
                         <Input
-                            label="Поиск по названию"
+                            label={t(`Search`)}
                             color="blue"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -262,7 +262,7 @@ export default function FactoryProductCreate() {
                                                 }}
                                                 className="px-3 py-1 text-xs"
                                             >
-                                                Edit
+                                                {t('Edit')}
                                             </Button>
                                         </div>
                                     )}
@@ -272,11 +272,18 @@ export default function FactoryProductCreate() {
                                             // Режим редактирования
                                             <div className="space-y-3">
                                                 <Input
-                                                    label="Название продукта"
+                                                    label={t('Product')}
                                                     value={editName}
                                                     onChange={(e) => setEditName(e.target.value)}
                                                     autoFocus
-                                                    className="text-gray-900 dark:text-gray-100"
+                                                    color="blue-gray"
+                                                    className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                                    containerProps={{
+                                                        className: "!min-w-0",
+                                                    }}
+                                                    labelProps={{
+                                                        className: `!text-text-light dark:!text-text-dark  `
+                                                    }}
                                                 />
                                                 <div className="flex gap-2">
                                                     <Button
@@ -285,7 +292,7 @@ export default function FactoryProductCreate() {
                                                         onClick={() => updateProduct(product.id)}
                                                         disabled={!editName.trim() || isProcessing}
                                                     >
-                                                        Сохранить
+                                                        {t('Save')}
                                                     </Button>
                                                     <Button
                                                         size="sm"
@@ -294,7 +301,7 @@ export default function FactoryProductCreate() {
                                                         onClick={cancelEditing}
                                                         disabled={isProcessing}
                                                     >
-                                                        Отмена
+                                                        {t('Cancel')}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -315,8 +322,6 @@ export default function FactoryProductCreate() {
                                                         </span>
                                                     )}
                                                 </Typography>
-
-
                                             </>
                                         )}
                                     </CardBody>
