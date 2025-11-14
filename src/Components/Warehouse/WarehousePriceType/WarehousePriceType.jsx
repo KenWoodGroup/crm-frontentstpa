@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Typography, Card, CardBody, Button } from "@material-tailwind/react";
+import { Typography, Card, CardBody, Button, Tooltip, IconButton } from "@material-tailwind/react";
 import { PaymentMethodApi } from "../../../utils/Controllers/PaymentMethodApi";
 import Cookies from "js-cookie";
 import {
@@ -8,6 +8,7 @@ import {
     Calendar,
     Info,
     PlusCircle,
+    EyeIcon,
 } from "lucide-react";
 import EmptyData from "../../UI/NoData/EmptyData";
 import Loading from "../../UI/Loadings/Loading";
@@ -16,6 +17,7 @@ import WarehousePriceTypeCreate from "./_components/WarehousePriceTypeCreate";
 import WarehousePriceTypeDelete from "./_components/WarehousePriceTypeDelete";
 import WarehousePriceTypeEdit from "./_components/WarehousePriceTypeEdit";
 import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router-dom";
 
 export default function WarehousePriceType() {
     const [data, setData] = useState([]);
@@ -79,6 +81,16 @@ export default function WarehousePriceType() {
                                         </Typography>
                                     </div>
                                     <div className="flex items-center gap-[10px]">
+                                        <NavLink to={`/warehouse/price-type/${item?.id}`}>
+                                            <Tooltip content={t("View")}>
+                                                <IconButton
+                                                    variant="text"
+                                                    color="blue"
+                                                >
+                                                    <EyeIcon className="text-[18px]" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </NavLink>
                                         <WarehousePriceTypeEdit item={item} refresh={getAllPriceType} />
                                         <WarehousePriceTypeDelete id={item?.id} refresh={getAllPriceType} />
                                     </div>

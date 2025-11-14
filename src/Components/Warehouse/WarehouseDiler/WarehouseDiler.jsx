@@ -153,7 +153,7 @@ export default function WarehouseDiler() {
                                         <Mail className="w-5 h-5 text-gray-500" />
                                         <Typography className=" dark:text-text-dark"
                                             variant="small">
-                                            {w.users?.[0]?.email || "—"}
+                                            {w.users?.[0]?.username || "—"}
                                         </Typography>
                                     </div>
 
@@ -185,7 +185,6 @@ export default function WarehouseDiler() {
                             </Card>
                         ))}
                     </div>
-
                     {/* Pagination */}
                     {totalCount > 15 && (
                         <div className="flex justify-center mt-6 gap-4">
@@ -197,11 +196,9 @@ export default function WarehouseDiler() {
                             >
                                 <ChevronLeft className="w-5 h-5" />
                             </IconButton>
-
                             <Typography variant="small" color="blue-gray" className="flex items-center">
                                 {page} / {totalPages}
                             </Typography>
-
                             <IconButton
                                 variant="text"
                                 color="blue-gray"

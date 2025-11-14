@@ -20,6 +20,7 @@ import WarehousePaymentType from "../Components/Warehouse/WarehousePaymentType/W
 import WarehouseClientCategory from "../Components/Warehouse/WarehouseClientCategory/WarehouseClientCategory";
 import WarehousePriceType from "../Components/Warehouse/WarehousePriceType/WarehousePriceType";
 import Profile from "../Components/Profile/Profile";
+import WarehousePriceTypeStock from "../Components/Warehouse/WarehousePriceTypeStock/WarehousePriceTypeStock";
 
 export const warehouseRoutes = [
     {
@@ -127,6 +128,11 @@ export const warehouseRoutes = [
         path: "/warehouse/profile",
         name: "Warehouse profile ",
         element: <Profile />
+    },
+    {
+        path: "/warehouse/price-type/:id",
+        name: "Warehouse  price type ",
+        element: <WarehousePriceTypeStock />
     },
 
 ];

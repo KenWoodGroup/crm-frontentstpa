@@ -175,7 +175,6 @@ export default function WarehouseClientsCreate({ refresh }) {
                                     className: `!text-text-light dark:!text-text-dark `
                                 }}
                             />
-
                             <div className="flex flex-col gap-1">
                                 <select
                                     value={form.client_type_id}

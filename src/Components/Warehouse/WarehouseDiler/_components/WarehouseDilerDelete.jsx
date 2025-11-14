@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@material-tailwind/react";
-import Swal from "sweetalert2";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseDilerDelete({ dilerId, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
+
 
     const handleOpen = () => setOpen(!open);
 
@@ -37,11 +39,11 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
 
             <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl dark:bg-card-dark">
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
-                    Omborni o‘chirish
+                    {t('Dealer_Delete')}
                 </DialogHeader>
                 <DialogBody divider className="text-gray-700 dark:text-text-dark dark:bg-card-dark"
                 >
-                    Siz haqiqatdan ham bu omborni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
+                    {t('Dealer_Delete_text')}
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
@@ -51,7 +53,7 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
                         className="dark:text-text-dark mr-2"
                         disabled={loading}
                     >
-                        Отмена
+                        {t('Cancel')}
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -80,7 +82,7 @@ export default function WarehouseDilerDelete({ dilerId, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "O‘chirish"
+                            t('Delete')
                         )}
                     </Button>
                 </DialogFooter>

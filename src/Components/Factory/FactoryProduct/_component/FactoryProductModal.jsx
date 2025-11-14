@@ -7,148 +7,97 @@ import {
     DialogHeader,
     IconButton,
     Typography,
+    Input,
+    Select,
+    Option,
 } from "@material-tailwind/react";
-import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 import { useState } from "react";
 import Cookies from "js-cookie";
-import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 
-export default function FactoryProductModal({
-    showModal,
-    setShowModal,
-    selectedProducts,
-    clearSelectedProducts,
-    handleProductSelect,
-}) {
-    const [loading, setLoading] = useState(false);
-    const location_id = Cookies.get('ul_nesw');
+export default function FactoryProductModal() {
+    const [open, setOpen] = useState(false);
+    const [name, setName] = useState("");
+    const [unit, setUnit] = useState("");
     const { t } = useTranslation();
+    const location_id = Cookies.get("ul_nesw");
+    const navigate = useNavigate()
 
+    const units = ["tonna", "kg", "dona", "m.kub", "m.kv", "litr", "metr"];
 
-    const PostProduct = async () => {
+    const toggleOpen = () => setOpen(!open);
+
+    const createProduct = async () => {
+        if (!name || !unit) return;
+
         try {
-            setLoading(true);
-            // Формируем данные в нужном формате
-            const dataToSend = {
-                list: selectedProducts.map((product) => ({
-                    location_id: location_id,
-                    key: "products",
-                    value: product.id,
-                })),
+            const data = {
+                name,
+                unit,
+                location_id,
             };
-            // Отправляем на backend
-            const response = await locationInfo?.Post(dataToSend);
-            console.log("✅ Ma'lumot yuborildi:", response);
-            Alert("Muvaffaqiyatli ", "success");
-
-            setShowModal(false);
-            // Alert("Muvaffaqiyatli ", "success");
+            await LocalProduct?.CreateProduct(data)
+            setName("");
+            setUnit("");
+            navigate(-1)
+            toggleOpen();
+            Alert(`${t("success")}`, "success");
         } catch (error) {
-            console.error("❌ Xatolik yuz berdi:", error);
-            Alert(`Xatolik yuz berdi ${error?.response?.data?.message}`, "error");
-
-        } finally {
-            setLoading(false);
+            console.error("Error creating product:", error);
+            Alert(`${t("Error")}`, "error");
         }
     };
 
-    // Функция для удаления одного продукта
-    const removeSingleProduct = (productId) => {
-        handleProductSelect(selectedProducts.find(p => p.id === productId));
-    };
-
     return (
-        <Dialog
-            size="xl"
-            open={showModal}
-            handler={() => setShowModal(false)}
-            className="relative bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
-            animate={{
-                mount: { scale: 1, y: 0 },
-                unmount: { scale: 0.9, y: -100 },
-            }}
-        >
-            <DialogHeader className="flex justify-between rounded-xl items-center border-b border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark">
-                <span className="font-semibold text-lg dark:text-text-dark">{t('Select_product')}</span>
-                <IconButton
-                    color="red"
-                    variant="text"
-                    size="sm"
-                    onClick={() => setShowModal(false)}
-                >
-                    <XMarkIcon className="h-5 w-5" />
-                </IconButton>
-            </DialogHeader>
+        <>
+            <Button onClick={toggleOpen}>Yangi</Button>
 
-            <DialogBody className="max-h-96 overflow-y-auto">
-                {selectedProducts.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {selectedProducts.map((product) => (
-                            <div
-                                key={product.id}
-                                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 transition-all duration-300 hover:shadow-md hover:border-blue-400"
-                            >
-                                <div className="flex flex-col h-full justify-between">
-                                    <Typography
-                                        variant="small"
-                                        className="font-medium text-gray-800 dark:text-gray-100 line-clamp-2 mb-2"
-                                    >
-                                        {product.name}
-                                    </Typography>
-
-                                    <Button
-                                        size="sm"
-                                        color="red"
-                                        variant="outlined"
-                                        onClick={() => removeSingleProduct(product.id)}
-                                        className="mt-2 text-xs"
-                                    >
-                                        {t('deletet')}
-                                    </Button>
-                                </div>
-                            </div>
+            <Dialog open={open} size="md" handler={toggleOpen}>
+                <DialogHeader>
+                    {t("Create Product")}
+                    <IconButton
+                        variant="text"
+                        color="red"
+                        onClick={toggleOpen}
+                        className="ml-auto"
+                    >
+                        <XMarkIcon className="h-5 w-5" />
+                    </IconButton>
+                </DialogHeader>
+                <DialogBody divider className="space-y-4">
+                    <Input
+                        label={t("Product name")}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder={t("Type product name")}
+                    />
+                    <Select
+                        label={t("Select unit")}
+                        value={unit}
+                        onChange={(value) => setUnit(value)}
+                    >
+                        {units.map((u) => (
+                            <Option key={u} value={u}>
+                                {u}
+                            </Option>
                         ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-10">
-                        <Typography variant="paragraph" className="text-gray-500 dark:text-gray-400 mb-2">
-                            Hozircha mahsulot tanlanmagan
-                        </Typography>
-                        <Typography variant="small" className="text-gray-400 dark:text-gray-500">
-                            Mahsulotlarni tanlash uchun kategoriyalarni oching
-                        </Typography>
-                    </div>
-                )}
-            </DialogBody>
-
-            <DialogFooter className="border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                <Button
-                    variant="outlined"
-                    color="red"
-                    onClick={clearSelectedProducts}
-                    disabled={selectedProducts.length === 0}
-                >
-                    {t("clear_all")}
-                </Button>
-                <div className="flex gap-2">
-                    <Button
-                        variant="outlined"
-                        color="gray"
-                        onClick={() => setShowModal(false)}
-                    >
-                        {t("Cancel")}
+                    </Select>
+                </DialogBody>
+                <DialogFooter className="justify-between">
+                    <Button variant="text" color="red" onClick={toggleOpen}>
+                        {t("Close")}
                     </Button>
                     <Button
-                        color="blue"
-                        onClick={PostProduct}
-                        disabled={selectedProducts.length === 0 || loading}
-                        className="flex items-center gap-2"
+                        color="green"
+                        onClick={createProduct}
+                        disabled={!name || !unit}
                     >
-                        {loading ? t("Saving") : t("Save")}
+                        {t("Create")}
                     </Button>
-                </div>
-            </DialogFooter>
-        </Dialog>
+                </DialogFooter>
+            </Dialog>
+        </>
     );
 }

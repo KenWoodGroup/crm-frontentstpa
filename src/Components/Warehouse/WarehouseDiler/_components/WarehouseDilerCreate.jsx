@@ -86,7 +86,6 @@ export default function WarehouseDilerCreate({ refresh }) {
         const newErrors = {};
         if (!data.name.trim()) newErrors.name = t("Field_required", { field: t("Dealer_name") });
         if (!data.username.trim()) newErrors.username = t("Field_required", { field: t("Dealer_login") });
-        if (!data.full_name.trim()) newErrors.full_name = t("Field_required", { field: t("Dealer_fullname") });
         if (!data.phone.trim()) newErrors.phone = t("Field_required", { field: t("Phone_number") });
         else if (!/^\+998\d{9}$/.test(data.phone)) newErrors.phone = t("Phone_format_error");
         if (!data.password.trim()) newErrors.password = t("Field_required", { field: t("Password") });
@@ -112,7 +111,7 @@ export default function WarehouseDilerCreate({ refresh }) {
             const payload = {
                 name: data.name,
                 username: data.username,
-                full_name: data.full_name,
+                full_name: data.name,
                 phone: data.phone,
                 password: data.password,
                 type: "dealer",
@@ -140,7 +139,7 @@ export default function WarehouseDilerCreate({ refresh }) {
                 onClick={handleOpen}
                 className="bg-black text-white hover:bg-black dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
             >
-                + {t("Add_Dealer")}
+                + {t("Add")}
             </Button>
 
             <Dialog
@@ -149,18 +148,26 @@ export default function WarehouseDilerCreate({ refresh }) {
                 handler={handleOpen}
                 size="sm"
             >
-                <DialogHeader className="border-b border-gray-200 dark:border-gray-600">
-                    {t("Create_Diler")}
+                <DialogHeader className="flex justify-between items-center dark:text-text-dark">
+                    {t("Dealer_create")}
                 </DialogHeader>
                 <DialogBody divider className="space-y-4 overflow-y-auto h-[500px]">
                     {/* Name */}
                     <div>
                         <Input
-                            label={t("Dealer_name")}
+                            label={t("Firstname")}
                             name="name"
                             value={data.name}
                             onChange={handleChange}
                             error={!!errors.name}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark `
+                            }}
                         />
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
@@ -168,25 +175,21 @@ export default function WarehouseDilerCreate({ refresh }) {
                     {/* Username */}
                     <div>
                         <Input
-                            label={t("Dealer_login")}
+                            label={t("Login")}
                             name="username"
                             value={data.username}
                             onChange={handleChange}
                             error={!!errors.username}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark `
+                            }}
                         />
                         {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
-                    </div>
-
-                    {/* Full name */}
-                    <div>
-                        <Input
-                            label={t("Dealer_fullname")}
-                            name="full_name"
-                            value={data.full_name}
-                            onChange={handleChange}
-                            error={!!errors.full_name}
-                        />
-                        {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
                     </div>
 
                     {/* Phone */}
@@ -197,17 +200,26 @@ export default function WarehouseDilerCreate({ refresh }) {
                             value={data.phone}
                             onChange={handleChange}
                             error={!!errors.phone}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark `
+                            }}
                         />
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
 
                     {/* Region */}
                     <div>
-                        <label className="block text-sm font-medium mb-1">{t("Region")}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-text-dark">{t("Region")}</label>
                         <select
                             value={data.region_id}
                             onChange={handleRegionChange}
-                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500" : "border-black"}`}
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black dark:border-text-dark focus:border-black"
+                                }`}
                         >
                             <option value="">{t("Select_region")}</option>
                             {Regions.map((region) => (
@@ -221,12 +233,13 @@ export default function WarehouseDilerCreate({ refresh }) {
 
                     {/* District */}
                     <div>
-                        <label className="block text-sm font-medium mb-1">{t("District")}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-text-dark">{t("District")}</label>
                         <select
                             value={data.district_id}
                             onChange={handleDistrictChange}
                             disabled={!data.region_id}
-                            className={`w-full p-3 border rounded-lg outline-none ${errors.district_id ? "border-red-500" : "border-black"}`}
+                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black dark:border-text-dark focus:border-black"
+                                }`}
                         >
                             <option value="">{t("Select_district")}</option>
                             {availableDistricts.map((district) => (
@@ -247,6 +260,14 @@ export default function WarehouseDilerCreate({ refresh }) {
                             value={data.password}
                             onChange={handleChange}
                             error={!!errors.password}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark `
+                            }}
                         />
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                     </div>
@@ -260,6 +281,14 @@ export default function WarehouseDilerCreate({ refresh }) {
                             value={data.confirm_password}
                             onChange={handleChange}
                             error={!!errors.confirm_password}
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark `
+                            }}
                         />
                         {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password}</p>}
                     </div>
@@ -268,12 +297,12 @@ export default function WarehouseDilerCreate({ refresh }) {
                 <DialogFooter className="flex justify-end gap-2 border-t border-gray-200 dark:border-gray-700">
                     <Button
                         variant="text"
-                        color="gray"
+                        color="red"
                         onClick={handleOpen}
+                        className="dark:text-gray-300"
                         disabled={loading}
-                        className="normal-case hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
-                        {t("Cancel")}
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={createDealer}
