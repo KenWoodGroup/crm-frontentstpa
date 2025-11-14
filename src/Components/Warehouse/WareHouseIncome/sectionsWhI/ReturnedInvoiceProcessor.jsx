@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
 import { useInventory } from "../../../../context/InventoryContext";
+import { useTranslation } from "react-i18next";
 
 const ReturnedInvoiceProcessor = () => {
+    const {t} = useTranslation()
     const [statuses, setStatuses] = useState({});
     const [mergingAll, setMergingAll] = useState(false)
     const {
@@ -35,7 +37,8 @@ const ReturnedInvoiceProcessor = () => {
             barcode: raw.barcode || null,
             batch: raw.batch || null,
             return_quantity: Number(raw.quantity || 0),
-            is_returning:true
+            is_returning:true,
+            s_price:0
         };
     };
 
@@ -51,7 +54,7 @@ const ReturnedInvoiceProcessor = () => {
                     const res = addItemPlusQty(normalized); // provider default mode = provided mode at creation
                     if (res && res.ok === false) {
                         notify.error(res.message || "Item qo'shilmadi");
-                    }
+                    };
                 }
 
                 setStatuses((prev) => ({ ...prev, [inv.id]: "merged" }));
@@ -82,25 +85,25 @@ const ReturnedInvoiceProcessor = () => {
                 return (
                     <div className="flex items-center gap-2 text-blue-600">
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Processing...</span>
+                        <span>{t("processing")}...</span>
                     </div>
                 );
             case "merged":
                 return (
                     <div className="flex items-center gap-2 text-green-600">
                         <CheckCircle2 className="w-5 h-5" />
-                        <span>Merged successfully</span>
+                        <span>{t("mergedSuccessfully")}</span>
                     </div>
                 );
             case "error":
                 return (
                     <div className="flex items-center gap-2 text-red-600">
                         <AlertCircle className="w-5 h-5" />
-                        <span>Error fetching data</span>
+                        <span>Error fetching data{t("errorFetchingData")}</span>
                     </div>
                 );
             default:
-                return <span className="text-gray-500">Selected</span>;
+                return <span className="text-gray-500">{t("selected")}</span>;
         }
     };
 
@@ -108,7 +111,7 @@ const ReturnedInvoiceProcessor = () => {
         <div className="p-6 space-y-6 dark:bg-card-dark">
             <div className="flex justify-between w-full">
                 <h2 className="text-xl font-semibold text-gray-800">
-                    Returned Invoices Progress
+                    {t("returnedInvoicesProgress")}
                 </h2>
                 <button
                     type="button"
@@ -155,7 +158,7 @@ const ReturnedInvoiceProcessor = () => {
                                         {new Date(inv.createdAt).toLocaleString()}
                                     </p>
                                     <p className="font-semibold text-gray-700">
-                                        {inv.total_sum  || "ok"}
+                                        {inv.total_sum  || "-"}
                                     </p>
                                 </div>
                                 <div className="text-xs text-gray-400">

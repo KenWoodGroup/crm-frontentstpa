@@ -5,74 +5,77 @@ import Spinner from "../../../UI/spinner/Spinner";
 import { customSelectStyles } from "../../WareHouseModals/ThemedReactTagsStyles";
 import { ChevronDown, Plus } from "lucide-react";
 import CarrierCreateModal from "../../WareHouseModals/CarrierCreateModal";
+import { useTranslation } from "react-i18next";
 
 const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver }) => {
+    // Komponent ichida (funksiya scope) joylashtiring:
+    const { t } = useTranslation();
+
     const [operationType, setOperationType] = useState("outgoing");
     const [status, setStatus] = useState("draft");
-    // const [receiver, setReceiver] = useState(null);
 
-
+    // translation-backed labels for combinations
     const comboLabels = {
-        draft_outgoing: { ru: "Черновик отгрузки", uz: "Chiqim zayafkasini qoralab qo‘yish" },
-        approved_outgoing: { ru: "Подтвержденная отгрузка", uz: "Chiqim zayafkasini tasdiqlash" },
-        sent_outgoing: { ru: "Отправленная отгрузка", uz: "Chiqim jo‘natildi" },
-        received_outgoing: { ru: "Полученная отгрузка", uz: "Jo‘natilgan tovar qabul qilindi" },
-        draft_transfer_out: { ru: "Черновик перемещения", uz: "Ko‘chirish zayafkasini qoralab qo‘yish" },
-        approved_transfer_out: { ru: "Подтвержденное перемещение", uz: "Ko‘chirish zayafkasini tasdiqlash" },
-        sent_transfer_out: { ru: "Отправленное перемещение", uz: "Ko‘chirish jo‘natildi" },
-        received_transfer_out: { ru: "Полученное перемещение", uz: "Ko‘chirilgan tovar qabul qilindi" },
+        draft_outgoing: t("combo.draft_outgoing"),
+        approved_outgoing: t("combo.approved_outgoing"),
+        sent_outgoing: t("combo.sent_outgoing"),
+        received_outgoing: t("combo.received_outgoing"),
+        draft_transfer_out: t("combo.draft_transfer_out"),
+        approved_transfer_out: t("combo.approved_transfer_out"),
+        sent_transfer_out: t("combo.sent_transfer_out"),
+        received_transfer_out: t("combo.received_transfer_out"),
     };
 
     const typeOptions = [
-        { value: "outgoing", label: "Отгрузка (Klientlarga)" },
-        { value: "transfer_out", label: "Перемещение (Boshqa omborga)" },
-        { value: "disposal", label: "Diposal" }
+        { value: "outgoing", label: t("type.outgoing_label") }, // Отгрузка (Klientlarga)
+        { value: "transfer_out", label: t("type.transfer_out_label") }, // Перемещение (Boshqa omborga)
+        { value: "disposal", label: t("type.disposal_label") }, // Diposal
     ];
 
     const statusOptions = [
-        { value: "draft", label: "Черновик" },
-        // { value: "approved", label: "Подтверждено" },
-        { value: "sent", label: "Отправлено" },
-        { value: "received", label: "Получено" },
+        { value: "draft", label: t("status.draft") }, // Черновик
+        { value: "sent", label: t("status.sent") },   // Отправлено
+        { value: "received", label: t("status.received") }, // Получено
     ];
 
     const receiverOptions = receiverLocations?.map((loc) => ({
         value: loc.id,
         label: loc.name,
-        type: loc.type
-    })
-    )
+        type: loc.type,
+    }));
+
     const staffOptions = staffs?.map((loc) => ({
         value: loc.id,
         label: loc.full_name,
-    })
-    )
+    }));
 
     const changeReceiver = (value) => {
-        // setReceiver(value);
         selectReceiver(value);
     };
+
     const changeOprSatatus = (value) => {
         setStatus(value);
-        selectStatus(value)
+        selectStatus(value);
     };
+
     const changeOprType = (value) => {
         setOperationType(value);
         selectOprType(value);
         if (value === "disposal") {
             const disposal = receiverOptions?.find((op) => op.type === "disposal");
             changeReceiver(disposal?.value);
-            changeOprSatatus("received")
+            changeOprSatatus("received");
         } else {
-            selectReceiver(null)
-            changeOprSatatus("draft")
+            selectReceiver(null);
+            changeOprSatatus("draft");
         }
     };
 
-    const activeLabel = comboLabels[`${status}_${operationType}`];
+    const activeLabel = comboLabels[`${status}_${operationType}`] || t("combo.unknown");
 
     // ---------- UI ----------
     const [carrierModalOpen, setCarrierModalOpen] = useState(false);
+
     // --- Custom DropdownIndicator ---
     const DropdownIndicator = (props) => {
         const { selectProps } = props;
@@ -81,7 +84,7 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
         return (
             <components.DropdownIndicator {...props}>
                 <div className="flex items-center gap-1">
-                    {/* Yangi kuryer qo‘shish tugmasi */}
+                    {/* Add new courier button */}
                     <div
                         onMouseDown={(e) => {
                             e.stopPropagation();
@@ -90,12 +93,13 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
                             setCarrierModalOpen(true);
                         }}
                         className="flex items-center justify-center text-blue-600 dark:text-blue-400 hover:scale-110 transition-transform cursor-pointer"
-                        title="Yangi kuryer qo‘shish"
+                        title={t("driver.add_new_title")}
+                        aria-label={t("driver.add_new_aria")}
                     >
                         <Plus size={18} />
                     </div>
 
-                    {/* Oddiy pastga strelka */}
+                    {/* Dropdown chevron */}
                     <ChevronDown className="w-5 h-5 text-gray-500" />
                 </div>
             </components.DropdownIndicator>
@@ -116,48 +120,50 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
         >
             <fieldset className="border border-gray-300 dark:border-gray-600 rounded-xl p-5 transition-colors duration-300">
                 <legend className="px-3 text-lg font-semibold text-gray-700 dark:text-gray-200">
-                    📦 Отгрузка / Перемещение
+                    📦 {t("legend.title")}
                 </legend>
 
                 {/* Operation Type */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-                        Тип операции:
+                        {t("label.operation_type")}
                     </label>
                     <Select
                         options={typeOptions}
-                        value={typeOptions.find(t => t.value === operationType)}
-                        onChange={opt => changeOprType(opt.value)}
+                        value={typeOptions.find((topt) => topt.value === operationType)}
+                        onChange={(opt) => changeOprType(opt.value)}
                         className="text-sm dark:text-gray-200"
                         styles={customSelectStyles()}
+                        aria-label={t("aria.operation_type")}
                     />
                 </div>
 
                 {/* Status */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-                        Статус:
+                        {t("label.status")}
                     </label>
                     <Select
                         options={
                             operationType === "disposal"
-                                ? statusOptions.filter(st => st.value === "received")
-                                : statusOptions.filter(st => st.value !== "received")
+                                ? statusOptions.filter((st) => st.value === "received")
+                                : statusOptions.filter((st) => st.value !== "received")
                         }
-                        value={statusOptions.find(s => s.value === status)}
-                        onChange={opt => changeOprSatatus(opt.value)}
+                        value={statusOptions.find((s) => s.value === status)}
+                        onChange={(opt) => changeOprSatatus(opt.value)}
                         className="text-sm dark:text-gray-200"
                         styles={customSelectStyles()}
+                        aria-label={t("aria.status")}
                     />
                 </div>
 
                 {/* Receiver */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-                        Получатель:
+                        {t("label.receiver")}
                     </label>
                     <Select
-                        options={receiverOptions.filter(r =>
+                        options={receiverOptions.filter((r) =>
                             operationType === "outgoing"
                                 ? r.type === "client" || r.type === "dealer"
                                 : operationType === "transfer_out"
@@ -166,41 +172,42 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
                         )}
                         value={
                             selectedReceiver
-                                ? receiverOptions?.find(loc => loc.value === selectedReceiver)
+                                ? receiverOptions?.find((loc) => loc.value === selectedReceiver)
                                 : null
                         }
-                        onChange={opt => changeReceiver(opt.value)}
+                        onChange={(opt) => changeReceiver(opt.value)}
                         isSearchable
-                        placeholder="Выберите..."
+                        placeholder={t("placeholder.choose")}
                         className="text-sm dark:text-gray-200"
                         styles={customSelectStyles()}
+                        aria-label={t("aria.receiver")}
                     />
                 </div>
 
                 {/* Driver */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-                        Driver:
+                        {t("label.driver")}
                     </label>
                     <>
                         <Select
                             options={staffOptions}
-                            value={staffOptions?.find(loc => loc.value === selectedStaff)}
-                            onChange={opt => selectStaff(opt.value)}
+                            value={staffOptions?.find((loc) => loc.value === selectedStaff)}
+                            onChange={(opt) => selectStaff(opt.value)}
                             isSearchable
                             components={{ DropdownIndicator }}
                             menuPlacement="auto"
                             fetchStaffs={getStaffs}
                             setCarrierModalOpen={setCarrierModalOpen}
-                            placeholder="Выберите получателя..."
+                            placeholder={t("placeholder.choose_driver")}
                             className="text-sm dark:text-gray-200"
                             styles={customSelectStyles()}
+                            aria-label={t("aria.driver")}
                         />
                         {carrierModalOpen && (
                             <CarrierCreateModal onClose={() => setCarrierModalOpen(false)} refresh={(id) => getStaffs(id, true)} />
                         )}
                     </>
-
                 </div>
 
                 {/* Summary */}
@@ -211,7 +218,7 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
                     whileHover={{ scale: 1.02 }}
                 >
                     <p className="text-gray-700 dark:text-gray-200 font-semibold text-base">
-                        {activeLabel?.ru}
+                        {activeLabel || t("combo.unknown")}
                     </p>
                 </motion.div>
 
@@ -223,118 +230,15 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
                      text-white font-medium py-2 px-5 rounded-xl 
                      transition-all flex gap-2 items-center"
                         onClick={startOperation}
+                        aria-label={t("aria.start_operation")}
                     >
                         {isLoading && <Spinner />}
-                        Начать операцию
+                        {t("button.start_operation")}
                     </motion.button>
                 </div>
             </fieldset>
         </motion.div>
     );
-
-    // return (
-    //     <motion.div
-    //         className="w-full max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-6 border border-gray-200"
-    //         initial={{ opacity: 0, y: 20 }}
-    //         animate={{ opacity: 1, y: 0 }}
-    //         transition={{ duration: 0.4 }}
-    //     >
-    //         <fieldset className="border border-gray-300 rounded-xl p-5">
-    //             <legend className="px-3 text-lg font-semibold text-gray-700">
-    //                 📦 Отгрузка / Перемещение
-    //             </legend>
-
-    //             {/* Operation Type */}
-    //             <div className="mb-4">
-    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
-    //                     Тип операции:
-    //                 </label>
-    //                 <Select
-    //                     options={typeOptions}
-    //                     value={typeOptions.find(t => t.value === operationType)}
-    //                     onChange={opt => changeOprType(opt.value)}
-    //                     className="text-sm"
-    //                     styles={{
-    //                         control: base => ({
-    //                             ...base,
-    //                             borderRadius: "0.75rem",
-    //                             borderColor: "#d1d5db",
-    //                             padding: "2px",
-    //                         }),
-    //                     }}
-    //                 />
-    //             </div>
-
-    //             {/* Status */}
-    //             <div className="mb-4">
-    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
-    //                     Статус:
-    //                 </label>
-    //                 <Select
-    //                     options={operationType === "disposal" ? statusOptions.filter((st)=> st.value === "received") :statusOptions.filter((st)=> st.value !== "received")}
-    //                     value={statusOptions.find(s => s.value === status)}
-    //                     onChange={opt => changeOprSatatus(opt.value)}
-    //                     className="text-sm"
-    //                 />
-    //             </div>
-
-    //             {/* Receiver */}
-    //             <div className="mb-4">
-    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
-    //                     Получатель:
-    //                 </label>
-    //                 <Select
-    //                     options={receiverOptions.filter(r =>
-    //                         operationType === "outgoing"
-    //                             ? r.type === "client" || r.type === "dealer"
-    //                             : operationType === "transfer_out" ? r.type === "warehouse"
-    //                                 : r.type === "disposal"
-    //                     )}
-    //                     value={selectedReceiver ? receiverOptions?.find((loc) => loc.value === selectedReceiver) : null}
-    //                     onChange={opt => changeReceiver(opt.value)}
-    //                     isSearchable
-    //                     placeholder="Выберите..."
-    //                     className="text-sm"
-    //                 />
-    //             </div>
-    //             <div className="mb-4">
-    //                 <label className="block text-sm font-medium text-gray-600 mb-1">
-    //                     Driver:
-    //                 </label>
-    //                 <Select
-    //                     options={staffOptions}
-    //                     value={staffOptions?.find((loc) => loc.value === selectedStaff)}
-    //                     onChange={opt => selectStaff(opt.value)}
-    //                     isSearchable
-    //                     placeholder="Выберите получателя..."
-    //                     className="text-sm"
-    //                 />
-    //             </div>
-
-    //             {/* Summary */}
-    //             <motion.div
-    //                 className="mt-6 bg-gray-50 border border-gray-200 rounded-xl p-4 text-center"
-    //                 whileHover={{ scale: 1.02 }}
-    //             >
-    //                 <p className="text-gray-700 font-semibold text-base">
-    //                     {activeLabel?.ru}
-    //                 </p>
-    //             </motion.div>
-
-    //             {/* Start Button */}
-    //             <div className="mt-6 flex justify-end">
-    //                 <motion.button
-    //                     whileTap={{ scale: 0.95 }}
-    //                     className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2 px-5 rounded-xl transition-all flex gap-2 items-center"
-    //                     onClick={startOperation}
-    //                 >
-    //                     {isLoading && <Spinner />}
-    //                     Начать операцию
-    //                 </motion.button>
-    //             </div>
-    //         </fieldset>
-    //     </motion.div>
-    // );
 };
 
 export default OutgoingPanel;
