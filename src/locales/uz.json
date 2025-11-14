@@ -218,5 +218,9 @@
     "Qr_text2": "So‘nggi partiyani avtomatik tanlash",
     "Qr_text3": "Modallikka ko‘ra tanlash",
     "Qr_text4": "Shtrixkod skanerlanganda tizim so‘nggi partiyani avtomatik tanlab, hisobga qo‘shadi. Ishni tezlashtirish uchun qulay.",
-    "Qr_text5": "Shtrixkod skanerlanganda tizim partiyalarni ro‘yxat ko‘rinishida ko‘rsatadi va keraklisini qo‘lda tanlaysiz. Aniqlik uchun qulay."
+    "Qr_text5": "Shtrixkod skanerlanganda tizim partiyalarni ro‘yxat ko‘rinishida ko‘rsatadi va keraklisini qo‘lda tanlaysiz. Aniqlik uchun qulay.",
+    "Dealer_create": "Diler yaratish",
+    "Dealer_Delete": "Dilerni o‘chirish",
+    "Dealer_Delete_text": "Siz chindan ham ushbu dilerni o‘chirib tashlamoqchimisiz?",
+    "Login": "login"
 }

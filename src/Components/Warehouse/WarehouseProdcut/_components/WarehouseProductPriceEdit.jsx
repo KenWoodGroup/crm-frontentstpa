@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Dialog,
     DialogHeader,
@@ -13,6 +13,9 @@ import { Stock } from "../../../../utils/Controllers/Stock";
 import { Alert } from "../../../../utils/Alert";
 import { formatNumber, unformatNumber } from "../../../../utils/Helpers/Formater";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie";
+import { PriceType } from "../../../../utils/Controllers/PriceType";
+
 
 export default function WarehouseEdit({ data }) {
     const [open, setOpen] = useState(false);
@@ -22,6 +25,18 @@ export default function WarehouseEdit({ data }) {
 
 
     const handleOpen = () => setOpen(!open);
+
+
+    const getAllPriceType = async () => {
+        try {
+            const response = await PriceType?.PriceTypeGet(
+                Cookies.get("ul_nesw")
+            );
+            setData(response?.data || []);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const handleSave = async () => {
         try {
@@ -49,6 +64,13 @@ export default function WarehouseEdit({ data }) {
         if (!/^\d*$/.test(rawValue)) return;
         setPrice(formatNumber(rawValue));
     };
+
+    useEffect(() => {
+        if (open) {
+            getAllPriceType()
+        }
+    }, [open])
+
 
     return (
         <>

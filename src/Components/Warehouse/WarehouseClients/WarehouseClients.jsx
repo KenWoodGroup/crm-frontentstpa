@@ -101,7 +101,7 @@ export default function WarehouseClients() {
 
             {/* Если нет клиентов */}
             {clients.length <= 0 ? (
-                <EmptyData text={t('Empty_Data')} />
+                <EmptyData text={t('Empty_data')} />
             ) : (
                 <>
                     <Card className="overflow-hidden bg-card-light dark:bg-card-dark transition-colors duration-300">

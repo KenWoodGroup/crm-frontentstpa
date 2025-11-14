@@ -218,5 +218,9 @@
   "Qr_text2": "Automatic selection of the last batch",
   "Qr_text3": "Selection by modal",
   "Qr_text4": "When scanning a barcode, the system automatically selects the last batch and adds it to the invoice. Convenient for fast work.",
-  "Qr_text5": "When scanning a barcode, the system shows batches in a list so you can choose manually. Convenient for accuracy."
+  "Qr_text5": "When scanning a barcode, the system shows batches in a list so you can choose manually. Convenient for accuracy.",
+  "Dealer_create": "Create dealer",
+  "Dealer_Delete": "Delete dealer",
+  "Dealer_Delete_text": "Are you sure you want to delete this dealer?",
+  "Login": "Login"
 }

@@ -1,4 +1,4 @@
 const Socket =
-    "https://dev.usderp.uz";            
+    "https://api.usderp.uz";            
 
 export default Socket;

@@ -9,12 +9,24 @@ class PriceType {
         const response = await $api.get(`/price-type/all/${id}`)
         return response;
     }
+    static PriceTypeByIDGet = async (id) => {
+        const response = await $api.get(`/price-type/${id}`)
+        return response;
+    }
     static PriceTypeDelete = async (id) => {
         const response = await $api.delete(`/price-type/${id}`)
         return response;
     }
     static PriceTypeEdit = async (id, data) => {
         const response = await $api.put(`/price-type/${id}`, data)
+        return response;
+    }
+    static SalePriceTypeCreate = async (data) => {
+        const response = await $api.post(`/stock-sale-type`, data)
+        return response;
+    }
+    static SalePriceTypeEdit = async (id, data) => {
+        const response = await $api.put(`/stock-sale-type/${id}`, data)
         return response;
     }
 } export { PriceType }
