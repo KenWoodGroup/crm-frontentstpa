@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 
 export default function FactoryProductModal() {
+    const { id } = useParams()
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [unit, setUnit] = useState("");
@@ -37,11 +38,12 @@ export default function FactoryProductModal() {
                 name,
                 unit,
                 location_id,
+                subcategory_id: id
             };
             await LocalProduct?.CreateProduct(data)
             setName("");
             setUnit("");
-            navigate(-1)
+            navigate(-2)
             toggleOpen();
             Alert(`${t("success")}`, "success");
         } catch (error) {

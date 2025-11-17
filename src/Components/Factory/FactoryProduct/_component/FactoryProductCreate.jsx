@@ -13,6 +13,7 @@ import EmptyData from "../../../UI/NoData/EmptyData";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
 import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
+import FactoryProductModal from "./FactoryProductModal";
 
 export default function FactoryProductCreate() {
     const { t } = useTranslation();
@@ -60,7 +61,8 @@ export default function FactoryProductCreate() {
                 name: product.name,
                 unit: product.unit || "шт",
                 location_id: location_id,
-                product_id: product.id
+                product_id: product.id,
+                subcategory_id: id
             };
             await LocalProduct?.CreateProduct(data);
             await getMyProduct();
@@ -205,6 +207,7 @@ export default function FactoryProductCreate() {
                     >
                         {subcategoryName}
                     </Typography>
+                    <FactoryProductModal />
                 </div>
 
                 <div className="flex items-center justify-between mx-auto">

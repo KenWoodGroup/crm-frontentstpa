@@ -11,6 +11,7 @@ import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseBarcodeModal from "./_components/WarehouseBarcodeCreateModal";
 import { useTranslation } from "react-i18next";
+import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 
 export default function WarehouseBarcodeCreate() {
     const [miniCategories, setMiniCategories] = useState([]);
@@ -23,7 +24,7 @@ export default function WarehouseBarcodeCreate() {
     const GetMiniCategory = async () => {
         setLoading(true);
         try {
-            const response = await ProductApi?.GetMiniCategoryById(
+            const response = await LocalProduct?.GetCategory(
                 Cookies.get("usd_nesw")
             );
             setMiniCategories(response?.data || []);
@@ -37,10 +38,10 @@ export default function WarehouseBarcodeCreate() {
     const GetProductBySubCategory = async (subCategoryId) => {
         try {
             const data = {
-                subcategory_id: subCategoryId,
+                sub_id: subCategoryId,
                 location_id: Cookies?.get('ul_nesw')
             }
-            const response = await ProductApi?.GetProductByLocationIdBySubCategory(data)
+            const response = await LocalProduct?.GetMyProductLocation(data)
             setProductsData((prev) => ({
                 ...prev,
                 [subCategoryId]: response?.data || [],
@@ -51,6 +52,9 @@ export default function WarehouseBarcodeCreate() {
     };
 
     const handleAccordion = (subCategoryId) => {
+
+
+
         setOpenAccordions((prev) => {
             const isOpen = prev.includes(subCategoryId);
             if (isOpen) {

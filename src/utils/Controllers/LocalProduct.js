@@ -9,8 +9,16 @@ class LocalProduct {
         const response = await $api.get(`/local-products/paginate/${data?.id}/page?page=${data?.page}`)
         return response;
     }
+    static GetCategory = async (id) => {
+        const response = await $api.get(`/local-products/category/${id}`)
+        return response;
+    }
     static GetMyProduct = async (data) => {
         const response = await $api.get(`/local-products/products/${data?.location_id}/${data?.sub_id}`)
+        return response;
+    }
+    static GetMyProductLocation = async (data) => {
+        const response = await $api.get(`/local-products/by-location/${data?.sub_id}/${data?.location_id}`)
         return response;
     }
     static DeleteProduct = async (id) => {
