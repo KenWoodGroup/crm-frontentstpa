@@ -6,6 +6,7 @@ import {
     Mail,
     ChevronLeft,
     ChevronRight,
+    CircleDollarSign,
 } from "lucide-react";
 import { Alert } from "../../../utils/Alert";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ import PartnerCreate from "./_components/PartnerCreate";
 import { Partner } from "../../../utils/Controllers/Partner";
 import PartnerEdit from "./_components/PartnerEdit";
 import PartnerDelete from "./_components/PartnerDelete";
+import PartnerPayment from "./_components/PartnerPayment";
 
 export default function FactoryPartnter() {
     const { t } = useTranslation();
@@ -91,7 +93,12 @@ export default function FactoryPartnter() {
                                         </h2>
                                     </div>
                                     <div className="flex items-center gap-2">
+                                        <PartnerPayment
+                                            refresh={() => GetAll(page)}
+                                            partner={w}
+                                        />
                                         <PartnerEdit
+                                        
                                             refresh={() => GetAll(page)}
                                             partner={w}
                                         />
@@ -107,10 +114,13 @@ export default function FactoryPartnter() {
                                         <MapPin className="w-5 h-5 opacity-70" />
                                         <span>{w.address}</span>
                                     </div>
-
                                     <div className="flex items-center gap-2">
                                         <Phone className="w-5 h-5 opacity-70" />
                                         <span>{w.phone}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <CircleDollarSign className="w-5 h-5 opacity-70" />
+                                        <span>{w?.balance}</span>
                                     </div>
                                 </div>
                             </div>
