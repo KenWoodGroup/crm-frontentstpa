@@ -16,15 +16,26 @@ i18n
             en: { translation: en },
             uz: { translation: uz },
         },
-        fallbackLng: "ru", // 🇷🇺 Русский по умолчанию
+        fallbackLng: "ru", // 🇷🇺 Если не найден язык, используем русский
         debug: false,
         interpolation: {
             escapeValue: false,
         },
         detection: {
             order: ["localStorage", "navigator", "htmlTag"],
-            caches: ["localStorage"], // язык будет запоминаться
+            caches: ["localStorage"],
+            lookupLocalStorage: "lang",
+        },
+        react: {
+            useSuspense: false,
         },
     });
+
+// 👇 Если не выбран язык, принудительно ставим русский
+const currentLang = i18n.language || localStorage.getItem("lang");
+if (!currentLang) {
+    i18n.changeLanguage("ru");
+    localStorage.setItem("lang", "ru");
+}
 
 export default i18n;

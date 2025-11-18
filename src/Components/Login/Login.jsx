@@ -241,18 +241,6 @@ export default function Login() {
                 {showPassword ? <Eye /> : <ClosedEye />}
               </button>
             </div>
-
-            <div className="flex justify-between mt-2">
-              <NavLink to="/forgot-password">
-                <button
-                  type="button"
-                  className="login-forgot bg-[rgba(19,102,214,0.06)] dark:bg-blue-900/20 !important px-1.5 py-2.5 rounded-full border-none text-[13px] font-medium text-blue-600 dark:text-blue-400 !important hover:bg-blue-100 dark:hover:bg-blue-900/30 !important transition-colors duration-200 !important"
-                  disabled={loading}
-                >
-                  Parolni unutdingizmi?
-                </button>
-              </NavLink>
-            </div>
           </label>
 
           <div className="flex gap-3 items-center mt-2">

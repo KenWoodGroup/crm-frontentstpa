@@ -12,13 +12,15 @@ import {
 import Cookies from "js-cookie";
 import { Payment } from "../../../../utils/Controllers/Payment";
 import { Alert } from "../../../../utils/Alert";
+import { useTranslation } from "react-i18next";
 
 export default function ParentPayment({ refresh, partner }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { t } = useTranslation();
 
     const [form, setForm] = useState({
-        amount: "",
+        amount: 0,
         status: "confirmed",
         payer_id: Cookies.get("ul_nesw") || "",
         receiver_id: partner?.id,
@@ -26,34 +28,63 @@ export default function ParentPayment({ refresh, partner }) {
         created_by: Cookies.get("us_nesw") || "",
     });
 
-    const handleOpen = () => setOpen(!open);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+    // ------------ FORMAT FUNCTIONS ---------------
+    const formatNumber = (value) => {
+        if (!value) return "";
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     };
 
+    const unFormatNumber = (value) => {
+        return value.replace(/\s/g, "");
+    };
+
+    // ------------ INPUT CHANGE HANDLER -----------
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === "amount") {
+            const pure = unFormatNumber(value);
+
+            if (!/^\d*$/.test(pure)) return;
+
+            setForm((prev) => ({
+                ...prev,
+                amount: Number(pure), // <-- передаём как number
+            }));
+        } else {
+            setForm((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
+    };
+
+    const handleOpen = () => setOpen(!open);
+
+    // ------------ CREATE PAYMENT ----------------
     const CreatePayment = async () => {
         setLoading(true);
+
         try {
             await Payment.PaymentPartner(form);
 
-            Alert("To'lov muvaffaqiyatli yaratildi", "success");
+            Alert(t(`success`), "success");
 
             setForm({
-                amount: "",
+                amount: 0,
                 status: "confirmed",
-                payer_id: "",
-                receiver_id: "",
+                payer_id: Cookies.get("ul_nesw") || "",
+                receiver_id: partner?.id,
                 note: "",
-                created_by: Cookies.get("ul_nesw") || "",
+                created_by: Cookies.get("us_nesw") || "",
             });
 
             handleOpen();
             refresh && refresh();
+
         } catch (error) {
             console.log(error);
-            Alert("Xatolik yuz berdi", "error");
+            Alert(t(`Error`), "error");
         } finally {
             setLoading(false);
         }
@@ -71,36 +102,57 @@ export default function ParentPayment({ refresh, partner }) {
             </Button>
 
             {/* Modal */}
-            <Dialog open={open} handler={handleOpen} size="sm">
-                <DialogHeader>To‘lov qo‘shish</DialogHeader>
+            <Dialog
+                className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
+                open={open}
+                handler={handleOpen}
+                size="sm"
+            >
+                <DialogHeader className="flex justify-between items-center dark:text-text-dark">
+                    To‘lov qo‘shish
+                </DialogHeader>
 
-                <DialogBody divider className="flex flex-col gap-4">
+                <DialogBody className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark" divider>
+
                     <Input
-                        label="Summasi"
+                        label={t('Price__sum')}
                         name="amount"
-                        type="number"
-                        value={form.amount}
+                        type="text"
+                        value={formatNumber(form.amount)}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark`,
+                        }}
                     />
+
                     <Textarea
-                        label="Izoh"
+                        label={t('Comment')}
                         name="note"
                         value={form.note}
                         onChange={handleChange}
+                        color="blue-gray"
+                        className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                        labelProps={{
+                            className: `!text-text-light dark:!text-text-dark`,
+                        }}
                     />
+
                 </DialogBody>
 
                 <DialogFooter className="flex justify-end gap-2">
                     <Button variant="text" color="red" onClick={handleOpen}>
-                        Bekor qilish
+                        {t('Cancel')}
                     </Button>
+
                     <Button
                         onClick={CreatePayment}
                         className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
                         disabled={loading}
                     >
                         {loading && <Spinner size="sm" />}
-                        Qo‘shish
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>
