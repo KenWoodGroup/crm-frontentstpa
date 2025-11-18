@@ -499,5 +499,6 @@
     "Delete_product": "Mahsulotni o‘chirish",
     "Edit_product": "Mahsulotni tahrirlash",
     "Delete_product_text": "Ushbu mahsulotni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!",
-    "Select_unit": "O‘lchov birligini tanlang"
+    "Select_unit": "O‘lchov birligini tanlang",
+    "partlyPaid":"Qisman to‘langan"
 }

@@ -168,6 +168,7 @@ export default function WarehouseInvoiceHistory() {
         payment: {
             paid: `${t("paid")}`,
             unpaid: `${t("unpaid")}`,
+            partly_paid:`${t("partlyPaid")}`
         },
     };
 
@@ -198,6 +199,7 @@ export default function WarehouseInvoiceHistory() {
         const map = {
             paid: "bg-green-50 text-green-700",
             unpaid: "bg-yellow-50 text-yellow-700",
+            partlyPaid: "bg-blue-50 text-blue-700",
         };
         return <span className={`px-2 py-0.5 text-xs rounded ${map[p] || "bg-gray-100 text-gray-700"}`}>{nice.payment[p] || p}</span>;
     }
@@ -600,7 +602,7 @@ export default function WarehouseInvoiceHistory() {
                                         checked={columns[k]}
                                         onChange={() => toggleColumn(k)}
                                     />
-                                    <span className="capitalize">{defaultColsLabels[Object.keys(defaultColsLabels).find((l)=> l === k)]}</span>
+                                    <span className="capitalize">{defaultColsLabels[Object.keys(defaultColsLabels).find((l) => l === k)]}</span>
                                 </label>
                             ))}
                         </div>
@@ -929,7 +931,7 @@ export default function WarehouseInvoiceHistory() {
 }
 
 function EditInvoiceModal({ invoice, onClose, onSave }) {
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const [form, setForm] = useState(() => ({ ...invoice }));
     useEffect(() => {
         const { note, id } = invoice
@@ -987,7 +989,7 @@ function EditInvoiceModal({ invoice, onClose, onSave }) {
 }
 
 function EditStatusModal({ invoice, onClose, onSave, loading }) {
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const [form, setForm] = useState(() => ({ ...invoice, org_status: invoice?.status }));
     useEffect(() => {
         setForm(prev => ({ ...invoice, org_status: invoice?.status || prev.org_status }));
@@ -1048,7 +1050,7 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
 }
 
 function EditItemModal({ item, onClose, onSave }) {
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const [form, setForm] = useState(() => ({ ...item }));
     useEffect(() => setForm({ ...item }), [item]);
     return (
