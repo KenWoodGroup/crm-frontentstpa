@@ -39,6 +39,7 @@ import { useInventory } from "../../../context/InventoryContext";
 import { PriceType } from "../../../utils/Controllers/PriceType";
 import { customSelectStyles } from "../WareHouseModals/ThemedReactTagsStyles";
 import Select, { components } from "react-select";
+import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -151,7 +152,7 @@ export default function WareHouseOutcome() {
         try {
             setGroupLoading(true);
             const LocationId = Cookies.get("usd_nesw");
-            const res = await ProductApi.GetMiniCategoryById(LocationId);
+            const res = await LocalProduct.GetCategory(LocationId);
             if (res?.status === 200) setCategories(res.data || []);
             else setCategories(res?.data || []);
         } catch (err) {
