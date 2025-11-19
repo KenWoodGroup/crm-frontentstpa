@@ -11,10 +11,12 @@ import { Alert } from "../../../../utils/Alert";
 import Edit from "../../../UI/Icons/Edit";
 import { UserApi } from "../../../../utils/Controllers/UserApi";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseUserEdit({ user, refresh }) {
     const [open, setOpen] = useState(false);
     const { id } = useParams();
+    const { t } = useTranslation()
     const [loading, setLoading] = useState(false);
     const [userId, setUserId] = useState("");
     const [data, setData] = useState({
@@ -72,13 +74,13 @@ export default function WarehouseUserEdit({ user, refresh }) {
                 );
             }
 
-            Alert("Foydalanuvchi muvaffaqiyatli yangilandi ✅", "success");
+            Alert(`${t('success')}`, "success");
             setOpen(false);
             refresh();
         } catch (error) {
             console.error(error);
             Alert(
-                `Xatolik yuz berdi ${error?.response?.data?.message || ""}`,
+                `${t('Error')} ${error?.response?.data?.message || ""}`,
                 "error"
             );
         } finally {
@@ -101,11 +103,11 @@ export default function WarehouseUserEdit({ user, refresh }) {
                 className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
             >
                 <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
-                    Foydalanuvchi maʼlumotlarini tahrirlash
+                    {t('Warehouse_user_Edit')}
                 </DialogHeader>
                 <DialogBody divider className="space-y-4">
                     <Input
-                        label="To‘liq ism"
+                        label={t(`Name`)}
                         color="blue-gray"
                         name="full_name"
                         value={data.full_name}
@@ -116,7 +118,7 @@ export default function WarehouseUserEdit({ user, refresh }) {
                         }}
                     />
                     <Input
-                        label="Username"
+                        label={t('Login')}
                         color="blue-gray"
                         name="username"
                         value={data.username}
@@ -128,7 +130,7 @@ export default function WarehouseUserEdit({ user, refresh }) {
                     />
                     {/* Поле для изменения пароля */}
                     <Input
-                        label="Yangi parol (ixtiyoriy)"
+                        label={t('Password')}
                         type="password"
                         color="blue-gray"
                         name="new_password"
@@ -147,7 +149,7 @@ export default function WarehouseUserEdit({ user, refresh }) {
                         color="red"
                         onClick={handleOpen}
                     >
-                        Bekor qilish
+                        {t('Cancel')}
                     </Button>
                     <Button
                         className={`bg-blue-600 text-white normal-case hover:bg-blue-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""
@@ -177,7 +179,7 @@ export default function WarehouseUserEdit({ user, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "Saqlash"
+                            t('Save')
                         )}
                     </Button>
                 </DialogFooter>

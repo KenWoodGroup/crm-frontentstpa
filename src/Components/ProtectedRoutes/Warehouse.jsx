@@ -5,8 +5,8 @@ import Cookies from "js-cookie";
 export default function Warehouse({ children }) {
 
     const isLoged = Cookies.get("nesw");
-    if (isLoged !== "SesdsdfmgrUID") {
-        return <Navigate to={"/login"} replace />
+    if (isLoged === "SesdsdfmgrUID" || isLoged === "KesdsdfmgrUID") {
+        return children;
     }
-    return children
+    return <Navigate to="/login" replace />;
 }

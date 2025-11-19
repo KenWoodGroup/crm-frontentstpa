@@ -34,4 +34,13 @@ class Statistik {
         const response = await $api.get(`/statistic/least-sel/${data?.id}/${data?.startDate}/${data?.endDate}`)
         return response;
     }
+    static GetStatistikFinanceWarehouse = async (id) => {
+        const response = await $api.get(`/statistic/warehouse-card/${id}`)
+        return response;
+    }
+    static GetStatistikFinanceCard = async (id) => {
+        const response = await $api.get(`/statistic/report-card/${id}`)
+        return response;
+    }
+
 } export { Statistik }

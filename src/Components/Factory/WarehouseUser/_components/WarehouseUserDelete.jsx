@@ -4,9 +4,11 @@ import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { UserApi } from "../../../../utils/Controllers/UserApi";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseUserDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation()
     const [loading, setLoading] = useState(false);
 
     const handleOpen = () => setOpen(!open);
@@ -15,12 +17,12 @@ export default function WarehouseUserDelete({ id, refresh }) {
         try {
             setLoading(true);
             await UserApi.UserDelete(id);
-            Alert("Ombor muvaffaqiyatli o‘chirildi ", "success");
+            Alert(`${t('success')}`, "success");
             refresh();
             setOpen(false);
         } catch (error) {
             console.error(error);
-            Alert("Xatolik yuz berdi ", "error");
+            Alert(`${t('Error')}`, "error");
         } finally {
             setLoading(false);
         }
@@ -37,10 +39,10 @@ export default function WarehouseUserDelete({ id, refresh }) {
 
             <Dialog open={open} handler={handleOpen} className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark">
                 <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
-                    Xodim o‘chirish
+                    {t('Warehouse_user_delete')}
                 </DialogHeader>
                 <DialogBody divider className="text-text-light dark:text-text-dark py-6">
-                    Siz haqiqatdan ham bu xodimni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
+                    {t('Warehouse_user_delete_text')}
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
@@ -53,7 +55,7 @@ export default function WarehouseUserDelete({ id, refresh }) {
                                   transition-colors duration-200 font-medium"
                         disabled={loading}
                     >
-                        Bekor qilish
+                        {t('Cancel')}
                     </Button>
                     <Button
                         className={`bg-red-600 text-white normal-case hover:bg-red-700 flex items-center gap-2 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
@@ -82,7 +84,7 @@ export default function WarehouseUserDelete({ id, refresh }) {
                                 ></path>
                             </svg>
                         ) : (
-                            "O‘chirish"
+                            t('Delete')
                         )}
                     </Button>
                 </DialogFooter>

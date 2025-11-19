@@ -76,26 +76,27 @@ export default function WarehouseDashboard() {
             icon: <BanknoteArrowDown className="w-6 h-6 text-green-600 dark:text-green-400" />,
         },
         {
-            title: t("Output_in_mont"),
-            value: CardData ? `${CardData.transferOut?.toLocaleString()} so'm` : "...",
-            icon: <BanknoteArrowUp className="w-6 h-6 text-red-600 dark:text-red-400" />,
-        },
-        {
             title: t('Sells_inMonth'),
             value: CardData ? `${CardData.income?.toLocaleString()} so'm` : "...",
             icon: <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />,
         },
         {
-            title: t('Cash_inMonth'),
-            value: CardData ? `${CardData.sumDisposal?.toLocaleString()} so'm` : "...",
-            icon: <Trash className="w-6 h-6 text-red-600 dark:text-red-400" />,
+            title: t("Output_in_mont"),
+            value: CardData ? `${CardData.transferOut?.toLocaleString()} so'm` : "...",
+            icon: <BanknoteArrowUp className="w-6 h-6 text-red-600 dark:text-red-400" />,
+        },
+
+        {
+            title: t('Grin'),
+            value: CardData ? `${CardData?.profit?.toLocaleString()} so'm` : "...",
+            icon: <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />,
         },
     ];
 
     return (
         <div className="text-black dark:text-gray-100 min-h-screen transition-all duration-300">
             <Typography variant="h4" className="mb-6 font-semibold dark:text-gray-100">
-                Ombor Dashboard
+                Dashboard
             </Typography>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">

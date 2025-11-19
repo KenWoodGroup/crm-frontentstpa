@@ -9,11 +9,14 @@ import WarehouseUserCreate from "./_components/WarehouseUserCreate";
 import EmptyData from "../../UI/NoData/EmptyData";
 import WarehouseUserDelete from "./_components/WarehouseUserDelete";
 import WarehouseUserEdit from "./_components/WarehouseUserEdit";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseUser() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
+    const { t } = useTranslation()
+
 
     const GetUsers = async () => {
         setLoading(true);
@@ -40,11 +43,10 @@ export default function WarehouseUser() {
             {/* Заголовок и кнопка */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold text-text-light dark:text-text-dark transition-colors duration-300">
-                    Ombor foydalanuvchilari
+                    {t('Warehouse_user')}
                 </h1>
                 <WarehouseUserCreate refresh={() => GetUsers()} />
             </div>
-
             {/* Контент */}
             {users?.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -88,7 +90,7 @@ export default function WarehouseUser() {
                     ))}
                 </div>
             ) : (
-                <EmptyData text={"Xodim mavjud emas"} />
+                <EmptyData text={t('Empty_data')} />
             )}
         </div>
     );
