@@ -81,7 +81,7 @@ export default function WarehouseExpenses() {
                 </h1>
 
                 <div className="flex items-center gap-3 flex-wrap">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-3 w-full md:w-auto">
                         {/* Дата начала */}
                         <div className="relative">
                             <Calendar
@@ -98,9 +98,7 @@ export default function WarehouseExpenses() {
                                            dark:border-gray-600 dark:bg-card-dark dark:text-text-dark focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
-
-                        <span className="text-gray-500 font-medium">—</span>
-
+                        
                         {/* Дата конца */}
                         <div className="relative">
                             <Calendar

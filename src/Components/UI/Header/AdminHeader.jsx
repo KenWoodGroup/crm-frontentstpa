@@ -86,12 +86,12 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
 
     return (
         <div
-            className={`fixed top-[10px] z-30 flex justify-between items-center mb-6 px-3 py-2 rounded-2xl border shadow-lg transition-all duration-500 ${isDarkMode
+            className={`header fixed top-[10px] w-full z-30 flex justify-between items-center mb-6 px-3 py-2 rounded-2xl border shadow-lg transition-all duration-500 ${isDarkMode
                 ? "bg-transparent backdrop-blur-md border-gray-700 shadow-gray-900/20"
                 : "bg-transparent backdrop-blur-md border-gray-200"
                 }`}
             style={{
-                width: sidebarOpen ? "calc(99% - 300px)" : "91%",
+                maxWidth: sidebarOpen ? "calc(99% - 300px)" : "91%",
                 left: sidebarOpen ? "310px" : "120px",
             }}
         >
@@ -99,7 +99,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
             <div className="flex items-center gap-[20px]">
                 <Button
                     onClick={() => navigate(-1)}
-                    className={`px-4 py-[5px] rounded-xl transition-all duration-300 ${isDarkMode
+                    className={`backbtn px-4 py-[5px] rounded-xl transition-all duration-300 ${isDarkMode
                         ? "bg-gray-800 hover:bg-gray-700 text-white"
                         : "bg-black hover:bg-black text-white"
                         }`}
@@ -116,14 +116,13 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
             </div>
 
             {/* Селектор языка, темная тема, профиль */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-[10px]">
                 {/* Селектор языка */}
-                <div className={`w-36 px-[10px] py-[5px] rounded-[10px] shadow-lg ${isDarkMode
+                <div className={`w-[80px]  rounded-[10px] shadow-lg ${isDarkMode
                     ? "bg-gray-800/80 backdrop-blur-md"
                     : "bg-white/80 backdrop-blur-md"
                     }`}>
                     <Select
-                        label={t("language")}
                         value={i18n.language || "ru"}
                         onChange={(lng) => changeLanguage(lng)}
                         size="md"
@@ -140,9 +139,9 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                                 : "bg-white border-gray-200"
                         }}
                     >
-                        <Option value="ru">Русский</Option>
-                        <Option value="en">English</Option>
-                        <Option value="uz">O‘zbek</Option>
+                        <Option value="ru">Ru</Option>
+                        <Option value="en">En</Option>
+                        <Option value="uz">Uz</Option>
                     </Select>
                 </div>
 
@@ -151,7 +150,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                     onClick={toggleDarkMode}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
-                    className={`relative flex items-center justify-center w-10 h-10 rounded-xl border shadow transition-all duration-500 ${isDarkMode
+                    className={` relative flex items-center justify-center w-10 h-10 rounded-xl border shadow transition-all duration-500 ${isDarkMode
                         ? "bg-gray-800/80 hover:bg-gray-700/80 border-gray-600 text-yellow-300 backdrop-blur-md"
                         : "bg-white/80 hover:bg-gray-100/80 border-gray-300 text-gray-700 backdrop-blur-md"
                         } ${isHovered ? "scale-110 rotate-12" : "scale-100 rotate-0"}`}
@@ -161,19 +160,19 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                 </button>
 
                 {/* Профиль */}
-                <div className="relative flex items-center gap-4" ref={menuRef}>
+                <div className="relative flex items-center gap-[5px]" ref={menuRef}>
                     <button
                         onClick={() => setOpenMenu(!openMenu)}
-                        className={`flex items-center gap-3 px-4 py-1 rounded-xl border shadow transition-all duration-300 text-sm font-medium backdrop-blur-md ${isDarkMode
+                        className={`header__profile_per flex items-center gap-[3px] px-[10px] py-1 rounded-xl border shadow transition-all duration-300 text-sm font-medium backdrop-blur-md ${isDarkMode
                             ? "bg-gray-800/80 hover:bg-gray-700/80 border-gray-600 text-white"
                             : "bg-white/80 hover:bg-gray-100/80 border-gray-300 text-gray-800"
                             }`}
                     >
-                        <div className={`p-2 rounded-full backdrop-blur-md ${isDarkMode ? "bg-gray-700/80" : "bg-gray-200/80"
+                        <div className={` p-2 rounded-full backdrop-blur-md ${isDarkMode ? "bg-gray-700/80" : "bg-gray-200/80"
                             }`}>
                             <User className="w-4 h-4" />
                         </div>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${openMenu ? "rotate-180" : ""
+                        <ChevronDown className={`iconHeader w-4 h-4 transition-transform duration-300 ${openMenu ? "rotate-180" : ""
                             }`} />
                     </button>
 

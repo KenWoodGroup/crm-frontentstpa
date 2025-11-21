@@ -68,8 +68,8 @@ export default function WarehouseSidebar() {
 
     return (
         <Card
-            className="
-                h-[98%] w-24 fixed top-[10px]   left-[10px] bottom-0 z-50 shadow-xl 
+            className="WarehouseSidebar
+                h-[98%] w-24 fixed top-[10px] left-[10px] bottom-0 z-50 shadow-xl 
                 bg-card-light text-text-light border border-white/20 
                 dark:bg-card-dark dark:text-text-dark dark:border-gray-700 
                 px-2 py-5 flex flex-col justify-between
@@ -137,7 +137,7 @@ export default function WarehouseSidebar() {
                     </MenuHandler>
 
                     <MenuList
-                        className={`p-4 ${access ? "w-[450px] grid-cols-2" : "w-[430px] grid-cols-2"} 
+                        className={`Sidebar_modal p-4 ${access ? "w-[450px] grid-cols-2" : "w-[430px] grid-cols-2"} 
                         translate-x-6 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl 
                         border border-gray-100 dark:border-gray-700 rounded-xl grid gap-4 transition-colors duration-300`}
                     >

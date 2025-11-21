@@ -35,7 +35,9 @@ export default function Profile() {
     }, []);
 
     if (loading) {
-        <Loading />
+        return (
+            <Loading />
+        )
     }
 
     if (!profile) {

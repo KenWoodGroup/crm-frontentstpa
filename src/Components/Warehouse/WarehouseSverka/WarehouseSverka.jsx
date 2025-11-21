@@ -126,9 +126,9 @@ export default function WarehouseSverka() {
     );
 
     return (
-        <div className="flex h-[calc(100vh-100px)] gap-4 bg-background-light dark:bg-background-dark p-4 transition-colors duration-200">
+        <div className="Analiz  flex min-h-screen pb-[30px] gap-4 bg-background-light dark:bg-background-dark transition-colors duration-200">
             {/* 🔹 Левая часть — список клиентов с поиском */}
-            <Card className="w-[30%] border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
+            <Card className="Analiz_1 w-[30%] border border-gray-200 dark:border-gray-700 shadow-md overflow-hidden flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
                     <Typography variant="h5" className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
                         {t("Clients")}
@@ -185,7 +185,7 @@ export default function WarehouseSverka() {
             </Card>
 
             {/* 🔹 Правая часть — история клиента */}
-            <Card className="w-[70%] border border-gray-200 dark:border-gray-700 shadow-md flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
+            <Card className="Analiz_2 w-[70%] border border-gray-200 dark:border-gray-700 shadow-md flex flex-col bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <CardBody className="flex flex-col flex-grow overflow-hidden">
                     <div className="flex flex-wrap items-center justify-between mb-5 gap-3">
                         <Typography variant="h5" className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
@@ -194,7 +194,7 @@ export default function WarehouseSverka() {
                                 : `${t('Select_clients')}`}
                         </Typography>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row items-end justify-between gap-3 w-full md:w-auto">
                             <Input
                                 type="date"
                                 label={t('StartDate')}

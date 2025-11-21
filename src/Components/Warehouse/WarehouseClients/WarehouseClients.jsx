@@ -78,7 +78,7 @@ export default function WarehouseClients() {
 
             {/* Поиск */}
             <Card className="p-3 mb-5 bg-card-light dark:bg-card-dark transition-colors duration-300">
-                <form onSubmit={handleSearch} className="flex items-center gap-3 w-full">
+                <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-end justify-between gap-3">
                     <Input
                         label={t('Search_name')}
                         icon={<Search />}

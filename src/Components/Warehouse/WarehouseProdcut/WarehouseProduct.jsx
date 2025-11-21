@@ -77,7 +77,7 @@ export default function WarehouseProduct() {
 
     return (
         <div className="min-h-screen text-text-light dark:text-text-dark">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-5">
                 <Typography variant="h4" className="font-semibold">
                     {t("warehouseTitle")}
                 </Typography>
@@ -88,7 +88,6 @@ export default function WarehouseProduct() {
                     </Button>
                 </NavLink>
             </div>
-
             {products?.length > 0 ? (
                 <>
                     <Card className="overflow-x-auto shadow-sm border border-gray-200 dark:border-card-dark bg-card-light dark:bg-card-dark">
@@ -107,12 +106,10 @@ export default function WarehouseProduct() {
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnActions")}</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {products.map((item, index) => {
                                     const date = item?.createdAt;
                                     const formattedDate = date ? new Date(date).toLocaleDateString("uz-UZ") : null;
-
                                     return (
                                         <tr
                                             key={`${item.id}-${index}`}

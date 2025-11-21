@@ -33,10 +33,10 @@ export default function WarehouseLayout() {
         ? "out" : location.pathname.includes("/warehouse/stockin") ? "in" : "m_other";
 
     return (
-        <div className={` bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
+        <div className={`WarehouseLayout bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
             <WarehouseSidebar />
-            <div className={`${mode === "m_other" ? "pt-[100px]" :"pt-[40px]"} pr-[10px]`}>
-                {mode === "m_other" ? <AdminHeader /> : ""}  
+            <div className={`${mode === "m_other" ? "pt-[100px]" : "pt-[40px]"} pr-[10px]`}>
+                {mode === "m_other" ? <AdminHeader /> : ""}
 
                 {/* pass mode to provider so provider can expose per-mode state */}
                 <WarehouseProvider mode={mode}>

@@ -54,7 +54,7 @@ export default function WarehousePriceType() {
             bg-background-light text-text-light
             dark:bg-background-dark dark:text-text-dark`}
         >
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full md:w-auto mb-6">
                 <Typography variant="h4" className="font-semibold">
                     {t('Price_type')}
                 </Typography>

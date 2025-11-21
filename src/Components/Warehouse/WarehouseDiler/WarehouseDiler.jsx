@@ -90,7 +90,7 @@ export default function WarehouseDiler() {
                     {t('dilers')}
                 </Typography>
 
-                <div className="flex items-center gap-3 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row items-end justify-between gap-3 w-full md:w-auto">
                     <div className="relative w-full md:w-72">
                         <Input
                             label={t('Search_name')}

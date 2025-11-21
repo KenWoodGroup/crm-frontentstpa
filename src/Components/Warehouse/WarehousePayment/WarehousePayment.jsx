@@ -96,7 +96,7 @@ export default function WarehousePayment() {
     }
 
     return (
-        <div className="bg-background-light dark:bg-background-dark min-h-screen p-4 transition-colors duration-200">
+        <div className="bg-background-light dark:bg-background-dark min-h-screen  transition-colors duration-200">
             {/* Заголовок */}
             <div className="flex items-center justify-between mb-5">
                 <Typography
@@ -110,7 +110,7 @@ export default function WarehousePayment() {
 
             {/* 🔍 Фильтры */}
             <Card className="p-4 mb-6 border border-gray-200 dark:border-gray-700 shadow-sm bg-card-light dark:bg-card-dark transition-colors duration-200">
-                <div className="flex items-center gap-[10px]">
+                <div className="flex flex-col gap-[10px] lg:flex-row items-end justify-between">
                     <Input
                         label={t('Srearch_by_Clients')}
 

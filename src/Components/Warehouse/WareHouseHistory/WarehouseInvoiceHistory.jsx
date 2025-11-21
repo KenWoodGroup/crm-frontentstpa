@@ -426,7 +426,7 @@ export default function WarehouseInvoiceHistory() {
     // — ensure: const { t } = useTranslation(); is present in function scope
 
     return (
-        <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen px-4 py-3 rounded-xl transition-colors duration-300">
+        <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen rounded-xl transition-colors duration-300">
             <div className="mx-auto">
                 {/* Header */}
                 <header className="flex items-center justify-between mb-6">

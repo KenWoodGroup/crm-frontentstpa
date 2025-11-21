@@ -50,7 +50,7 @@ export default function WarehouseClientCategory() {
     return (
         <div className="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-200">
             {/* 🔹 Заголовок */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full md:w-auto mb-6">
                 <Typography
                     variant="h5"
                     className="font-semibold text-blue-gray-700 dark:text-text-dark transition-colors duration-200"

@@ -95,11 +95,11 @@ export default function FactoryDashboard() {
             value: CardData ? `${CardData.income.toLocaleString()} so'm` : "...",
             icon: <BanknoteArrowDown className="w-6 h-6 text-green-600" />,
         },
-        {
-            title: t("Output_in_mont"),
-            value: CardData ? `${CardData.sumDisposal.toLocaleString()} so'm` : "...",
-            icon: <BanknoteArrowUp className="w-6 h-6 text-red-600" />,
-        },
+        // {
+        //     title: t("Output_in_mont"),
+        //     value: CardData ? `${CardData?.sumDisposal?.toLocaleString()} so'm` : "...",
+        //     icon: <BanknoteArrowUp className="w-6 h-6 text-red-600" />,
+        // },
     ];
 
     if (loading) {
