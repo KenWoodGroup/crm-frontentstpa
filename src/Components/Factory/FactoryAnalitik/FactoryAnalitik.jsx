@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { Card, CardBody, Typography, Progress, Input, Button } from "@material-tailwind/react";
 import { Statistik } from "../../../utils/Controllers/Statistik";
 import Cookies from "js-cookie";
+import { useTranslation } from "react-i18next";
+import Loading from "../../UI/Loadings/Loading";
 
 export default function FactoryAnalitik() {
+    const { t } = useTranslation();
     const [cardData, setCardData] = useState(null);
     const [topProducts, setTopProducts] = useState([]);
     const [worstProducts, setWorstProducts] = useState([]);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [loading, setLoading] = useState(true);
 
     // Устанавливаем даты по умолчанию — текущий месяц
     useEffect(() => {
@@ -16,56 +20,53 @@ export default function FactoryAnalitik() {
         const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
             .toISOString()
             .split("T")[0];
+
         const today = now.toISOString().split("T")[0];
         setStartDate(firstDay);
         setEndDate(today);
     }, []);
 
-    const getStatistikCard = async () => {
-        try {
-            const response = await Statistik.GetStatistikTovarAnalitikCard(Cookies.get("ul_nesw"));
-            setCardData(response.data);
-        } catch (error) {
-            console.log("Card Error:", error);
-        }
-    };
 
-    const getStatistikTop = async () => {
+    // функция загрузки всех данных
+    const loadAllData = async () => {
         try {
+            setLoading(true);
+
             const data = {
                 id: Cookies.get("us_nesw"),
                 startDate,
                 endDate,
             };
-            const response = await Statistik.GetStatistikTovarAnalitikTop(data);
-            setTopProducts(response.data);
+
+            const [cardRes, topRes, worstRes] = await Promise.all([
+                Statistik.GetStatistikTovarAnalitikCard(Cookies.get("ul_nesw")),
+                Statistik.GetStatistikTovarAnalitikTop(data),
+                Statistik.GetStatistikTovarAnalitikSeal(data),
+            ]);
+
+            setCardData(cardRes.data);
+            setTopProducts(topRes.data);
+            setWorstProducts(worstRes.data);
+
         } catch (error) {
-            console.log("Top Error:", error);
+            console.log("Loading Error:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const getStatistikSeal = async () => {
-        try {
-            const data = {
-                id: Cookies.get("us_nesw"),
-                startDate,
-                endDate,
-            };
-            const response = await Statistik.GetStatistikTovarAnalitikSeal(data);
-            setWorstProducts(response.data);
-        } catch (error) {
-            console.log("Seal Error:", error);
-        }
-    };
 
-    // Загружаем всё при изменении диапазона дат
+    // Загружаем всё при изменении дат
     useEffect(() => {
         if (startDate && endDate) {
-            getStatistikCard();
-            getStatistikTop();
-            getStatistikSeal();
+            loadAllData();
         }
     }, [startDate, endDate]);
+
+
+    if (loading) {
+        return <Loading />;
+    }
 
     return (
         <div className="min-h-screen">
@@ -73,31 +74,28 @@ export default function FactoryAnalitik() {
             <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
                     <Typography variant="h2" className="text-text-light dark:text-text-dark font-bold mb-2">
-                        Mahsulot Tahlili
-                    </Typography>
-                    <Typography variant="paragraph" className="text-gray-600 dark:text-gray-400">
-                        Sotuv statistikasi, tovar qoldiqlari va daromad tahlili
+                        {t('Product_analiz')}
                     </Typography>
                 </div>
 
                 {/* Фильтр по дате */}
-                <div className="flex items-center gap-3 mt-4 md:mt-0">
+                <div className="flex md:flex-row flex-col items-center gap-3 mt-4 md:mt-0">
                     <Input
                         type="date"
-                        label="Boshlanish sanasi"
+                        label={t('StartDate')}
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         className="dark:text-white"
                     />
                     <Input
                         type="date"
-                        label="Tugash sanasi"
+                        label={t('EndDate')}
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         className="dark:text-white"
                     />
-                    <Button onClick={() => { getStatistikTop(); getStatistikSeal(); }}>
-                        Yangilash
+                    <Button color="blue" className="w-[100%] px-[10px]" onClick={() => { getStatistikTop(); getStatistikSeal(); }}>
+                        {t('Search')}
                     </Button>
                 </div>
             </div>
@@ -106,10 +104,10 @@ export default function FactoryAnalitik() {
             {cardData && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
-                        { label: "Jami Mahsulotlar", value: cardData.countProduct },
-                        { label: "Sotilganlar", value: cardData.selProduct },
-                        { label: "Sotilmaganlar", value: cardData.noSelProduct },
-                        { label: "Jami Daromad", value: `$${cardData.income.toLocaleString()}` },
+                        { label: `${t('Total_products')}`, value: cardData.countProduct },
+                        { label: `${t('table_col_sold')}`, value: cardData.selProduct },
+                        { label: `${t('Dont_sells')}`, value: cardData.noSelProduct },
+                        { label: `${t('Total_money')}`, value: `${cardData.income.toLocaleString()} uzs` },
                     ].map((item, i) => (
                         <Card
                             key={i}
@@ -133,7 +131,7 @@ export default function FactoryAnalitik() {
                 {/* Top 5 Sotiladigan Mahsulotlar */}
                 <div>
                     <Typography variant="h4" className="text-text-light dark:text-text-dark font-bold mb-6">
-                        Top 5 Sotiladigan Mahsulotlar
+                        {t('Top5')}
                     </Typography>
                     <div className="space-y-4">
                         {topProducts.length > 0 ? (
@@ -149,7 +147,7 @@ export default function FactoryAnalitik() {
                                                     #{index + 1} {product.name}
                                                 </Typography>
                                                 <Typography variant="small" className="text-gray-600 dark:text-gray-400">
-                                                    {product.count} dona sotilgan
+                                                    {product.count} {t('table_col_sold')}
                                                 </Typography>
                                             </div>
                                             <div className="text-right">
@@ -168,7 +166,11 @@ export default function FactoryAnalitik() {
                                 </Card>
                             ))
                         ) : (
-                            <Typography className="text-gray-500 dark:text-gray-400">Ma'lumot yo‘q</Typography>
+                            <>
+                                <div className="flex items-center justify-center">
+                                    <Typography className="text-gray-500 dark:text-gray-400">{t('Empty_data')}</Typography>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
@@ -176,7 +178,7 @@ export default function FactoryAnalitik() {
                 {/* Top 5 Kam Sotiladigan Mahsulotlar */}
                 <div>
                     <Typography variant="h4" className="text-text-light dark:text-text-dark font-bold mb-6">
-                        Top 5 Kam Sotiladigan Mahsulotlar
+                        {t('Bottom5')}
                     </Typography>
                     <div className="space-y-4">
                         {worstProducts.length > 0 ? (
@@ -192,7 +194,7 @@ export default function FactoryAnalitik() {
                                                     #{index + 1} {product.name}
                                                 </Typography>
                                                 <Typography variant="small" className="text-gray-600 dark:text-gray-400">
-                                                    {product.count} dona sotilgan
+                                                    {product.count} {t('table_col_sold')}
                                                 </Typography>
                                             </div>
                                             <div className="text-right">
@@ -211,8 +213,11 @@ export default function FactoryAnalitik() {
                                 </Card>
                             ))
                         ) : (
-                            <Typography className="text-gray-500 dark:text-gray-400">Ma'lumot yo‘q</Typography>
-                        )}
+                            <>
+                                <div className="flex items-center justify-center">
+                                    <Typography className="text-gray-500 dark:text-gray-400">{t('Empty_data')}</Typography>
+                                </div>
+                            </>)}
                     </div>
                 </div>
             </div>

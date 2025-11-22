@@ -5,6 +5,10 @@ class LocalProduct {
         const response = await $api.post(`/local-products`, data)
         return response;
     }
+    static CreateProductInArray = async (data) => {
+        const response = await $api.post(`/local-products/array`, data)
+        return response;
+    }
     static GetProduct = async (data) => {
         const response = await $api.get(`/local-products/paginate/${data?.id}/page?page=${data?.page}`)
         return response;

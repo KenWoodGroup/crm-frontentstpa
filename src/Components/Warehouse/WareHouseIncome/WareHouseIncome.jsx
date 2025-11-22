@@ -988,7 +988,7 @@ export default function WareHouseIncome() {
                 )}
 
             {/* Main content */}
-            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[70px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
+            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[0px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
                 <div className="bg-background-light dark:bg-background-dark rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4 transition-colors duration-300">
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (

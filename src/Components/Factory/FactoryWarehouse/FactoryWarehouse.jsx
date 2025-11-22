@@ -68,7 +68,7 @@ export default function FactoryWarehouse() {
     return (
         <div className="min-h-screen k text-text-light dark:text-text-dark transition-colors duration-300">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center flex-wrap gap-[20px] justify-between mb-8">
                 <h1 className="text-2xl font-semibold">
                     {t("Warehouses")}
                 </h1>
@@ -84,8 +84,8 @@ export default function FactoryWarehouse() {
                                 key={w.id}
                                 className="bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 hover:shadow-md transition-colors duration-300"
                             >
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-3">
+                                <div className="flex items-center flex-wrap gap-[20px] justify-between mb-4">
+                                    <div className="flex items-center flex-wrap gap-3">
                                         <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
                                             <Building2 className="w-6 h-6 text-text-light dark:text-text-dark" />
                                         </div>
@@ -121,7 +121,7 @@ export default function FactoryWarehouse() {
                                         <span>{w.phone}</span>
                                     </div>
 
-                                    <div className="flex flex-col md:flex-row gap-3">
+                                    <div className="flex flex-wrap gap-3">
                                         <NavLink
                                             to={`/factory/warehouse/user/${w?.id}`}
                                             className="flex-1"

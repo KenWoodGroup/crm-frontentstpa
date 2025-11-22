@@ -27,6 +27,7 @@ export default function FactoryProductCreate() {
     const [editingProduct, setEditingProduct] = useState(null); // ID продукта в режиме редактирования
     const [editName, setEditName] = useState(""); // Новое название для редактирования
     const [hoveredProduct, setHoveredProduct] = useState(null); // Для отслеживания hover
+    const [bulkProcessing, setBulkProcessing] = useState(false); // Для отслеживания массового создания
     const location_id = Cookies.get("ul_nesw");
 
     // GET: Получить продукты подкатегории
@@ -74,6 +75,49 @@ export default function FactoryProductCreate() {
                 newSet.delete(product.id);
                 return newSet;
             });
+        }
+    };
+
+    // Массовое создание всех продуктов
+    const createAllProducts = async () => {
+        setBulkProcessing(true);
+
+        try {
+            // Фильтруем продукты, которые еще не созданы
+            const productsToCreate = products.filter(product =>
+                !isProductCreated(product.id)
+            );
+
+            if (productsToCreate.length === 0) {
+                console.log("Все продукты уже созданы");
+                return;
+            }
+
+            // Формируем данные в нужном формате
+            const bulkData = {
+                products: productsToCreate.map(product => ({
+                    name: product.name,
+                    unit: product.unit || "TA", // Используем "TA" как в примере
+                    location_id: location_id,
+                    product_id: product.id,
+                    subcategory_id: id
+                }))
+            };
+
+            console.log("Отправляемые данные:", bulkData);
+
+            // Отправляем запрос на массовое создание
+            await LocalProduct?.CreateProductInArray(bulkData);
+
+            // Обновляем список продуктов
+            await getMyProduct();
+
+            console.log("Успешно создано продуктов:", productsToCreate.length);
+
+        } catch (error) {
+            console.error("Ошибка при массовом создании продуктов:", error);
+        } finally {
+            setBulkProcessing(false);
         }
     };
 
@@ -187,6 +231,9 @@ export default function FactoryProductCreate() {
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Подсчитываем количество еще не созданных продуктов
+    const notCreatedCount = products.filter(product => !isProductCreated(product.id)).length;
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-[60vh]">
@@ -200,7 +247,7 @@ export default function FactoryProductCreate() {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
             <div className="mx-auto space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center flex-wrap gap-[10px] justify-between">
                     <Typography
                         variant="h3"
                         className="text-gray-900 dark:text-gray-100 font-bold"
@@ -210,7 +257,7 @@ export default function FactoryProductCreate() {
                     <FactoryProductModal />
                 </div>
 
-                <div className="flex items-center justify-between mx-auto">
+                <div className="flex items-center justify-between flex-wrap gap-[20px] mx-auto">
                     <div className="max-w-[500px] w-full">
                         <Input
                             label={t(`Search`)}
@@ -219,6 +266,21 @@ export default function FactoryProductCreate() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
+                    <Button
+                        color="blue"
+                        onClick={createAllProducts}
+                        disabled={bulkProcessing || notCreatedCount === 0}
+                        className="relative"
+                    >
+                        {bulkProcessing ? (
+                            <>
+                                <div className="animate-spin h-4 w-4 border-b-2 border-white rounded-full mr-2"></div>
+                                {t('Processing')}...
+                            </>
+                        ) : (
+                            `${t('AddAll')} (${notCreatedCount})`
+                        )}
+                    </Button>
                 </div>
 
                 {filteredProducts.length > 0 ? (

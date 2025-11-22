@@ -11,7 +11,7 @@ export default function FactorySidebar({ active, open }) {
 
     const groupedMenuItems = [
         {
-            section: `${t(`main`)}`,
+            section: `${t(``)}`,
             items: [
                 {
                     id: 1,
@@ -114,20 +114,16 @@ export default function FactorySidebar({ active, open }) {
         },
     ];
 
-    const handleLogout = () => {
-        Object.keys(Cookies.get()).forEach((cookie) => Cookies.remove(cookie));
-        navigate("/login");
-    };
 
     return (
         <Card
-            className={`fixed top-[15px] left-[15px] h-[95%] z-50 shadow-xl border rounded-2xl overflow-y-auto flex flex-col justify-between transition-all duration-500
+            className={`FactorySidebar fixed top-[10px] left-[15px] h-[95%] z-50 shadow-xl border rounded-2xl overflow-y-auto flex flex-col justify-between transition-all duration-500
             bg-background-light dark:bg-card-dark border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark
             ${open ? "w-[100px]" : "w-[280px]"} px-4 py-6`}
         >
             <div>
                 {/* Кнопка открытия/закрытия */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="ToggleBtn_sidebar flex items-center justify-between mb-6">
                     <div></div>
                     <button
                         onClick={active}

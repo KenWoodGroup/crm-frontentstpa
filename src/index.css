@@ -129,22 +129,42 @@ input[type="number"]::-webkit-inner-spin-button {
   }
 }
 
-@media (max-width: 1300px) {
-  .header {
-    max-width: 89% !important;
-  }
-}
+@media (max-width: 1300px) {}
 
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
+  .FactorySidebar {
+    width: 100px !important;
+    padding: 5px !important;
+  }
+
+  .FactoryLayout {
+    margin-left: 110px !important;
+    width: 100% !important;
+  }
+
   .header {
-    max-width: 85% !important;
+    left: 120px !important;
+    max-width: calc(99% - 120px) !important;
+  }
+
+  .FactorySidebar a span {
+    font-size: 12px;
+    display: block;
+    text-align: center;
+  }
+
+  .FactorySidebar a {
+    flex-direction: column;
+    padding: 5px;
+  }
+
+  .ToggleBtn_sidebar {
+    display: none;
   }
 }
 
 @media (max-width: 800px) {
-  .header {
-    max-width: 80% !important;
-  }
+
 
   .Analiz {
     flex-direction: column !important;
@@ -161,9 +181,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 @media (max-width: 680px) {
-  .header {
-    max-width: 75% !important;
-  }
+
 
   .dashboard_wrapper {
     flex-wrap: wrap;
@@ -174,8 +192,19 @@ input[type="number"]::-webkit-inner-spin-button {
 
 @media (max-width: 530px) {
   .WarehouseSidebar {
-    width: 80px !important;
+    width: 75px;
     padding: 5px
+  }
+  .FactoryLayout  {
+    margin-left: 85px !important;
+  }
+
+  .FactorySidebar {
+    left: 5px !important;
+    width: 75px !important;
+  }
+  .FactorySidebar span{
+    font-size: 10px !important;
   }
 
   .header {
@@ -212,6 +241,10 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 @media (max-width: 380px) {
+  .header {
+    max-width: calc(110% - 120px) !important;
+  }
+
   .WarehouseSidebar {
     width: 70px !important;
   }

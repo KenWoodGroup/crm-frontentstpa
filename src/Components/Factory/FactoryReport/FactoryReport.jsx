@@ -261,8 +261,8 @@ export default function FactoryReport() {
                                             </Typography>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                                            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg border border-gray-300 dark:border-gray-700">
+                                        <div className="flex  sm:flex-col items-center gap-[10px] w-full text-sm mb-4">
+                                            <div className="bg-gray-100 w-full dark:bg-gray-800 p-3 rounded-lg border border-gray-300 dark:border-gray-700">
                                                 <Typography variant="small" className="text-gray-600 dark:text-gray-400">
                                                     {t('Exp_sum')}
                                                 </Typography>
@@ -270,7 +270,7 @@ export default function FactoryReport() {
                                                     {formatCurrency(cash.expenseSum)}
                                                 </Typography>
                                             </div>
-                                            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg border border-gray-300 dark:border-gray-700">
+                                            <div className="bg-gray-100 w-full dark:bg-gray-800 p-3 rounded-lg border border-gray-300 dark:border-gray-700">
                                                 <Typography variant="small" className="text-gray-600 dark:text-gray-400">
                                                     {t('Pay_sum')}
                                                 </Typography>

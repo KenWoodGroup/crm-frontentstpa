@@ -529,5 +529,11 @@
   "Grin2": "Profitable",
   "bad2": "Unprofitable",
   "Profil": "Profile",
-  "Out": "Log out"
+  "Out": "Log out",
+  "Product_analiz": "Product Analysis",
+  "Dont_sells": "Not Selling",
+  "Total_money": "Total Revenue",
+  "Top5": "Top 5 Best-Selling Products",
+  "Bottom5": "Top 5 Least-Selling Products",
+  "AddAll": "Add All"
 }

@@ -97,7 +97,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                 : "bg-transparent backdrop-blur-md border-gray-200"
                 }`}
             style={{
-                maxWidth: sidebarOpen ? "calc(99% - 300px)" : "91%",
+                maxWidth: sidebarOpen ? "calc(99% - 300px)" : "calc(99% - 120px)",
                 left: sidebarOpen ? "310px" : "120px",
             }}
         >

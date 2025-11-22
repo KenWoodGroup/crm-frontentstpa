@@ -168,7 +168,7 @@ export default function WarehouseInvoiceHistory() {
         payment: {
             paid: `${t("paid")}`,
             unpaid: `${t("unpaid")}`,
-            partly_paid:`${t("partlyPaid")}`
+            partly_paid: `${t("partlyPaid")}`
         },
     };
 
@@ -429,7 +429,7 @@ export default function WarehouseInvoiceHistory() {
         <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen rounded-xl transition-colors duration-300">
             <div className="mx-auto">
                 {/* Header */}
-                <header className="flex items-center justify-between mb-6">
+                <header className="flex items-center flex-wrap gap-[10px] justify-between mb-6">
                     <div>
                         <h1 className="text-2xl font-semibold">{t("invoices.title")}</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -437,7 +437,7 @@ export default function WarehouseInvoiceHistory() {
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center flex-wrap gap-3">
                         <button
                             onClick={exportCurrentToCSV}
                             className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
@@ -741,7 +741,7 @@ export default function WarehouseInvoiceHistory() {
                             </div>
 
                             {/* Pagination */}
-                            <div className="mt-4 flex items-center justify-between">
+                            <div className="mt-4 flex items-center flex-wrap justify-between">
                                 <div className="text-sm text-gray-600 dark:text-gray-400">
                                     {t("invoices.showing_range", {
                                         from: (page - 1) * PER_PAGE + 1,
@@ -749,7 +749,7 @@ export default function WarehouseInvoiceHistory() {
                                         total,
                                     })}
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center flex-wrap gap-2">
                                     <button
                                         onClick={() => setPage(1)}
                                         disabled={page === 1}
@@ -901,7 +901,7 @@ export default function WarehouseInvoiceHistory() {
                                             {selectedInvoice.created?.full_name}
                                         </div>
 
-                                        <div className="mt-4">
+                                        <div    className="mt-4">
                                             <button
                                                 className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                                 onClick={() => alert(t("detail.print_alert"))}

@@ -119,7 +119,7 @@ export default function FactoryDashboard() {
                 </div>
 
                 {/* === Statistik Cards === */}
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+                <div className="grid gap-3 xs:gap-4 sm:gap-6 grid-cols-1 min-[320px]:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mb-6 xs:mb-8 sm:mb-10">
                     {stats.map((item, index) => (
                         <Card
                             key={index}
@@ -146,68 +146,63 @@ export default function FactoryDashboard() {
                 </div>
 
                 {/* === Filter === */}
-                <Card className="bg-card dark:bg-card-dark mb-[20px] transition-colors duration-300">
-                    <CardBody className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="flex gap-4 w-full sm:w-auto">
-                            <Select
-                                label={t("Select_yers")}
-                                value={year.toString()}
-                                onChange={(val) => setYear(val)}
-                                className="text-gray-900 dark:text-text-dark outline-none"
-                                labelProps={{
-                                    className: "text-gray-700 dark:text-text-dark",
-                                }}
-                                menuProps={{
-                                    className: "dark:bg-gray-800 dark:text-text-dark",
-                                }}
-                            >
-                                {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
-                                    <Option key={y} value={y.toString()}>
-                                        {y}
-                                    </Option>
-                                ))}
-                            </Select>
+                <Card className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 mb-4 xs:mb-5 sm:mb-6">
+                    <CardBody className="dashboard_wrapper flex items-end   gap-3 xs:gap-4 p-4 xs:p-6">
+                        <Select
+                            label={t("Select_yers")}
+                            value={year.toString()}
+                            onChange={(val) => setYear(val)}
+                            className="text-gray-900 dark:text-text-dark outline-none text-sm"
+                            labelProps={{
+                                className: "text-gray-700 dark:text-text-dark text-xs xs:text-sm"
+                            }}
+                            menuProps={{
+                                className: "dark:bg-gray-800 dark:text-text-dark max-h-48 overflow-y-auto"
+                            }}
+                        >
+                            {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
+                                <Option key={y} value={y.toString()} className="text-xs xs:text-sm">
+                                    {y}
+                                </Option>
+                            ))}
+                        </Select>
 
-                            <Select
-                                label={t("Select_month")}
-                                value={month}
-                                className="text-gray-900 dark:text-text-dark outline-none"
-                                labelProps={{
-                                    className: "text-gray-700 dark:text-text-dark",
-                                }}
-                                menuProps={{
-                                    className: "dark:bg-gray-800 dark:text-text-dark",
-                                }}
-                                onChange={(val) => setMonth(val)}
-                            >
-                                {[
-                                    { id: "01", name: "Yanvar" },
-                                    { id: "02", name: "Fevral" },
-                                    { id: "03", name: "Mart" },
-                                    { id: "04", name: "Aprel" },
-                                    { id: "05", name: "May" },
-                                    { id: "06", name: "Iyun" },
-                                    { id: "07", name: "Iyul" },
-                                    { id: "08", name: "Avgust" },
-                                    { id: "09", name: "Sentabr" },
-                                    { id: "10", name: "Oktabr" },
-                                    { id: "11", name: "Noyabr" },
-                                    { id: "12", name: "Dekabr" },
-                                ].map((m) => (
-                                    <Option key={m.id} value={m.id}>
-                                        {m.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </div>
+                        <Select
+                            label={t("Select_month")}
+                            value={month}
+                            onChange={(val) => setMonth(val)}
+                            className="text-gray-900 dark:text-text-dark outline-none text-sm"
+                            labelProps={{
+                                className: "text-gray-700 dark:text-text-dark text-xs xs:text-sm"
+                            }}
+                            menuProps={{
+                                className: "dark:bg-gray-800 dark:text-text-dark max-h-48 overflow-y-auto"
+                            }}
+                        >
+                            {[
+                                { id: "01", name: "Yanvar" },
+                                { id: "02", name: "Fevral" },
+                                { id: "03", name: "Mart" },
+                                { id: "04", name: "Aprel" },
+                                { id: "05", name: "May" },
+                                { id: "06", name: "Iyun" },
+                                { id: "07", name: "Iyul" },
+                                { id: "08", name: "Avgust" },
+                                { id: "09", name: "Sentabr" },
+                                { id: "10", name: "Oktabr" },
+                                { id: "11", name: "Noyabr" },
+                                { id: "12", name: "Dekabr" },
+                            ].map((m) => (
+                                <Option key={m.id} value={m.id} className="text-xs xs:text-sm">
+                                    {m.name}
+                                </Option>
+                            ))}
+                        </Select>
 
                         <Button
                             color="green"
-                            className="px-6"
-                            onClick={() => {
-                                setLoading(true);
-                                fetchAllData().finally(() => setLoading(false));
-                            }}
+                            className="px-4 xs:px-6 normal-case text-xs xs:text-sm w-full xs:w-auto mt-2 xs:mt-0"
+                            onClick={fetchAllData}
                         >
                             {t("Search")}
                         </Button>
@@ -219,7 +214,7 @@ export default function FactoryDashboard() {
                     <WarehouseMonyChart data={productSum} />
                     <WarehouseProduct data={productCount} />
                 </div>
-{/* 
+                {/* 
                 <AllDilerChart data={dilerData} />
                 <AllMinusPlusChart data={sumData} year={sumYer} filter={setSumYer} /> */}
             </div>

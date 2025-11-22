@@ -49,7 +49,7 @@ export default function FactoryLocalProduct() {
 
     return (
         <div className=" bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center flex-wrap gap-[20px] justify-between mb-4">
                 <Typography variant="h2" className="text-gray-900 dark:text-gray-100 font-bold">
                     {t('Product')}
                 </Typography>
@@ -60,15 +60,15 @@ export default function FactoryLocalProduct() {
             {loading ? (
                 <Loading />
             ) : products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {products.map((product) => (
                         <Card
                             key={product.id}
                             className="bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow"
                         >
                             <CardBody>
-                                <div className="flex items-start justify-between gap-[20px]">
-                                    <Typography variant="h6" className="text-gray-900 dark:text-gray-100 font-semibold">
+                                <div className="flex items-start flex-wrap justify-between gap-[20px]">
+                                    <Typography variant="h6" className="text-gray-900 max-w-[300px] dark:text-gray-100 font-semibold">
                                         {product.name}
                                     </Typography>
                                     <div className="flex items-center gap-[10px]">

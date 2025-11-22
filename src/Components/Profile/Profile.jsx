@@ -69,7 +69,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="flex bg-background-light dark:bg-background-dark transition-colors duration-300 p-4">
+        <div className="flex bg-background-light dark:bg-background-dark transition-colors duration-300 ">
             <Card className="w-full max-w-xl shadow-lg rounded-2xl bg-card-light dark:bg-card-dark transition-colors duration-300">
                 <CardHeader
                     floated={false}
@@ -83,19 +83,19 @@ export default function Profile() {
 
                 <CardBody className="p-6 space-y-4">
                     <div className="flex flex-col gap-3">
-                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Package className="w-5 h-5" /> {t(`Type`)}: <span className="font-normal">{profile.type}</span>
                         </Typography>
 
-                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <MapPin className="w-5 h-5" /> {t('Address')}: <span className="font-normal">{profile.address}</span>
                         </Typography>
 
-                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Phone className="w-5 h-5" /> {t('Phone')}: <span className="font-normal">{profile.phone}</span>
                         </Typography>
 
-                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Package className="w-5 h-5" /> {t('Balance')}:{" "}
                             <span
                                 className={`font-bold ${Number(profile.balance) < 0
@@ -107,11 +107,11 @@ export default function Profile() {
                             </span>
                         </Typography>
 
-                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Calendar className="w-5 h-5" /> {t('Created')}: <span className="font-normal">{formatDate(profile.createdAt)}</span>
                         </Typography>
 
-                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center gap-2">
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <RefreshCw className="w-5 h-5" /> {t('Updated')}: <span className="font-normal">{formatDate(profile.updatedAt)}</span>
                         </Typography>
                     </div>
