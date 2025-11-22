@@ -35,12 +35,16 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
         }
     }, []);
 
-    // Установка дефолтного языка (если не выбран)
+    // Установка дефолтного языка (если не выбран) - ИСПРАВЛЕНО
     useEffect(() => {
         const savedLang = localStorage.getItem("lang");
         if (!savedLang) {
-            i18n.changeLanguage("ru");
+            // Устанавливаем русский по умолчанию
             localStorage.setItem("lang", "ru");
+            i18n.changeLanguage("ru");
+        } else {
+            // Если язык сохранен, применяем его
+            i18n.changeLanguage(savedLang);
         }
     }, [i18n]);
 
@@ -73,8 +77,10 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
     }, []);
 
     const changeLanguage = (lng) => {
-        if (lng) i18n.changeLanguage(lng);
-        localStorage.setItem("lang", lng);
+        if (lng) {
+            i18n.changeLanguage(lng);
+            localStorage.setItem("lang", lng);
+        }
     };
 
     const handleProfile = () => {
@@ -118,7 +124,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
             {/* Селектор языка, темная тема, профиль */}
             <div className="flex items-center gap-[10px]">
                 {/* Селектор языка */}
-                <div className={`w-[80px]  rounded-[10px] shadow-lg ${isDarkMode
+                <div className={`w-[80px] rounded-[10px] shadow-lg ${isDarkMode
                     ? "bg-gray-800/80 backdrop-blur-md"
                     : "bg-white/80 backdrop-blur-md"
                     }`}>
@@ -150,7 +156,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                     onClick={toggleDarkMode}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
-                    className={` relative flex items-center justify-center w-10 h-10 rounded-xl border shadow transition-all duration-500 ${isDarkMode
+                    className={`relative flex items-center justify-center w-10 h-10 rounded-xl border shadow transition-all duration-500 ${isDarkMode
                         ? "bg-gray-800/80 hover:bg-gray-700/80 border-gray-600 text-yellow-300 backdrop-blur-md"
                         : "bg-white/80 hover:bg-gray-100/80 border-gray-300 text-gray-700 backdrop-blur-md"
                         } ${isHovered ? "scale-110 rotate-12" : "scale-100 rotate-0"}`}
@@ -168,7 +174,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                             : "bg-white/80 hover:bg-gray-100/80 border-gray-300 text-gray-800"
                             }`}
                     >
-                        <div className={` p-2 rounded-full backdrop-blur-md ${isDarkMode ? "bg-gray-700/80" : "bg-gray-200/80"
+                        <div className={`p-2 rounded-full backdrop-blur-md ${isDarkMode ? "bg-gray-700/80" : "bg-gray-200/80"
                             }`}>
                             <User className="w-4 h-4" />
                         </div>

@@ -190,10 +190,10 @@ export default function Login() {
       <div className="login-card w-full max-w-[520px] rounded-[14px] p-[28px] border border-[#e6eef2] dark:border-gray-700 !important bg-white dark:bg-card-dark !important shadow-lg dark:shadow-gray-900/20 !important transition-colors duration-200 !important">
         <div className="flex gap-3.5 items-center mb-4.5">
           <div className="login-logo shadow-[0_8px_24px_rgba(19,102,214,0.12)] dark:shadow-[0_8px_24px_rgba(19,102,214,0.2)] !important w-16 h-16 rounded-[16px] flex items-center justify-center text-[#fff] font-bold text-[20px] bg-blue-600 dark:bg-blue-700 !important">
-            KW
+            USD
           </div>
           <div className="flex flex-col gap-0.5">
-            <h1 className="m-0 text-[18px] font-medium text-gray-900 dark:text-text-dark !important">KENWOOD</h1>
+            <h1 className="m-0 text-[18px] font-medium text-gray-900 dark:text-text-dark !important">USD sistem</h1>
             <p className="m-0 text-[#6b7280] dark:text-gray-400 !important text-[13px]">
               Ombor nazorati — tez, aniq va ishonchli
             </p>
@@ -265,7 +265,7 @@ export default function Login() {
 
         <footer className="mt-4 text-center font-[3px] text-[#6b7280] dark:text-gray-400 !important">
           <small>
-            © {new Date().getFullYear()} KENWOOD Barcha huquqlar himoyalangan.
+            © {new Date().getFullYear()} USD sistem Barcha huquqlar himoyalangan.
           </small>
         </footer>
       </div>
