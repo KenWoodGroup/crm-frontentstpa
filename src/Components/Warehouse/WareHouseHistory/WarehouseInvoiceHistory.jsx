@@ -218,7 +218,7 @@ export default function WarehouseInvoiceHistory() {
             const baseId = Cookies.get("ul_nesw");
             const res = await location.getAllGroupLocations(baseId);
             const items = (res?.data || []).map((l) => ({ value: l.id, label: l.name }));
-            // add "all" option
+            // add "all" options
             setLocations([{ value: "all", label: `${t("allLocations")}` }, ...items]);
         } catch (err) {
             console.error(err);
