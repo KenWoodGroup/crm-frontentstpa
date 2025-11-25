@@ -20,6 +20,8 @@ import Cookies from "js-cookie";
 import WarehouseMonyChart from "../../Factory/FactoryDashboard/_components/WarehouseMonyChart";
 import WarehouseProduct from "../../Factory/FactoryDashboard/_components/WarehouseProduct";
 import { useTranslation } from "react-i18next";
+import { location } from "../../../utils/Controllers/location";
+import Loading from "../../UI/Loadings/Loading";
 
 export default function WarehouseDashboard() {
     const locationId = Cookies.get("ul_nesw");
@@ -30,19 +32,24 @@ export default function WarehouseDashboard() {
     const [productSum, setProductSum] = useState([]);
     const [productCount, setProductCount] = useState([]);
     const [CardData, setCardData] = useState(null);
+    const [info, setInfo] = useState([])
     const [loading, setLoading] = useState(true);
+
+
 
     const fetchAllData = async () => {
         setLoading(true);
         try {
-            const [card, sum, count] = await Promise.all([
+            const [card, sum, count, info] = await Promise.all([
                 Statistik.GetStatistik(locationId),
                 Statistik.GetStatistikProductSum({ id: locationId, year, month }),
                 Statistik.GetStatistikProductCount({ id: locationId, year, month }),
+                location.Get(Cookies.get("ul_nesw")),
             ]);
             setCardData(card?.data || {});
             setProductSum(sum?.data || []);
             setProductCount(count?.data || []);
+            setInfo(info?.data || [])
         } catch (error) {
             console.log(error);
         } finally {
@@ -93,10 +100,14 @@ export default function WarehouseDashboard() {
         },
     ];
 
+    if (loading) {
+        return (<Loading />)
+    }
+
     return (
         <div className="text-black dark:text-gray-100 min-h-screen transition-all duration-300 px-2 xs:px-3 sm:px-4">
             <Typography variant="h4" className="mb-4 xs:mb-5 sm:mb-6 font-semibold dark:text-gray-100 text-lg xs:text-xl sm:text-2xl lg:text-4xl">
-                Dashboard
+                {info?.name}
             </Typography>
 
             <div className="grid gap-3 xs:gap-4 sm:gap-6 grid-cols-1 min-[320px]:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 mb-6 xs:mb-8 sm:mb-10">

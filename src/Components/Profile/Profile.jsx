@@ -8,13 +8,15 @@ import {
 } from "@material-tailwind/react";
 import Cookies from "js-cookie";
 import { location } from "../../utils/Controllers/location";
-import { MapPin, Phone, Package, Calendar, RefreshCw } from "lucide-react";
+import { MapPin, Phone, Package, Calendar, RefreshCw, Mail } from "lucide-react";
 import Loading from "../UI/Loadings/Loading";
 import { useTranslation } from "react-i18next";
+import { UserApi } from "../../utils/Controllers/UserApi";
 
 export default function Profile() {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState([])
     const { t } = useTranslation();
 
 
@@ -30,7 +32,17 @@ export default function Profile() {
         }
     };
 
+    const getUser = async () => {
+        try {
+            const response = await UserApi?.UserGet({ id: Cookies.get("ul_nesw") })
+            setUser(response?.data[0])
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
+        getUser()
         getProfiler();
     }, []);
 
@@ -93,6 +105,9 @@ export default function Profile() {
 
                         <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Phone className="w-5 h-5" /> {t('Phone')}: <span className="font-normal">{profile.phone}</span>
+                        </Typography>
+                        <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
+                            <Mail className="w-5 h-5" /> {t('Phone')}: <span className="font-normal">{user.email ? user?.email : 'Berilmagan'}</span>
                         </Typography>
 
                         <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">

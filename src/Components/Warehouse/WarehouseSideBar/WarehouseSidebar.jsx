@@ -27,7 +27,6 @@ import {
     UserCog,
     CircleDollarSign,
 } from "lucide-react";
-import LogoutButton from "../../SuperAdminSidebar/sectionsSaSide/LogoutButton";
 import Cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 
@@ -62,9 +61,14 @@ export default function WarehouseSidebar() {
     const settingsSubLinks = [
         { id: 1, label: t('Settings'), path: "/warehouse/settings", icon: UserCog },
         { id: 2, label: t('Payment_type'), path: "/warehouse/peyment/type", icon: CreditCard },
-        { id: 2, label: t('Client_type'), path: "/warehouse/client/category", icon: User },
-        { id: 2, label: t('Price_type'), path: "/warehouse/price-type", icon: CircleDollarSign },
-    ];
+        { id: 3, label: t('Client_type'), path: "/warehouse/client/category", icon: User },
+        access && {
+            id: 4,
+            label: t('Price_type'),
+            path: "/warehouse/price-type",
+            icon: CircleDollarSign
+        }
+    ].filter(Boolean);
 
     return (
         <Card
@@ -164,7 +168,6 @@ export default function WarehouseSidebar() {
                                 </div>
                             </div>
                         )}
-
                         <div>
                             <Typography
                                 variant="small"
@@ -222,7 +225,6 @@ export default function WarehouseSidebar() {
                     </MenuList>
                 </Menu>
             </div>
-
             <div className="flex justify-center mt-4">
                 {/* <LogoutButton /> */}
             </div>

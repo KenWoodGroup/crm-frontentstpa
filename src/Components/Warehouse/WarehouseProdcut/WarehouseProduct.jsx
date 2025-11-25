@@ -97,13 +97,11 @@ export default function WarehouseProduct() {
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">№</th>
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnProductName")}</th>
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBatch")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnSalePrice")}</th>
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnPurchasePrice")}</th>
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnQuantity")}</th>
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDraftQuantity")}</th>
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBarcode")}</th>
                                     <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDate")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnActions")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -126,9 +124,6 @@ export default function WarehouseProduct() {
                                                 )}
                                             </td>
                                             <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {item.sale_price ? `${formatNumber(item.sale_price)} UZS` : t("noData")}
-                                            </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
                                                 {item.purchase_price ? `${formatNumber(item.purchase_price)} UZS` : t("noData")}
                                             </td>
                                             <td className="p-4 text-gray-700 dark:text-text-dark">{item.quantity}</td>
@@ -141,9 +136,6 @@ export default function WarehouseProduct() {
                                                         <span>{t("dateMissingMessage")}</span>
                                                     </span>
                                                 )}
-                                            </td>
-                                            <td className="p-4 text-center">
-                                                <WarehouseEdit data={item} />
                                             </td>
                                         </tr>
                                     );

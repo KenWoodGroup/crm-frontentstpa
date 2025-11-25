@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Select, { components } from "react-select";
 import Spinner from "../../../UI/spinner/Spinner";
 import { customSelectStyles } from "../../WareHouseModals/ThemedReactTagsStyles";
+import Cookies from "js-cookie";
 import { ChevronDown, Plus } from "lucide-react";
 import CarrierCreateModal from "../../WareHouseModals/CarrierCreateModal";
 import { useTranslation } from "react-i18next";
@@ -10,6 +11,7 @@ import { useTranslation } from "react-i18next";
 const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver }) => {
     // Komponent ichida (funksiya scope) joylashtiring:
     const { t } = useTranslation();
+    const access = Cookies.get("sedqwdqdqwd") === "terrwerwerw";
 
     const [operationType, setOperationType] = useState("outgoing");
     const [status, setStatus] = useState("draft");
@@ -26,11 +28,12 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
         received_transfer_out: t("combo.received_transfer_out"),
     };
 
-    const typeOptions = [
-        { value: "outgoing", label: t("type.outgoing_label") }, // Отгрузка (Klientlarga)
-        { value: "transfer_out", label: t("type.transfer_out_label") }, // Перемещение (Boshqa omborga)
-        { value: "disposal", label: t("type.disposal_label") }, // Diposal
-    ];
+const typeOptions = [
+    access && { value: "outgoing", label: t("type.outgoing_label") }, // Отгрузка (Klientlarga)
+    { value: "transfer_out", label: t("type.transfer_out_label") },   // Перемещение (Boshqa omborga)
+    { value: "disposal", label: t("type.disposal_label") },            // Disposal
+].filter(Boolean);
+
 
     const statusOptions = [
         { value: "draft", label: t("status.draft") }, // Черновик
