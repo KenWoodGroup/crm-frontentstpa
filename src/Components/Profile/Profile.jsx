@@ -12,6 +12,7 @@ import { MapPin, Phone, Package, Calendar, RefreshCw, Mail } from "lucide-react"
 import Loading from "../UI/Loadings/Loading";
 import { useTranslation } from "react-i18next";
 import { UserApi } from "../../utils/Controllers/UserApi";
+import ProfileEdit from "./_components/ProfileEdit";
 
 export default function Profile() {
     const [profile, setProfile] = useState(null);
@@ -86,11 +87,12 @@ export default function Profile() {
                 <CardHeader
                     floated={false}
                     shadow={false}
-                    className="p-6 rounded-t-2xl bg-card-light dark:bg-background-dark"
+                    className="p-6 rounded-t-2xl bg-card-light dark:bg-background-dark flex items-center justify-between flex-wrap"
                 >
                     <Typography variant="h4" className="text-text-light dark:text-text-dark font-semibold flex items-center gap-2">
                         <Package className="w-6 h-6" /> {profile.name}
                     </Typography>
+                    <ProfileEdit />
                 </CardHeader>
 
                 <CardBody className="p-6 space-y-4">

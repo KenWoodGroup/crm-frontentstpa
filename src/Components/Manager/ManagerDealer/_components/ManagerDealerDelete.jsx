@@ -36,10 +36,10 @@ export default function ManagerDealerDelete({ id, refresh }) {
 
             <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl">
                 <DialogHeader className="text-lg font-semibold border-b border-gray-200">
-                    Dilerni o‘chirish
+                    Zavodni o'chirish o‘chirish
                 </DialogHeader>
                 <DialogBody divider className="text-gray-700">
-                    Siz haqiqatdan ham bu dilerni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
+                    Siz haqiqatdan ham bu zavodni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200">
                     <Button
