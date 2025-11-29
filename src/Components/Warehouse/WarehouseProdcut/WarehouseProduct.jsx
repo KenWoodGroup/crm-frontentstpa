@@ -11,6 +11,7 @@ import { io } from "socket.io-client";
 import { Info } from "lucide-react";
 import Socket from "../../../utils/Socket";
 import { useTranslation } from "react-i18next";
+import socket from "../../../utils/Socket";
 
 export default function WarehouseProduct() {
     const [loading, setLoading] = useState(false);
@@ -51,10 +52,10 @@ export default function WarehouseProduct() {
         if (!locationId) return;
         GetAllProduct(1);
 
-        const socket = io(`${Socket}`, {
-            path: "/socket.io",
-            transports: ["websocket"],
-        });
+        // const socket = io(`${Socket}`, {
+        //     path: "/socket.io",
+        //     transports: ["websocket"],
+        // });
 
         socket.emit("joinLocation", locationId);
 
@@ -62,7 +63,7 @@ export default function WarehouseProduct() {
             if (data.location_id === locationId) GetAllProduct(1);
         });
 
-        return () => socket.disconnect();  
+        return () => socket.off("stockUpdate");  
     }, [locationId]);
 
     const loadNextPage = () => {

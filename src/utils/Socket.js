@@ -1,4 +1,12 @@
-const Socket =
-    "https://api.usderp.uz";            
+import { io } from "socket.io-client";
 
-export default Socket;
+const socket = io(`https://api.usderp.uz`, {
+    path: "/socket.io",
+    transports: ["websocket"],
+    reconnection: true,
+    reconnectionAttempts: 10,
+    reconnectionDelay: 2000,
+    timeout: 20000, // 20s
+});
+
+export default socket;
