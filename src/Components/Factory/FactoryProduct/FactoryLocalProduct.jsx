@@ -10,6 +10,7 @@ import FactoryCategoryEdit from "./_component/FactoryCategoryEdit";
 import FactoryCategoryDelete from "./_component/FactoryCategoryDelete";
 import Eye from "../../UI/Icons/Eye";
 import { NavLink } from "react-router-dom";
+import Cookies from "js-cookie";
 import FactoryProductExelModal from "./_component/FactoryProductExelModal";
 
 export default function FactoryLocalProduct() {
@@ -18,15 +19,20 @@ export default function FactoryLocalProduct() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
+    const location_id = Cookies.get("ul_nesw");
 
     const GetLocalCategory = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await LocalCategory?.GetallCateogry(page);
+            const data = {
+                location_id: location_id,
+                id: page
+            };
+            const response = await LocalCategory?.GetallCateogry(data);
             const records = response?.data?.data?.records || [];
             const pagination = response?.data?.data?.pagination || {};
             setProducts(records);
-            setCurrentPage(Number(pagination.currentPage) || 1);
+            setCurrentPage(Number(pagination.currentPage) || page);
             setTotalPages(Number(pagination.total_pages) || 1);
         } catch (error) {
             console.log(error);
@@ -54,7 +60,7 @@ export default function FactoryLocalProduct() {
                 </Typography>
                 <div className="flex items-center gap-[10px]">
                     <FactoryProductExelModal />
-                    <FactoryCategoryCreate refresh={GetLocalCategory} />
+                    <FactoryCategoryCreate refresh={() => GetLocalCategory(currentPage)} />
                 </div>
             </div>
 
@@ -66,7 +72,7 @@ export default function FactoryLocalProduct() {
                         <table className="w-full table-auto">
                             <thead className="bg-gray-100 dark:bg-gray-700 ">
                                 <tr>
-                                    <th className="px-4 py-3 text-left rounded rounded-tl-[10px] text-gray-900 dark:text-gray-100 font-semibold">
+                                    <th className="px-4 py-3 text-left rounded-tl-[10px] text-gray-900 dark:text-gray-100 font-semibold">
                                         {t("Name")}
                                     </th>
                                     <th className="px-4 py-3 rounded-tr-[10px] text-right text-gray-900 dark:text-gray-100 font-semibold">
@@ -74,7 +80,6 @@ export default function FactoryLocalProduct() {
                                     </th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 {products.map((product) => (
                                     <tr
@@ -84,13 +89,10 @@ export default function FactoryLocalProduct() {
                                         <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
                                             {product.name}
                                         </td>
-
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-end gap-2">
                                                 <NavLink to={`/factory/category/${product?.id}`}>
-                                                    <Button
-                                                        className="bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 normal-case p-[8px] transition-colors duration-200"
-                                                    >
+                                                    <Button className="bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 normal-case p-[8px] transition-colors duration-200">
                                                         <Eye size={20} />
                                                     </Button>
                                                 </NavLink>
@@ -114,7 +116,6 @@ export default function FactoryLocalProduct() {
                 <EmptyData text={t(`Empty_data`)} />
             )}
 
-            {/* Pagination */}
             {totalPages > 1 && (
                 <div className="flex justify-center items-center mt-6 gap-2">
                     <Button
@@ -127,7 +128,6 @@ export default function FactoryLocalProduct() {
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </Button>
-
                     <Button
                         color="blue"
                         size="sm"
@@ -143,3 +143,4 @@ export default function FactoryLocalProduct() {
         </div>
     );
 }
+

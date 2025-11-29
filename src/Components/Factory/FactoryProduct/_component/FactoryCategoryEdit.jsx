@@ -63,7 +63,7 @@ export default function FactoryCategoryEdit({ oldData, refresh }) {
                 <DialogHeader
                     className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
                 >
-                    {t("Edit_product")}
+                    {t("Edit_Category")}
                     <IconButton
                         variant="text"
                         color="red"

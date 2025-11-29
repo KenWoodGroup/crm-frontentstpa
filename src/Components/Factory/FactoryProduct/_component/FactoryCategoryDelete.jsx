@@ -43,10 +43,10 @@ export default function FactoryCategoryDelete({ id, refresh }) {
                 className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300"
             >
                 <DialogHeader className="text-lg dark:text-text-dark font-semibold border-b border-gray-200 dark:border-gray-700 pb-4 bg-card-light dark:bg-card-dark rounded-t-xl">
-                    {t('Delete_product')}
+                    {t('Delete_Category')}
                 </DialogHeader>
                 <DialogBody divider className="text-text-light dark:text-text-dark py-6">
-                    {t('Delete_product_text')}
+                    {t('Delete__text_Category')}
                 </DialogBody>
                 <DialogFooter className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <Button
