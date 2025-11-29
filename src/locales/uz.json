@@ -537,4 +537,9 @@
     "Bottom5": "Top 5 Kam Sotiladigan Mahsulotlar",
     "AddAll": "Xamasini qoshish",
     "notifies": "Xabarnomalar"
+    "Creaete_Category": "Kategoriya yaratish",
+    "Delete_Category": "Kategoriya o‘chirish",
+    "Delete__text_Category": "Siz ushbu kategoriyani o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!",
+    "Edit_Category": "Kategoriya tahrirlash",
+    "Category": "Kategoriya"
 }

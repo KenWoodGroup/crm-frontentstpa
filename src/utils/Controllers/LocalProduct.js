@@ -5,12 +5,25 @@ class LocalProduct {
         const response = await $api.post(`/local-products`, data)
         return response;
     }
+    static CreateProductExel = async (id, data) => {
+        const response = await $api.post(
+            `/local-products/upload/${id}`,
+            data,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            }
+        );
+        return response;
+    };
+
     static CreateProductInArray = async (data) => {
         const response = await $api.post(`/local-products/array`, data)
         return response;
     }
     static GetProduct = async (data) => {
-        const response = await $api.get(`/local-products/paginate/${data?.id}/page?page=${data?.page}`)
+        const response = await $api.get(`/local-products/paginate/${data?.location_id}/${data?.category_id}/page?page=${data?.page}`)
         return response;
     }
     static GetCategory = async (id) => {

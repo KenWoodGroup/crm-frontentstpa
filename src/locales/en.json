@@ -537,4 +537,9 @@
   "Bottom5": "Top 5 Least-Selling Products",
   "AddAll": "Add All",
   "notifies":"Notifies"
+  "Creaete_Category": "Create Category",
+  "Delete_Category": "Delete Category",
+  "Delete__text_Category": "Are you sure you want to delete this category? This action cannot be undone!",
+  "Edit_Category": "Edit Category",
+  "Category": "Category"
 }

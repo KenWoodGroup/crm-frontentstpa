@@ -1,4 +1,5 @@
 import FactoryAnalitik from "../Components/Factory/FactoryAnalitik/FactoryAnalitik";
+import FactoryCategoryDetail from "../Components/Factory/FactoryCategoryDeltail/FactoryCategoryDetail";
 import FactoryDashboard from "../Components/Factory/FactoryDashboard/FactoryDashboard";
 import FactoryPartner from "../Components/Factory/FactoryPartner/FactoryPartnter";
 import FactoryProductCreate from "../Components/Factory/FactoryProduct/_component/FactoryProductCreate";
@@ -42,6 +43,11 @@ export const userRoutes = [
     path: "factory/product",
     name: 'Product create',
     element: <FactoryLocalProduct />
+  },
+  {
+    path: "factory/category/:id",
+    name: 'Product create',
+    element: <FactoryCategoryDetail />
   },
   {
     path: "factory/product/create",
