@@ -535,5 +535,6 @@
   "Total_money": "Total Revenue",
   "Top5": "Top 5 Best-Selling Products",
   "Bottom5": "Top 5 Least-Selling Products",
-  "AddAll": "Add All"
+  "AddAll": "Add All",
+  "notifies":"Notifies"
 }

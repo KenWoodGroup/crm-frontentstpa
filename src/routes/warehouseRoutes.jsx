@@ -21,6 +21,7 @@ import WarehouseClientCategory from "../Components/Warehouse/WarehouseClientCate
 import WarehousePriceType from "../Components/Warehouse/WarehousePriceType/WarehousePriceType";
 import Profile from "../Components/Profile/Profile";
 import WarehousePriceTypeStock from "../Components/Warehouse/WarehousePriceTypeStock/WarehousePriceTypeStock";
+import NotifiesPage from "../Components/Warehouse/WarehouseOffers/WarehouseOffers";
 
 export const warehouseRoutes = [
     {
@@ -47,6 +48,11 @@ export const warehouseRoutes = [
         path: "/warehouse/stockout",
         name: "Warehouse stock out",
         element: <WareHouseOutcome />
+    },
+    {
+        path:"/warehouse/notifications",
+        name:"Warehouse notifications",
+        element:<NotifiesPage/>
     },
     {
         path: "/warehouse/history",

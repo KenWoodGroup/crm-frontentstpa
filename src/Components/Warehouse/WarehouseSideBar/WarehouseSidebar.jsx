@@ -26,6 +26,7 @@ import {
     Moon,
     UserCog,
     CircleDollarSign,
+    SendIcon,
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
@@ -55,6 +56,7 @@ export default function WarehouseSidebar() {
         { id: 1, label: t('Warehouse'), path: "/warehouse/product", icon: Package },
         { id: 3, label: t('Coming'), path: "/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: t('Shipment'), path: "/warehouse/stockout", icon: PackageMinus },
+        {id:5, label:t("notifies"), path:"/warehouse/notifications", icon:SendIcon}
     ];
 
     // ссылки для маленького меню "Настройки"
