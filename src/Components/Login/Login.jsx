@@ -261,6 +261,9 @@ export default function Login() {
               )}
             </button>
           </div>
+          <div>
+            
+          </div>
         </form>
 
         <footer className="mt-4 text-center font-[3px] text-[#6b7280] dark:text-gray-400 !important">

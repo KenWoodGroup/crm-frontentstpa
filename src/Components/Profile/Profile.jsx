@@ -92,7 +92,7 @@ export default function Profile() {
                     <Typography variant="h4" className="text-text-light dark:text-text-dark font-semibold flex items-center gap-2">
                         <Package className="w-6 h-6" /> {profile.name}
                     </Typography>
-                    <ProfileEdit />
+                    <ProfileEdit info={profile} user={user} refresh={() => { getProfiler(); getUser() }} />
                 </CardHeader>
 
                 <CardBody className="p-6 space-y-4">
@@ -100,18 +100,15 @@ export default function Profile() {
                         <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Package className="w-5 h-5" /> {t(`Type`)}: <span className="font-normal">{profile.type}</span>
                         </Typography>
-
                         <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <MapPin className="w-5 h-5" /> {t('Address')}: <span className="font-normal">{profile.address}</span>
                         </Typography>
-
                         <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Phone className="w-5 h-5" /> {t('Phone')}: <span className="font-normal">{profile.phone}</span>
                         </Typography>
                         <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Mail className="w-5 h-5" /> {t('Phone')}: <span className="font-normal">{user.email ? user?.email : 'Berilmagan'}</span>
                         </Typography>
-
                         <Typography className="text-text-light dark:text-text-dark font-medium flex items-center flex-wrap gap-2">
                             <Package className="w-5 h-5" /> {t('Balance')}:{" "}
                             <span
