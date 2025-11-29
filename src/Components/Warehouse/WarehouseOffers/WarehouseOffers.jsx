@@ -1,7 +1,7 @@
 export default function NotifiesPage() {
     return (
         <section>
-            "ok"
+            "ok 11"
         </section>
     )
 }
