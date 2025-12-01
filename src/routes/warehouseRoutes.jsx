@@ -2,26 +2,12 @@
 import WarehouseBarcodeCreate from "../Components/Warehouse/WarehouseBarcodeCreate/WarehouseBarcodeCreate";
 import WarehouseDashboard from "../Components/Warehouse/WarehouseDashboard/WarehouseDashboard";
 import WarehouseProdcut from "../Components/Warehouse/WarehouseProdcut/WarehouseProduct";
-import WarehouseDiler from "../Components/Warehouse/WarehouseDiler/WarehouseDiler";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
 import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
 import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/SettingsWareHouse";
 
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
-import WarehousePayment from "../Components/Warehouse/WarehousePayment/WarehousePayment";
-import WarehouseSverka from "../Components/Warehouse/WarehouseSverka/WarehouseSverka";
-import WarehouseDebtor from "../Components/Warehouse/WarehouseDebtor/WarehouseDebtor";
-import WarehouseExpenses from "../Components/Warehouse/WarehouseExpenses/WarehouseExpenses";
-import WarehouseClients from "../Components/Warehouse/WarehouseClients/WarehouseClients";
-import WarehouseClientDetail from "../Components/Warehouse/WarehouseClientDetail/WarehouseClientDetail";
-import WarehouseCash from "../Components/Warehouse/WarehouseCash/WarehouseCash";
-import WarehouseСarrier from "../Components/Warehouse/WarehouseСarrier/WarehouseСarrier";
-import WarehousePaymentType from "../Components/Warehouse/WarehousePaymentType/WarehousePaymentType";
-import WarehouseClientCategory from "../Components/Warehouse/WarehouseClientCategory/WarehouseClientCategory";
-import WarehousePriceType from "../Components/Warehouse/WarehousePriceType/WarehousePriceType";
 import Profile from "../Components/Profile/Profile";
-import WarehousePriceTypeStock from "../Components/Warehouse/WarehousePriceTypeStock/WarehousePriceTypeStock";
-import NotifiesPage from "../Components/Warehouse/WarehouseOffers/WarehouseOffers";
 
 export const warehouseRoutes = [
     {
@@ -50,11 +36,6 @@ export const warehouseRoutes = [
         element: <WareHouseOutcome />
     },
     {
-        path:"/warehouse/notifications",
-        name:"Warehouse notifications",
-        element:<NotifiesPage/>
-    },
-    {
         path: "/warehouse/history",
         name: "warehouse history",
         element: <WarehouseInvoiceHistory />
@@ -65,80 +46,17 @@ export const warehouseRoutes = [
         name: "warehouse detail history by id",
         element: <WarehouseInvoiceHistory />
     },
-    {
-        path: "/warehouse/dilers",
-        name: "Warehouse Diler",
-        element: <WarehouseDiler />
-    },
+
     {
         path: "/warehouse/settings",
         name: "Warehouse settings",
         element: <SettingsWareHouse />
     },
     {
-        path: "/warehouse/payment",
-        name: "Warehouse payment",
-        element: <WarehousePayment />
-    },
-    {
-        path: "/warehouse/revisen",
-        name: "Warehouse sverka",
-        element: <WarehouseSverka />
-    },
-    {
-        path: "/warehouse/debtor",
-        name: "Warehouse Debtor",
-        element: <WarehouseDebtor />
-    },
-    {
-        path: "/warehouse/expenses",
-        name: "Warehouse expenses",
-        element: <WarehouseExpenses />
-    },
-    {
-        path: "/warehouse/clients",
-        name: "Warehouse Clients",
-        element: <WarehouseClients />
-    },
-    {
-        path: "/warehouse/client/:id",
-        name: "Warehouse Client detail",
-        element: <WarehouseClientDetail />
-    },
-    {
-        path: "/warehouse/kassa",
-        name: "Warehouse Kassa",
-        element: <WarehouseCash />
-    },
-    {
-        path: "/warehouse/carrier",
-        name: "Warehouse carrier ",
-        element: <WarehouseСarrier />
-    },
-    {
-        path: "/warehouse/peyment/type",
-        name: "Warehouse payment type ",
-        element: <WarehousePaymentType />
-    },
-    {
-        path: "/warehouse/client/category",
-        name: "Warehouse Client category ",
-        element: <WarehouseClientCategory />
-    },
-    {
-        path: "/warehouse/price-type",
-        name: "Warehouse price type ",
-        element: <WarehousePriceType />
-    },
-    {
         path: "/warehouse/profile",
         name: "Warehouse profile ",
         element: <Profile />
     },
-    {
-        path: "/warehouse/price-type/:id",
-        name: "Warehouse  price type ",
-        element: <WarehousePriceTypeStock />
-    },
+
 
 ];
