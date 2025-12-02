@@ -9,6 +9,10 @@ class LocalCategory {
         const response = await $api.get(`/local-categories/page/${data?.location_id}?page=${data?.id}`)
         return response;
     }
+    static GetAll = async (id) => {
+        const response = await $api.get(`/local-categories/all/${id}`)
+        return response;
+    }
     static EditCategory = async (id, data) => {
         const response = await $api.put(`/local-categories/${id}`, data)
         return response;
@@ -17,4 +21,5 @@ class LocalCategory {
         const response = await $api.delete(`/local-categories/${id}`)
         return response;
     }
-} export { LocalCategory }
+}
+export { LocalCategory }

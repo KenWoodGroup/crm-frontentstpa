@@ -88,7 +88,7 @@ function mixReducer(state, action) {
         default:
             return state;
     }
-}
+};
 
 const InventoryContext = createContext(null);
 

@@ -34,6 +34,10 @@ class InvoicesApi {
         const response = await $api.get(`invoices/find-returnIn/${data.sender_id}/${data.receiver_id}/${data.searchINV}`)
         return response
     }
+    static GetInvoiceNotifications = async (location_id, page) => {
+        const response = await $api.get(`/invoices/notification/${location_id}/page?page=${page}`)
+        return response;
+    }
     static DeleteInvoice = async (id) => {
         const response = await $api.delete(`/invoices/${id}`)
         return response;

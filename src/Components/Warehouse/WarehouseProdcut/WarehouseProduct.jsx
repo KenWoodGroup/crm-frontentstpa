@@ -63,7 +63,7 @@ export default function WarehouseProduct() {
             if (data.location_id === locationId) GetAllProduct(1);
         });
 
-        return () => socket.off("stockUpdate");  
+        return () => socket.disconnect("stockUpdate");  
     }, [locationId]);
 
     const loadNextPage = () => {
