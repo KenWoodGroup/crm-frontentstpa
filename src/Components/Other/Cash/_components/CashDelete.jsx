@@ -2,11 +2,10 @@ import { useState } from "react";
 import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Tooltip, IconButton } from "@material-tailwind/react";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
-import { Clients } from "../../../../utils/Controllers/Clients";
 import { Cash } from "../../../../utils/Controllers/Cash";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseCashDelete({ id, refresh }) {
+export default function CashDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation()
     const [loading, setLoading] = useState(false);

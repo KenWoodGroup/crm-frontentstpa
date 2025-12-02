@@ -12,7 +12,7 @@ import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseDebtor() {
+export default function Debtor() {
     const { t } = useTranslation();
     const [data, setData] = useState([]);
     const [filterName, setFilterName] = useState("");

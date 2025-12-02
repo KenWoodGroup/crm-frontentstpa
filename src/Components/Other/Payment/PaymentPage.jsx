@@ -10,14 +10,14 @@ import {
     IconButton,
 } from "@material-tailwind/react";
 import { Trash2, Edit, CreditCard } from "lucide-react";
-import WarehousePaymentCreate from "./_components/WarehousePaymentCreate";
+import PaymentCreate from "./_components/PaymentCreate";
 import { Payment } from "../../../utils/Controllers/Payment";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import { useTranslation } from "react-i18next";
 
-export default function WarehousePayment() {
+export default function PaymentPage() {
     const { t } = useTranslation();
 
     // Получаем начало и конец текущего месяца
@@ -105,7 +105,7 @@ export default function WarehousePayment() {
                 >
                     {t('Clients_Payment')}
                 </Typography>
-                <WarehousePaymentCreate />
+                <PaymentCreate />
             </div>
 
             {/* 🔍 Фильтры */}

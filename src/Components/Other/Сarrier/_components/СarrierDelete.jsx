@@ -2,11 +2,10 @@ import { useState } from "react";
 import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Tooltip, IconButton } from "@material-tailwind/react";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
-import { Clients } from "../../../../utils/Controllers/Clients";
 import { Staff } from "../../../../utils/Controllers/Staff";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseСarrierDelete({ id, refresh }) {
+export default function СarrierDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();

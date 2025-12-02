@@ -92,13 +92,12 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
 
     return (
         <div
-            className={`header fixed top-[10px] w-full z-30 flex justify-between items-center mb-6 px-3 py-2 rounded-2xl border shadow-lg transition-all duration-500 ${isDarkMode
+            className={`header fixed top-[10px] w-full z-30 flex justify-between items-center mb-6 px-3 left-[110px] py-2 rounded-2xl border shadow-lg transition-all duration-500 ${isDarkMode
                 ? "bg-transparent backdrop-blur-md border-gray-700 shadow-gray-900/20"
                 : "bg-transparent backdrop-blur-md border-gray-200"
                 }`}
             style={{
-                maxWidth: sidebarOpen ? "calc(99% - 300px)" : "calc(99% - 120px)",
-                left: sidebarOpen ? "310px" : "120px",
+                maxWidth: "calc(99% - 100px)",
             }}
         >
             {/* Кнопка назад */}

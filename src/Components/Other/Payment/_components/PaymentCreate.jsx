@@ -12,7 +12,7 @@ import {
     Textarea,
 } from "@material-tailwind/react";
 
-export default function WarehousePaymentCreate() {
+export default function PaymentCreate() {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(!open);
 

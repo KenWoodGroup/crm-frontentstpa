@@ -15,7 +15,7 @@ import { Staff } from "../../../../utils/Controllers/Staff";
 import Edit from "../../../UI/Icons/Edit";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseСarrierEdit({ refresh, data, id }) {
+export default function СarrierEdit({ refresh, data, id }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);

@@ -6,14 +6,14 @@ import {
 } from "@material-tailwind/react";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
-import WarehouseSupplierCreate from "./_components/WarehouseСarrierCreate";
+import SupplierCreate from "./_components/СarrierCreate";
 import { Staff } from "../../../utils/Controllers/Staff";
 import Cookies from "js-cookie";
-import WarehouseSupplierDelete from "./_components/WarehouseСarrierDelete";
-import WarehouseSupplierEdit from "./_components/WarehouseСarrierEdit";
+import SupplierDelete from "./_components/СarrierDelete";
+import SupplierEdit from "./_components/СarrierEdit";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseСarrier() {
+export default function Сarrier() {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [clients, setClients] = useState([]);
@@ -45,7 +45,7 @@ export default function WarehouseСarrier() {
                 >
                     {t('Kurier')}
                 </Typography>
-                <WarehouseSupplierCreate refresh={GetStaff} />
+                <SupplierCreate refresh={GetStaff} />
             </div>
 
             {clients.length <= 0 ? (
@@ -81,12 +81,12 @@ export default function WarehouseСarrier() {
                                             {new Date(client.createdAt).toLocaleDateString()}
                                         </td>
                                         <td className="p-3 text-center flex justify-center gap-2">
-                                            <WarehouseSupplierEdit
+                                            <SupplierEdit
                                                 id={client?.id}
                                                 data={client}
                                                 refresh={GetStaff}
                                             />
-                                            <WarehouseSupplierDelete
+                                            <SupplierDelete
                                                 id={client?.id}
                                                 refresh={GetStaff}
                                             />

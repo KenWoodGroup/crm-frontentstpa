@@ -7,14 +7,14 @@ import {
 } from "@material-tailwind/react";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
-import WarehouseCashCreate from "./_components/WarehouseCashCreate";
+import CashCreate from "./_components/CashCreate";
 import Cookies from "js-cookie";
 import { Cash } from "../../../utils/Controllers/Cash";
-import WarehouseCashDelete from "./_components/WarehouseCashDelete";
-import WarehouseCashEdit from "./_components/WarehouseCashEdit";
+import CashDelete from "./_components/CashDelete";
+import CashEdit from "./_components/CashEdit";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseCash() {
+export default function Kassa() {
     const { t } = useTranslation()
     const [loading, setLoading] = useState(true);
     const [cashes, setCashes] = useState([]);
@@ -46,7 +46,7 @@ export default function WarehouseCash() {
                 <Typography variant="h4" className="font-semibold">
                     {t("Kassa")}
                 </Typography>
-                <WarehouseCashCreate refresh={GetAllCash} />
+                <CashCreate refresh={GetAllCash} />
             </div>
 
             {/* Если нет касс */}
@@ -89,8 +89,8 @@ export default function WarehouseCash() {
                                             })}
                                         </td>
                                         <td className="p-3 text-center flex justify-center gap-2">
-                                            <WarehouseCashEdit id={cash?.id} data={cash} refresh={GetAllCash} />
-                                            <WarehouseCashDelete id={cash?.id} refresh={GetAllCash} />
+                                            <CashEdit id={cash?.id} data={cash} refresh={GetAllCash} />
+                                            <CashDelete id={cash?.id} refresh={GetAllCash} />
                                         </td>
                                     </tr>
                                 ))}

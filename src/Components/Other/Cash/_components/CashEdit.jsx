@@ -15,7 +15,7 @@ import { Cash } from "../../../../utils/Controllers/Cash";
 import { useTranslation } from "react-i18next";
 
 
-export default function WarehouseCashEdit({ data, refresh, id }) {
+export default function CashEdit({ data, refresh, id }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation()
     const [form, setForm] = useState({

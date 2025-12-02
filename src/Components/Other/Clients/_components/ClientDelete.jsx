@@ -10,10 +10,10 @@ import {
 } from "@material-tailwind/react";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
-import { Clients } from "../../../../utils/Controllers/Clients";
+import { ClientsApi } from "../../../../utils/Controllers/ClientsApi";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientDelete({ id, refresh }) {
+export default function ClientDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();
@@ -24,7 +24,7 @@ export default function WarehouseClientDelete({ id, refresh }) {
     const handleDelete = async () => {
         try {
             setLoading(true);
-            await Clients.DeleteClient(id);
+            await ClientsApi.DeleteClient(id);
             Alert(`${t(`success`)}`, "success");
             refresh();
             setOpen(false);

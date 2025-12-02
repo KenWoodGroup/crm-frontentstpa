@@ -1,6 +1,6 @@
 import { $api } from "../Headers"
 
-class Clients {
+class ClientsApi {
 
     static ClientsCreate = async (data) => {
         const response = await $api.post(`/locations/client`, data)
@@ -19,4 +19,4 @@ class Clients {
         return response;
     };
 
-} export { Clients }
+} export { ClientsApi }

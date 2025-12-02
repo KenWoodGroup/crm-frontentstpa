@@ -14,10 +14,9 @@ export default function MainLayout() {
                 active={() => setActive((s) => !s)}
             />
             <div
-                className="FactoryLayout  mt-[95px] pb-[30px] px-[15px] min-h-screen transition-all duration-300"
+                className="FactoryLayout  mt-[95px] pb-[30px] ml-[100px] px-[15px] min-h-screen transition-all duration-300"
                 style={{
-                    marginLeft: !active ? "300px" : "110px",
-                    width: !active ? "calc(100% - 320px)" : "calc(100% - 120px)",
+                    width: "calc(100% - 100px)",
                 }}
             >
                 <AdminHeader sidebarOpen={!active} />

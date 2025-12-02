@@ -8,18 +8,18 @@ import {
     IconButton,
 } from "@material-tailwind/react";
 import { Search, ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
-import WarehouseClientsCreate from "./_components/WarehouseClientsCreate";
-import { Clients } from "../../../utils/Controllers/Clients";
+import ClientsCreate from "./_components/ClientsCreate";
+import { ClientsApi } from "../../../utils/Controllers/ClientsApi";
 import Loading from "../../UI/Loadings/Loading";
-import WarehouseClientDelete from "./_components/WarehouseClientDelete";
-import WarehouseClientEdit from "./_components/WarehouseClientEdit";
+import ClientDelete from "./_components/ClientDelete";
+import ClientEdit from "./_components/ClientEdit";
 import EmptyData from "../../UI/NoData/EmptyData";
 import Cookies from "js-cookie";
-import WarehouseClientPayment from "./_components/WarehouseClientPayment";
+import ClientPayment from "./_components/ClientPayment";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClients() {
+export default function Clients() {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [clients, setClients] = useState([]);
@@ -37,7 +37,7 @@ export default function WarehouseClients() {
                 search: searchValue.trim() === "" ? "all" : searchValue,
                 location_id: Cookies.get(`ul_nesw`)
             };
-            const response = await Clients?.GetClients(data);
+            const response = await ClientsApi?.GetClients(data);
             setClients(response?.data?.data?.records || []);
             setPagination(response?.data?.data?.pagination || { total_pages: 1 });
         } catch (error) {
@@ -72,7 +72,7 @@ export default function WarehouseClients() {
                 </Typography>
 
                 <div className="flex items-center gap-3">
-                    <WarehouseClientsCreate refresh={() => GetAllClient(search, page)} />
+                    <ClientsCreate refresh={() => GetAllClient(search, page)} />
                 </div>
             </div>
 
@@ -130,7 +130,7 @@ export default function WarehouseClients() {
                                             <td className="p-3 font-medium">
                                                 <NavLink
                                                     className="text-blue-600 dark:text-blue-400 hover:underline"
-                                                    to={`/warehouse/client/${client?.id}`}
+                                                    to={`/client/${client?.id}`}
                                                 >
                                                     {client.name}
                                                 </NavLink>
@@ -145,16 +145,16 @@ export default function WarehouseClients() {
                                                 {new Date(client.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="p-3 text-center flex justify-center gap-2">
-                                                <WarehouseClientEdit
+                                                <ClientEdit
                                                     id={client?.id}
                                                     data={client}
                                                     refresh={() => GetAllClient(search, page)}
                                                 />
-                                                <WarehouseClientDelete
+                                                <ClientDelete
                                                     id={client?.id}
                                                     refresh={() => GetAllClient(search, page)}
                                                 />
-                                                <WarehouseClientPayment
+                                                <ClientPayment
                                                     refresh={() => GetAllClient(search, page)}
                                                     client={client}
                                                 />

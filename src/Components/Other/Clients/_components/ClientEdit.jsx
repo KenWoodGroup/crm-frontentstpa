@@ -10,14 +10,14 @@ import {
     IconButton,
     Spinner,
 } from "@material-tailwind/react";
-import { Clients } from "../../../../utils/Controllers/Clients";
+import {  ClientsApi } from "../../../../utils/Controllers/ClientsApi";
 import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { Edit } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientEdit({ data, refresh, id }) {
+export default function ClientEdit({ data, refresh, id }) {
     const [open, setOpen] = useState(false);
     const [clientCategories, setClientCategories] = useState([]);
     const { t } = useTranslation();
@@ -60,7 +60,7 @@ export default function WarehouseClientEdit({ data, refresh, id }) {
         }
 
         try {
-            await Clients?.EditClient(id, form);
+            await ClientsApi?.EditClient(id, form);
             Alert(`${t(`success`)}`, "success");
             setForm({
                 name: "",

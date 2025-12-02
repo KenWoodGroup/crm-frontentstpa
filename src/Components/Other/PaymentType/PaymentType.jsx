@@ -16,7 +16,7 @@ import PaymentTypeDelete from "./_components/PaymentTypeDelete";
 import PaymentTypeEdit from "./_components/PaymentTypeEdit";
 import { useTranslation } from "react-i18next";
 
-export default function WarehousePaymentType() {
+export default function PaymentType() {
     const [data, setData] = useState([]);
     const { t } = useTranslation()
     const [loading, setLoading] = useState(true)

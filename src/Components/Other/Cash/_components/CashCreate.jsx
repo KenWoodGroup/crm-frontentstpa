@@ -12,7 +12,7 @@ import { Cash } from "../../../../utils/Controllers/Cash";
 import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseCashCreate({ refresh }) {
+export default function CashCreate({ refresh }) {
     const { t } = useTranslation()
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");

@@ -13,13 +13,13 @@ import {
 import EmptyData from "../../UI/NoData/EmptyData";
 import Loading from "../../UI/Loadings/Loading";
 import { PriceType } from "../../../utils/Controllers/PriceType";
-import WarehousePriceTypeCreate from "./_components/WarehousePriceTypeCreate";
-import WarehousePriceTypeDelete from "./_components/WarehousePriceTypeDelete";
-import WarehousePriceTypeEdit from "./_components/WarehousePriceTypeEdit";
+import PriceTypeCreate from "./_components/PriceTypeCreate";
+import PriceTypeDelete from "./_components/PriceTypeDelete";
+import PriceTypeEdit from "./_components/PriceTypeEdit";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 
-export default function WarehousePriceType() {
+export default function PriceTypePage() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true)
     const { t } = useTranslation()
@@ -58,7 +58,7 @@ export default function WarehousePriceType() {
                 <Typography variant="h4" className="font-semibold">
                     {t('Price_type')}
                 </Typography>
-                <WarehousePriceTypeCreate refresh={getAllPriceType} />
+                <PriceTypeCreate refresh={getAllPriceType} />
             </div>
 
             {/* Если данных нет */}
@@ -81,7 +81,7 @@ export default function WarehousePriceType() {
                                         </Typography>
                                     </div>
                                     <div className="flex items-center gap-[10px]">
-                                        <NavLink to={`/warehouse/price-type/${item?.id}`}>
+                                        <NavLink to={`//price-type/${item?.id}`}>
                                             <Tooltip content={t("View")}>
                                                 <IconButton
                                                     variant="text"
@@ -91,8 +91,8 @@ export default function WarehousePriceType() {
                                                 </IconButton>
                                             </Tooltip>
                                         </NavLink>
-                                        <WarehousePriceTypeEdit item={item} refresh={getAllPriceType} />
-                                        <WarehousePriceTypeDelete id={item?.id} refresh={getAllPriceType} />
+                                        <PriceTypeEdit item={item} refresh={getAllPriceType} />
+                                        <PriceTypeDelete id={item?.id} refresh={getAllPriceType} />
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">

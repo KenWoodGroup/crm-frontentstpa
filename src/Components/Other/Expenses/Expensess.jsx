@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { Expenses } from "../../../utils/Controllers/Expenses";
-import WarehouseExpensesCreate from "./_components/WarehouseExpensesCreate";
+import ExpensesCreate from "./_components/ExpensesCreate";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
-import WarehouseExpensesDelete from "./_components/WarehouseExpensesDelete";
-import WarehouseExpensesEdit from "./_components/WarehouseExpensesEdit";
+import ExpensesDelete from "./_components/ExpensesDelete";
+import ExpensesEdit from "./_components/ExpensesEdit";
 import { useTranslation } from "react-i18next";
 
 const getDefaultDates = () => {
@@ -19,7 +19,7 @@ const getDefaultDates = () => {
     };
 };
 
-export default function WarehouseExpenses() {
+export default function Expensess() {
 
     const { t } = useTranslation();
     const { first, last } = getDefaultDates();
@@ -77,7 +77,7 @@ export default function WarehouseExpenses() {
             {/* Заголовок + фильтры */}
             <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
                 <h1 className="text-2xl font-bold">
-                    {t('Warehouse_Exp')}
+                    {t('expenses')}
                 </h1>
 
                 <div className="flex items-center gap-3 flex-wrap">
@@ -128,7 +128,7 @@ export default function WarehouseExpenses() {
                     </div>
 
                     {/* Добавление */}
-                    <WarehouseExpensesCreate refresh={GetAllExpenses} />
+                    <ExpensesCreate refresh={GetAllExpenses} />
                 </div>
             </div>
 
@@ -191,11 +191,11 @@ export default function WarehouseExpenses() {
                                             </td>
                                             <td className="px-1 py-3 text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <WarehouseExpensesEdit
+                                                    <ExpensesEdit
                                                         data={item}
                                                         refresh={GetAllExpenses}
                                                     />
-                                                    <WarehouseExpensesDelete
+                                                    <ExpensesDelete
                                                         id={item?.id}
                                                         refresh={GetAllExpenses}
                                                     />

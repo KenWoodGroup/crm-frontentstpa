@@ -11,6 +11,16 @@ import WarehouseAccess from "../Components/Factory/FactoryWarehouse/_components/
 import FactoryWarehouse from "../Components/Factory/FactoryWarehouse/FactoryWarehouse";
 import WarehouseDetail from "../Components/Factory/WarehouseDetail/WarehouseDetail";
 import WarehouseUser from "../Components/Factory/WarehouseUser/WarehouseUser";
+import Kassa from "../Components/Other/Cash/Kassa";
+import WarehouseClients from "../Components/Other/Clients/Clients";
+import Debtor from "../Components/Other/Debtor/Debtor";
+import Expensess from "../Components/Other/Expenses/Expensess";
+import PaymentPage from "../Components/Other/Payment/PaymentPage";
+import PaymentType from "../Components/Other/PaymentType/PaymentType";
+import PriceTypePage from "../Components/Other/PriceType/PriceTypePage";
+import PriceTypeStock from "../Components/Other/PriceTypeStock/PriceTypeStock";
+import Sverka from "../Components/Other/Sverka/Sverka";
+import Carrier from "../Components/Other/Сarrier/Сarrier";
 import Profile from "../Components/Profile/Profile";
 
 export const userRoutes = [
@@ -83,5 +93,60 @@ export const userRoutes = [
     path: "/factory/profile",
     name: 'Profile ',
     element: <Profile />
+  },
+  {
+    path: "/factory/clients",
+    name: 'clients ',
+    element: <WarehouseClients />
+  },
+  {
+    path: "/factory/kassa",
+    name: 'Kassa',
+    element: <Kassa />
+  },
+  {
+    path: "/factory/debtor",
+    name: 'Debtor',
+    element: <Debtor />
+  },
+  {
+    path: "/factory/expenses",
+    name: 'expenses',
+    element: <Expensess />
+  },
+  {
+    path: "/factory/payment",
+    name: 'Payment',
+    element: <PaymentPage />
+  },
+  {
+    path: "/factory/payment-type",
+    name: 'Payment type',
+    element: <PaymentType />
+  },
+  {
+    path: "/factory/price-type",
+    name: 'Price type',
+    element: <PriceTypePage />
+  },
+  {
+    path: "/factory/price-type",
+    name: 'Price type',
+    element: <PriceTypePage />
+  },
+  {
+    path: "/factory/price-type-stock",
+    name: 'Price type stock',
+    element: <PriceTypeStock />
+  },
+  {
+    path: "/factory/clients-sverka",
+    name: 'Price type stock',
+    element: <Sverka />
+  },
+  {
+    path: "/factory/carrier",
+    name: 'Carrier',
+    element: <Carrier />
   }
 ]

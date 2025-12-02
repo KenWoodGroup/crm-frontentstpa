@@ -8,14 +8,13 @@ import {
     IconButton,
     Spinner,
 } from "@material-tailwind/react";
-import { FileDown, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
 import { Payment } from "../../../utils/Controllers/Payment";
-import Loading from "../../UI/Loadings/Loading";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseSverka() {
+export default function Sverka() {
     const { t } = useTranslation();
     const [clients, setClients] = useState([]);
     const [selectedClient, setSelectedClient] = useState(null);

@@ -8,13 +8,13 @@ import {
     Input,
     Spinner,
 } from "@material-tailwind/react";
-import { Clients } from "../../../../utils/Controllers/Clients";
+import {  ClientsApi } from "../../../../utils/Controllers/ClientsApi";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientsCreate({ refresh }) {
+export default function ClientsCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const [clientCategories, setClientCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -65,7 +65,7 @@ export default function WarehouseClientsCreate({ refresh }) {
 
         setLoading(true);
         try {
-            await Clients?.ClientsCreate(form);
+            await ClientsApi?.ClientsCreate(form);
             Alert(`${t(`success`)}`, "success");
             setForm({
                 type: "client",

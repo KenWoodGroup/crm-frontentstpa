@@ -14,7 +14,7 @@ import { Staff } from "../../../../utils/Controllers/Staff";
 import { useTranslation } from "react-i18next";
 import { Plus, PlusIcon } from "lucide-react";
 
-export default function WarehouseCarrierCreate({ refresh, apperance = false }) {
+export default function CarrierCreate({ refresh, apperance = false }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [form, setForm] = useState({

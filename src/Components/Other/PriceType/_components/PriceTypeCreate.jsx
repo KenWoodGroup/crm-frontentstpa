@@ -13,7 +13,7 @@ import { PriceType } from "../../../../utils/Controllers/PriceType";
 import { useTranslation } from "react-i18next";
 
 
-export default function WarehousePriceTypeCreate({ refresh }) {
+export default function PriceTypeCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
     const [form, setForm] = useState({

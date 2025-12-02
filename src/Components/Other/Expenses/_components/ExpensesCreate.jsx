@@ -18,7 +18,7 @@ import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
 import { PaymentMethodApi } from "../../../../utils/Controllers/PaymentMethodApi"; // 🔹 добавлено
 
-export default function WarehouseExpensesCreate({ refresh }) {
+export default function ExpensesCreate({ refresh }) {
     const { t } = useTranslation()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);

@@ -12,7 +12,7 @@ import Socket from "../../../utils/Socket";
 import { useTranslation } from "react-i18next";
 import { PriceType } from "../../../utils/Controllers/PriceType";
 
-export default function WarehousePriceTypeStock() {
+export default function PriceTypeStock() {
     const { id } = useParams()
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
