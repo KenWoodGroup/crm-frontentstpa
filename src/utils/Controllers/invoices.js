@@ -35,15 +35,20 @@ class InvoicesApi {
         return response
     }
     static GetInvoiceNotifications = async (location_id, page) => {
-        const response = await $api.get(`/invoices/notification/${location_id}/page?page=${page}`)
+        const response = await $api.get(`/invoices/${location_id}/page?page=${page}`)
         return response;
     }
+
     static DeleteInvoice = async (id) => {
         const response = await $api.delete(`/invoices/${id}`)
         return response;
     }
     static EditInvoice = async (id, data) => {
         const response = await $api.put(`/invoices/${id}`, data)
+        return response;
+    }
+    static EditInvoiceSeen = async (id, data) => {
+        const response = await $api.put(`/invoices/seen/${id}`, data)
         return response;
     }
     static EditStatusInvoice = async (id, data) => {

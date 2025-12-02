@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import InvoiceItemsTable from './InvoiceItemsTable';
+import { InvoicesApi } from '../../../../utils/Controllers/invoices';
 function formatSum(sumStr) {
     if (!sumStr) return '0';
     const n = Number(sumStr);
@@ -43,11 +44,13 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
         try {
             // 1) Optimistic UI: open drawer with skeleton and immediately call PUT to mark seen
             setMarkingSeen(true);
-            await axios.put(`/api/invoices/${id}`, { seen: 'old' });
+            // await axios.put(`/api/invoices/${id}`, { seen: 'old' });
+            await InvoicesApi.EditInvoiceSeen(id, {seen:"old"})
             setMarkingSeen(false);
 
             // 2) Fetch full invoice detail
-            const res = await axios.get(`/api/invoices/${id}`);
+            // const res = await axios.get(`/api/invoices/${id}`);
+            const res = await InvoicesApi.GetInvoiceById(id);
             const data = res.data?.data ?? res.data ?? null;
             setInvoice(data);
 
