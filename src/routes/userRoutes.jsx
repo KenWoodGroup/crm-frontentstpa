@@ -19,6 +19,7 @@ import PaymentPage from "../Components/Other/Payment/PaymentPage";
 import PaymentType from "../Components/Other/PaymentType/PaymentType";
 import PriceTypePage from "../Components/Other/PriceType/PriceTypePage";
 import PriceTypeStock from "../Components/Other/PriceTypeStock/PriceTypeStock";
+import StockApi from "../Components/Other/Stock/StockApi";
 import Sverka from "../Components/Other/Sverka/Sverka";
 import Carrier from "../Components/Other/Сarrier/Сarrier";
 import Profile from "../Components/Profile/Profile";
@@ -148,5 +149,10 @@ export const userRoutes = [
     path: "/factory/carrier",
     name: 'Carrier',
     element: <Carrier />
+  },
+  {
+    path: "/factory/stock",
+    name: 'Stock',
+    element: <StockApi />
   }
 ]
