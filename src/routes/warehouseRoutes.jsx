@@ -8,6 +8,7 @@ import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/Setting
 
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
 import Profile from "../Components/Profile/Profile";
+import ReceivedInvoices from "../Components/Warehouse/WarehouseOffers/WarehouseOffers";
 
 export const warehouseRoutes = [
     {
@@ -34,6 +35,11 @@ export const warehouseRoutes = [
         path: "/warehouse/stockout",
         name: "Warehouse stock out",
         element: <WareHouseOutcome />
+    },
+    {
+        path:"/warehouse/notifications",
+        name:"notifications",
+        element:<ReceivedInvoices/>
     },
     {
         path: "/warehouse/history",

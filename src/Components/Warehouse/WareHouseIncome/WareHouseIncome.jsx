@@ -54,6 +54,7 @@ import { useInventory } from "../../../context/InventoryContext";
 import CarrierCreateModal from "../WareHouseModals/CarrierCreateModal";
 import { PriceType } from "../../../utils/Controllers/PriceType";
 import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
+import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -192,7 +193,7 @@ export default function WareHouseIncome() {
         try {
             setGroupLoading(true);
             const LocationId = Cookies.get("usd_nesw");
-            const res = await LocalProduct.GetCategory(LocationId);
+            const res = await LocalCategory.GetAll(LocationId);
             if (res?.status === 200) setCategories(res.data || []);
             else setCategories(res?.data || []);
         } catch (err) {
