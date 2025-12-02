@@ -8,12 +8,11 @@ import {
 } from "@material-tailwind/react";
 import { BanknotesIcon, CheckCircleIcon, ClockIcon, CreditCardIcon, CurrencyDollarIcon, ReceiptRefundIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { Payment } from "../../../../utils/Controllers/Payment";
-import { CalendarSearchIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Loading from "../../../UI/Loadings/Loading";
 
 
-export default function WarehouseClientPayment({ clientData, refreshKey }) {
+export default function ClientPayment({ clientData, refreshKey }) {
     const [payments, setPayments] = useState([]);
     const [pagination, setPagination] = useState({});
     const [page, setPage] = useState(1);

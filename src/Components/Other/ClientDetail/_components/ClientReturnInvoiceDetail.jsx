@@ -9,7 +9,7 @@ import {
     Card,
 } from "@material-tailwind/react";
 
-export default function WarehouseClientReturnInvoiceDetail({ data }) {
+export default function ClientReturnInvoiceDetail({ data }) {
     const [open, setOpen] = useState(false);
     const [animate, setAnimate] = useState(false);
 

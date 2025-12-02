@@ -29,12 +29,9 @@ export default function StockApi() {
                 id: locationId,
                 page: pageNum,
             });
-
             const newProducts = response?.data?.data?.records || [];
             const total = Number(response?.data?.data?.pagination?.total_pages || 0);
-
             setTotalPages(total);
-
             if (append) setProducts((prev) => [...prev, ...newProducts]);
             else setProducts(newProducts);
         } catch (error) {

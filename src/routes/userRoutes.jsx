@@ -12,6 +12,9 @@ import FactoryWarehouse from "../Components/Factory/FactoryWarehouse/FactoryWare
 import WarehouseDetail from "../Components/Factory/WarehouseDetail/WarehouseDetail";
 import WarehouseUser from "../Components/Factory/WarehouseUser/WarehouseUser";
 import Kassa from "../Components/Other/Cash/Kassa";
+import CategoryClient from "../Components/Other/ClientCategory/CategoryClient";
+import ClientCategory from "../Components/Other/ClientCategory/CategoryClient";
+import ClientDetail from "../Components/Other/ClientDetail/ClientDetail";
 import WarehouseClients from "../Components/Other/Clients/Clients";
 import Debtor from "../Components/Other/Debtor/Debtor";
 import Expensess from "../Components/Other/Expenses/Expensess";
@@ -154,5 +157,20 @@ export const userRoutes = [
     path: "/factory/stock",
     name: 'Stock',
     element: <StockApi />
+  },
+  {
+    path: "/factory/users",
+    name: 'Users',
+    element: <WarehouseUser />
+  },
+  {
+    path: "/factory/client-category",
+    name: 'Client-Category',
+    element: <CategoryClient />
+  },
+  {
+    path: "/factory/client/:id",
+    name: 'Client detail',
+    element: <ClientDetail />
   }
 ]

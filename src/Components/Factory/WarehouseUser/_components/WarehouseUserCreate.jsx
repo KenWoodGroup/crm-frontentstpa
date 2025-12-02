@@ -11,11 +11,10 @@ import {
 } from "@material-tailwind/react";
 import { UserApi } from "../../../../utils/Controllers/UserApi";
 import { Alert } from "../../../../utils/Alert";
-import { useParams } from "react-router-dom";
+import Cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
 
 export default function WarehouseUserCreate({ refresh }) {
-    const { id } = useParams();
     const [open, setOpen] = useState(false);
     const [fullName, setFullName] = useState("");
     const [username, setUsername] = useState("");
@@ -23,25 +22,20 @@ export default function WarehouseUserCreate({ refresh }) {
     const [role, setRole] = useState("warehouse");
     const [loading, setLoading] = useState(false); // <-- добавлено
     const { t } = useTranslation();
-
     const handleOpen = () => setOpen(!open);
-
     const handleCreate = async () => {
         if (!fullName || !username || !password || !role) {
             return Alert("Iltimos, barcha maydonlarni to‘ldiring ❌", "error");
         }
-
         try {
             setLoading(true); // start loading
-
             await UserApi.UserCreate({
-                location_id: id,
+                location_id: Cookies.get("ul_nesw"),
                 full_name: fullName,
                 username,
                 password,
                 role,
             });
-
             Alert(`${t("success")}`, "success");
             handleOpen();
             refresh();

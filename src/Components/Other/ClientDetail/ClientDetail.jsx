@@ -22,14 +22,13 @@ import {
 } from "@heroicons/react/24/outline"
 import Loading from "../../UI/Loadings/Loading"
 import EmptyData from "../../UI/NoData/EmptyData"
-import WarehouseClientDetailPayment from "./_components/WarehouseClientDetailPayment"
-import WarehouseClientInvoices from "./_components/WarehouseClientInvoices"
-import WarehouseClientPayment from "./_components/WarehouseClientPayment"
-import WarehousesClientInvoiceReturn from "./_components/WarehousesClientInvoiceReturn"
+import ClientDetailPayment from "./_components/ClientDetailPayment"
+import ClientInvoices from "./_components/ClientInvoices"
+import ClientPayment from "./_components/ClientPayment"
 import Socket from "../../../utils/Socket"
 import { useTranslation } from "react-i18next"
 
-export default function WarehouseClientDetail() {
+export default function ClientDetail() {
     const { id } = useParams()
     const { t } = useTranslation();
     const [clientData, setClientData] = useState(null)
@@ -156,7 +155,7 @@ export default function WarehouseClientDetail() {
                                         </Typography>
                                     </div>
                                 </div>
-                                <WarehouseClientDetailPayment
+                                <ClientDetailPayment
                                     client={clientData}
                                     refresh={getUser}
                                 />
@@ -308,19 +307,19 @@ export default function WarehouseClientDetail() {
                     </Tabs>
 
                     {activeTab === "invoices" && (
-                        <WarehouseClientInvoices
+                        <ClientInvoices
                             clientData={clientData}
                             refreshKey={refreshKey} // ✅ передаём ключ
                         />
                     )}
                     {activeTab === "returns" && (
-                        <WarehousesClientInvoiceReturn
+                        <sClientInvoiceReturn
                             clientData={clientData}
                             refreshKey={refreshKey}
                         />
                     )}
                     {activeTab === "payments" && (
-                        <WarehouseClientPayment
+                        <ClientPayment
                             clientData={clientData}
                             refreshKey={refreshKey}
                         />

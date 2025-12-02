@@ -13,7 +13,7 @@ import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
 import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientCategoryCreate({ refresh }) {
+export default function ClientCategoryCreate({ refresh }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation()
     const [loading, setLoading] = useState(false);

@@ -10,12 +10,16 @@ import EmptyData from "../../UI/NoData/EmptyData";
 import WarehouseUserDelete from "./_components/WarehouseUserDelete";
 import WarehouseUserEdit from "./_components/WarehouseUserEdit";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie";
+
 
 export default function WarehouseUser() {
-    const { id } = useParams();
+    const id = Cookies.get("ul_nesw")
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const { t } = useTranslation()
+
+    console.log(id)
 
 
     const GetUsers = async () => {

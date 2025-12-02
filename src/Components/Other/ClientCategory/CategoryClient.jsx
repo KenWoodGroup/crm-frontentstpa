@@ -12,12 +12,12 @@ import {
 import { ClientCategory } from "../../../utils/Controllers/ClientCategory";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
-import WarehouseClientCategoryCreate from "./_components/WarehouseClientCategoryCreate";
-import WarehouseClientCategoryDelete from "./_components/WarehouseClientCategoryDelete";
-import WarehouseClientCategoryEdit from "./_components/WarehouseClientCategoryEdit";
+import ClientCategoryCreate from "./_components/ClientCategoryCreate";
+import ClientCategoryDelete from "./_components/ClientCategoryDelete";
+import ClientCategoryEdit from "./_components/ClientCategoryEdit";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientCategory() {
+export default function CategoryClient() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation()
@@ -57,7 +57,7 @@ export default function WarehouseClientCategory() {
                 >
                     {t('Category_Client')}
                 </Typography>
-                <WarehouseClientCategoryCreate refresh={getAllCategoryClient} />
+                <ClientCategoryCreate refresh={getAllCategoryClient} />
             </div>
 
             {/* 🔹 Таблица */}
@@ -107,8 +107,8 @@ export default function WarehouseClientCategory() {
                                     </td>
                                     <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-right text-gray-700 dark:text-gray-300">
                                         <div className="flex items-center justify-end gap-[10px]">
-                                            <WarehouseClientCategoryEdit data={item} id={item?.id} refresh={getAllCategoryClient} />
-                                            <WarehouseClientCategoryDelete id={item?.id} refresh={getAllCategoryClient} />
+                                            <ClientCategoryEdit data={item} id={item?.id} refresh={getAllCategoryClient} />
+                                            <ClientCategoryDelete id={item?.id} refresh={getAllCategoryClient} />
                                         </div>
                                     </td>
                                 </tr>
@@ -116,7 +116,7 @@ export default function WarehouseClientCategory() {
                         </tbody>
                     </table>
                 ) : (
-                    <EmptyData text={t('Empty_Data')} />
+                    <EmptyData text={t('Empty_data')} />
                 )}
             </div>
         </div>

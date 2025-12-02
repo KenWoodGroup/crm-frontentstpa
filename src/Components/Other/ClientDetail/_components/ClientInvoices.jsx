@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button, Card, CardBody, Typography, Chip } from "@material-tailwind/react";
-import WarehouseClientDetailPayment from "./WarehouseClientDetailPayment";
+import ClientDetailPayment from "./ClientDetailPayment";
 import { CheckCircleIcon, ClockIcon, DocumentTextIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
 import Cookies from "js-cookie";
 import { CheckCircle2Icon } from "lucide-react";
-import WarehouseClientPaymentDetail from "./WarehouseClientPaymentDetail";
+import ClientPaymentDetail from "./ClientPaymentDetail";
 import { useTranslation } from "react-i18next";
 import Loading from "../../../UI/Loadings/Loading";
 
-export default function WarehouseClientInvoices({ clientData, refreshKey }) {
+export default function ClientInvoices({ clientData, refreshKey }) {
     const { t } = useTranslation();
     const [invoices, setInvoices] = useState([]);
     const [pagination, setPagination] = useState({});
@@ -213,9 +213,9 @@ export default function WarehouseClientInvoices({ clientData, refreshKey }) {
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <WarehouseClientPaymentDetail data={invoice} />
+                                        <ClientPaymentDetail data={invoice} />
                                         {invoice.payment_status === "unpaid" || invoice?.payment_status === 'partially_paid' ? (
-                                            <WarehouseClientDetailPayment
+                                            <ClientDetailPayment
                                                 refresh={getAllInvoice}
                                                 client={clientData}
                                                 invoice={invoice}

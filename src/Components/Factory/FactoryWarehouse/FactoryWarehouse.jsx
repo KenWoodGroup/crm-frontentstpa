@@ -122,15 +122,7 @@ export default function FactoryWarehouse() {
                                     </div>
 
                                     <div className="flex flex-wrap gap-3">
-                                        <NavLink
-                                            to={`/factory/warehouse/user/${w?.id}`}
-                                            className="flex-1"
-                                        >
-                                            <Button className="w-full flex items-center justify-center gap-2 bg-background-dark dark:bg-background-light  dark:text-text-light  text-white transition-colors">
-                                                <User size={18} />
-                                                {t("workers")}
-                                            </Button>
-                                        </NavLink>
+                                       
                                         <NavLink
                                             to={`/factory/warehouse-access/${w?.id}`}
                                             className="flex-1"

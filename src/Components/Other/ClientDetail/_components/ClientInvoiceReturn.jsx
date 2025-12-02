@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { Button, Card, CardBody, Typography, Chip } from "@material-tailwind/react";
 import { CheckCircleIcon, ClockIcon, DocumentTextIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { InvoicesApi } from "../../../../utils/Controllers/invoices";
-import WarehouseClientReturnInvoiceDetail from "./WarehouseClientReturnInvoiceDetail";
+import ClientReturnInvoiceDetail from "./ClientReturnInvoiceDetail";
 import { useTranslation } from "react-i18next";
 import Loading from "../../../UI/Loadings/Loading";
 
-export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }) {
+export default function ClientInvoiceReturn({ clientData, refreshKey }) {
     const [invoices, setInvoices] = useState([]);
     const [pagination, setPagination] = useState({});
     const [loading, setLoading] = useState(true);
@@ -183,7 +183,7 @@ export default function WarehousesClientInvoiceReturn({ clientData, refreshKey }
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <WarehouseClientReturnInvoiceDetail data={invoice} />
+                                        <ClientReturnInvoiceDetail data={invoice} />
                                     </div>
                                 </div>
                             </CardBody>

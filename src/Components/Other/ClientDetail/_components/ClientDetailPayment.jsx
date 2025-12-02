@@ -17,7 +17,7 @@ import { Cash } from "../../../../utils/Controllers/Cash";
 import { PaymentMethodApi } from "../../../../utils/Controllers/PaymentMethodApi";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientDetailPayment({ client, refresh, invoice }) {
+export default function ClientDetailPayment({ client, refresh, invoice }) {
     const [open, setOpen] = useState(false);
     const [cashes, setCashes] = useState([]);
     const [paymentMethods, setPaymentMethods] = useState([]);

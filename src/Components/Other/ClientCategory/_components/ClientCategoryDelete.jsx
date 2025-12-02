@@ -13,7 +13,7 @@ import { Alert } from "../../../../utils/Alert";
 import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientCategoryDelete({ id, refresh }) {
+export default function ClientCategoryDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation()
     const [loading, setLoading] = useState(false);

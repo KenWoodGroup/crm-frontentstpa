@@ -37,6 +37,7 @@ export default function FactorySidebar() {
             isMenu: true,
             items: [
                 { id: 9, path: "/factory/stock", icon: <Blocks className="w-4 h-4" />, label: t("warehouseTitle") },
+                { id: 17, path: "/factory/warehouse", icon: <Warehouse className="w-4 h-4" />, label: t("Warehouses") },
             ]
         },
         {
@@ -72,9 +73,10 @@ export default function FactorySidebar() {
                 { id: 12, path: "/factory/product", icon: <Factory className="w-4 h-4" />, label: t("Production") },
                 { id: 5, path: "/factory/partner", icon: <Users className="w-4 h-4" />, label: t("partner") },
                 { id: 7, path: "/factory/payment-type", icon: <ClipboardType className="w-4 h-4" />, label: t("Payment_type") },
+                { id: 5, path: "/factory/users", icon: <Users className="w-4 h-4" />, label: t("workers") },
                 { id: 8, path: "/factory/price-type", icon: <DollarSign className="w-4 h-4" />, label: t("Price_type") },
                 { id: 11, path: "/factory/carrier", icon: <Car className="w-4 h-4" />, label: t("Kurier") },
-                { id: 9, path: "/factory/price-type-stock", icon: <Blocks className="w-4 h-4" />, label: t("warehouseTitle") },
+                { id: 11, path: "/factory/client-category", icon: <Users className="w-4 h-4" />, label: t("Category_Client") },
             ]
         }
     ];

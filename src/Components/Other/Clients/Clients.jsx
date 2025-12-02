@@ -130,7 +130,7 @@ export default function Clients() {
                                             <td className="p-3 font-medium">
                                                 <NavLink
                                                     className="text-blue-600 dark:text-blue-400 hover:underline"
-                                                    to={`/client/${client?.id}`}
+                                                    to={`/factory/client/${client?.id}`}
                                                 >
                                                     {client.name}
                                                 </NavLink>

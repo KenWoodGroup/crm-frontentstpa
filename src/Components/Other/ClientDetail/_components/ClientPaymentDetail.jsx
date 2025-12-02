@@ -9,7 +9,7 @@ import {
     Card,
 } from "@material-tailwind/react";
 
-export default function WarehouseClientPaymentDetail({ data }) {
+export default function ClientPaymentDetail({ data }) {
     const [open, setOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("payments");
     const [animate, setAnimate] = useState(false);

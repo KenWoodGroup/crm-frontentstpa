@@ -15,7 +15,7 @@ import { Alert } from "../../../../utils/Alert";
 import { ClientCategory } from "../../../../utils/Controllers/ClientCategory";
 import { useTranslation } from "react-i18next";
 
-export default function WarehouseClientCategoryEdit({ data, refresh, id }) {
+export default function ClientCategoryEdit({ data, refresh, id }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation()
     const [form, setForm] = useState({
