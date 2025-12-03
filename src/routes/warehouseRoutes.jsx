@@ -29,12 +29,12 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/stockin",
         name: "Warehouse stock in",
-        element: <WareHouseIncome />
+        element: <WareHouseIncome role="warehouse"/>
     },
     {
         path: "/warehouse/stockout",
         name: "Warehouse stock out",
-        element: <WareHouseOutcome />
+        element: <WareHouseOutcome role="warehouse" />
     },
     {
         path:"/warehouse/notifications",

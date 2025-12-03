@@ -45,7 +45,7 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
             // 1) Optimistic UI: open drawer with skeleton and immediately call PUT to mark seen
             setMarkingSeen(true);
             // await axios.put(`/api/invoices/${id}`, { seen: 'old' });
-            await InvoicesApi.EditInvoiceSeen(id, {seen:"old"})
+            await InvoicesApi.EditInvoiceSeen(id, { seen: "old" })
             setMarkingSeen(false);
 
             // 2) Fetch full invoice detail
@@ -67,18 +67,18 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
 
     return (
         // backdrop + drawer
-        <div className="fixed inset-0 z-50 flex">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex overflow-y-auto">
+            <div className="absolute  z-60" onClick={onClose} />
 
-            <aside className="ml-auto w-full sm:w-[720px] max-w-[100%] h-full bg-white shadow-xl flex flex-col">
+            <aside  className="ml-auto w-full sm:w-[720px] max-w-[100%] h-full shadow-xl flex flex-col bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-100 sticky top-0 bg-white z-10">
+                <div className="flex items-center justify-between p-4 border-b border-gray-100 sticky top-0 transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark z-10">
                     <div>
                         <div className="text-lg font-semibold text-slate-900">{invoice?.invoice_number ?? 'Invoice'}</div>
                         <div className="text-sm text-gray-500">{invoice?.status ?? ''}</div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button onClick={onClose} className="px-3 py-2 rounded-md bg-white border">Bekor qilish</button>
+                        <button onClick={onClose} className="px-3 py-2 rounded-md border">Bekor qilish</button>
                         <button
                             onClick={() => { if (onApplied) onApplied(); }}
                             className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium"
@@ -92,14 +92,14 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
                 <div className="p-6 overflow-y-auto flex-1">
                     {(loading || markingSeen) && (
                         <div>
-                            <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4" />
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="h-16 bg-gray-100 rounded animate-pulse"></div>
-                                <div className="h-16 bg-gray-100 rounded animate-pulse"></div>
+                            <div className="h-6 w-48 rounded animate-pulse mb-4 duration-300 shadow-sm bg-card-light dark:bg-card-dark" />
+                            <div className="grid grid-cols-2 gap-4 mb-6 duration-300 shadow-sm bg-card-light dark:bg-card-dark">
+                                <div className="h-16  rounded animate-pulse duration-300 shadow-sm bg-card-light dark:bg-card-dark"></div>
+                                <div className="h-16  rounded animate-pulse duration-300 shadow-sm bg-card-light dark:bg-card-dark"></div>
                             </div>
                             <div className="space-y-2">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="h-12 bg-gray-100 rounded animate-pulse"></div>
+                                    <div key={i} className="h-12 rounded animate-pulse duration-300 shadow-sm bg-card-light dark:bg-card-dark"></div>
                                 ))}
                             </div>
                         </div>
@@ -110,17 +110,17 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
                     )}
 
                     {!loading && !error && invoice && (
-                        <div className="space-y-6">
+                        <div className="space-y-6 ">
                             {/* General info */}
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white p-4 border rounded">
+                                <div className="p-4 border rounded transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark">
                                     <div className="text-xs text-gray-500">Jo'natuvchi</div>
                                     <div className="text-sm font-medium text-slate-800">{invoice.sender_name}</div>
 
                                     <div className="text-xs text-gray-500 mt-3">Qabul qiluvchi</div>
                                     <div className="text-sm font-medium text-slate-800">{invoice.receiver_name}</div>
                                 </div>
-                                <div className="bg-white p-4 border rounded">
+                                <div className="p-4 border transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark rounded">
                                     <div className="text-xs text-gray-500">Summa</div>
                                     <div className="text-sm font-medium text-slate-800">{formatSum(invoice.total_sum)}</div>
 
@@ -131,15 +131,15 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
 
                             {/* Meta */}
                             <div className="grid grid-cols-3 gap-4">
-                                <div className="bg-white p-3 border rounded text-sm">
+                                <div className="p-3 border rounded text-sm transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark">
                                     <div className="text-xs text-gray-400">Yaratildi</div>
                                     <div className="text-sm">{formatDateTime(invoice.createdAt)}</div>
                                 </div>
-                                <div className="bg-white p-3 border rounded text-sm">
+                                <div className="transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark p-3 border rounded text-sm">
                                     <div className="text-xs text-gray-400">Yangilangan</div>
                                     <div className="text-sm">{formatDateTime(invoice.updatedAt)}</div>
                                 </div>
-                                <div className="bg-white p-3 border rounded text-sm">
+                                <div className="transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark p-3 border rounded text-sm">
                                     <div className="text-xs text-gray-400">Izoh</div>
                                     <div className="text-sm">{invoice.note ?? '-'}</div>
                                 </div>
