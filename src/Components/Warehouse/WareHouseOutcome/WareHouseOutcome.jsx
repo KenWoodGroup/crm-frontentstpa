@@ -192,7 +192,8 @@ export default function WareHouseOutcome({ role = "factory" }) {
     const fetchStaffs = async (id = 0, isNewCreated = false) => {
         try {
             setLocationsLoading(true);
-            const res = await Staff.StaffGet(userLId);
+            const locId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw")
+            const res = await Staff.StaffGet(locId);
             if (res?.status === 200 || res?.status === 201) {
                 setStaffs(res.data || []);
                 if (isNewCreated && id) {
