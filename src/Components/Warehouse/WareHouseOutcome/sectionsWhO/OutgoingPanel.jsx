@@ -8,7 +8,7 @@ import { ChevronDown, Plus } from "lucide-react";
 import CarrierCreateModal from "../../WareHouseModals/CarrierCreateModal";
 import { useTranslation } from "react-i18next";
 
-const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver }) => {
+const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver, role }) => {
     // Komponent ichida (funksiya scope) joylashtiring:
     const { t } = useTranslation();
     const access = Cookies.get("sedqwdqdqwd") === "terrwerwerw";
@@ -29,7 +29,7 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
     };
 
 const typeOptions = [
-    access && { value: "outgoing", label: t("type.outgoing_label") }, // Отгрузка (Klientlarga)
+    access && role === "factory"  && { value: "outgoing", label: t("type.outgoing_label") }, // Отгрузка (Klientlarga)
     { value: "transfer_out", label: t("type.transfer_out_label") },   // Перемещение (Boshqa omborga)
     { value: "disposal", label: t("type.disposal_label") },            // Disposal
 ].filter(Boolean);

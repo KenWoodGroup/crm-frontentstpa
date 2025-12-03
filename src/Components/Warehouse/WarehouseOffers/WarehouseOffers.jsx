@@ -46,7 +46,7 @@ export default function ReceivedInvoices() {
     }
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="p-6 min-h-screen transition-all duration-300 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-semibold text-slate-900">Kelib tushgan jo'natmalar</h1>

@@ -35,7 +35,7 @@ class InvoicesApi {
         return response
     }
     static GetInvoiceNotifications = async (location_id, page) => {
-        const response = await $api.get(`/invoices/${location_id}/page?page=${page}`)
+        const response = await $api.get(`/invoices/notification/${location_id}/page?page=${page}`)
         return response;
     }
 

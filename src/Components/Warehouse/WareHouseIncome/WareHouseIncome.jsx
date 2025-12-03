@@ -70,7 +70,7 @@ function useDebounce(value, delay) {
 }
 
 /* ---------- Component ---------- */
-export default function WareHouseIncome() {
+export default function WareHouseIncome({ role = "factory" }) {
     // Ensure you have this import at the top of the file:
     // import { useTranslation } from 'react-i18next';
 
@@ -345,7 +345,6 @@ export default function WareHouseIncome() {
             return;
         } else if (!selectedStaff?.value) {
             notify.warning(t("missing_staff_warning"));
-            return;
         }
         const operation_type = (selected === "return_in" && sendToTrash === true) ? "return_dis" : (selected === "return_in" && sendToTrash === false) ? "return_in" : (selected === "incoming" && sendToTrash === false) ? "incoming" : "transfer_in";
         if ((operation_type === "return_in" || operation_type === "return_dis") && selectedInvoices?.length === 0) {
@@ -717,7 +716,7 @@ export default function WareHouseIncome() {
         } else if (!mixData || mixData.length === 0) {
             notify.warning(t("no_products_added_error"));
             return;
-        } else if (!selectedSalePriceType?.[mode]?.value) {
+        } else if (!selectedSalePriceType?.[mode]?.value && role === "factory") {
             notify.warning(t("sale_price_type_not_selected_warning"));
             return;
         }
@@ -1026,33 +1025,35 @@ export default function WareHouseIncome() {
                                 </button>
 
                                 {/* Return_in */}
-                                <div
-                                    className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200
+                                {role === "factory" &&
+                                    <div
+                                        className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200
                   ${selected === "return_in" ? "bg-green-50 border-green-500 text-green-700 shadow dark:bg-green-900 dark:text-white" : "border-gray-300 hover:border-green-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-green-600"}`}
-                                >
-                                    <div onClick={() => setSelected("return_in")} className="flex items-center justify-between cursor-pointer">
-                                        <div className="flex items-center gap-3">
-                                            <Undo2 size={22} />
-                                            <span className="text-lg font-medium">{t("op_return_card")}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Checkbox for return_dis */}
-                                    {selected === "return_in" && (
-                                        <label className="flex items-center justify-between bg-gray-50 dark:bg-[#2a2a2a] p-3 rounded-lg cursor-pointer">
-                                            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                                                <Trash2 size={18} />
-                                                <span>{t("return_disposal_label")}</span>
+                                    >
+                                        <div onClick={() => setSelected("return_in")} className="flex items-center justify-between cursor-pointer">
+                                            <div className="flex items-center gap-3">
+                                                <Undo2 size={22} />
+                                                <span className="text-lg font-medium">{t("op_return_card")}</span>
                                             </div>
-                                            <input
-                                                type="checkbox"
-                                                checked={sendToTrash}
-                                                onChange={(e) => setSendToTrash(e.target.checked)}
-                                                className="w-5 h-5 accent-red-500"
-                                            />
-                                        </label>
-                                    )}
-                                </div>
+                                        </div>
+
+                                        {/* Checkbox for return_dis */}
+                                        {selected === "return_in" && (
+                                            <label className="flex items-center justify-between bg-gray-50 dark:bg-[#2a2a2a] p-3 rounded-lg cursor-pointer">
+                                                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                                    <Trash2 size={18} />
+                                                    <span>{t("return_disposal_label")}</span>
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={sendToTrash}
+                                                    onChange={(e) => setSendToTrash(e.target.checked)}
+                                                    className="w-5 h-5 accent-red-500"
+                                                />
+                                            </label>
+                                        )}
+                                    </div>
+                                }
                             </div>
 
                             <div>
@@ -1326,19 +1327,21 @@ export default function WareHouseIncome() {
                                         <div className="font-semibold text-lg text-text-light dark:text-text-dark">{(total || 0).toLocaleString()} sum</div>
                                     </div>
                                 </div>
-                                <div className="max-w-80">
-                                    <div className="text-xs text-gray-500 dark:text-gray-400 dark:bg-card-dark mb-2">{t("sale_price_type_label")}</div>
-                                    <Select
-                                        options={saleTypes}
-                                        value={selectedSalePriceType?.[mode]}
-                                        onChange={(op) => changeSalePriceType(op)}
-                                        placeholder={t("sale_price_type_label")}
-                                        isSearchable
-                                        isClearable
-                                        isLoading={saleTypesLoading}
-                                        styles={customSelectStyles()}
-                                    />
-                                </div>
+                                {role === "factory" &&
+                                    <div className="max-w-80">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 dark:bg-card-dark mb-2">{t("sale_price_type_label")}</div>
+                                        <Select
+                                            options={saleTypes}
+                                            value={selectedSalePriceType?.[mode]}
+                                            onChange={(op) => changeSalePriceType(op)}
+                                            placeholder={t("sale_price_type_label")}
+                                            isSearchable
+                                            isClearable
+                                            isLoading={saleTypesLoading}
+                                            styles={customSelectStyles()}
+                                        />
+                                    </div>
+                                }
                             </div>
 
                             {(invoiceMeta?.[mode]?.operation_type !== "return_in" && invoiceMeta?.[mode]?.operation_type !== "return_dis") ? (
@@ -1398,7 +1401,9 @@ export default function WareHouseIncome() {
                                                     <th key={th} className="p-2">{th}</th>
                                                 ))}
                                             <th className="p-2">{t("table_col_unit")}</th>
-                                            <th className="p-2">{t("table_col_sale_price")}</th>
+                                            {role === "factory" &&
+                                                <th className="p-2">{t("table_col_sale_price")}</th>
+                                            }
                                             <th className="p-2">{t("table_col_total")}</th>
                                             <th className="p-2">{t("table_col_remove")}</th>
                                         </tr>
@@ -1451,16 +1456,17 @@ export default function WareHouseIncome() {
                                                     )}
 
                                                     <td className="p-2 align-center w-[120px] ">{it?.unit || "-"}</td>
-                                                    <td className="p-2 align-center w-[120px] ">
-                                                        {selectedSalePriceType?.[mode]?.value ? (
-                                                            ((invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") && !it.is_new_batch) ? t("price_type_not_selected") :
-                                                                <input placeholder={t("s_price_placeholder")} type="number" step="any" value={it.s_price ?? ""} onChange={(e) => handleUpdateSPrice(idx, e.target.value, it.origin_s_price)} className="border rounded px-2 py-1 w-full bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400" aria-label={`Price for ${it.product?.name || idx + 1}`} />
-                                                        )
-                                                            :
-                                                            <p className="text-xs text-yellow-900">{t("price_type_not_selected")}</p>
-                                                        }
-                                                    </td>
-
+                                                    {role === "factory" &&
+                                                        < td className="p-2 align-center w-[120px] ">
+                                                            {selectedSalePriceType?.[mode]?.value ? (
+                                                                ((invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") && !it.is_new_batch) ? t("price_type_not_selected") :
+                                                                    <input placeholder={t("s_price_placeholder")} type="number" step="any" value={it.s_price ?? ""} onChange={(e) => handleUpdateSPrice(idx, e.target.value, it.origin_s_price)} className="border rounded px-2 py-1 w-full bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400" aria-label={`Price for ${it.product?.name || idx + 1}`} />
+                                                            )
+                                                                :
+                                                                <p className="text-xs text-yellow-900">{t("price_type_not_selected")}</p>
+                                                            }
+                                                        </td>
+                                                    }
                                                     <td className="p-2 align-center">{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
 
                                                     <td className="p-2 align-center">
@@ -1492,83 +1498,85 @@ export default function WareHouseIncome() {
             </div>
 
             {/* ---------- Modal (centered, A4 preview) ---------- */}
-            {modalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-                    <div className="bg-white dark:bg-card-dark rounded shadow-lg w-[210mm] max-w-full max-h-[95vh] overflow-auto p-6 text-text-light dark:text-text-dark" aria-live="polite">
-                        <div id="modal_window" ref={modalContentRef}>
-                            {/* A4 preview content */}
-                            <div style={{ width: "100%", boxSizing: "border-box" }}>
-                                <h1 id="modal-title" className="text-center text-lg font-bold text-text-light dark:text-text-dark">
-                                    {invoiceMeta?.[mode]?.operation_type === "transfer_in"
-                                        ? t("modal_title_transfer")
-                                        : invoiceMeta?.[mode]?.operation_type === "return_in"
-                                            ? t("modal_title_return")
-                                            : invoiceMeta?.[mode]?.operation_type === "return_dis"
-                                                ? t("modal_title_return_disposal")
-                                                : t("modal_title_incoming")}
-                                </h1>
-                                <div className="meta mb-4 text-text-light dark:text-text-dark">
-                                    <div><strong>{t("label_sender")}:</strong> {invoiceMeta?.[mode]?.sender || t("dash_fallback")}</div>
-                                    <div><strong>{t("label_receiver")}:</strong> {invoiceMeta?.[mode]?.receiver || t("dash_fallback")}</div>
-                                    <div><strong>{t("label_time")}:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
-                                    <div><strong>{t("label_total_sum")}:</strong> {(total || 0).toLocaleString()} sum</div>
-                                </div>
+            {
+                modalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                        <div className="bg-white dark:bg-card-dark rounded shadow-lg w-[210mm] max-w-full max-h-[95vh] overflow-auto p-6 text-text-light dark:text-text-dark" aria-live="polite">
+                            <div id="modal_window" ref={modalContentRef}>
+                                {/* A4 preview content */}
+                                <div style={{ width: "100%", boxSizing: "border-box" }}>
+                                    <h1 id="modal-title" className="text-center text-lg font-bold text-text-light dark:text-text-dark">
+                                        {invoiceMeta?.[mode]?.operation_type === "transfer_in"
+                                            ? t("modal_title_transfer")
+                                            : invoiceMeta?.[mode]?.operation_type === "return_in"
+                                                ? t("modal_title_return")
+                                                : invoiceMeta?.[mode]?.operation_type === "return_dis"
+                                                    ? t("modal_title_return_disposal")
+                                                    : t("modal_title_incoming")}
+                                    </h1>
+                                    <div className="meta mb-4 text-text-light dark:text-text-dark">
+                                        <div><strong>{t("label_sender")}:</strong> {invoiceMeta?.[mode]?.sender || t("dash_fallback")}</div>
+                                        <div><strong>{t("label_receiver")}:</strong> {invoiceMeta?.[mode]?.receiver || t("dash_fallback")}</div>
+                                        <div><strong>{t("label_time")}:</strong> {invoiceMeta?.[mode]?.time || new Date().toLocaleString()}</div>
+                                        <div><strong>{t("label_total_sum")}:</strong> {(total || 0).toLocaleString()} sum</div>
+                                    </div>
 
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full" style={{ borderCollapse: "collapse", width: "100%" }}>
-                                        <thead>
-                                            <tr>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_index")}</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_name")}</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>{t("product_barcode_label")}</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_price")}</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_qty")}</th>
-                                                <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_total")}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {mixData.map((it, idx) => (
-                                                <tr key={it.id || idx}>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{idx + 1}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{it?.name || t("dash_fallback")}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{it.barcode || ""}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.price || 0).toLocaleString()}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.quantity || 0)} {it.unit || t("table_col_unit")}</td>
-                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full" style={{ borderCollapse: "collapse", width: "100%" }}>
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_index")}</th>
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_name")}</th>
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>{t("product_barcode_label")}</th>
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_price")}</th>
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_qty")}</th>
+                                                    <th style={{ border: "1px solid #333", padding: 6 }}>{t("table_col_total")}</th>
                                                 </tr>
-                                            ))}
-                                            <tr>
-                                                <td colSpan={5} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>{t("modal_total_label")}</td>
-                                                <td style={{ border: "1px solid #333", padding: 6 }}>{Number(total || 0).toLocaleString()}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {mixData.map((it, idx) => (
+                                                    <tr key={it.id || idx}>
+                                                        <td style={{ border: "1px solid #333", padding: 6 }}>{idx + 1}</td>
+                                                        <td style={{ border: "1px solid #333", padding: 6 }}>{it?.name || t("dash_fallback")}</td>
+                                                        <td style={{ border: "1px solid #333", padding: 6 }}>{it.barcode || ""}</td>
+                                                        <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.price || 0).toLocaleString()}</td>
+                                                        <td style={{ border: "1px solid #333", padding: 6 }}>{Number(it.quantity || 0)} {it.unit || t("table_col_unit")}</td>
+                                                        <td style={{ border: "1px solid #333", padding: 6 }}>{(Number(it.price || 0) * Number(it.quantity || 0)).toLocaleString()}</td>
+                                                    </tr>
+                                                ))}
+                                                <tr>
+                                                    <td colSpan={5} style={{ border: "1px solid #333", padding: 6, textAlign: "right", fontWeight: "bold" }}>{t("modal_total_label")}</td>
+                                                    <td style={{ border: "1px solid #333", padding: 6 }}>{Number(total || 0).toLocaleString()}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                <div style={{ marginTop: 20 }}>
-                                    <div>{t("signature_sender")}</div>
-                                    <div style={{ marginTop: 8 }}>{t("signature_receiver")}</div>
+                                    <div style={{ marginTop: 20 }}>
+                                        <div>{t("signature_sender")}</div>
+                                        <div style={{ marginTop: 8 }}>{t("signature_receiver")}</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Modal actions */}
-                        <div className="mt-4 flex justify-end gap-2">
-                            <button onClick={closeModal} className="px-4 py-2 rounded border hover:bg-gray-100 dark:hover:bg-[#2b2b2b]">{t("modal_cancel")}</button>
-                            <button onClick={handleModalSave} disabled={saving} className="px-4 py-2 rounded bg-black text-white disabled:opacity-60">
-                                {saving ? <Spinner size="sm" /> : t("modal_save")}
-                            </button>
-                            <button onClick={handlePrint} disabled={printing} className="px-4 py-2 rounded border hover:bg-gray-100 dark:hover:bg-[#2b2b2b]">
-                                {printing ? <Spinner size="sm" /> : t("modal_print")}
-                            </button>
+                            {/* Modal actions */}
+                            <div className="mt-4 flex justify-end gap-2">
+                                <button onClick={closeModal} className="px-4 py-2 rounded border hover:bg-gray-100 dark:hover:bg-[#2b2b2b]">{t("modal_cancel")}</button>
+                                <button onClick={handleModalSave} disabled={saving} className="px-4 py-2 rounded bg-black text-white disabled:opacity-60">
+                                    {saving ? <Spinner size="sm" /> : t("modal_save")}
+                                </button>
+                                <button onClick={handlePrint} disabled={printing} className="px-4 py-2 rounded border hover:bg-gray-100 dark:hover:bg-[#2b2b2b]">
+                                    {printing ? <Spinner size="sm" /> : t("modal_print")}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/*  ---------- Modal (selectBatchModal) ---------- */}
             <SelectBatchModal isOpen={batchModalOpen} onClose={() => setBatchModalOpen(false)} products={batchProducts} addItemToMixData={addItemToMixDataByBatchModal} />
-        </section>
+        </section >
     );
 
 }

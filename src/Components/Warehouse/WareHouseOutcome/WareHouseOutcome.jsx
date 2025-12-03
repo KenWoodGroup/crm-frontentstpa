@@ -55,7 +55,7 @@ function useDebounce(value, delay) {
     return debounced;
 }
 
-export default function WareHouseOutcome() {
+export default function WareHouseOutcome({ role = "factory" }) {
     // (Place this inside your component function scope)
     const { t } = useTranslation();
 
@@ -257,7 +257,6 @@ export default function WareHouseOutcome() {
             return;
         } else if (!selectedStaff) {
             notify.warning(t("missing_staff_warning"));
-            return;
         }
         try {
             setCreateInvoiceLoading(true);
@@ -272,6 +271,9 @@ export default function WareHouseOutcome() {
                 carrier_id: selectedStaff,
                 note: "ok",
             };
+            if (!selectedStaff) {
+                delete payload.carrier_id
+            }
             const res = await InvoicesApi.CreateInvoice(payload);
             const invoice_id = res?.data?.invoice?.id;
 
@@ -770,6 +772,7 @@ export default function WareHouseOutcome() {
                             selectedStaff={selectedStaff}
                             selectStaff={setSelectedStaff}
                             getStaffs={fetchStaffs}
+                            role={role}
                         />
                     ) : (
                         <div className="h-[65px] bg-card-light dark:bg-card-dark rounded-lg flex items-center gap-3 px-3 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -837,27 +840,33 @@ export default function WareHouseOutcome() {
                                         <div className="text-xs text-gray-500 dark:text-gray-400">{t("label_total_sum")}</div>
                                         <div className="font-semibold text-lg text-text-light dark:text-text-dark">{Number(total || 0).toLocaleString()} {t("currency")}</div>
                                     </div>
-                                    <div className="ml-auto text-right">
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">{t("label_total_discount_value")}</div>
-                                        <div className="font-semibold text-lg text-text-light dark:text-text-dark">{(Number(total || 0) - Number(disTotal || 0)).toLocaleString()} {t("currency")}</div>
-                                    </div>
-                                    <div className="ml-auto text-right">
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">{t("label_total_with_discount")}</div>
-                                        <div className="font-semibold text-lg text-text-light dark:text-text-dark">{Number(disTotal || 0).toLocaleString()} {t("currency")}</div>
-                                    </div>
+                                    {invoiceMeta?.[mode]?.operation_type === "outgoing" &&
+                                        <div className="flex items-center gap-6">
+                                            <div className="ml-auto text-right">
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">{t("label_total_discount_value")}</div>
+                                                <div className="font-semibold text-lg text-text-light dark:text-text-dark">{(Number(total || 0) - Number(disTotal || 0)).toLocaleString()} {t("currency")}</div>
+                                            </div>
+                                            <div className="ml-auto text-right">
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">{t("label_total_with_discount")}</div>
+                                                <div className="font-semibold text-lg text-text-light dark:text-text-dark">{Number(disTotal || 0).toLocaleString()} {t("currency")}</div>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                                <div className="max-w-80">
-                                    <div className="text-xs text-gray-500 dark:text-gray-400 dark:bg-card-dark mb-2">{t("sale_price_type_label")}</div>
-                                    <Select
-                                        options={saleTypes}
-                                        value={selectedSalePriceType?.[mode]}
-                                        onChange={(op) => changeSalePriceType(op)}
-                                        placeholder={t("sale_price_type_label")}
-                                        isSearchable
-                                        isLoading={saleTypesLoading}
-                                        styles={customSelectStyles()}
-                                    />
-                                </div>
+                                {invoiceMeta?.[mode]?.operation_type === "outgoing" &&
+                                    <div className="max-w-80">
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 dark:bg-card-dark mb-2">{t("sale_price_type_label")}</div>
+                                        <Select
+                                            options={saleTypes}
+                                            value={selectedSalePriceType?.[mode]}
+                                            onChange={(op) => changeSalePriceType(op)}
+                                            placeholder={t("sale_price_type_label")}
+                                            isSearchable
+                                            isLoading={saleTypesLoading}
+                                            styles={customSelectStyles()}
+                                        />
+                                    </div>
+                                }
                             </div>
 
                             <div className="bg-card-light dark:bg-card-dark rounded-lg p-3 shadow-sm border border-gray-200 dark:border-gray-700">

@@ -21,9 +21,9 @@ export default function InvoiceItemsTable({ items }) {
     }
 
     return (
-        <div className="bg-white border rounded">
-            <table className="w-full text-sm table-auto">
-                <thead className="bg-gray-50">
+        <div className="border rounded transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark">
+            <table className="w-full text-sm table-auto transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark">
+                <thead className="transition-all ">
                     <tr className="text-left">
                         <th className="px-4 py-3">Mahsulot</th>
                         <th className="px-4 py-3">Soni</th>
@@ -35,7 +35,7 @@ export default function InvoiceItemsTable({ items }) {
                 </thead>
                 <tbody>
                     {items.map(item => (
-                        <tr key={item.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                        <tr key={item.id} className="border-b last:border-b-0">
                             <td className="px-4 py-3">{item.product?.name ?? '—'}</td>
                             <td className="px-4 py-3">{item.quantity}</td>
                             <td className="px-4 py-3">{formatPrice(item.sale_price)}</td>

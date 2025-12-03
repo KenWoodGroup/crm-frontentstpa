@@ -22,7 +22,7 @@ export default function InvoiceCard({ invoice, onView }) {
     const { invoice_number, sender_name, receiver_name, total_sum, status, createdAt, seen } = invoice;
 
     return (
-        <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-md shadow-sm">
+        <div className="flex items-center justify-between p-4  border border-gray-200 rounded-md transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark">
             <div className="flex items-start gap-4">
                 <div className={`w-2 h-12 rounded ${seen === 'new' ? 'bg-yellow-400' : 'bg-gray-300'}`} />
                 <div>
@@ -38,7 +38,7 @@ export default function InvoiceCard({ invoice, onView }) {
             <div className="flex items-center gap-3">
                 <button
                     onClick={onView}
-                    className="px-3 py-2 rounded-md border border-slate-200 bg-white text-sm shadow-sm hover:shadow transition"
+                    className="px-3 py-2 rounded-md border border-slate-200 bg-blue text-sm shadow-sm hover:shadow transition"
                 >
                     Ko'rish
                 </button>
