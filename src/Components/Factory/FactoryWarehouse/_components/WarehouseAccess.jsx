@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 import Loading from "../../../UI/Loadings/Loading";
-import { Card, Typography, Switch } from "@material-tailwind/react";
+import { Card, Typography, Switch, Button } from "@material-tailwind/react";
 import {
     Building2,
     Package,
@@ -16,6 +16,7 @@ import {
     Shield,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie"
 
 // форматирование чисел 70000 → 70 000
 const formatNumber = (num) => {
@@ -57,6 +58,7 @@ export default function WarehouseAccess() {
     const [access, setAccess] = useState([]);
     const [sellAccess, setSellAccess] = useState(false);
     const [saving, setSaving] = useState(false);
+    const navigate = useNavigate()
 
     const GetWarehouse = async () => {
         try {
@@ -143,12 +145,24 @@ export default function WarehouseAccess() {
     return (
         <div className="flex justify-start items-start pb-[30px] bg-background-light dark:bg-background-dark transition-colors duration-300">
             <Card className="w-full max-w-2xl p-8 shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-300">
-                <Typography
-                    variant="h5"
-                    className="mb-6 font-semibold text-center text-text-light dark:text-text-dark"
-                >
-                    {t("Warehouse_Info")}
-                </Typography>
+                <div className="flex items-center justify-between mb-6 ">
+                    <Typography
+                        variant="h5"
+                        className="font-semibold text-center text-text-light dark:text-text-dark"
+                    >
+                        {t("Warehouse_Info")}
+                    </Typography>
+                        <Button onClick={()=>{
+                            sessionStorage.setItem("de_ul_name", warehouse?.name)
+                            Cookies.set('de_ul_nesw', warehouse?.id);
+                            if(true) {
+                                Cookies.set("sedqwdqdqwd", "terrwerwerw")
+                            }
+                            navigate('/factory/warehouse/stockin')
+                        }}>
+                            Операций
+                        </Button>
+                </div>
 
                 {warehouse ? (
                     <div className="space-y-4">

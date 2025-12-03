@@ -18,7 +18,11 @@ import {
     Eraser,
     MinusCircle,
     CheckSquare,
-    InfinityIcon
+    InfinityIcon,
+    PackagePlus,
+    PackageMinus,
+    SendIcon,
+    Move
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 // import { ProductApi } from "../../../utils/Controllers/ProductApi";
@@ -41,6 +45,8 @@ import { customSelectStyles } from "../WareHouseModals/ThemedReactTagsStyles";
 import Select, { components } from "react-select";
 import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 import { LocalCategory } from "../../../utils/Controllers/LocalCategory"
+import { Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
+import { NavLink } from "react-router-dom";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -58,10 +64,16 @@ function useDebounce(value, delay) {
 export default function WareHouseOutcome({ role = "factory" }) {
     // (Place this inside your component function scope)
     const { t } = useTranslation();
-
+    const skladSubLinks = [
+        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/product", icon: Package },
+        { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
+        { id: 4, label: t('Shipment'), path: "/factory/warehouse/stockout", icon: PackageMinus },
+        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon }
+    ];
     // user / location
-    const userLId = Cookies.get("ul_nesw");
+    const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
+    const deUlName = sessionStorage.getItem("de_ul_name")
 
     // context (per-mode)
     const {
@@ -152,7 +164,7 @@ export default function WareHouseOutcome({ role = "factory" }) {
     const fetchCategories = async () => {
         try {
             setGroupLoading(true);
-            const LocationId = Cookies.get("usd_nesw");
+            const LocationId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw");
             const res = await LocalCategory.GetAll(LocationId);
             if (res?.status === 200) setCategories(res.data || []);
             else setCategories(res?.data || []);
@@ -629,9 +641,10 @@ export default function WareHouseOutcome({ role = "factory" }) {
     return (
         <section className="relative w-full min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-hidden transition-colors duration-300">
             <div
-                className={`fixed transition-all duration-300 top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-card-light dark:bg-card-dark text-[rgb(25_118_210)] shadow flex items-center pr-8 justify-center ${invoiceStarted?.[mode] && "justify-between pl-[190px]"} text-xl font-semibold z-30`}
+                className={`fixed transition-all duration-300 top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-card-light dark:bg-card-dark text-[rgb(25_118_210)] shadow flex items-center pr-8 justify-center ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px]"} text-xl font-semibold z-30`}
             >
                 <h2 className="text-text-light dark:text-text-dark">
+                    {role === "factory" && deUlName + " | "}
                     {!invoiceStarted?.out && t("out_header_not_started")}
                     {invoiceStarted?.out &&
                         (invoiceMeta?.out?.operation_type === "outgoing"
@@ -650,6 +663,40 @@ export default function WareHouseOutcome({ role = "factory" }) {
                 ) : (
                     <span />
                 )}
+                {(!invoiceStarted?.[mode] && role === "factory") ? (
+                    <div>
+                        {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
+                        <Menu placement="right-start" allowHover offset={15}>
+                            <MenuHandler>
+                                <div className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer 
+                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
+                                        transition-all duration-300">
+                                    <Move className="w-8 h-8 mb-1" />
+                                </div>
+                            </MenuHandler>
+
+                            <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300">
+                                <Typography
+                                    variant="small"
+                                    color="gray"
+                                    className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400"
+                                >
+                                    {t('Opt_warehouse')}
+                                </Typography>
+                                {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
+                                    <NavLink key={id} to={path}>
+                                        <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all">
+                                            <Icon className="w-4 h-4" />
+                                            {label}
+                                        </MenuItem>
+                                    </NavLink>
+                                ))}
+                            </MenuList>
+                        </Menu>
+                    </div>
+                ) :
+                    <span />
+                }
             </div>
 
             {/* Sidebar */}

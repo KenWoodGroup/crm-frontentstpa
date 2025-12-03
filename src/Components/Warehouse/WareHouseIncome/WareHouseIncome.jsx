@@ -31,11 +31,15 @@ import {
     X, Plus,
     Search,
     Circle,
-    CircleX
+    CircleX,
+    Move,
+    PackagePlus,
+    PackageMinus,
+    SendIcon
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
-import { button, input, select, Spinner } from "@material-tailwind/react";
+import { button, input, Menu, MenuHandler, MenuItem, MenuList, select, Spinner, Typography } from "@material-tailwind/react";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
 import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
@@ -76,8 +80,9 @@ export default function WareHouseIncome({ role = "factory" }) {
 
     // --- Function section (i18n keys applied) ---
     // user / location
-    const userLId = Cookies.get("ul_nesw");
+    const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
+    const deUlName = sessionStorage.getItem("de_ul_name")
 
     // Context (per-mode provider)
     const {
@@ -107,6 +112,12 @@ export default function WareHouseIncome({ role = "factory" }) {
 
     // i18n hook
     const { t } = useTranslation();
+    const skladSubLinks = [
+        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/product", icon: Package },
+        { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
+        { id: 4, label: t('Shipment'), path: "/factory/warehouse/stockout", icon: PackageMinus },
+        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon }
+    ];
 
     // Local UI state
     const [sidebarMode, setSidebarMode] = useState(0); // 0=closed,1=25%,2=33.3%
@@ -192,7 +203,7 @@ export default function WareHouseIncome({ role = "factory" }) {
     const fetchCategories = async () => {
         try {
             setGroupLoading(true);
-            const LocationId = Cookies.get("usd_nesw");
+            const LocationId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw");
             const res = await LocalCategory.GetAll(LocationId);
             if (res?.status === 200) setCategories(res.data || []);
             else setCategories(res?.data || []);
@@ -230,7 +241,8 @@ export default function WareHouseIncome({ role = "factory" }) {
     const fetchStaffs = async (id = 0, isNewCreated = false,) => {
         try {
             setStaffsLoading(true);
-            const res = await Staff.StaffGet(userLId);
+            const locationId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw")
+            const res = await Staff.StaffGet(locationId);
             if (res?.status === 200 || res?.status === 201) {
                 // setStaffs(res.data  || []);
                 const formatted = (res.data || []).map((st) => {
@@ -859,9 +871,10 @@ export default function WareHouseIncome({ role = "factory" }) {
             <div
                 className={`fixed transition-all duration-300 text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px]
         bg-card-light dark:bg-gray-800 shadow text-xl font-semibold z-30 flex items-center pr-8 justify-center
-        ${invoiceStarted?.[mode] && "justify-between pl-[190px]"}`}
+        ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px]"}`}
             >
                 <h2 className="text-text-light dark:text-text-dark">
+                    {role === "factory" && deUlName + " | "}
                     {!invoiceStarted?.[mode]
                         ? t("income_header_not_started")
                         : invoiceMeta?.[mode]?.operation_type === "incoming"
@@ -880,6 +893,40 @@ export default function WareHouseIncome({ role = "factory" }) {
                 ) : (
                     <span />
                 )}
+                {(!invoiceStarted?.[mode] && role === "factory") ? (
+                    <div>
+                        {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
+                        <Menu placement="right-start" allowHover offset={15}>
+                            <MenuHandler>
+                                <div className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer 
+                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
+                        transition-all duration-300">
+                                    <Move className="w-8 h-8 mb-1" />
+                                </div>
+                            </MenuHandler>
+
+                            <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300">
+                                <Typography
+                                    variant="small"
+                                    color="gray"
+                                    className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400"
+                                >
+                                    {t('Opt_warehouse')}
+                                </Typography>
+                                {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
+                                    <NavLink key={id} to={path}>
+                                        <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all">
+                                            <Icon className="w-4 h-4" />
+                                            {label}
+                                        </MenuItem>
+                                    </NavLink>
+                                ))}
+                            </MenuList>
+                        </Menu>
+                    </div>
+                ) :
+                    <span />
+                }
             </div>
 
             {/* Sidebar */}
@@ -1233,7 +1280,7 @@ export default function WareHouseIncome({ role = "factory" }) {
                                             />
 
                                             {carrierModalOpen && (
-                                                <CarrierCreateModal onClose={() => setCarrierModalOpen(false)} refresh={(id) => fetchStaffs(id, true)} />
+                                                <CarrierCreateModal role={role} onClose={() => setCarrierModalOpen(false)} refresh={(id) => fetchStaffs(id, true)} />
                                             )}
                                         </>
                                     )}
