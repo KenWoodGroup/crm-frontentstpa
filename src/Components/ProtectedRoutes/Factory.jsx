@@ -4,12 +4,26 @@ import { useEffect, useState } from "react";
 
 export default function Factory({ children }) {
     const location = useLocation();
-    const [isValid, setIsValid] = useState(Cookies.get("nesw") === "SefwfmgrUID");
+    const [isValid, setIsValid] = useState(null); // null для начальной загрузки
 
     useEffect(() => {
-        const isLoged = Cookies.get("nesw");
-        setIsValid(isLoged === "SefwfmgrUID");
+        const checkAuth = () => {
+            const cookieValue = Cookies.get("nesw");
+            // Проверяем оба значения
+            const isValidCookie = cookieValue === "SefwfmgrUID" ||
+                cookieValue === "CesdsdfmgrUID";
+
+            console.log("Is valid:", isValidCookie); // Для отладки
+            setIsValid(isValidCookie);
+        };
+
+        checkAuth();
     }, [location]);
+
+    // Пока проверяем, показываем загрузку или ничего
+    if (isValid === null) {
+        return <div>Loading...</div>; // или <Spinner />
+    }
 
     if (!isValid) {
         return <Navigate to="/login" replace />;

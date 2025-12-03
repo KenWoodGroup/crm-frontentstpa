@@ -75,8 +75,8 @@ export default function FactorySidebar() {
                 { id: 7, path: "/factory/payment-type", icon: <ClipboardType className="w-4 h-4" />, label: t("Payment_type") },
                 { id: 5, path: "/factory/users", icon: <Users className="w-4 h-4" />, label: t("workers") },
                 { id: 8, path: "/factory/price-type", icon: <DollarSign className="w-4 h-4" />, label: t("Price_type") },
+                { id: 13, path: "/factory/client-category", icon: <Users className="w-4 h-4" />, label: t("Category_Client") },
                 { id: 11, path: "/factory/carrier", icon: <Car className="w-4 h-4" />, label: t("Kurier") },
-                { id: 11, path: "/factory/client-category", icon: <Users className="w-4 h-4" />, label: t("Category_Client") },
             ]
         }
     ];

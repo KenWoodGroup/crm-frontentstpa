@@ -9,6 +9,10 @@ class UserApi {
         const response = await $api.get(`/user/locationId/${data?.id}`)
         return response;
     }
+    static UserById = async (id) => {
+        const response = await $api.get(`/user/${id}`)
+        return response;
+    }
     static UserDelete = async (id) => {
         const response = await $api.delete(`/user/${id}`,)
         return response;

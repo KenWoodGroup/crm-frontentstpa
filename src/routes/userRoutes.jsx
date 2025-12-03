@@ -7,13 +7,13 @@ import FactoryLocalProduct from "../Components/Factory/FactoryProduct/FactoryLoc
 import FactoryProduct from "../Components/Factory/FactoryProduct/FactoryProduct";
 import FactoryReport from "../Components/Factory/FactoryReport/FactoryReport";
 import FactorySettings from "../Components/Factory/FactorySettings/FactorySettings";
+import FactoryUserDetail from "../Components/Factory/FactoryUserDetail/FactoryUserDetail";
 import WarehouseAccess from "../Components/Factory/FactoryWarehouse/_components/WarehouseAccess";
 import FactoryWarehouse from "../Components/Factory/FactoryWarehouse/FactoryWarehouse";
 import WarehouseDetail from "../Components/Factory/WarehouseDetail/WarehouseDetail";
 import WarehouseUser from "../Components/Factory/WarehouseUser/WarehouseUser";
 import Kassa from "../Components/Other/Cash/Kassa";
 import CategoryClient from "../Components/Other/ClientCategory/CategoryClient";
-import ClientCategory from "../Components/Other/ClientCategory/CategoryClient";
 import ClientDetail from "../Components/Other/ClientDetail/ClientDetail";
 import WarehouseClients from "../Components/Other/Clients/Clients";
 import Debtor from "../Components/Other/Debtor/Debtor";
@@ -172,5 +172,10 @@ export const userRoutes = [
     path: "/factory/client/:id",
     name: 'Client detail',
     element: <ClientDetail />
-  }
+  },
+  {
+    path: "/factory/user/:id",
+    name: 'Factory user',
+    element: <FactoryUserDetail />
+  },
 ]

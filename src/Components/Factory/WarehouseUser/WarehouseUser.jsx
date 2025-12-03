@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { UserApi } from "../../../utils/Controllers/UserApi";
 import Loading from "../../UI/Loadings/Loading";
 import { Alert } from "../../../utils/Alert";
-import { Card, CardBody } from "@material-tailwind/react";
-import { User, Mail, CalendarDays } from "lucide-react";
+import { Button, Card, CardBody } from "@material-tailwind/react";
+import { User, Mail, CalendarDays, ShieldUser } from "lucide-react";
 import WarehouseUserCreate from "./_components/WarehouseUserCreate";
 import EmptyData from "../../UI/NoData/EmptyData";
 import WarehouseUserDelete from "./_components/WarehouseUserDelete";
 import WarehouseUserEdit from "./_components/WarehouseUserEdit";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
+import Eye from "../../UI/Icons/Eye";
 
 
 export default function WarehouseUser() {
@@ -19,8 +20,12 @@ export default function WarehouseUser() {
     const [users, setUsers] = useState([]);
     const { t } = useTranslation()
 
-    console.log(id)
-
+    const roleMapper = {
+        cashier: "Cashier",
+        storekeeper: "Storekeeper",
+        seller: "Seller",
+        factory: "Factory"
+    };
 
     const GetUsers = async () => {
         setLoading(true);
@@ -69,16 +74,28 @@ export default function WarehouseUser() {
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2 mt-4">
+                                        <NavLink to={`/factory/user/${u?.id}`}>
+                                            <Button
+                                                className="bg-blue-600 text-white hover:bg-blue-700 normal-case p-[8px]"
+                                            >
+                                                <Eye size={20} />
+                                            </Button>
+                                        </NavLink>
                                         <WarehouseUserEdit user={u} refresh={() => GetUsers()} />
                                         <WarehouseUserDelete id={u.id} refresh={() => GetUsers()} />
                                     </div>
                                 </div>
 
-                                {/* Email */}
                                 <div className="flex items-center gap-2">
                                     <Mail className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                                     <span className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
                                         {u.username}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <ShieldUser className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                                    <span className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
+                                        {roleMapper[u.role] || u.role}
                                     </span>
                                 </div>
 

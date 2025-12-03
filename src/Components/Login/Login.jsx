@@ -43,7 +43,7 @@ export default function Login() {
 
   const saveUserData = (data) => {
     const { access_token, refresh_token } = data?.tokens || {};
-    const { id, role, location_id, location } = data?.newUser || {};
+    const { id, role, location_id, location, access } = data?.newUser || {};
 
     const sellAccessEntry = location?.location_data?.find(
       (item) => item.key === "sell_access"
@@ -56,6 +56,7 @@ export default function Login() {
       sell_access_value === 1 ||
       sell_access_value === "1";
 
+    // Сохраняем токены в куки
     Cookies.set("token", access_token);
     Cookies.set("refresh_token", refresh_token);
 
@@ -63,13 +64,8 @@ export default function Login() {
       super_admin: "SPAfefefeUID",
       admin: "AutngergUID",
       factory: "SefwfmgrUID",
-      company: "SeCfmgrUID",
       warehouse: "SesdsdfmgrUID",
-      cashier: "KesdsdfmgrUID",
-      dealer: "SwedsdfmgrUID",
-      independent: "inedsdfmgrUID",
-      com_warehouse: "comedsdfmgrUID",
-      building: "builewweUID",
+      cashier: "CesdsdfmgrUID",
     };
 
     Cookies.set("nesw", roleMap[role] || "");
@@ -77,18 +73,69 @@ export default function Login() {
     Cookies.set("ul_nesw", location_id);
     Cookies.set("usd_nesw", location?.parent_id);
 
-    const hashedValue = sell_access ? "terrwerwerw" : "fdqewfewf";
-    Cookies.set("sedqwdqdqwd", hashedValue);
+    // Сохраняем access права в виде объекта {kassa: true, seller: true}
+    if (access && Array.isArray(access)) {
+      // Создаем объект с правами доступа
+      const userAccess = {};
+      access.forEach(item => {
+        if (item.key && item.value === "true") {
+          userAccess[item.key] = true;
+        }
+      });
 
-    const userWithAccess = { ...data.newUser, sell_access };
+      // Сохраняем в localStorage как JSON объект
+      localStorage.setItem("user_access", JSON.stringify(userAccess));
+
+      // Для cookies сохраняем как строку с ключами через запятую
+      const accessKeys = Object.keys(userAccess);
+      Cookies.set("user_access_keys", accessKeys.join(","));
+    } else {
+      // Если нет прав, сохраняем пустой объект
+      localStorage.setItem("user_access", JSON.stringify({}));
+      Cookies.set("user_access_keys", "");
+    }
+
+    const userWithAccess = {
+      ...data.newUser,
+      sell_access
+    };
+
     setUserData(userWithAccess);
 
-    return { locationId: location_id, userData: userWithAccess, role };
+    return {
+      locationId: location_id,
+      userData: userWithAccess,
+      role
+    };
   };
 
   const redirectUser = (userData) => {
     if (!userData) return;
     const role = userData.role;
+
+    // Проверяем access права для кассира
+    if (role === "cashier") {
+      // Получаем объект прав доступа из localStorage
+      let userAccess = {};
+      try {
+        const accessFromStorage = localStorage.getItem("user_access");
+        userAccess = accessFromStorage ? JSON.parse(accessFromStorage) : {};
+      } catch (e) {
+        console.error("Error parsing user access:", e);
+      }
+
+      // Проверяем, имеет ли кассир доступ к кассе
+      const hasKassaAccess = userAccess.kassa === true;
+
+      // Если у кассира location.type === "factory" ИЛИ он имеет доступ к кассе, перенаправляем на factory dashboard
+      if (userData?.location?.type === "factory" || hasKassaAccess) {
+        navigate("/factory/dashboard");
+        return;
+      }
+      // Иначе используем стандартный маршрут для кассира
+      navigate("/warehouse/dashboard");
+      return;
+    }
 
     if (
       userData?.location?.parent?.type === "company" &&
@@ -106,12 +153,7 @@ export default function Login() {
         { role: "admin", vektor: "/manager/dashboard" },
         { role: "factory", vektor: "/factory/dashboard" },
         { role: "warehouse", vektor: "/warehouse/dashboard" },
-        { role: "cashier", vektor: "/warehouse/dashboard" },
-        { role: "dealer", vektor: "/diler/dashboard" },
-        { role: "company", vektor: "/company/dashboard" },
-        { role: "independent", vektor: "/independent/dashboard" },
-        { role: "com_warehouse", vektor: "/company-warehouse/dashboard" },
-        { role: "building", vektor: "/building/dashboard" },
+        { role: "cashier", vektor: "/factory/dashboard" },
       ];
       const vektor_obj = roleLinks.find((item) => item.role === role);
       navigate(vektor_obj?.vektor || "/");
@@ -168,13 +210,16 @@ export default function Login() {
 
   const handleOffertaClose = () => {
     setShowOfferta(false);
+    // Очищаем все сохраненные данные
     Cookies.remove("token");
     Cookies.remove("refresh_token");
     Cookies.remove("nesw");
     Cookies.remove("us_nesw");
     Cookies.remove("ul_nesw");
     Cookies.remove("usd_nesw");
-    Cookies.remove("sedqwdqdqwd");
+    // Очищаем access права
+    Cookies.remove("user_access_keys");
+    localStorage.removeItem("user_access");
     setUserData(null);
     setUsername("");
     setPassword("");
@@ -262,7 +307,7 @@ export default function Login() {
             </button>
           </div>
           <div>
-            
+
           </div>
         </form>
 

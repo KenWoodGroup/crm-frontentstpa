@@ -16,14 +16,10 @@ export default function Offerta({ isOpen, onClose, onAgree, locationId }) {
             { role: "SPAfefefeUID", vektor: "/" },
             { role: "AutngergUID", vektor: "/manager/dashboard" },
             { role: "SefwfmgrUID", vektor: "/factory/dashboard" },
+            { role: "CesdsdfmgrUID", vektor: "/factory/dashboard" },
             { role: "SesdsdfmgrUID", vektor: "/warehouse/dashboard" },
             { role: "KesdsdfmgrUID", vektor: "/warehouse/dashboard" },
-            { role: "SwedsdfmgrUID", vektor: "/diler/dashboard" },
             { role: "SeCfmgrUID", vektor: "/company/dashboard" },
-            { role: "inedsdfmgrUID", vektor: "/independent/dashboard" },
-            { role: "comedsdfmgrUID", vektor: "/company-warehouse/dashboard" },
-            { role: "builewweUID", vektor: "/building/dashboard" },
-
         ];
 
         const vektor_obj = roleLinks.find((item) => item.role === role);
