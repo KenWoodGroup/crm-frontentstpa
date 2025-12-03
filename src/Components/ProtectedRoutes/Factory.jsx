@@ -11,12 +11,12 @@ export default function Factory({ children }) {
             const cookieValue = Cookies.get("nesw");
             // Проверяем оба значения
             const isValidCookie = cookieValue === "SefwfmgrUID" ||
-                cookieValue === "CesdsdfmgrUID";
+                cookieValue === "CesdsdfmgrUID" ||
+                cookieValue === "KesdsdfmgrUID" ||
+                cookieValue === "SdsdfmgrUID";
 
-            console.log("Is valid:", isValidCookie); // Для отладки
             setIsValid(isValidCookie);
         };
-
         checkAuth();
     }, [location]);
 

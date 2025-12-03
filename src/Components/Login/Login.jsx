@@ -66,6 +66,8 @@ export default function Login() {
       factory: "SefwfmgrUID",
       warehouse: "SesdsdfmgrUID",
       cashier: "CesdsdfmgrUID",
+      storekeeper: "KesdsdfmgrUID",
+      seller: "SdsdfmgrUID",
     };
 
     Cookies.set("nesw", roleMap[role] || "");
@@ -154,6 +156,8 @@ export default function Login() {
         { role: "factory", vektor: "/factory/dashboard" },
         { role: "warehouse", vektor: "/warehouse/dashboard" },
         { role: "cashier", vektor: "/factory/dashboard" },
+        { role: "storekeeper", vektor: "/factory/dashboard" },
+        { role: "seller", vektor: "/factory/dashboard" },
       ];
       const vektor_obj = roleLinks.find((item) => item.role === role);
       navigate(vektor_obj?.vektor || "/");

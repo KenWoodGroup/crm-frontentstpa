@@ -10,16 +10,118 @@ import {
     PieChart,
     Settings,
     Banknote,
-    BanknoteArrowDown,
+    ArrowDownToLine,
     DollarSign,
     ClipboardType,
     Blocks,
-    ChartNoAxesGantt,
+    ListChecks,
     Car
 } from "lucide-react";
 
 export default function FactorySidebar() {
     const { t } = useTranslation();
+
+    // Получаем права доступа из cookies
+    const getUserAccessKeys = () => {
+        const cookies = document.cookie.split(';');
+        const accessCookie = cookies.find(cookie => cookie.trim().startsWith('user_access_keys='));
+
+        if (!accessCookie) {
+            return null; // Если cookie нет, возвращаем null (полный доступ)
+        }
+
+        const accessValue = accessCookie.split('=')[1];
+
+        // Проверяем, пустая ли строка
+        if (!accessValue || accessValue.trim() === '') {
+            return null; // Пустое значение = полный доступ
+        }
+
+        const decodedValue = decodeURIComponent(accessValue);
+        return decodedValue.split(',').map(key => key.trim().toLowerCase());
+    };
+
+    const userAccessKeys = getUserAccessKeys();
+
+    // Если cookie нет или пустой - полный доступ
+    const hasFullAccess = userAccessKeys === null || userAccessKeys.length === 0;
+
+    // Проверяем наличие конкретных ролей
+    const hasKassaAccess = userAccessKeys && userAccessKeys.includes('kassa');
+    const hasSellerAccess = userAccessKeys && userAccessKeys.includes('seller');
+    const hasSkladAccess = userAccessKeys && userAccessKeys.includes('sklad');
+    const hasZayavkiAccess = userAccessKeys && userAccessKeys.includes('zayavki');
+
+    // Определяем доступные пути для каждой роли
+    const getAccessiblePaths = () => {
+        if (hasFullAccess) return 'all';
+
+        const paths = new Set();
+
+        // Dashboard доступен всем
+        paths.add('/factory/dashboard');
+
+        // Кассир
+        if (hasKassaAccess) {
+            paths.add('/factory/debtor');
+            paths.add('/factory/expenses');
+            paths.add('/factory/kassa');
+            paths.add('/factory/partner');
+            paths.add('/factory/payment-type');
+            paths.add('/factory/price-type');
+            paths.add('/factory/payment');
+        }
+
+        // Продавец
+        if (hasSellerAccess) {
+            paths.add('/factory/clients');
+            paths.add('/factory/debtor');
+            paths.add('/factory/payment');
+            paths.add('/factory/clients-sverka');
+            paths.add('/factory/client-category');
+            paths.add('/factory/carrier');
+        }
+
+        // Склад
+        if (hasSkladAccess) {
+            paths.add('/factory/stock');
+            paths.add('/factory/warehouse');
+        }
+
+        // Заявки
+        if (hasZayavkiAccess) {
+            paths.add('/factory/stock');
+        }
+
+        return paths;
+    };
+
+    const accessiblePaths = getAccessiblePaths();
+
+    // Проверка доступа к конкретному пути
+    const hasAccessToPath = (path) => {
+        if (accessiblePaths === 'all') return true;
+        return accessiblePaths.has(path);
+    };
+
+    // Фильтрация меню в зависимости от прав доступа
+    const filterMenuItems = (items) => {
+        if (accessiblePaths === 'all') return items;
+
+        // Фильтруем только те пункты, к которым есть доступ
+        return items.filter(item => hasAccessToPath(item.path));
+    };
+
+    // Проверка, нужно ли показывать меню
+    const shouldShowMenu = (menuId, filteredItems) => {
+        // Dashboard всегда доступен всем
+        if (menuId === 1) return true;
+
+        if (accessiblePaths === 'all') return true;
+
+        // Для меню показываем только если есть хотя бы один доступный пункт
+        return filteredItems && filteredItems.length > 0;
+    };
 
     // Главные меню-кнопки
     const mainMenuItems = [
@@ -58,9 +160,9 @@ export default function FactorySidebar() {
             items: [
                 { id: 1, path: "/factory/clients", icon: <Users className="w-4 h-4" />, label: t("Clients") },
                 { id: 3, path: "/factory/debtor", icon: <Users className="w-4 h-4" />, label: t("Clients_debtor") },
-                { id: 4, path: "/factory/expenses", icon: <BanknoteArrowDown className="w-4 h-4" />, label: t("expenses") },
+                { id: 4, path: "/factory/expenses", icon: <ArrowDownToLine className="w-4 h-4" />, label: t("expenses") },
                 { id: 6, path: "/factory/payment", icon: <DollarSign className="w-4 h-4" />, label: t("Payment_History") },
-                { id: 10, path: "/factory/clients-sverka", icon: <ChartNoAxesGantt className="w-4 h-4" />, label: t("Clients_sverka") },
+                { id: 10, path: "/factory/clients-sverka", icon: <ListChecks className="w-4 h-4" />, label: t("Clients_sverka") },
                 { id: 2, path: "/factory/kassa", icon: <Banknote className="w-4 h-4" />, label: t("Kassa") },
             ]
         },
@@ -73,7 +175,7 @@ export default function FactorySidebar() {
                 { id: 12, path: "/factory/product", icon: <Factory className="w-4 h-4" />, label: t("Production") },
                 { id: 5, path: "/factory/partner", icon: <Users className="w-4 h-4" />, label: t("partner") },
                 { id: 7, path: "/factory/payment-type", icon: <ClipboardType className="w-4 h-4" />, label: t("Payment_type") },
-                { id: 5, path: "/factory/users", icon: <Users className="w-4 h-4" />, label: t("workers") },
+                { id: 14, path: "/factory/users", icon: <Users className="w-4 h-4" />, label: t("workers") },
                 { id: 8, path: "/factory/price-type", icon: <DollarSign className="w-4 h-4" />, label: t("Price_type") },
                 { id: 13, path: "/factory/client-category", icon: <Users className="w-4 h-4" />, label: t("Category_Client") },
                 { id: 11, path: "/factory/carrier", icon: <Car className="w-4 h-4" />, label: t("Kurier") },
@@ -144,6 +246,14 @@ export default function FactorySidebar() {
                         );
                     }
 
+                    // Фильтруем пункты меню в зависимости от прав доступа
+                    const filteredItems = filterMenuItems(items);
+
+                    // Проверяем, нужно ли показывать это меню
+                    if (!shouldShowMenu(id, filteredItems)) {
+                        return null;
+                    }
+
                     // Для меню
                     return (
                         <Menu key={id} placement="right-start" allowHover offset={15}>
@@ -163,7 +273,7 @@ export default function FactorySidebar() {
                                 <h3 className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
                                     {title}
                                 </h3>
-                                {renderMenuContent(items, title)}
+                                {renderMenuContent(filteredItems, title)}
                             </MenuList>
                         </Menu>
                     );

@@ -94,7 +94,7 @@ export const userRoutes = [
     element: <FactoryPartner />
   },
   {
-    path: "/factory/profile",
+    path: "/profile",
     name: 'Profile ',
     element: <Profile />
   },

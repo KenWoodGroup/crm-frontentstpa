@@ -112,8 +112,8 @@ export default function WarehouseUserCreate({ refresh }) {
                             className: "dark:bg-gray-800 dark:text-text-dark",
                         }}
                     >
+                        <Option value="seller">{t("seller")}</Option>
                         <Option value="cashier">{t("Kassir")}</Option>
-                        <Option value="warehouse">{t("Manager")}</Option>
                         <Option value="storekeeper">{t("Warehouser")}</Option>
                     </Select>
                 </DialogBody>
