@@ -29,7 +29,7 @@ const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, sele
     };
 
 const typeOptions = [
-    access && role === "factory"  && { value: "outgoing", label: t("type.outgoing_label") }, // Отгрузка (Klientlarga)
+    (access && role === "factory")  && { value: "outgoing", label: t("type.outgoing_label") }, // Отгрузка (Klientlarga)
     { value: "transfer_out", label: t("type.transfer_out_label") },   // Перемещение (Boshqa omborga)
     { value: "disposal", label: t("type.disposal_label") },            // Disposal
 ].filter(Boolean);

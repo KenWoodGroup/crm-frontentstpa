@@ -4,13 +4,13 @@ import Cookies from "js-cookie";
 import { Staff } from "../../../utils/Controllers/Staff";
 import {Alert} from "../../../utils/Alert"
 
-export default function CarrierCreateModal({ refresh, onClose }) {
+export default function CarrierCreateModal({ refresh, onClose, role }) {
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         role: "carrier",
         full_name: "",
         phone: "+998",
-        location_id: Cookies.get("ul_nesw"),
+        location_id: role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw"),
     });
 
     const handleChange = (e) => {

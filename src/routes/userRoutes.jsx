@@ -26,6 +26,8 @@ import StockApi from "../Components/Other/Stock/StockApi";
 import Sverka from "../Components/Other/Sverka/Sverka";
 import Carrier from "../Components/Other/Сarrier/Сarrier";
 import Profile from "../Components/Profile/Profile";
+import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
+import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
 
 export const userRoutes = [
   {
@@ -37,6 +39,16 @@ export const userRoutes = [
     path: "factory/warehouse",
     name: "Warehouse",
     element: <FactoryWarehouse />
+  },
+  {
+    path:"factory/warehouse/stockin",
+    name:"factory de warehouse stockin",
+    element:<WareHouseIncome role="factory"/>
+  },
+  {
+    path:"factory/warehouse/stockout",
+    name:"factory de warehouse stockout",
+    element:<WareHouseOutcome role="factory"/>
   },
   {
     path: "factory/warehouse/user/:id",
