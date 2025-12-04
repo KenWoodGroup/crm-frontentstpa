@@ -50,6 +50,10 @@ class location {
         const response = await $api.get(`/locations/debtor/${data?.parent_id}/${data?.type}/${data?.searchName}/page?page=${data?.page}`)
         return response;
     }
+    static GetLocationByType = async (data) => {
+        const response = await $api.get(`/locations/type/${data?.parent_id}/${data?.type}/${data?.searchName}/page?page=${data?.page}`)
+        return response;
+    }
 }
 
 export { location };

@@ -13,12 +13,10 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
     const menuRef = useRef(null);
     const { t, i18n } = useTranslation();
 
-    // Правильное определение темы по умолчанию
+    // Определение темы по умолчанию
     useEffect(() => {
         const savedTheme = localStorage.getItem("theme");
         const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-        // Приоритет: сохраненная тема > системная тема > светлая тема
         const defaultTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
 
         setIsDarkMode(defaultTheme === "dark");
@@ -29,24 +27,10 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
             document.documentElement.classList.remove("dark");
         }
 
-        // Сохраняем тему если ее еще нет
         if (!savedTheme) {
             localStorage.setItem("theme", defaultTheme);
         }
     }, []);
-
-    // Установка дефолтного языка (если не выбран) - ИСПРАВЛЕНО
-    useEffect(() => {
-        const savedLang = localStorage.getItem("lang");
-        if (!savedLang) {
-            // Устанавливаем русский по умолчанию
-            localStorage.setItem("lang", "ru");
-            i18n.changeLanguage("ru");
-        } else {
-            // Если язык сохранен, применяем его
-            i18n.changeLanguage(savedLang);
-        }
-    }, [i18n]);
 
     const toggleDarkMode = () => {
         const newDark = !isDarkMode;

@@ -130,6 +130,11 @@ export default function FactoryCategoryDetail() {
                         <ChevronLeft className="w-4 h-4" />
                     </Button>
 
+                    {/* --- PAGE NUMBERS --- */}
+                    <span className="px-3 py-2 text-gray-900 dark:text-gray-100 font-medium">
+                        {currentPage} / {totalPages}
+                    </span>
+
                     <Button
                         color="blue"
                         size="sm"
@@ -142,6 +147,7 @@ export default function FactoryCategoryDetail() {
                     </Button>
                 </div>
             )}
+
         </div>
     );
 }

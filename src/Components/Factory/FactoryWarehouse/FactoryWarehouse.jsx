@@ -6,6 +6,7 @@ import {
     Mail,
     ChevronLeft,
     ChevronRight,
+    EyeIcon,
 } from "lucide-react";
 import WarehouseCreate from "./_components/WarehouseCreate";
 import { WarehouseApi } from "../../../utils/Controllers/WarehouseApi";
@@ -15,7 +16,7 @@ import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseDelete from "./_components/WarehouseDelete";
 import WarehouseEdit from "./_components/WarehouseEdit";
-import { Button } from "@material-tailwind/react";
+import { Button, IconButton, Tooltip } from "@material-tailwind/react";
 import { NavLink } from "react-router-dom";
 import EmptyData from "../../UI/NoData/EmptyData";
 import { useTranslation } from "react-i18next";
@@ -78,7 +79,7 @@ export default function FactoryWarehouse() {
             {warehouses?.length > 0 ? (
                 <>
                     {/* Warehouse Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 gap-6">
                         {warehouses.map((w) => (
                             <div
                                 key={w.id}
@@ -94,6 +95,17 @@ export default function FactoryWarehouse() {
                                         </h2>
                                     </div>
                                     <div className="flex items-center gap-2">
+                                        <NavLink to={`/factory/warehouse-access/${w?.id}`}>
+                                            <Tooltip content={t("View")}>
+                                                <IconButton
+                                                    className="bg-blue-500"
+                                                    variant="text"
+                                                    color="white"
+                                                >
+                                                    <EyeIcon className="text-[18px]" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </NavLink>
                                         <WarehouseEdit
                                             refresh={() => GetAll(page)}
                                             warehouse={w}
@@ -119,19 +131,6 @@ export default function FactoryWarehouse() {
                                     <div className="flex items-center gap-2">
                                         <Phone className="w-5 h-5 opacity-70" />
                                         <span>{w.phone}</span>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-3">
-                                       
-                                        <NavLink
-                                            to={`/factory/warehouse-access/${w?.id}`}
-                                            className="flex-1"
-                                        >
-                                            <Button className="w-full flex items-center justify-center gap-2 bg-background-dark dark:bg-background-light  dark:text-text-light  text-white transition-colors">
-                                                <User size={18} />
-                                                {t("Detail")}
-                                            </Button>
-                                        </NavLink>
                                     </div>
                                 </div>
                             </div>
@@ -162,8 +161,9 @@ export default function FactoryWarehouse() {
                     )}
                 </>
             ) : (
-                <EmptyData text={t("no_warehouses")} />
+                <EmptyData text={t("Empty_data")} />
             )}
+
         </div>
     );
 }

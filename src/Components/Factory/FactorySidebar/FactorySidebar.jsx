@@ -15,7 +15,9 @@ import {
     ClipboardType,
     Blocks,
     ListChecks,
-    Car
+    Car,
+    BanknoteArrowDown,
+    FileUser
 } from "lucide-react";
 
 export default function FactorySidebar() {
@@ -159,8 +161,8 @@ export default function FactorySidebar() {
             isMenu: true,
             items: [
                 { id: 1, path: "/factory/clients", icon: <Users className="w-4 h-4" />, label: t("Clients") },
-                { id: 3, path: "/factory/debtor", icon: <Users className="w-4 h-4" />, label: t("Clients_debtor") },
-                { id: 4, path: "/factory/expenses", icon: <ArrowDownToLine className="w-4 h-4" />, label: t("expenses") },
+                { id: 3, path: "/factory/debtor", icon: <FileUser className="w-4 h-4" />, label: t("Clients_debtor") },
+                { id: 4, path: "/factory/expenses", icon: <BanknoteArrowDown className="w-4 h-4" />, label: t("expenses") },
                 { id: 6, path: "/factory/payment", icon: <DollarSign className="w-4 h-4" />, label: t("Payment_History") },
                 { id: 10, path: "/factory/clients-sverka", icon: <ListChecks className="w-4 h-4" />, label: t("Clients_sverka") },
                 { id: 2, path: "/factory/kassa", icon: <Banknote className="w-4 h-4" />, label: t("Kassa") },

@@ -4,9 +4,10 @@ import { location } from "../../../utils/Controllers/location";
 import ManagerFactoryCreate from "./_components/ManagerFactoryCreate";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
-import ManagerFactoryDelete from "./_components/ManagerFactoryDelete";
 import ManagerFactoryEdit from "./_components/ManagetFactoryEdit";
 import ManagerDealerDelete from "../ManagerDealer/_components/ManagerDealerDelete";
+import { NavLink } from "react-router-dom";
+import Eye from "../../UI/Icons/Eye";
 
 export default function ManagerFactory() {
     const [loading, setLoading] = useState(false);
@@ -91,6 +92,13 @@ export default function ManagerFactory() {
                                         {factory.name}
                                     </Typography>
                                     <div className="flex items-center gap-[10px]">
+                                        <NavLink to={`/manager/factory/${factory?.id}`}>
+                                            <Button
+                                                className="bg-blue-600 text-white hover:bg-blue-700 normal-case p-[8px]"
+                                            >
+                                                <Eye size={20} />
+                                            </Button>
+                                        </NavLink>
                                         <ManagerDealerDelete id={factory.id} refresh={refresh} />
                                         <ManagerFactoryEdit data={factory} refresh={refresh} />
                                     </div>

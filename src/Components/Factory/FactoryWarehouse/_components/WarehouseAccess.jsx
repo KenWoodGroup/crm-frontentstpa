@@ -57,7 +57,7 @@ export default function WarehouseAccess() {
     const [warehouse, setWarehouse] = useState(null);
     const [access, setAccess] = useState([]);
     const [sellAccess, setSellAccess] = useState(false);
-    const [saving, setSaving] = useState(false);
+
     const navigate = useNavigate()
 
     const GetWarehouse = async () => {
@@ -88,43 +88,7 @@ export default function WarehouseAccess() {
         }
     };
 
-    // Обновление разрешения продажи
-    const UpdateSellAccess = async (newValue) => {
-        // оптимистично блокируем переключатель и сохраняем старое значение
-        const prev = sellAccess;
-        setSellAccess(newValue);
-        setSaving(true);
-        try {
-            const data = {
-                list: [
-                    {
-                        location_id: id,
-                        key: "sell_access",
-                        // отправляем булево значение (не строку)
-                        value: String(newValue),
-                    },
-                ],
-            };
-            const response = await locationInfo.Create(data);
-            if (response?.status === 200 || response?.status === 201) {
-                // Если бэкенд вернул актуальные данные, можно обновить access
-                const updatedList = normalizeList(response.data) || [];
-                // Если ответ не содержит список, оставим локальный state как есть
-                if (updatedList.length > 0) setAccess(updatedList);
-                // уже установили sellAccess оптимистично
-            } else {
-                // неуспешный код — откатываем
-                setSellAccess(prev);
-                console.log("Update sell_access unexpected status:", response?.status);
-            }
-        } catch (error) {
-            // при ошибке откатываем и логируем
-            setSellAccess(prev);
-            console.log("Update sell_access error:", error);
-        } finally {
-            setSaving(false);
-        }
-    };
+
 
     useEffect(() => {
         let mounted = true;
@@ -198,30 +162,7 @@ export default function WarehouseAccess() {
                     </Typography>
                 )}
 
-                {/* Раздел разрешений */}
-                <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-5">
-                    <div className="flex items-center gap-2 mb-3">
-                        <Shield size={18} className="text-gray-700 dark:text-gray-300" />
-                        <Typography
-                            variant="h6"
-                            className="font-semibold text-text-light dark:text-text-dark"
-                        >
-                            {t("Permissions")}
-                        </Typography>
-                    </div>
-
-                    <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
-                        <Typography className="font-medium text-gray-700 dark:text-gray-300">
-                            {t("Sell_Access")}
-                        </Typography>
-                        <Switch
-                            color="green"
-                            checked={sellAccess}
-                            onChange={(e) => UpdateSellAccess(e.target.checked)}
-                            disabled={saving}
-                        />
-                    </div>
-                </div>
+              
             </Card>
         </div>
     );

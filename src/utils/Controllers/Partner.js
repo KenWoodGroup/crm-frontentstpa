@@ -9,6 +9,10 @@ class Partner {
         const response = await $api.get(`locations/partner/${data?.id}/page?page=${data?.page}`)
         return response;
     }
+    static GetAllPartner = async (id) => {
+        const response = await $api.get(`/locations/partner-all/${id}`)
+        return response;
+    }
     static PartnerDelete = async (id) => {
         const response = await $api.delete(`/locations/${id}`)
         return response;

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./_components/login.css";
 import Eye from "../../Components/UI/Svg/Eye";
 import ClosedEye from "../../Components/UI/Svg/ClosedEye";
 import { Auth } from "../../utils/Controllers/Auth";
 import { locationInfo } from "../../utils/Controllers/locationInfo";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { notify } from "../../utils/toast";
 import Spinner from "../../Components/UI/spinner/Spinner";
