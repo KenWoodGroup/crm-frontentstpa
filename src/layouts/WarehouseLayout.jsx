@@ -30,8 +30,10 @@ import AdminHeader from "../Components/UI/Header/AdminHeader";
 import { useNotifyStore } from "../store/useNotifyStore";
 import { InvoicesApi } from "../utils/Controllers/invoices";
 import socket from "../utils/Socket";
-import { toast, ToastContainer } from "react-toastify";
+
 import NotifyToast from "../Components/UI/notify/NotifyToast";
+import WarehouseNotifyContainer from "../Components/UI/notify/WarehouseNotifyContainer";
+import toast from "react-hot-toast";
 
 export default function WarehouseLayout() {
     const userLid = Cookies.get("ul_nesw");
@@ -55,10 +57,16 @@ export default function WarehouseLayout() {
         socket.on("invoiceUpdate", (data) => {
             if (data.location_id === userLid) {
                 fetchNotify();
-                toast(
-                    <NotifyToast message={"Yangi jo'natma"} handleClick={() => navigate("warehouse/notifications")} />,
-                    { containerId: "warehouseNotify" }
-                );
+                toast.custom((t) => (
+                    <NotifyToast
+                        t={t}
+                        onNavigate={() => {
+                            navigate("/warehouse/notifications");
+                            toast.dismiss(t.id);
+                        }}
+                    />
+                ), { duration: Infinity });
+
             };
         });
 
@@ -68,23 +76,7 @@ export default function WarehouseLayout() {
     return (
         <div className={`WarehouseLayout bg-background-light dark:bg-background-dark transition-colors  min-h-screen duration-300 pl-[125px]`}>
             <WarehouseSidebar />
-            <ToastContainer
-                containerId="warehouseNotify"
-                position="top-center"
-                hideProgressBar={true}
-                closeOnClick={false}
-                draggable={false}
-                theme="light"
-                newestOnTop
-                autoClose={3500}
-                icon={false}     
-                closeButton={false} 
-                toastClassName={() => "bg-transparent shadow-none p-0 m-0"}
-                bodyClassName={() => "p-0 m-0"}
-            />
-
-
-
+            <WarehouseNotifyContainer />
 
             <div className={`${mode === "m_other" ? "pt-[100px]" : "pt-[40px]"} pr-[10px]`}>
                 {mode === "m_other" ? <AdminHeader /> : ""}
