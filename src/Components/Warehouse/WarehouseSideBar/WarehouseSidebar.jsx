@@ -13,19 +13,7 @@ import {
     PackagePlus,
     PackageMinus,
     Move,
-    User,
-    UsersRound,
-    BanknoteArrowDown,
-    ChevronsLeftRight,
-    UserPen,
-    CreditCard,
-    Blocks,
-    Truck,
     Settings,
-    Globe,
-    Moon,
-    UserCog,
-    CircleDollarSign,
     SendIcon,
 } from "lucide-react";
 import Cookies from "js-cookie";
@@ -37,7 +25,6 @@ export default function WarehouseSidebar() {
     const mainLinks = [
         { id: 1, label: t('dashboard'), path: "/warehouse/dashboard", icon: LayoutDashboard },
         { id: 2, label: t('Order'), path: "/warehouse/history", icon: Move },
-
     ];
     const skladSubLinks = [
         { id: 1, label: t('Warehouse'), path: "/warehouse/product", icon: Package },

@@ -52,7 +52,7 @@ export default function ManagerFactoryDetail() {
     }
     return (
         <div className="w-full">
-            <h1 className="text-2xl font-bold mb-5">Склады</h1>
+            <h1 className="text-2xl font-bold mb-5 text-black">Склады</h1>
 
             <div className="flex flex-col gap-4">
                 {warehouses.map((item) => (
@@ -64,7 +64,7 @@ export default function ManagerFactoryDetail() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 mb-1">
                                 <Store className="w-5 h-5 text-blue-600" />
-                                <h2 className="text-lg font-semibold">{item.name}</h2>
+                                <h2 className="text-lg font-semibold text-black">{item.name}</h2>
                             </div>
                             <div className="flex items-center gap-[10px]">
                                 <NavLink to={`/manager/factory/warehouse/${item?.parent?.id}/${item?.id}`}>

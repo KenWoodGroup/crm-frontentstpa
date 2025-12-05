@@ -17,7 +17,8 @@ import {
     ListChecks,
     Car,
     BanknoteArrowDown,
-    FileUser
+    FileUser,
+    Move
 } from "lucide-react";
 
 export default function FactorySidebar() {
@@ -124,7 +125,6 @@ export default function FactorySidebar() {
         // Для меню показываем только если есть хотя бы один доступный пункт
         return filteredItems && filteredItems.length > 0;
     };
-
     // Главные меню-кнопки
     const mainMenuItems = [
         {
@@ -132,6 +132,13 @@ export default function FactorySidebar() {
             title: t("dashboard"),
             path: "/factory/dashboard",
             icon: <LayoutDashboard className="w-7 h-7" />,
+            isMenu: false
+        },
+        {
+            id: 2,
+            title: t('Order'),
+            path: "/factory/history",
+            icon: <Move className="w-7 h-7" />,
             isMenu: false
         },
         {

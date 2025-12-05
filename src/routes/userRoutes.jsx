@@ -41,14 +41,14 @@ export const userRoutes = [
     element: <FactoryWarehouse />
   },
   {
-    path:"factory/warehouse/stockin",
-    name:"factory de warehouse stockin",
-    element:<WareHouseIncome role="factory"/>
+    path: "factory/warehouse/stockin",
+    name: "factory de warehouse stockin",
+    element: <WareHouseIncome role="factory" />
   },
   {
-    path:"factory/warehouse/stockout",
-    name:"factory de warehouse stockout",
-    element:<WareHouseOutcome role="factory"/>
+    path: "factory/warehouse/stockout",
+    name: "factory de warehouse stockout",
+    element: <WareHouseOutcome role="factory" />
   },
   {
     path: "factory/warehouse/user/:id",

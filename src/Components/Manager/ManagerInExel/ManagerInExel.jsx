@@ -138,11 +138,9 @@ export default function ManagerInExel() {
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                     />
-
                     <Button color="blue" fullWidth onClick={createInvoice}>
                         Invoice yaratish
                     </Button>
-
                     {/* Hidden file input */}
                     <input
                         type="file"
@@ -151,7 +149,6 @@ export default function ManagerInExel() {
                         className="hidden"
                         onChange={handleExcelUpload}
                     />
-
                 </CardBody>
             </Card>
         </div>
