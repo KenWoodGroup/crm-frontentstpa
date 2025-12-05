@@ -925,7 +925,7 @@ export default function WareHouseIncome({ role = "factory" }) {
                         </Menu>
                     </div>
                 ) :
-                    <span />
+                    <noscript></noscript>
                 }
             </div>
 

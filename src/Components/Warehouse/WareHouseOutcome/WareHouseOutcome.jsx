@@ -669,7 +669,7 @@ export default function WareHouseOutcome({ role = "factory" }) {
                         {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
                         <Menu placement="right-start" allowHover offset={15}>
                             <MenuHandler>
-                                <div className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer 
+                                <div className="flex flex-col items-center justify-center w-full py-3 px-3 rounded-xl cursor-pointer 
                                         text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
                                         transition-all duration-300">
                                     <Move className="w-8 h-8 mb-1" />
@@ -696,7 +696,7 @@ export default function WareHouseOutcome({ role = "factory" }) {
                         </Menu>
                     </div>
                 ) :
-                    <span />
+                    <noscript></noscript>
                 }
             </div>
 

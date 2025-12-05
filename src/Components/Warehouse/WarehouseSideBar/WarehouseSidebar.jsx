@@ -18,10 +18,12 @@ import {
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
+import { useNotifyStore } from "../../../store/useNotifyStore";
 
 export default function WarehouseSidebar() {
     const { t } = useTranslation();
 
+    const { unreadCount } = useNotifyStore()
     const mainLinks = [
         { id: 1, label: t('dashboard'), path: "/warehouse/dashboard", icon: LayoutDashboard },
         { id: 2, label: t('Order'), path: "/warehouse/history", icon: Move },
@@ -85,9 +87,18 @@ export default function WarehouseSidebar() {
                         </Typography>
                         {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
                             <NavLink key={id} to={path}>
-                                <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all">
+                                <MenuItem className="relative flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all px-3 py-2">
+
                                     <Icon className="w-4 h-4" />
-                                    {label}
+                                    <span>{label}</span>
+
+                                    {/* Faqat notifications uchun badge */}
+                                    {id === 5 && unreadCount > 0 && (
+                                        <span className="absolute right-2 top-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 leading-none">
+                                            {unreadCount}
+                                        </span>
+                                    )}
+
                                 </MenuItem>
                             </NavLink>
                         ))}

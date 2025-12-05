@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import InvoiceItemsTable from './InvoiceItemsTable';
 import { InvoicesApi } from '../../../../utils/Controllers/invoices';
+import Spinner from '../../../UI/spinner/Spinner';
 function formatSum(sumStr) {
     if (!sumStr) return '0';
     const n = Number(sumStr);
@@ -20,7 +21,7 @@ export function formatDateTime(iso) {
 }
 
 
-export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied }) {
+export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied, seen, reload, setSelectedInv, startLoading }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [invoice, setInvoice] = useState(null);
@@ -43,16 +44,19 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
 
         try {
             // 1) Optimistic UI: open drawer with skeleton and immediately call PUT to mark seen
-            setMarkingSeen(true);
-            // await axios.put(`/api/invoices/${id}`, { seen: 'old' });
-            await InvoicesApi.EditInvoiceSeen(id, { seen: "old" })
-            setMarkingSeen(false);
-
+            if (seen === "new") {
+                setMarkingSeen(true);
+                // await axios.put(`/api/invoices/${id}`, { seen: 'old' });
+                await InvoicesApi.EditInvoiceSeen(id, { seen: "old" })
+                setMarkingSeen(false);
+                reload();
+            }
             // 2) Fetch full invoice detail
             // const res = await axios.get(`/api/invoices/${id}`);
             const res = await InvoicesApi.GetInvoiceById(id);
             const data = res.data?.data ?? res.data ?? null;
             setInvoice(data);
+            setSelectedInv(data)
 
         } catch (err) {
             console.error(err);
@@ -61,7 +65,7 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
             setLoading(false);
             setMarkingSeen(false);
         }
-    }
+    };
 
     if (!isOpen) return null;
 
@@ -70,7 +74,7 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex overflow-y-auto">
             <div className="absolute  z-60" onClick={onClose} />
 
-            <aside  className="ml-auto w-full sm:w-[720px] max-w-[100%] h-full shadow-xl flex flex-col bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+            <aside className="ml-auto w-full sm:w-[720px] max-w-[100%] h-full shadow-xl flex flex-col bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-100 sticky top-0 transition-all duration-300 shadow-sm bg-card-light dark:bg-card-dark z-10">
                     <div>
@@ -80,11 +84,12 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied })
                     <div className="flex items-center gap-2">
                         <button onClick={onClose} className="px-3 py-2 rounded-md border">Bekor qilish</button>
                         <button
-                            onClick={() => { if (onApplied) onApplied(); }}
-                            className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium"
+                            onClick={()=> onApplied()}
+                            className={`px-4 py-2 rounded-md bg-blue-600 text-white font-medium flex items-center justify-center gap-[6px] ${startLoading ? "cursor-progress" : "cursor-pointer"}`}
                         >
-                            Qo'llash
+                         {startLoading && <Spinner/> } Qo'llash
                         </button>
+                        
                     </div>
                 </div>
 
