@@ -32,6 +32,8 @@ export default function ManagerInExel() {
         }
     };
 
+    const GetWarehouse = async
+
     // === CREATE INVOICE ===
     const createInvoice = async () => {
         const data = {

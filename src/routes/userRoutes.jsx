@@ -151,7 +151,7 @@ export const userRoutes = [
     element: <PriceTypePage />
   },
   {
-    path: "/factory/price-type-stock",
+    path: "/factory/price-type/:id",
     name: 'Price type stock',
     element: <PriceTypeStock />
   },
@@ -190,4 +190,5 @@ export const userRoutes = [
     name: 'Factory user',
     element: <FactoryUserDetail />
   },
+
 ]

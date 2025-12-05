@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { Typography, Card, CardBody, Button, Tooltip, IconButton } from "@material-tailwind/react";
-import { PaymentMethodApi } from "../../../utils/Controllers/PaymentMethodApi";
 import Cookies from "js-cookie";
 import {
     CreditCard,
     FileText,
     Calendar,
-    Info,
-    PlusCircle,
     EyeIcon,
 } from "lucide-react";
 import EmptyData from "../../UI/NoData/EmptyData";
@@ -81,7 +78,7 @@ export default function PriceTypePage() {
                                         </Typography>
                                     </div>
                                     <div className="flex items-center gap-[10px]">
-                                        <NavLink to={`//price-type/${item?.id}`}>
+                                        <NavLink to={`/factory/price-type/${item?.id}`}>
                                             <Tooltip content={t("View")}>
                                                 <IconButton
                                                     variant="text"
