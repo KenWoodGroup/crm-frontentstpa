@@ -27,7 +27,7 @@ class LocalProduct {
         return response;
     }
     static GetCategory = async (id) => {
-        const response = await $api.get(`/local-products/category/${id}`)
+        const response = await $api.get(`local-categories/all/${id}`)
         return response;
     }
     static GetMyProduct = async (data) => {
@@ -35,7 +35,7 @@ class LocalProduct {
         return response;
     }
     static GetMyProductLocation = async (data) => {
-        const response = await $api.get(`/local-products/by-location/${data?.sub_id}/${data?.location_id}`)
+        const response = await $api.get(`/local-products/products/${data?.location_id}/${data?.sub_id}`)
         return response;
     }
     static DeleteProduct = async (id) => {

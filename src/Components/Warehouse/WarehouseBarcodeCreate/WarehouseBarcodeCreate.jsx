@@ -6,7 +6,6 @@ import {
     Typography,
 } from "@material-tailwind/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseBarcodeModal from "./_components/WarehouseBarcodeCreateModal";
@@ -39,7 +38,7 @@ export default function WarehouseBarcodeCreate() {
         try {
             const data = {
                 sub_id: subCategoryId,
-                location_id: Cookies?.get('ul_nesw')
+                location_id: Cookies?.get('usd_nesw')
             }
             const response = await LocalProduct?.GetMyProductLocation(data)
             setProductsData((prev) => ({

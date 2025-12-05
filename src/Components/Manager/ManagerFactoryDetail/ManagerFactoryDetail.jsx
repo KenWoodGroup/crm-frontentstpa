@@ -76,7 +76,6 @@ export default function ManagerFactoryDetail() {
                                 </NavLink>
                             </div>
                         </div>
-
                         {/* Info */}
                         <div className="space-y-2 mt-3 text-sm text-gray-700">
                             <div className="flex items-start gap-2">
