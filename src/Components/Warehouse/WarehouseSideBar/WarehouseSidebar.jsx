@@ -16,7 +16,7 @@ import {
     Settings,
     SendIcon,
 } from "lucide-react";
-import Cookies from "js-cookie";
+import Logo from '../../../Images/image_2025-12-05_11-46-58.png'
 import { useTranslation } from "react-i18next";
 import { useNotifyStore } from "../../../store/useNotifyStore";
 
@@ -48,7 +48,11 @@ export default function WarehouseSidebar() {
             "
         >
             {/* === Верхняя часть === */}
+
             <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center justify-center">
+                    <img src={Logo} alt="Foto" className="w-[70%]  rounded-[8px]" />
+                </div>
                 {mainLinks.map(({ id, label, path, icon: Icon }) => (
                     <NavLink
                         key={id}

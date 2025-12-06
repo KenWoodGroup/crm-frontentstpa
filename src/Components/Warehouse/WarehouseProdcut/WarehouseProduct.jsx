@@ -279,7 +279,7 @@ export default function WarehouseProduct() {
                                             </td>
                                             <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
                                                 {item.purchase_price ? (
-                                                    <span className="text-green-600 dark:text-green-400 font-medium">
+                                                    <span className=" font-medium">
                                                         {formatNumber(item.purchase_price)} UZS
                                                     </span>
                                                 ) : (
@@ -292,7 +292,7 @@ export default function WarehouseProduct() {
                                                 </span>
                                             </td>
                                             <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                <span className="font-medium text-blue-600 dark:text-blue-400">
+                                                <span className="font-medium">
                                                     {item.draft_quantity}
                                                 </span>
                                             </td>
