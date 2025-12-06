@@ -486,20 +486,29 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                 {/* Filters */}
                 <div className="bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-gray-200 dark:border-gray-700 mb-6 shadow-sm transition-colors duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <select
-                            value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                        {/* Type Filter */}
+                        <Select
+                            options={[
+                                { value: "all", label: t("invoices.filter.all_types") },
+                                ...typesList.map((tKey) => ({
+                                    value: tKey,
+                                    label: nice.type[tKey] || tKey
+                                }))
+                            ]}
+                            value={{
+                                value: typeFilter,
+                                label:
+                                    typeFilter === "all"
+                                        ? t("invoices.filter.all_types")
+                                        : nice.type[typeFilter] || typeFilter
+                            }}
+                            onChange={(v) => setTypeFilter(v?.value || "all")}
+                            styles={customSelectStyles()}
                             aria-label={t("invoices.filter.type")}
-                        >
-                            <option value="all">{t("invoices.filter.all_types")}</option>
-                            {typesList.map((tKey) => (
-                                <option value={tKey} key={tKey}>
-                                    {nice.type[tKey] || tKey}
-                                </option>
-                            ))}
-                        </select>
+                            isClearable={false}
+                        />
 
+                        {/* Sender */}
                         <Select
                             options={locations}
                             value={senderFilter}
@@ -511,6 +520,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             aria-label={t("placeholder.sender_search")}
                         />
 
+                        {/* Receiver */}
                         <Select
                             options={locations}
                             value={receiverFilter}
@@ -522,20 +532,29 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             aria-label={t("placeholder.receiver_search")}
                         />
 
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                        {/* Status Filter */}
+                        <Select
+                            options={[
+                                { value: "all", label: t("invoices.filter.all_statuses") },
+                                ...statusesList.map((s) => ({
+                                    value: s,
+                                    label: nice.status[s] || s
+                                }))
+                            ]}
+                            value={{
+                                value: statusFilter,
+                                label:
+                                    statusFilter === "all"
+                                        ? t("invoices.filter.all_statuses")
+                                        : nice.status[statusFilter] || statusFilter
+                            }}
+                            onChange={(v) => setStatusFilter(v?.value || "all")}
+                            styles={customSelectStyles()}
                             aria-label={t("invoices.filter.status")}
-                        >
-                            <option value="all">{t("invoices.filter.all_statuses")}</option>
-                            {statusesList.map((s) => (
-                                <option value={s} key={s}>
-                                    {nice.status[s] || s}
-                                </option>
-                            ))}
-                        </select>
+                            isClearable={false}
+                        />
 
+                        {/* From Date */}
                         <input
                             type="date"
                             value={fromDate}
@@ -543,6 +562,8 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
                             aria-label={t("invoices.filter.from_date")}
                         />
+
+                        {/* To Date */}
                         <input
                             type="date"
                             value={toDate}
@@ -551,17 +572,29 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             aria-label={t("invoices.filter.to_date")}
                         />
 
-                        <select
-                            value={paymentFilter}
-                            onChange={(e) => setPaymentFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                        {/* Payment Filter */}
+                        <Select
+                            options={[
+                                { value: "all", label: t("invoices.filter.all_payments") },
+                                { value: "paid", label: t("invoices.filter.paid") },
+                                { value: "unpaid", label: t("invoices.filter.unpaid") }
+                            ]}
+                            value={{
+                                value: paymentFilter,
+                                label:
+                                    paymentFilter === "all"
+                                        ? t("invoices.filter.all_payments")
+                                        : paymentFilter === "paid"
+                                            ? t("invoices.filter.paid")
+                                            : t("invoices.filter.unpaid")
+                            }}
+                            onChange={(v) => setPaymentFilter(v?.value || "all")}
+                            styles={customSelectStyles()}
                             aria-label={t("invoices.filter.payment")}
-                        >
-                            <option value="all">{t("invoices.filter.all_payments")}</option>
-                            <option value="paid">{t("invoices.filter.paid")}</option>
-                            <option value="unpaid">{t("invoices.filter.unpaid")}</option>
-                        </select>
+                            isClearable={false}
+                        />
 
+                        {/* Search */}
                         <div className="flex gap-2">
                             <input
                                 value={searchText}
@@ -572,6 +605,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             />
                         </div>
                     </div>
+
 
                     <div className="mt-2 flex justify-between">
                         <div />
@@ -623,7 +657,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                 </div>
 
                 {/* List area */}
-                <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm transition">
+                <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-300 dark:border-gray-700 shadow-sm transition">
                     {loading ? (
                         <div className="py-10 text-center text-gray-500 dark:text-gray-400">
                             {t("loading")}
@@ -632,74 +666,141 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                         <div className="py-10 text-center text-red-500">{error}</div>
                     ) : (
                         <div>
-                            {/* Table */}
+                            {/* Table - Desktop */}
                             <div className="hidden md:block">
-                                <table className="w-full table-auto border-collapse">
+                                <table className="w-full border-collapse">
                                     <thead>
-                                        <tr className="text-left text-sm text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                                            {columns.id && <th className="py-3 px-2">{t("table.id")}</th>}
-                                            {columns.type && <th className="py-3 px-2">{t("table.type")}</th>}
-                                            {columns.sender_name && <th className="py-3 px-2">{t("table.sender")}</th>}
-                                            {columns.receiver_name && <th className="py-3 px-2">{t("table.receiver")}</th>}
-                                            {columns.createdAt && <th className="py-3 px-2">{t("table.created")}</th>}
-                                            {columns.status && <th className="py-3 px-2">{t("table.status")}</th>}
-                                            {(columns.payment_status && role==="factory") && <th className="py-3 px-2">{t("table.payment")}</th>}
-                                            {(columns.total_sum && role==="factory") && <th className="py-3 px-2">{t("table.total")}</th>}
-                                            {columns.actions && <th className="py-3 px-2">{t("table.actions")}</th>}
+                                        <tr className="bg-gray-50 dark:bg-[#424242]  ">
+                                            {columns.id && (
+                                                <th className="p-3 text-center  rounded-tl-[10px] text-sm font-semibold text-gray-700 dark:text-gray-300  border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.id")}
+                                                </th>
+                                            )}
+                                            {columns.type && (
+                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.type")}
+                                                </th>
+                                            )}
+                                            {columns.sender_name && (
+                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.sender")}
+                                                </th>
+                                            )}
+                                            {columns.receiver_name && (
+                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.receiver")}
+                                                </th>
+                                            )}
+                                            {columns.createdAt && (
+                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.created")}
+                                                </th>
+                                            )}
+                                            {columns.status && (
+                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.status")}
+                                                </th>
+                                            )}
+                                            {columns.payment_status && (
+                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.payment")}
+                                                </th>
+                                            )}
+                                            {columns.total_sum && (
+                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.total")}
+                                                </th>
+                                            )}
+                                            {columns.actions && (
+                                                <th className="p-3 text-center rounded-tr-[10px] text-sm font-semibold text-gray-700 dark:text-gray-300  border-gray-300 dark:border-gray-700 border-b">
+                                                    {t("table.actions")}
+                                                </th>
+                                            )}
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {invoices?.map((inv) => (
+                                        {invoices?.map((inv, index) => (
                                             <tr
                                                 key={inv.id}
-                                                className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                                                className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-x border-gray-300 dark:border-gray-700 ${index === invoices.length - 1
+                                                    ? 'border-b border-gray-300 dark:border-gray-700'
+                                                    : ''
+                                                    } ${index % 2 === 0
+                                                        ? 'bg-white dark:bg-gray-900'
+                                                        : 'bg-gray-50/50 dark:bg-gray-800/50'
+                                                    }`}
                                             >
                                                 {columns.id && (
-                                                    <td
-                                                        className="py-3 px-2 text-sm"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: highlightMatch(inv.invoice_number || inv.id, searchText),
-                                                        }}
-                                                    />
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        <div
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: highlightMatch(inv.invoice_number || inv.id, searchText),
+                                                            }}
+                                                        />
+                                                    </td>
                                                 )}
-                                                {columns.type && <td className="py-3 px-2 text-sm">{typeBadge(inv.type)}</td>}
+                                                {columns.type && (
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        {typeBadge(inv.type)}
+                                                    </td>
+                                                )}
                                                 {columns.sender_name && (
-                                                    <td className="py-3 px-2 text-sm">{inv.sender_name || inv.sender?.name || "—"}</td>
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        {inv.sender_name || inv.sender?.name || (
+                                                            <span className="text-gray-400 dark:text-gray-500">—</span>
+                                                        )}
+                                                    </td>
                                                 )}
                                                 {columns.receiver_name && (
-                                                    <td className="py-3 px-2 text-sm">{inv.receiver_name || inv.receiver?.name || "—"}</td>
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        {inv.receiver_name || inv.receiver?.name || (
+                                                            <span className="text-gray-400 dark:text-gray-500">—</span>
+                                                        )}
+                                                    </td>
                                                 )}
                                                 {columns.createdAt && (
-                                                    <td className="py-3 px-2 text-sm">{formatDateISO(inv.createdAt)}</td>
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        {formatDateISO(inv.createdAt)}
+                                                    </td>
                                                 )}
                                                 {columns.status && (
-                                                    <td className="py-3 px-2 text-sm">
-                                                        <button onClick={() => setEditingStatusInvoice(inv)} type="button">
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        <button
+                                                            onClick={() => setEditingStatusInvoice(inv)}
+                                                            type="button"
+                                                            className="w-full"
+                                                        >
                                                             {statusBadge(inv.status)}
                                                         </button>
                                                     </td>
                                                 )}
-                                                {(columns.payment_status && role==="factory") && (
-                                                    <td className="py-3 px-2 text-sm">{paymentBadge(inv.payment_status)}</td>
+                                                {columns.payment_status && (
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        {paymentBadge(inv.payment_status)}
+                                                    </td>
                                                 )}
-                                                {(columns.total_sum && role==="factory") && <td className="py-3 px-2 text-sm">{inv.total_sum}</td>}
+                                                {columns.total_sum && (
+                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                        <span className="font-medium">
+                                                            {inv.total_sum}
+                                                        </span>
+                                                    </td>
+                                                )}
                                                 {columns.actions && (
-                                                    <td className="py-3 px-2 text-sm">
-                                                        <div className="flex items-center gap-2">
+                                                    <td className="p-3 text-center text-sm rounded-br-[10px] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700">
+                                                        <div className="flex items-center justify-center gap-2">
                                                             <button
                                                                 onClick={() => openDetail(inv.id)}
-                                                                className="text-sm px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
+                                                                className="text-sm px-3 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
                                                             >
                                                                 {t("button.open")}
                                                             </button>
-                                                            {Number(inv?.total_sum) === 0 ? (
+                                                            {Number(inv?.total_sum) === 0 && (
                                                                 <CancelInvoiceButton
                                                                     resetAll={() => fetchInvoices()}
                                                                     appearance="icn"
                                                                     id={inv?.id}
                                                                 />
-                                                            ) : (
-                                                                <noscript />
                                                             )}
                                                         </div>
                                                     </td>
@@ -715,7 +816,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                 {invoices.map((inv) => (
                                     <div
                                         key={inv.id}
-                                        className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-card-light dark:bg-card-dark shadow-sm"
+                                        className="p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-card-light dark:bg-card-dark shadow-sm"
                                     >
                                         <div className="flex justify-between items-start">
                                             <div>
@@ -730,7 +831,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                                 </div>
                                             </div>
                                             <div className="flex flex-col gap-2 items-end">
-                                                <div className="text-sm">{inv.total_sum}</div>
+                                                <div className="text-sm font-medium">{inv.total_sum}</div>
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => openDetail(inv.id)}
@@ -766,7 +867,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                     <button
                                         onClick={() => setPage(1)}
                                         disabled={page === 1}
-                                        className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded disabled:opacity-50"
+                                        className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                                     >
                                         {t("pagination.first")}
                                     </button>
@@ -774,20 +875,20 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                     <button
                                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                                         disabled={page === 1}
-                                        className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded"
+                                        className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                                         aria-label={t("pagination.previous")}
                                     >
                                         <ChevronLeft size={16} />
                                     </button>
 
-                                    <div className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded">
+                                    <div className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900">
                                         {t("pagination.page_of", { page, totalPages })}
                                     </div>
 
                                     <button
                                         onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                                         disabled={page === totalPages}
-                                        className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded"
+                                        className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                                         aria-label={t("pagination.next")}
                                     >
                                         <ChevronRight size={16} />
@@ -796,7 +897,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                     <button
                                         onClick={() => setPage(totalPages)}
                                         disabled={page === totalPages}
-                                        className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded"
+                                        className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
                                     >
                                         {t("pagination.last")}
                                     </button>

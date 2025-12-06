@@ -16,7 +16,7 @@ import {
     Settings,
     SendIcon,
 } from "lucide-react";
-import Cookies from "js-cookie";
+import Logo from '../../../Images/image_2025-12-05_11-46-58.png'
 import { useTranslation } from "react-i18next";
 import { useNotifyStore } from "../../../store/useNotifyStore";
 
@@ -48,7 +48,11 @@ export default function WarehouseSidebar() {
             "
         >
             {/* === Верхняя часть === */}
+
             <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center justify-center">
+                    <img src={Logo} alt="Foto" className="w-[70%]  rounded-[8px]" />
+                </div>
                 {mainLinks.map(({ id, label, path, icon: Icon }) => (
                     <NavLink
                         key={id}
@@ -56,8 +60,8 @@ export default function WarehouseSidebar() {
                         className={({ isActive }) =>
                             `flex flex-col items-center justify-center w-full py-3 rounded-xl transition-all duration-300 
                             ${isActive
-                                ? "bg-white/80 text-[#4DA057] shadow-md scale-105 dark:bg-gray-800 dark:text-green-400"
-                                : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057]"
+                                ? "bg-white/80 text-[black] shadow-md scale-105 dark:bg-gray-800 dark:text-[white]"
+                                : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]"
                             }`
                         }
                     >
@@ -70,7 +74,7 @@ export default function WarehouseSidebar() {
                 <Menu placement="right-start" allowHover offset={15}>
                     <MenuHandler>
                         <div className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer 
-                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
+                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white] 
                         transition-all duration-300">
                             <Package className="w-8 h-8 mb-1" />
                             <span className="text-[11px] font-medium text-center">{t(`Warehouse`)}</span>
@@ -87,7 +91,7 @@ export default function WarehouseSidebar() {
                         </Typography>
                         {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
                             <NavLink key={id} to={path}>
-                                <MenuItem className="relative flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all px-3 py-2">
+                                <MenuItem className="relative flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[white] dark:hover:bg-[#4DA057]/20 dark:hover:text-[white] transition-all px-3 py-2">
 
                                     <Icon className="w-4 h-4" />
                                     <span>{label}</span>
@@ -111,15 +115,15 @@ export default function WarehouseSidebar() {
                         className={({ isActive }) =>
                             `flex flex-col items-center justify-center w-full rounded-xl transition-all duration-300 
                             ${isActive
-                                ? "bg-white/80 text-[#4DA057] shadow-md scale-105 dark:bg-gray-800 dark:text-green-400"
-                                : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057]"
+                                ? "bg-white/80 text-[#4DA057] shadow-md scale-105 dark:bg-gray-800 dark:text-[white]"
+                                : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]"
                             }`
                         }
                     >
                         <div
                             className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer
                             text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3]
-                            dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057]
+                            dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]
                             transition-all duration-300"
                         >
                             <Settings className="w-8 h-8 mb-1" />

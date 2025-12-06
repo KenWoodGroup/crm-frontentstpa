@@ -110,24 +110,24 @@ export default function Debtor() {
             </div>
 
             {/* 🔹 Таблица */}
-            <div className="overflow-y-auto  border-gray-200 dark:border-gray-700 rounded-lg flex-grow max-h-[600px] bg-card-light dark:bg-card-dark transition-colors duration-200">
+            <div className="overflow-y-auto border border-gray-300 dark:border-gray-700 rounded-lg flex-grow max-h-[600px] bg-card-light dark:bg-card-dark transition-colors duration-200">
                 {data?.length > 0 ? (
-                    <table className="w-full text-left">
-                        <thead className="bg-blue-50 dark:bg-card-dark text-gray-700 dark:text-gray-300 text-sm sticky top-0 z-10 transition-colors duration-200">
-                            <tr>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-center w-[5%] transition-colors duration-200">
+                    <table className="w-full border-collapse">
+                        <thead className="bg-gray-50 dark:bg-[#424242] sticky top-0 z-10 transition-colors duration-200">
+                            <tr className="border-x border-t border-gray-300 dark:border-gray-700">
+                                <th className="p-1 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     №
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+                                <th className="p-1 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Firstname')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+                                <th className="p-1 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Factory')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+                                <th className="p-1 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t("Phone")}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-right transition-colors duration-200">
+                                <th className="p-1 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Debt')}
                                 </th>
                             </tr>
@@ -137,37 +137,44 @@ export default function Debtor() {
                             {data.map((item, i) => (
                                 <tr
                                     key={item.id || i}
-                                    className={`${i % 2 === 0
-                                        ? "bg-white dark:bg-gray-800"
-                                        : "bg-gray-50 dark:bg-gray-700/50"
-                                        } hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200`}
+                                    className={`border-x border-gray-300 dark:border-gray-700 ${i === data.length - 1
+                                            ? 'border-b border-gray-300 dark:border-gray-700'
+                                            : ''
+                                        } ${i % 2 === 0
+                                            ? "bg-white dark:bg-gray-900"
+                                            : "bg-gray-50/50 dark:bg-gray-800/50"
+                                        } hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200`}
                                 >
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-center text-text-light dark:text-text-dark transition-colors duration-200">
+                                    <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                         {i + 1}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 font-medium text-blue-gray-700 dark:text-text-dark transition-colors duration-200">
+                                    <td className="p-1 text-center text-sm font-medium text-gray-900 dark:text-gray-100 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                         {item.name}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 transition-colors duration-200">
-                                        {item.parent?.name || "-"}
+                                    <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
+                                        {item.parent?.name || (
+                                            <span className="text-gray-400 dark:text-gray-500">-</span>
+                                        )}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 transition-colors duration-200">
-                                        {item.phone || "-"}
+                                    <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
+                                        {item.phone || (
+                                            <span className="text-gray-400 dark:text-gray-500">-</span>
+                                        )}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-right text-red-600 dark:text-red-400 font-semibold transition-colors duration-200">
+                                    <td className="p-1 text-center text-sm font-semibold text-red-600 dark:text-red-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                         {formatNumber(item.balance)} so'm
                                     </td>
                                 </tr>
-                            ))
-                            }
+                            ))}
                         </tbody>
+
                         {data.length > 0 && (
-                            <tfoot className="bg-blue-50 dark:bg-card-dark sticky bottom-0 transition-colors duration-200">
-                                <tr>
-                                    <td colSpan={4} className="p-3 font-semibold text-right text-text-light dark:text-text-dark transition-colors duration-200">
+                            <tfoot className="bg-gray-50 dark:bg-[#424242] sticky bottom-0 transition-colors duration-200">
+                                <tr className="border-x border-b border-gray-300 dark:border-gray-700">
+                                    <td colSpan={4} className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                         {t('Total_debt')}
                                     </td>
-                                    <td className="p-3 font-semibold text-red-600 dark:text-red-400 text-right transition-colors duration-200">
+                                    <td className="p-1 text-center text-sm font-semibold text-red-600 dark:text-red-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                         {formatNumber(totalDebt)} uzs
                                     </td>
                                 </tr>

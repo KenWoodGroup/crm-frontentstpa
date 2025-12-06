@@ -95,7 +95,7 @@ export default function RegisterModal({ refresh }) {
                 name: form.companyName,
                 full_name: form.companyName,
                 username: form.username,
-                phone: '998901234567',
+                phone: '+998901234567',
                 password: form.password,
                 address: 'Berilmagan',
                 type: "factory",

@@ -205,82 +205,92 @@ export default function PaymentPage() {
             {/* Таблица */}
             <Card className="shadow-lg border border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-200">
                 <CardBody className="overflow-x-auto p-0">
-                    <table className="w-full text-left min-w-max">
+                    <table className="w-full border-collapse min-w-max">
                         <thead>
-                            <tr className="bg-blue-50 dark:bg-blue-900/30 transition-colors duration-200">
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                            <tr className="bg-gray-50 dark:bg-[#424242] border-x border-t border-gray-300 dark:border-gray-700">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('payment_date')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Clients')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Balance')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Payment_type')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Payment_price')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Kasa')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Creater')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-200">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Comment')}
                                 </th>
                             </tr>
                         </thead>
-
 
                         <tbody>
                             {payments.length > 0 ? (
                                 payments.map((item, index) => (
                                     <tr
                                         key={item.id}
-                                        className={`hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 ${index % 2 === 0
-                                            ? "bg-white dark:bg-gray-800"
-                                            : "bg-gray-50 dark:bg-gray-700/50"
-                                            }`}
+                                        className={`border-x border-gray-300 dark:border-gray-700 ${index === payments.length - 1
+                                                ? 'border-b border-gray-300 dark:border-gray-700'
+                                                : ''
+                                            } ${index % 2 === 0
+                                                ? "bg-white dark:bg-gray-900"
+                                                : "bg-gray-50/50 dark:bg-gray-800/50"
+                                            } hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200`}
                                     >
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                        <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                             {new Date(item.createdAt).toLocaleDateString()}
                                         </td>
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 font-medium text-text-light dark:text-text-dark transition-colors duration-200">
-                                            {item?.payer?.name || "-"}
+                                        <td className="p-1 text-center text-sm font-medium text-gray-900 dark:text-gray-100 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
+                                            {item?.payer?.name || (
+                                                <span className="text-gray-400 dark:text-gray-500">-</span>
+                                            )}
                                         </td>
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-red-600 dark:text-red-400 font-medium transition-colors duration-200">
+                                        <td className="p-1 text-center text-sm font-semibold text-red-600 dark:text-red-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                             {Number(item?.payer?.balance).toLocaleString()} so'm
                                         </td>
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
+                                        <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                             {item.method === "cash"
                                                 ? "Наличный"
                                                 : item.method === "card"
                                                     ? "Карта"
                                                     : "Перечисление"}
                                         </td>
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-green-600 dark:text-green-400 font-semibold transition-colors duration-200">
+                                        <td className="p-1 text-center text-sm font-semibold text-green-600 dark:text-green-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                             {Number(item.amount).toLocaleString()} so'm
                                         </td>
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                            {item?.receiver?.name || "-"}
+                                        <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
+                                            {item?.receiver?.name || (
+                                                <span className="text-gray-400 dark:text-gray-500">-</span>
+                                            )}
                                         </td>
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                            {item?.created?.full_name || "-"}
+                                        <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
+                                            {item?.created?.full_name || (
+                                                <span className="text-gray-400 dark:text-gray-500">-</span>
+                                            )}
                                         </td>
-                                        <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-text-light dark:text-text-dark transition-colors duration-200">
-                                            {item.note || "-"}
+                                        <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
+                                            {item.note || (
+                                                <span className="text-gray-400 dark:text-gray-500">-</span>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
                             ) : (
-                                <tr>
+                                <tr className="border-x border-b border-gray-300 dark:border-gray-700">
                                     <td
-                                        colSpan="10"
-                                        className="text-center py-6 text-gray-500 dark:text-gray-400 transition-colors duration-200"
+                                        colSpan="8"
+                                        className="p-2 text-center text-sm text-gray-500 dark:text-gray-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200"
                                     >
                                         {loading ? "Загрузка данных..." : "Нет данных по фильтру"}
                                     </td>

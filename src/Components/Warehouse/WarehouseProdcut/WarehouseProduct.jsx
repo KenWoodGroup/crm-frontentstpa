@@ -15,15 +15,14 @@ import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 export default function WarehouseProduct() {
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [loadingSearch, setLoadingSearch] = useState(false);
     const [products, setProducts] = useState([]);
+    const [originalProducts, setOriginalProducts] = useState([]); // Сохраняем оригинальные данные
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]); // Результаты поиска для выпадающего списка
-    const [showSearchResults, setShowSearchResults] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null); // Выбранный продукт из поиска
+    const [isSearchActive, setIsSearchActive] = useState(false);
     const searchTimeoutRef = useRef(null);
-    const searchRef = useRef(null);
     const { t } = useTranslation();
 
     const locationId = Cookies?.get("ul_nesw");
@@ -43,8 +42,13 @@ export default function WarehouseProduct() {
 
             setTotalPages(total);
 
-            if (append) setProducts((prev) => [...prev, ...newProducts]);
-            else setProducts(newProducts);
+            if (append) {
+                setProducts((prev) => [...prev, ...newProducts]);
+                setOriginalProducts((prev) => [...prev, ...newProducts]);
+            } else {
+                setProducts(newProducts);
+                setOriginalProducts(newProducts);
+            }
         } catch (error) {
             console.log("Mahsulotlarni olishda xatolik:", error);
         } finally {
@@ -68,7 +72,7 @@ export default function WarehouseProduct() {
 
     const loadNextPage = () => {
         const nextPage = page + 1;
-        if (nextPage <= totalPages) {
+        if (nextPage <= totalPages && !isSearchActive) {
             setPage(nextPage);
             GetAllProduct(nextPage, true);
         }
@@ -76,22 +80,58 @@ export default function WarehouseProduct() {
 
     const searchProducts = async (query) => {
         if (!query.trim()) {
-            setSearchResults([]);
-            setShowSearchResults(false);
-            setSelectedProduct(null);
+            // Если поле пустое, показываем все продукты
+            setIsSearchActive(false);
+            setProducts(originalProducts);
             return;
         }
+
+        setIsSearchActive(true);
+        setLoadingSearch(true);
 
         try {
             const response = await LocalProduct?.SearchProduct(query);
 
+            // Обработка ответа - адаптируйте под ваш формат данных
             if (response?.data) {
-                setSearchResults(response.data);
-                setShowSearchResults(true);
+                const searchData = response.data;
+
+                // Преобразуем данные если нужно
+                const formattedResults = Array.isArray(searchData)
+                    ? searchData.map(item => ({
+                        id: item.id,
+                        product_id: item.product_id,
+                        location_id: item.location_id,
+                        quantity: item.quantity,
+                        draft_quantity: item.draft_quantity,
+                        purchase_price: item.purchase_price,
+                        barcode: item.barcode,
+                        batch: item.batch,
+                        fixed_quantity: item.fixed_quantity,
+                        createdAt: item.createdAt,
+                        updatedAt: item.updatedAt,
+                        product: item.product || {
+                            id: item.product?.id,
+                            name: item.product?.name || item.name || "Nomsiz mahsulot",
+                            unit: item.product?.unit || "dona",
+                            location_id: item.product?.location_id,
+                            category_id: item.product?.category_id,
+                            createdAt: item.product?.createdAt,
+                            updatedAt: item.product?.updatedAt
+                        }
+                    }))
+                    : [];
+
+                setProducts(formattedResults);
+                setTotalPages(1);
+                setPage(1);
             }
         } catch (error) {
             console.log("Qidiruvda xatolik:", error);
-            setSearchResults([]);
+            setProducts(originalProducts);
+            setIsSearchActive(false);
+        } finally {
+            setLoadingSearch(false);
         }
     };
 
@@ -104,55 +144,27 @@ export default function WarehouseProduct() {
             clearTimeout(searchTimeoutRef.current);
         }
 
-        // Устанавливаем новый таймаут для отправки запроса через 300ms
+        // Устанавливаем новый таймаут для отправки запроса через 500ms
         searchTimeoutRef.current = setTimeout(() => {
             searchProducts(value);
-        }, 300);
+        }, 500);
     };
 
-    const handleSelectProduct = (product) => {
-        setSelectedProduct(product);
-        setSearchQuery(product.name || "");
-        setSearchResults([]);
-        setShowSearchResults(false);
-
-        // Если нужно отобразить только выбранный продукт в таблице
-        setProducts([product]);
-        setTotalPages(1);
-        setPage(1);
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            // При нажатии Enter сразу отправляем запрос
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+            searchProducts(searchQuery);
+        }
     };
 
     const handleClearSearch = () => {
         setSearchQuery("");
-        setSearchResults([]);
-        setShowSearchResults(false);
-        setSelectedProduct(null);
-        GetAllProduct(1);
+        setIsSearchActive(false);
+        setProducts(originalProducts);
     };
-
-    const handleSearchSubmit = () => {
-        if (searchQuery.trim() && !selectedProduct) {
-            // Если есть запрос, но не выбран продукт, ищем и показываем все результаты
-            setLoading(true);
-            searchProducts(searchQuery);
-        } else if (!searchQuery.trim()) {
-            handleClearSearch();
-        }
-    };
-
-    // Закрытие выпадающего списка при клике вне его
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setShowSearchResults(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
 
     // Очищаем таймаут при размонтировании компонента
     useEffect(() => {
@@ -172,17 +184,17 @@ export default function WarehouseProduct() {
                     {t("warehouseTitle")}
                 </Typography>
 
-                <div className="flex items-center gap-[10px] mt-3 sm:mt-0 relative" ref={searchRef}>
-                    {/* Поле поиска с выпадающим списком */}
+                <div className="flex items-center gap-[10px] mt-3 sm:mt-0">
+                    {/* Поле поиска */}
                     <div className="relative">
                         <Input
-                            label={t("Search")}
+                            label={t('Search')}
                             type="text"
                             value={searchQuery}
                             onChange={handleSearchChange}
-                            onFocus={() => searchQuery && setShowSearchResults(true)}
+                            onKeyPress={handleKeyPress}
                             color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark w-[300px] placeholder-gray-500 dark:placeholder-gray-400"
+                            className="!text-text-light dark:!text-text-dark  placeholder-gray-500 dark:placeholder-gray-400"
                             containerProps={{
                                 className: "!min-w-0",
                             }}
@@ -198,56 +210,6 @@ export default function WarehouseProduct() {
                                 <X size={18} />
                             </button>
                         )}
-
-                        {/* Выпадающий список результатов поиска */}
-                        {showSearchResults && searchResults.length > 0 && (
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-                                {searchResults.map((product, index) => (
-                                    <div
-                                        key={`search-${product.id}-${index}`}
-                                        className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors"
-                                    >
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <p className="font-medium text-gray-900 dark:text-white">
-                                                    {product.product?.name || product.name || "Nomsiz mahsulot"}
-                                                </p>
-                                                {product.barcode && (
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                        Barkod: {product.barcode}
-                                                    </p>
-                                                )}
-                                                {product.batch && (
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                        Partiya: {product.batch}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="text-right">
-                                                {product.quantity !== undefined && (
-                                                    <p className="font-medium text-gray-900 dark:text-white">
-                                                        {product.quantity} dona
-                                                    </p>
-                                                )}
-                                                {product.purchase_price && (
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                        {formatNumber(product.purchase_price)} UZS
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {showSearchResults && searchResults.length === 0 && searchQuery && (
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4">
-                                <p className="text-gray-500 dark:text-gray-400 text-center">
-                                    "{searchQuery}" bo'yicha natijalar topilmadi
-                                </p>
-                            </div>
-                        )}
                     </div>
 
                     {/* Кнопка добавления штрихкода */}
@@ -259,91 +221,95 @@ export default function WarehouseProduct() {
                 </div>
             </div>
 
-            {/* Основная таблица */}
+
+            {/* Таблица */}
             {products?.length > 0 ? (
                 <>
-                    {/* Индикатор поиска */}
-                    {selectedProduct && (
-                        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <p className="font-medium text-blue-800 dark:text-blue-300">
-                                        Tanlangan mahsulot: {selectedProduct.product?.name || selectedProduct.name}
-                                    </p>
-                                    {selectedProduct.barcode && (
-                                        <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
-                                            Barkod: {selectedProduct.barcode}
-                                        </p>
-                                    )}
-                                </div>
-                                <Button
-                                    size="sm"
-                                    variant="text"
-                                    onClick={handleClearSearch}
-                                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                                >
-                                    Hamma mahsulotlarni ko'rish
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    <Card className="overflow-x-auto shadow-sm border border-gray-200 dark:border-card-dark bg-card-light dark:bg-card-dark">
-                        <table className="w-full min-w-max table-auto text-left">
-                            <thead className="bg-gray-100 dark:bg-card-dark">
-                                <tr>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">№</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnProductName")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBatch")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnPurchasePrice")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnQuantity")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDraftQuantity")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBarcode")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDate")}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products.map((item, index) => {
-                                    const date = item?.createdAt;
-                                    const formattedDate = date ? new Date(date).toLocaleDateString("uz-UZ") : null;
-                                    return (
+                    <Card className="overflow-x-auto border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md">
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 dark:bg-[#424242]  ">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            №
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("Направления товара")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnProductName")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnBatch")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnPurchasePrice")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnQuantity")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnDraftQuantity")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnBarcode")}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {products.map((item, index) => (
                                         <tr
                                             key={`${item.id}-${index}`}
-                                            className="border-b border-gray-200 dark:border-card-dark hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                                            className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/50'
+                                                }`}
                                         >
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{index + 1}</td>
-                                            <td className="p-4 text-gray-900 font-medium dark:text-text-dark">{item.product?.name}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {index + 1}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="text-gray-500 dark:text-gray-400">-</span>
+                                            </td>
+                                            <td className="p-3 text-left  text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700">
+                                                {item.product?.name || "Nomsiz mahsulot"}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
                                                 {item.batch || (
-                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                                                        <Info size={16} />
-                                                        <span>{t("noData")}</span>
-                                                    </span>
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
                                                 )}
                                             </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {item.purchase_price ? `${formatNumber(item.purchase_price)} UZS` : t("noData")}
-                                            </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.quantity}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.draft_quantity}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.barcode}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {formattedDate || (
-                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                                                        <Info size={16} />
-                                                        <span>{t("dateMissingMessage")}</span>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {item.purchase_price ? (
+                                                    <span className=" font-medium">
+                                                        {formatNumber(item.purchase_price)} UZS
                                                     </span>
+                                                ) : (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                )}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="font-medium">
+                                                    {item.quantity}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="font-medium">
+                                                    {item.draft_quantity}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {item.barcode || (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
                                                 )}
                                             </td>
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </Card>
 
-                    {/* Показываем кнопку "Загрузить еще" только если не выбран конкретный продукт */}
-                    {!selectedProduct && page < totalPages && (
+                    {/* Кнопка "Загрузить еще" показываем только если не идет поиск */}
+                    {!isSearchActive && page < totalPages && (
                         <div className="flex justify-center mt-6">
                             <Button
                                 color="gray"
@@ -360,9 +326,12 @@ export default function WarehouseProduct() {
                 </>
             ) : (
                 <EmptyData
-                    text={searchQuery ?
-                        (t("noSearchResults") || `"${searchQuery}" bo'yicha natijalar topilmadi`) :
-                        t("noProductsMessage")
+                    text={
+                        loadingSearch ?
+                            `${t("searchingText") || "Qidirilmoqda..."} "${searchQuery}"` :
+                            searchQuery ?
+                                (t("noSearchResults") || `"${searchQuery}" bo'yicha natijalar topilmadi`) :
+                                t("noProductsMessage")
                     }
                 />
             )}
