@@ -98,7 +98,7 @@ export default function Expensess() {
                                            dark:border-gray-600 dark:bg-card-dark dark:text-text-dark focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
-                        
+
                         {/* Дата конца */}
                         <div className="relative">
                             <Calendar
@@ -133,64 +133,72 @@ export default function Expensess() {
             </div>
 
             {/* Таблица */}
-            <div className="rounded-xl shadow-sm border border-gray-200 overflow-hidden bg-card-light dark:bg-card-dark">
+            {/* Таблица */}
+            <div className="rounded-xl shadow-sm border border-gray-300 dark:border-gray-700 overflow-hidden bg-card-light dark:bg-card-dark">
                 {data?.length > 0 ? (
                     <div className="overflow-x-auto">
                         <div className="max-h-[600px] overflow-y-auto">
-                            <table className="w-full">
-                                <thead className="sticky top-0 z-10 bg-gradient-to-r ">
-                                    <tr className="bg-blue-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
-                                        <th className="px-4 py-3 text-left text-xs font-semibold border-b w-[60px]">
+                            <table className="w-full border-collapse">
+                                <thead className="sticky top-0 z-10">
+                                    <tr className="bg-gray-50 dark:bg-[#424242] border-x border-t border-gray-300 dark:border-gray-700">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                             №
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold border-b">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                             {t('Date')}
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold border-b">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                             {t('Payment_method')}
                                         </th>
-                                        <th className="px-4 py-3 text-right text-xs font-semibold border-b">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                             {t('Summ')}
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold border-b">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                             {t('Comment')}
                                         </th>
-                                        <th className="px-1 py-3 text-left text-xs font-semibold border-b w-[80px]">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                             {t('columnActions')}
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
+                                <tbody>
                                     {data.map((item, index) => (
                                         <tr
                                             key={item.id || index}
-                                            className={`${index % 2 === 0
-                                                ? "bg-white dark:bg-gray-900"
-                                                : "bg-blue-gray-50/50 dark:bg-gray-800"
-                                                } hover:bg-blue-gray-100 dark:hover:bg-gray-700 transition`}
+                                            className={`border-x border-gray-300 dark:border-gray-700 ${index === data.length - 1
+                                                    ? 'border-b border-gray-300 dark:border-gray-700'
+                                                    : ''
+                                                } ${index % 2 === 0
+                                                    ? "bg-white dark:bg-gray-900"
+                                                    : "bg-gray-50/50 dark:bg-gray-800/50"
+                                                } hover:bg-gray-100 dark:hover:bg-gray-800 transition`}
                                         >
-                                            <td className="px-4 py-3 text-sm text-center font-medium">
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                 {(filter.page - 1) * 20 + index + 1}
                                             </td>
-                                            <td className="px-4 py-3 text-sm">
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                 {item.createdAt
                                                     ? new Date(item.createdAt).toLocaleDateString("ru-RU")
-                                                    : "-"}
+                                                    : (
+                                                        <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                    )}
                                             </td>
-                                            <td className="px-4 py-3 text-sm">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 capitalize">
                                                     {item.method?.name}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-right font-semibold">
+                                            <td className="p-1 text-center text-sm font-semibold text-gray-900 dark:text-gray-100 border-x border-gray-300 dark:border-gray-700">
                                                 {formatNumber(item.amount)}{" "}
-                                                <span className="text-gray-500 font-normal">so'm</span>
+                                                <span className="text-gray-500 dark:text-gray-400 font-normal">so'm</span>
                                             </td>
-                                            <td className="px-4 py-3 text-sm">
-                                                {item.note || "-"}
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {item.note || (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                )}
                                             </td>
-                                            <td className="px-1 py-3 text-sm">
-                                                <div className="flex items-center gap-2">
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                <div className="flex items-center justify-center gap-2">
                                                     <ExpensesEdit
                                                         data={item}
                                                         refresh={GetAllExpenses}

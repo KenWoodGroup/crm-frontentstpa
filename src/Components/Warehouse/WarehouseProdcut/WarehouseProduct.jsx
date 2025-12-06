@@ -227,252 +227,84 @@ export default function WarehouseProduct() {
                 <>
                     <Card className="overflow-x-auto border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md">
                         <div className="overflow-x-auto">
-                            <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-300 dark:border-gray-700 shadow-sm transition">
-                                {loading ? (
-                                    <div className="py-10 text-center text-gray-500 dark:text-gray-400">
-                                        {t("loading")}
-                                    </div>
-                                ) : error ? (
-                                    <div className="py-10 text-center text-red-500">{error}</div>
-                                ) : (
-                                    <div>
-                                        {/* Table - Desktop */}
-                                        <div className="hidden md:block">
-                                            <table className="w-full border-collapse">
-                                                <thead>
-                                                    <tr className="bg-gray-50 dark:bg-[#424242]">
-                                                        {columns.id && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.id")}
-                                                            </th>
-                                                        )}
-                                                        {columns.type && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.type")}
-                                                            </th>
-                                                        )}
-                                                        {columns.sender_name && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.sender")}
-                                                            </th>
-                                                        )}
-                                                        {columns.receiver_name && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.receiver")}
-                                                            </th>
-                                                        )}
-                                                        {columns.createdAt && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.created")}
-                                                            </th>
-                                                        )}
-                                                        {columns.status && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.status")}
-                                                            </th>
-                                                        )}
-                                                        {columns.payment_status && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.payment")}
-                                                            </th>
-                                                        )}
-                                                        {columns.total_sum && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.total")}
-                                                            </th>
-                                                        )}
-                                                        {columns.actions && (
-                                                            <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                {t("table.actions")}
-                                                            </th>
-                                                        )}
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {invoices?.map((inv, index) => (
-                                                        <tr
-                                                            key={inv.id}
-                                                            className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index % 2 === 0
-                                                                    ? 'bg-white dark:bg-gray-900'
-                                                                    : 'bg-gray-50/50 dark:bg-gray-800/50'
-                                                                }`}
-                                                        >
-                                                            {columns.id && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    <div
-                                                                        dangerouslySetInnerHTML={{
-                                                                            __html: highlightMatch(inv.invoice_number || inv.id, searchText),
-                                                                        }}
-                                                                    />
-                                                                </td>
-                                                            )}
-                                                            {columns.type && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    {typeBadge(inv.type)}
-                                                                </td>
-                                                            )}
-                                                            {columns.sender_name && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    {inv.sender_name || inv.sender?.name || (
-                                                                        <span className="text-gray-400 dark:text-gray-500">—</span>
-                                                                    )}
-                                                                </td>
-                                                            )}
-                                                            {columns.receiver_name && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    {inv.receiver_name || inv.receiver?.name || (
-                                                                        <span className="text-gray-400 dark:text-gray-500">—</span>
-                                                                    )}
-                                                                </td>
-                                                            )}
-                                                            {columns.createdAt && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    {formatDateISO(inv.createdAt)}
-                                                                </td>
-                                                            )}
-                                                            {columns.status && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    <button
-                                                                        onClick={() => setEditingStatusInvoice(inv)}
-                                                                        type="button"
-                                                                        className="w-full"
-                                                                    >
-                                                                        {statusBadge(inv.status)}
-                                                                    </button>
-                                                                </td>
-                                                            )}
-                                                            {columns.payment_status && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    {paymentBadge(inv.payment_status)}
-                                                                </td>
-                                                            )}
-                                                            {columns.total_sum && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    <span className="font-medium">
-                                                                        {inv.total_sum}
-                                                                    </span>
-                                                                </td>
-                                                            )}
-                                                            {columns.actions && (
-                                                                <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                                    <div className="flex items-center justify-center gap-2">
-                                                                        <button
-                                                                            onClick={() => openDetail(inv.id)}
-                                                                            className="text-sm px-3 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
-                                                                        >
-                                                                            {t("button.open")}
-                                                                        </button>
-                                                                        {Number(inv?.total_sum) === 0 && (
-                                                                            <CancelInvoiceButton
-                                                                                resetAll={() => fetchInvoices()}
-                                                                                appearance="icn"
-                                                                                id={inv?.id}
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-                                                            )}
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        {/* Mobile cards */}
-                                        <div className="md:hidden grid gap-3">
-                                            {invoices.map((inv) => (
-                                                <div
-                                                    key={inv.id}
-                                                    className="p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-card-light dark:bg-card-dark shadow-sm"
-                                                >
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <div className="text-sm font-medium">
-                                                                {inv.type} — {String(inv.id).slice(0, 8)}
-                                                            </div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                                {inv.sender_name || inv.sender?.name}
-                                                            </div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                                {formatDateISO(inv.createdAt)}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col gap-2 items-end">
-                                                            <div className="text-sm font-medium">{inv.total_sum}</div>
-                                                            <div className="flex gap-2">
-                                                                <button
-                                                                    onClick={() => openDetail(inv.id)}
-                                                                    className="text-sm px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
-                                                                >
-                                                                    {t("button.open")}
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => openEditInvoice(inv)}
-                                                                    className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                                                                    aria-label={t("button.edit")}
-                                                                    title={t("button.edit")}
-                                                                >
-                                                                    <Pencil size={14} />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        {/* Pagination */}
-                                        <div className="mt-4 flex items-center flex-wrap justify-between">
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">
-                                                {t("invoices.showing_range", {
-                                                    from: (page - 1) * PER_PAGE + 1,
-                                                    to: Math.min(page * PER_PAGE, total),
-                                                    total,
-                                                })}
-                                            </div>
-                                            <div className="flex items-center flex-wrap gap-2">
-                                                <button
-                                                    onClick={() => setPage(1)}
-                                                    disabled={page === 1}
-                                                    className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                                                >
-                                                    {t("pagination.first")}
-                                                </button>
-
-                                                <button
-                                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                                    disabled={page === 1}
-                                                    className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                                                    aria-label={t("pagination.previous")}
-                                                >
-                                                    <ChevronLeft size={16} />
-                                                </button>
-
-                                                <div className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900">
-                                                    {t("pagination.page_of", { page, totalPages })}
-                                                </div>
-
-                                                <button
-                                                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                                    disabled={page === totalPages}
-                                                    className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                                                    aria-label={t("pagination.next")}
-                                                >
-                                                    <ChevronRight size={16} />
-                                                </button>
-
-                                                <button
-                                                    onClick={() => setPage(totalPages)}
-                                                    disabled={page === totalPages}
-                                                    className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                                                >
-                                                    {t("pagination.last")}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 dark:bg-[#424242]  ">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            №
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("Направления товара")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnProductName")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnBatch")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnPurchasePrice")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnQuantity")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnDraftQuantity")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnBarcode")}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {products.map((item, index) => (
+                                        <tr
+                                            key={`${item.id}-${index}`}
+                                            className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/50'
+                                                }`}
+                                        >
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {index + 1}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="text-gray-500 dark:text-gray-400">-</span>
+                                            </td>
+                                            <td className="p-3 text-left  text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700">
+                                                {item.product?.name || "Nomsiz mahsulot"}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {item.batch || (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                )}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {item.purchase_price ? (
+                                                    <span className=" font-medium">
+                                                        {formatNumber(item.purchase_price)} UZS
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                )}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="font-medium">
+                                                    {item.quantity}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="font-medium">
+                                                    {item.draft_quantity}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {item.barcode || (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </Card>
 

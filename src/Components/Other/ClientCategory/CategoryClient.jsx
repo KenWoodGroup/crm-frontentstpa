@@ -61,24 +61,24 @@ export default function CategoryClient() {
             </div>
 
             {/* 🔹 Таблица */}
-            <div className="overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg flex-grow max-h-[600px] bg-card-light dark:bg-card-dark transition-colors duration-200">
+            <div className="overflow-y-auto border border-gray-300 dark:border-gray-700 rounded-lg flex-grow max-h-[600px] bg-card-light dark:bg-card-dark transition-colors duration-200">
                 {data?.length > 0 ? (
-                    <table className="w-full text-left">
-                        <thead className="bg-blue-50 dark:bg-card-dark text-gray-700 dark:text-gray-300 text-sm sticky top-0 z-10 transition-colors duration-200">
-                            <tr>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-center w-[5%]">
+                    <table className="w-full border-collapse">
+                        <thead className="bg-gray-50 dark:bg-[#424242] text-sm sticky top-0 z-10 transition-colors duration-200">
+                            <tr className="border-x border-t border-gray-300 dark:border-gray-700">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                     №
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                     {t('Name')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                     {t('Comment')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-right">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                     {t('Created')}
                                 </th>
-                                <th className="p-3 border-b border-gray-200 dark:border-gray-700 text-right">
+                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                     {t('columnActions')}
                                 </th>
                             </tr>
@@ -88,25 +88,32 @@ export default function CategoryClient() {
                             {data.map((item, i) => (
                                 <tr
                                     key={item.id || i}
-                                    className={`${i % 2 === 0
-                                        ? "bg-white dark:bg-gray-800"
-                                        : "bg-gray-50 dark:bg-gray-700/50"
-                                        } hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200`}
+                                    className={`border-x border-gray-300 dark:border-gray-700 ${i === data.length - 1
+                                            ? 'border-b border-gray-300 dark:border-gray-700'
+                                            : ''
+                                        } ${i % 2 === 0
+                                            ? "bg-white dark:bg-gray-900"
+                                            : "bg-gray-50/50 dark:bg-gray-800/50"
+                                        } hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200`}
                                 >
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-center text-text-light dark:text-text-dark">
+                                    <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                         {i + 1}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 font-medium text-blue-gray-700 dark:text-text-dark">
-                                        {item.name || "-"}
+                                    <td className="p-1 text-center text-sm font-medium text-gray-900 dark:text-gray-100 border-x border-gray-300 dark:border-gray-700">
+                                        {item.name || (
+                                            <span className="text-gray-400 dark:text-gray-500">-</span>
+                                        )}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
-                                        {item.note || "-"}
+                                    <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                        {item.note || (
+                                            <span className="text-gray-400 dark:text-gray-500">-</span>
+                                        )}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-right text-gray-700 dark:text-gray-300">
+                                    <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                         {new Date(item.createdAt).toLocaleString("ru-RU")}
                                     </td>
-                                    <td className="p-3 border-b border-gray-200 dark:border-gray-700 text-right text-gray-700 dark:text-gray-300">
-                                        <div className="flex items-center justify-end gap-[10px]">
+                                    <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                        <div className="flex items-center justify-center gap-1">
                                             <ClientCategoryEdit data={item} id={item?.id} refresh={getAllCategoryClient} />
                                             <ClientCategoryDelete id={item?.id} refresh={getAllCategoryClient} />
                                         </div>

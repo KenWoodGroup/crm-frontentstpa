@@ -55,45 +55,69 @@ export default function Kassa() {
             ) : (
                 <Card className="overflow-hidden bg-card-light dark:bg-card-dark">
                     <CardBody className="p-0 overflow-auto">
-                        <table className="w-full min-w-max text-left">
-                            <thead className="bg-blue-gray-50 dark:bg-gray-700 text-gray-700 dark:text-text-dark">
-                                <tr>
-                                    <th className="p-3">{t('Name')}</th>
-                                    <th className="p-3">{t('Balance')}</th>
-                                    <th className="p-3">{t('Created')}</th>
-                                    <th className="p-3 text-center">{t('columnActions')}</th>
+                        <table className="w-full border-collapse min-w-max">
+                            <thead>
+                                <tr className="bg-gray-50 dark:bg-[#424242] border-x border-t border-gray-300 dark:border-gray-700">
+                                    <th className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                        {t('Name')}
+                                    </th>
+                                    <th className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                        {t('Balance')}
+                                    </th>
+                                    <th className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                        {t('Created')}
+                                    </th>
+                                    <th className="p-2 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                        {t('columnActions')}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {cashes.map((cash, index) => (
-                                    <tr
-                                        key={cash.id}
-                                        className={`${index % 2 === 0
-                                            ? "bg-card-light dark:bg-card-dark"
-                                            : "bg-card-light/50 dark:bg-card-dark/50"
-                                            } hover:bg-blue-gray-100 dark:hover:bg-gray-600 transition-colors`}
-                                    >
-                                        <td className="p-3 font-medium text-text-light dark:text-text-dark">
-                                            {cash.name}
-                                        </td>
-                                        <td className="p-3 text-blue-700 font-semibold">
-                                            {Number(cash.balance).toLocaleString()} so'm
-                                        </td>
-                                        <td className="p-3 text-gray-600 dark:text-text-dark">
-                                            {new Date(cash.createdAt).toLocaleDateString("ru-RU", {
-                                                day: "2-digit",
-                                                month: "2-digit",
-                                                year: "numeric",
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </td>
-                                        <td className="p-3 text-center flex justify-center gap-2">
-                                            <CashEdit id={cash?.id} data={cash} refresh={GetAllCash} />
-                                            <CashDelete id={cash?.id} refresh={GetAllCash} />
-                                        </td>
-                                    </tr>
-                                ))}
+                                {cashes.map((cash, index) => {
+                                    const balance = Number(cash.balance);
+                                    const isPositive = balance > 0;
+                                    const isNegative = balance < 0;
+
+                                    return (
+                                        <tr
+                                            key={cash.id}
+                                            className={`border-x border-gray-300 dark:border-gray-700 ${index === cashes.length - 1
+                                                    ? 'border-b border-gray-300 dark:border-gray-700'
+                                                    : ''
+                                                } ${index % 2 === 0
+                                                    ? "bg-white dark:bg-gray-900"
+                                                    : "bg-gray-50/50 dark:bg-gray-800/50"
+                                                } hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+                                        >
+                                            <td className="p-1 text-center text-sm font-medium text-gray-900 dark:text-gray-100 border-x border-gray-300 dark:border-gray-700">
+                                                {cash.name}
+                                            </td>
+                                            <td className={`p-1 text-center text-sm font-semibold border-x border-gray-300 dark:border-gray-700 ${isPositive
+                                                    ? 'text-green-600 dark:text-green-400'
+                                                    : isNegative
+                                                        ? 'text-red-600 dark:text-red-400'
+                                                        : 'text-gray-700 dark:text-gray-300'
+                                                }`}>
+                                                {balance.toLocaleString()} so'm
+                                            </td>
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {new Date(cash.createdAt).toLocaleDateString("ru-RU", {
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
+                                            </td>
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <CashEdit id={cash?.id} data={cash} refresh={GetAllCash} />
+                                                    <CashDelete id={cash?.id} refresh={GetAllCash} />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </CardBody>

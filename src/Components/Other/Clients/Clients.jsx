@@ -16,7 +16,7 @@ import ClientEdit from "./_components/ClientEdit";
 import EmptyData from "../../UI/NoData/EmptyData";
 import Cookies from "js-cookie";
 import ClientPayment from "./_components/ClientPayment";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 export default function Clients() {
@@ -26,6 +26,7 @@ export default function Clients() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState({ total_pages: 1 });
+    const navigate = useNavigate()
 
 
     const GetAllClient = async (searchValue = "all", currentPage = 1) => {
@@ -106,61 +107,104 @@ export default function Clients() {
                 <>
                     <Card className="overflow-hidden bg-card-light dark:bg-card-dark transition-colors duration-300">
                         <CardBody className="p-0 overflow-auto">
-                            <table className="w-full min-w-max text-left">
+                            <table className="w-full border-collapse">
                                 <thead>
-                                    <tr className="bg-blue-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
-                                        <th className="p-3">{t('Name')}</th>
-                                        <th className="p-3">{t('Phone')}</th>
-                                        <th className="p-3">{t(`Address`)}</th>
-                                        <th className="p-3">{t('Client_type')}</th>
-                                        <th className="p-3">{t('Balance')}</th>
-                                        <th className="p-3">{t('Created')}</th>
-                                        <th className="p-3 text-center">{t('columnActions')}</th>
+                                    <tr className="bg-gray-50 dark:bg-[#424242] border-x border-t border-gray-300 dark:border-gray-700">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                            {t('Name')}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                            {t('Phone')}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                            {t('Address')}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                            {t('Client_type')}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                            {t('Balance')}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                            {t('Created')}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                            {t('columnActions')}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {clients.map((client, index) => (
                                         <tr
                                             key={client.id}
-                                            className={`${index % 2 === 0
-                                                ? "bg-white dark:bg-gray-900"
-                                                : "bg-blue-gray-50/50 dark:bg-gray-800"
-                                                } hover:bg-blue-gray-100 dark:hover:bg-gray-700 transition`}
+                                            onClick={() => navigate(`/factory/client/${client.id}`)}
+                                            className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-x border-gray-300 dark:border-gray-700 ${index === clients.length - 1
+                                                ? "border-b border-gray-300 dark:border-gray-700"
+                                                : ""
+                                                } ${index % 2 === 0
+                                                    ? "bg-white dark:bg-gray-900"
+                                                    : "bg-gray-50/50 dark:bg-gray-800/50"
+                                                }`}
                                         >
-                                            <td className="p-3 font-medium">
-                                                <NavLink
-                                                    className="text-blue-600 dark:text-blue-400 hover:underline"
-                                                    to={`/factory/client/${client?.id}`}
-                                                >
+                                            <td
+                                                className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700"
+                                            >
+                                                <span className=" font-medium ">
                                                     {client.name}
-                                                </NavLink>
+                                                </span>
                                             </td>
-                                            <td className="p-3 dark:text-text-dark">{client.phone}</td>
-                                            <td className="p-3 dark:text-text-dark">{client.address}</td>
-                                            <td className="p-3 dark:text-text-dark">{client.client_type?.name}</td>
-                                            <td className="p-3 dark:text-text-dark">
-                                                {Number(client.balance).toLocaleString()} UZS
+
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {client.phone}
                                             </td>
-                                            <td className="p-3 dark:text-text-dark">
+
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {client.address}
+                                            </td>
+
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {client.client_type?.name}
+                                            </td>
+
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                <span className="font-medium">
+                                                    {Number(client.balance).toLocaleString()} UZS
+                                                </span>
+                                            </td>
+
+                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                 {new Date(client.createdAt).toLocaleDateString()}
                                             </td>
-                                            <td className="p-3 text-center flex justify-center gap-2">
-                                                <ClientEdit
-                                                    id={client?.id}
-                                                    data={client}
-                                                    refresh={() => GetAllClient(search, page)}
-                                                />
-                                                <ClientDelete
-                                                    id={client?.id}
-                                                    refresh={() => GetAllClient(search, page)}
-                                                />
-                                                <ClientPayment
-                                                    refresh={() => GetAllClient(search, page)}
-                                                    client={client}
-                                                />
+
+                                            <td
+                                                className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700"
+                                            >
+                                                <div className="flex items-center justify-center gap-2">
+                                                    {/* ВАЖНО — останавливаем всплытие чтобы не срабатывал onClick TR */}
+                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                        <ClientEdit
+                                                            id={client?.id}
+                                                            data={client}
+                                                            refresh={() => GetAllClient(search, page)}
+                                                        />
+                                                    </div>
+                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                        <ClientDelete
+                                                            id={client?.id}
+                                                            refresh={() => GetAllClient(search, page)}
+                                                        />
+                                                    </div>
+                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                        <ClientPayment
+                                                            refresh={() => GetAllClient(search, page)}
+                                                            client={client}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
+
                                 </tbody>
                             </table>
                         </CardBody>
