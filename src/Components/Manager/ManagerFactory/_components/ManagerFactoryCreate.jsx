@@ -131,11 +131,9 @@ export default function RegisterModal({ refresh }) {
                 Ro'yxatdan o'tish
             </Button>
 
-            <Dialog open={open} handler={handleOpen} size="md">
-                <DialogHeader className="pb-2">
-                    <Typography variant="h4" className="text-left text-gray-900">
-                        Yangi kompaniya yaratish
-                    </Typography>
+            <Dialog open={open} handler={handleOpen} size="sm" className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300 max-h-[90vh] overflow-y-auto" >
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
+                    Yangi kompaniya yaratish
                 </DialogHeader>
 
                 <DialogBody className="py-4">
@@ -148,6 +146,14 @@ export default function RegisterModal({ refresh }) {
                                 onChange={handleChange}
                                 placeholder="Masalan: Kenwood MChJ"
                                 error={!!errors.companyName}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark`,
+                                }}
                             />
                             {errors.companyName && (
                                 <Typography variant="small" color="red" className="mt-1 text-xs">
@@ -164,6 +170,14 @@ export default function RegisterModal({ refresh }) {
                                 onChange={handleChange}
                                 placeholder="Masalan: kenwood_user"
                                 error={!!errors.username}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark`,
+                                }}
                             />
                             {errors.username && (
                                 <Typography variant="small" color="red" className="mt-1 text-xs">
@@ -181,6 +195,14 @@ export default function RegisterModal({ refresh }) {
                                 placeholder="Kamida 6 belgidan iborat"
                                 type="password"
                                 error={!!errors.password}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark`,
+                                }}  
                             />
                             {errors.password && (
                                 <Typography variant="small" color="red" className="mt-1 text-xs">

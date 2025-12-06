@@ -69,11 +69,9 @@ export default function ManagerFactoryEdit({ refresh, data }) {
             >
                 <Edit size={20} />
             </Button>
-            <Dialog open={open} handler={handleOpen} size="sm" className="max-h-[90vh] overflow-y-auto">
-                <DialogHeader className="pb-2">
-                    <Typography variant="h4" className="text-left text-gray-900">
-                        Fabrikani tahrirlash
-                    </Typography>
+            <Dialog open={open} handler={handleOpen} size="sm" className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300 max-h-[90vh] overflow-y-auto" >
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
+                    Fabrikani tahrirlash
                 </DialogHeader>
 
                 <DialogBody className="py-4">
@@ -85,11 +83,27 @@ export default function ManagerFactoryEdit({ refresh, data }) {
                                 name="companyName"
                                 value={form.companyName}
                                 onChange={handleChange}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark`,
+                                }}
                             />
                             <Input
                                 label="Login"
                                 name="Username"
                                 value={form.Username}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark`,
+                                }}
                                 onChange={handleChange}
                             />
                             <Input
@@ -98,12 +112,28 @@ export default function ManagerFactoryEdit({ refresh, data }) {
                                 value={form.companyPhone}
                                 onChange={handleChange}
                                 type="tel"
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark`,
+                                }}
                             />
                             <Input
                                 label="Manzil"
                                 name="legalAddress"
                                 value={form.legalAddress}
                                 onChange={handleChange}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark`,
+                                }}
                             />
                         </div>
 
@@ -115,6 +145,8 @@ export default function ManagerFactoryEdit({ refresh, data }) {
                                 color="gray"
                                 variant="outlined"
                                 onClick={handleOpen}
+                                className="dark:text-gray-300"
+
                             >
                                 Bekor qilish
                             </Button>

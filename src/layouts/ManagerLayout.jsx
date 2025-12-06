@@ -6,7 +6,7 @@ export default function ManagerLayout() {
     const [active, setActive] = useState(false); // true = открыт сайдбар
 
     return (
-        <div className="flex w-full overflow-hidden bg-[#FAFAFA] relative">
+        <div className="flex w-full overflow-hidden bg-background-light dark:bg-background-dark transition-colors relative min-h-screen">
             <ManagerSidebar open={active} onClose={() => setActive(false)} active={() => setActive(!active)} />
             <div
                 className={`mt-[30px] pb-[30px] px-[15px] min-h-screen transition-all duration-300`}

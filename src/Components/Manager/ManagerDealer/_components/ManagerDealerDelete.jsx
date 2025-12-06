@@ -34,19 +34,21 @@ export default function ManagerDealerDelete({ id, refresh }) {
                 <Delete size={20} />
             </Button>
 
-            <Dialog open={open} handler={handleOpen} className="bg-white text-gray-900 rounded-xl">
-                <DialogHeader className="text-lg font-semibold border-b border-gray-200">
+            <Dialog open={open} handler={handleOpen} className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl transition-colors duration-300"
+            >
+                <DialogHeader className="text-lg font-semibold border-b border-gray-200 dark:border-gray-700 dark:text-text-dark">
                     Zavodni o'chirish o‘chirish
                 </DialogHeader>
-                <DialogBody divider className="text-gray-700">
+                <DialogBody divider className="text-gray-700 dark:text-text-dark dark:bg-card-dark"
+                >
                     Siz haqiqatdan ham bu zavodni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
                 </DialogBody>
-                <DialogFooter className="border-t border-gray-200">
+                <DialogFooter className="border-t border-gray-200 dark:border-gray-700 dark:bg-card-dark">
                     <Button
                         variant="text"
                         color="gray"
                         onClick={handleOpen}
-                        className="mr-2"
+                        className="dark:text-gray-300"
                         disabled={loading}
                     >
                         Bekor qilish

@@ -19,6 +19,7 @@ export default function ManagerFactory() {
     const GetAllFactory = useCallback(async (pageNum = 1, append = false) => {
         if (pageNum === 1) setLoading(true);
         else setLoadingMore(true);
+
         try {
             const data = { type: "factory", page: pageNum };
             const response = await location.GetFactory(data);
@@ -28,90 +29,105 @@ export default function ManagerFactory() {
 
             setTotalPages(total);
 
-            // 🔹 Если append=false, просто заменяем старые данные (чистое обновление)
             if (!append) {
                 setFactories(newFactories);
             } else {
                 setFactories((prev) => {
                     const existingIds = new Set(prev.map((f) => f.id));
-                    const uniqueNew = newFactories.filter((f) => !existingIds.has(f.id));
-                    return [...prev, ...uniqueNew];
+                    const unique = newFactories.filter((f) => !existingIds.has(f.id));
+                    return [...prev, ...unique];
                 });
             }
         } catch (error) {
-            console.log("Fabrikalarni olishda xatolik:", error);
+            console.log("Factory fetch error:", error);
         } finally {
             setLoading(false);
             setLoadingMore(false);
         }
     }, []);
 
-    // 🔹 При первом рендере
     useEffect(() => {
         GetAllFactory(1);
     }, [GetAllFactory]);
 
-    // 🔹 Загрузка следующей страницы
     const loadNextPage = () => {
-        const nextPage = page + 1;
-        if (nextPage <= totalPages) {
-            setPage(nextPage);
-            GetAllFactory(nextPage, true);
+        const next = page + 1;
+        if (next <= totalPages) {
+            setPage(next);
+            GetAllFactory(next, true);
         }
     };
 
-    // 🔹 Функция refresh для передачи в дочерние компоненты
     const refresh = useCallback(() => {
         setPage(1);
         GetAllFactory(1);
     }, [GetAllFactory]);
 
-    if (loading) {
-        return <Loading />;
-    }
+    if (loading) return <Loading />;
 
     return (
         <div className="min-h-screen text-gray-900 dark:text-gray-100">
-            {/* 🔹 Сарлавҳа */}
+            {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <Typography variant="h4" className="font-semibold">
                     Fabrikalar
                 </Typography>
+
                 <ManagerFactoryCreate refresh={refresh} />
             </div>
+
             {factories?.length > 0 ? (
                 <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
                         {factories.map((factory, index) => (
                             <Card
                                 key={`${factory.id}-${index}`}
-                                className="p-4 border border-gray-200 shadow-sm hover:shadow-md bg-[white] transition-all dark:bg-background-dark dark:border-gray-700"
+                                className="p-4 shadow-md border border-gray-200 bg-white 
+                                           dark:bg-[#1E1E22] dark:border-gray-700 
+                                           hover:shadow-lg transition-all rounded-xl"
                             >
-                                <div className="flex items-center justify-between">
-                                    <Typography variant="h6" className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                {/* Header Row */}
+                                <div className="flex items-center justify-between mb-2">
+                                    <Typography
+                                        variant="h6"
+                                        className="font-semibold text-gray-800 dark:text-gray-100"
+                                    >
                                         {factory.name}
                                     </Typography>
-                                    <div className="flex items-center gap-[10px]">
-                                        <NavLink to={`/manager/factory/${factory?.id}`}>
+
+                                    <div className="flex items-center gap-2">
+                                        {/* View button */}
+                                        <NavLink to={`/manager/factory/${factory.id}`}>
                                             <Button
-                                                className="bg-blue-600 text-white hover:bg-blue-700 normal-case p-[8px]"
+                                                className="bg-blue-600 text-white hover:bg-blue-700 p-2 rounded-lg shadow-sm"
                                             >
                                                 <Eye size={20} />
                                             </Button>
                                         </NavLink>
+
+                                        {/* Delete */}
                                         <ManagerDealerDelete id={factory.id} refresh={refresh} />
+
+                                        {/* Edit */}
                                         <ManagerFactoryEdit data={factory} refresh={refresh} />
                                     </div>
                                 </div>
-                                <Typography className="text-gray-600 dark:text-gray-300 text-sm mb-1">
-                                    <span className="font-medium">Manzil:</span> {factory.address || "—"}
-                                </Typography>
-                                <Typography className="text-gray-600 dark:text-gray-300 text-sm mb-1">
-                                    <span className="font-medium">Telefon:</span> {factory.phone || "—"}
-                                </Typography>
-                                <Typography className="text-gray-600 dark:text-gray-300 text-sm mb-1">
-                                    <span className="font-medium">Login:</span> {factory?.users[0]?.username || "—"}
-                                </Typography>
+
+                                {/* Info */}
+                                <div className="space-y-1">
+                                    <Typography className="text-gray-700 dark:text-gray-300 text-sm">
+                                        <span className="font-medium">Manzil:</span> {factory.address || "—"}
+                                    </Typography>
+
+                                    <Typography className="text-gray-700 dark:text-gray-300 text-sm">
+                                        <span className="font-medium">Telefon:</span> {factory.phone || "—"}
+                                    </Typography>
+
+                                    <Typography className="text-gray-700 dark:text-gray-300 text-sm">
+                                        <span className="font-medium">Login:</span>{" "}
+                                        {factory?.users?.[0]?.username || "—"}
+                                    </Typography>
+                                </div>
                             </Card>
                         ))}
                     </div>
@@ -121,10 +137,12 @@ export default function ManagerFactory() {
                             <Button
                                 color="gray"
                                 variant="outlined"
-                                size="sm"
+                                size="md"
                                 onClick={loadNextPage}
                                 disabled={loadingMore}
-                                className="rounded-full border-gray-400 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-full border-gray-400 text-gray-800 
+                                           dark:text-gray-200 dark:border-gray-600 
+                                           hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                             >
                                 {loadingMore ? "Yuklanmoqda..." : "Ko‘proq ko‘rsatish"}
                             </Button>
