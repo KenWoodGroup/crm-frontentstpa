@@ -701,12 +701,12 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                                     {t("table.status")}
                                                 </th>
                                             )}
-                                            {columns.payment_status && (
+                                            {(columns.payment_status && role==="factory") && (
                                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                                     {t("table.payment")}
                                                 </th>
                                             )}
-                                            {columns.total_sum && (
+                                            {(columns.total_sum && role==="factory") && (
                                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                                     {t("table.total")}
                                                 </th>
