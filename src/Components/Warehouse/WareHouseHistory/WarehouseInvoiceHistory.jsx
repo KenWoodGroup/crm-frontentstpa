@@ -669,9 +669,9 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             <div className="hidden md:block">
                                 <table className="w-full border-collapse">
                                     <thead>
-                                        <tr className="bg-gray-50 dark:bg-[#424242] border-x border-t border-gray-300 dark:border-gray-700">
+                                        <tr className="bg-gray-50 dark:bg-[#424242]  ">
                                             {columns.id && (
-                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                <th className="p-3 text-center  rounded-tl-[10px] text-sm font-semibold text-gray-700 dark:text-gray-300  border-gray-300 dark:border-gray-700 border-b">
                                                     {t("table.id")}
                                                 </th>
                                             )}
@@ -711,7 +711,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                                 </th>
                                             )}
                                             {columns.actions && (
-                                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
+                                                <th className="p-3 text-center rounded-tr-[10px] text-sm font-semibold text-gray-700 dark:text-gray-300  border-gray-300 dark:border-gray-700 border-b">
                                                     {t("table.actions")}
                                                 </th>
                                             )}
@@ -722,8 +722,8 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                             <tr
                                                 key={inv.id}
                                                 className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-x border-gray-300 dark:border-gray-700 ${index === invoices.length - 1
-                                                        ? 'border-b border-gray-300 dark:border-gray-700'
-                                                        : ''
+                                                    ? 'border-b border-gray-300 dark:border-gray-700'
+                                                    : ''
                                                     } ${index % 2 === 0
                                                         ? 'bg-white dark:bg-gray-900'
                                                         : 'bg-gray-50/50 dark:bg-gray-800/50'
@@ -786,7 +786,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                                     </td>
                                                 )}
                                                 {columns.actions && (
-                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                    <td className="p-3 text-center text-sm rounded-br-[10px] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700">
                                                         <div className="flex items-center justify-center gap-2">
                                                             <button
                                                                 onClick={() => openDetail(inv.id)}
