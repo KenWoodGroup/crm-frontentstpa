@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import AsyncSelect from 'react-select/async';
-import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy, Loader2, Newspaper } from "lucide-react";
+import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy, Loader2, Newspaper, FilePlus2, FilePlus, PlusCircle } from "lucide-react";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
@@ -439,18 +439,19 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
 
                     <div className="flex items-center flex-wrap gap-3">
                         {role === "factory" ?
-                            <button
-                                onClick={exportCurrentToCSV}
-                                className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
-                                aria-label={t("invoices.export_csv")}
-                                title={t("invoices.export_csv")}
-                            >
-                                <Newspaper size={16} />
-                                <span className="text-sm">{t("invoices.export_csv")}</span>
-                            </button>
+                            <NavLink to={"/factory/clients"}>
+                                <button
+                                    className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
+                                    aria-label={t("invoices.export_csv")}
+                                    title={t("invoices.export_csv")}
+                                >
+                                    <PlusCircle size={16} />
+                                    <span className="text-sm">{t("new_order")}</span>
+                                </button>
+                            </NavLink>
                             : <noscript></noscript>
                         }
-                        <button
+                        {/* <button
                             onClick={exportCurrentToCSV}
                             className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
                             aria-label={t("invoices.export_csv")}
@@ -478,7 +479,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                         >
                             <Copy size={16} />
                             <span className="text-sm">{t("invoices.inventory_log")}</span>
-                        </a>
+                        </a> */}
                     </div>
                 </header>
 
