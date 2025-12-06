@@ -4,6 +4,7 @@ import axios from 'axios';
 import InvoiceItemsTable from './InvoiceItemsTable';
 import { InvoicesApi } from '../../../../utils/Controllers/invoices';
 import Spinner from '../../../UI/spinner/Spinner';
+import { useNotifyStore } from '../../../../store/useNotifyStore';
 function formatSum(sumStr) {
     if (!sumStr) return '0';
     const n = Number(sumStr);
@@ -26,6 +27,8 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied, s
     const [error, setError] = useState(null);
     const [invoice, setInvoice] = useState(null);
     const [markingSeen, setMarkingSeen] = useState(false);
+    const changeNotifyCount = useNotifyStore((s) => s.setUnreadCount)
+
 
     useEffect(() => {
         if (isOpen && invoiceId) {
@@ -49,6 +52,7 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied, s
                 // await axios.put(`/api/invoices/${id}`, { seen: 'old' });
                 await InvoicesApi.EditInvoiceSeen(id, { seen: "old" })
                 setMarkingSeen(false);
+                // changeNotifyCount()
                 reload();
             }
             // 2) Fetch full invoice detail
@@ -84,12 +88,12 @@ export default function InvoiceDrawer({ isOpen, invoiceId, onClose, onApplied, s
                     <div className="flex items-center gap-2">
                         <button onClick={onClose} className="px-3 py-2 rounded-md border">Bekor qilish</button>
                         <button
-                            onClick={()=> onApplied()}
+                            onClick={() => onApplied()}
                             className={`px-4 py-2 rounded-md bg-blue-600 text-white font-medium flex items-center justify-center gap-[6px] ${startLoading ? "cursor-progress" : "cursor-pointer"}`}
                         >
-                         {startLoading && <Spinner/> } Qo'llash
+                            {startLoading && <Spinner />} Qo'llash
                         </button>
-                        
+
                     </div>
                 </div>
 
