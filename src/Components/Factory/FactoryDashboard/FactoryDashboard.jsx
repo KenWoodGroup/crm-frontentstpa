@@ -73,33 +73,31 @@ export default function FactoryDashboard() {
         {
             title: t("Warehouses"),
             value: CardData ? CardData.countWarehouse : "...",
-            icon: <Warehouse className="w-6 h-6 text-blue-600" />,
+            icon: <Warehouse className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
         },
         {
             title: t("dilers"),
             value: CardData ? CardData.countDealer : "...",
-            icon: <Users className="w-6 h-6 text-green-600" />,
+            icon: <Users className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
         },
         {
             title: t("products"),
             value: CardData ? CardData.countProduct : "...",
-            icon: <Package className="w-6 h-6 text-purple-600" />,
+            icon: <Package className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
         },
         {
             title: t("Total_Value"),
             value: CardData ? `${CardData.sumProduct.toLocaleString()} so'm` : "...",
-            icon: <DollarSign className="w-6 h-6 text-yellow-600" />,
+            icon: <DollarSign className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
+            textColor: "text-red-500 dark:text-red-400",
         },
         {
             title: t("Receipts_in_month"),
             value: CardData ? `${CardData.income.toLocaleString()} so'm` : "...",
-            icon: <BanknoteArrowDown className="w-6 h-6 text-green-600" />,
+            icon: <BanknoteArrowDown className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
+            textColor: "text-green-500 dark:text-green-400",
+
         },
-        // {
-        //     title: t("Output_in_mont"),
-        //     value: CardData ? `${CardData?.sumDisposal?.toLocaleString()} so'm` : "...",
-        //     icon: <BanknoteArrowUp className="w-6 h-6 text-red-600" />,
-        // },
     ];
 
     if (loading) {
@@ -126,7 +124,7 @@ export default function FactoryDashboard() {
                             className="bg-card dark:bg-card-dark border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                         >
                             <CardBody className="flex items-center gap-4 p-6">
-                                <div className="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl shadow-sm">
+                                <div className="p-2 xs:p-3 sm:p-4 bg-gradient-to-br bg-[#e7e7e7aa] dark:bg-background-dark rounded-xl xs:rounded-2xl shadow-sm">
                                     {item.icon}
                                 </div>
                                 <div>
@@ -135,7 +133,8 @@ export default function FactoryDashboard() {
                                     </Typography>
                                     <Typography
                                         variant="h5"
-                                        className="font-bold text-gray-900 dark:text-gray-100"
+                                        className={`font-bold text-sm xs:text-base sm:text-lg truncate 
+        ${item.textColor ? item.textColor : "text-gray-900 dark:text-gray-100"}`}
                                     >
                                         {item.value}
                                     </Typography>
@@ -146,7 +145,7 @@ export default function FactoryDashboard() {
                 </div>
 
                 {/* === Filter === */}
-                <Card className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 mb-4 xs:mb-5 sm:mb-6">
+                <Card className="bg-white   dark:bg-card-dark mb-4 xs:mb-5 sm:mb-6">
                     <CardBody className="dashboard_wrapper flex items-end   gap-3 xs:gap-4 p-4 xs:p-6">
                         <Select
                             label={t("Select_yers")}
@@ -198,14 +197,6 @@ export default function FactoryDashboard() {
                                 </Option>
                             ))}
                         </Select>
-
-                        <Button
-                            color="green"
-                            className="px-4 xs:px-6 normal-case text-xs xs:text-sm w-full xs:w-auto mt-2 xs:mt-0"
-                            onClick={fetchAllData}
-                        >
-                            {t("Search")}
-                        </Button>
                     </CardBody>
                 </Card>
 

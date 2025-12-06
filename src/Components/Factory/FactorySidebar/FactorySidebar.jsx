@@ -20,6 +20,7 @@ import {
     FileUser,
     Move
 } from "lucide-react";
+import Logo from '../../../Images/image_2025-12-05_11-46-58.png'
 
 export default function FactorySidebar() {
     const { t } = useTranslation();
@@ -236,6 +237,9 @@ export default function FactorySidebar() {
         >
             {/* Верх */}
             <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center justify-center">
+                    <img src={Logo} alt="Foto" className="w-[70%]  rounded-[8px]" />
+                </div>
                 {mainMenuItems.map(({ id, title, path, icon, isMenu, items }) => {
                     // Для обычных ссылок (не меню)
                     if (!isMenu) {
@@ -246,8 +250,8 @@ export default function FactorySidebar() {
                                 className={({ isActive }) =>
                                     `flex flex-col items-center justify-center w-full py-3 rounded-xl transition-all duration-300 
                                     ${isActive
-                                        ? "bg-white/80 text-[#4DA057] shadow-md scale-105 dark:bg-gray-800 dark:text-green-400"
-                                        : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057]"}`}
+                                        ? "bg-white/80 text-[black] shadow-md scale-105 dark:bg-gray-800 dark:text-card-light"
+                                        : "text-gray-700 hover:bg-white/40 hover:text-[black] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]"}`}
                             >
                                 <span className="w-7 h-7 mb-1">{icon}</span>
                                 <span className="text-[11px] font-medium text-center">{title}</span>
@@ -269,8 +273,8 @@ export default function FactorySidebar() {
                             <MenuHandler>
                                 <div
                                     className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer
-                                    text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3]
-                                    dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057]
+                                    text-gray-700 hover:bg-white/40 hover:text-[black]
+                                    dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]
                                     transition-all duration-300"
                                 >
                                     <span className="w-7 h-7 mb-1">{icon}</span>
