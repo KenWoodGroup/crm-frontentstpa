@@ -485,20 +485,29 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                 {/* Filters */}
                 <div className="bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-gray-200 dark:border-gray-700 mb-6 shadow-sm transition-colors duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <select
-                            value={typeFilter}
-                            onChange={(e) => setTypeFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                        {/* Type Filter */}
+                        <Select
+                            options={[
+                                { value: "all", label: t("invoices.filter.all_types") },
+                                ...typesList.map((tKey) => ({
+                                    value: tKey,
+                                    label: nice.type[tKey] || tKey
+                                }))
+                            ]}
+                            value={{
+                                value: typeFilter,
+                                label:
+                                    typeFilter === "all"
+                                        ? t("invoices.filter.all_types")
+                                        : nice.type[typeFilter] || typeFilter
+                            }}
+                            onChange={(v) => setTypeFilter(v?.value || "all")}
+                            styles={customSelectStyles()}
                             aria-label={t("invoices.filter.type")}
-                        >
-                            <option value="all">{t("invoices.filter.all_types")}</option>
-                            {typesList.map((tKey) => (
-                                <option value={tKey} key={tKey}>
-                                    {nice.type[tKey] || tKey}
-                                </option>
-                            ))}
-                        </select>
+                            isClearable={false}
+                        />
 
+                        {/* Sender */}
                         <Select
                             options={locations}
                             value={senderFilter}
@@ -510,6 +519,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             aria-label={t("placeholder.sender_search")}
                         />
 
+                        {/* Receiver */}
                         <Select
                             options={locations}
                             value={receiverFilter}
@@ -521,20 +531,29 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             aria-label={t("placeholder.receiver_search")}
                         />
 
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                        {/* Status Filter */}
+                        <Select
+                            options={[
+                                { value: "all", label: t("invoices.filter.all_statuses") },
+                                ...statusesList.map((s) => ({
+                                    value: s,
+                                    label: nice.status[s] || s
+                                }))
+                            ]}
+                            value={{
+                                value: statusFilter,
+                                label:
+                                    statusFilter === "all"
+                                        ? t("invoices.filter.all_statuses")
+                                        : nice.status[statusFilter] || statusFilter
+                            }}
+                            onChange={(v) => setStatusFilter(v?.value || "all")}
+                            styles={customSelectStyles()}
                             aria-label={t("invoices.filter.status")}
-                        >
-                            <option value="all">{t("invoices.filter.all_statuses")}</option>
-                            {statusesList.map((s) => (
-                                <option value={s} key={s}>
-                                    {nice.status[s] || s}
-                                </option>
-                            ))}
-                        </select>
+                            isClearable={false}
+                        />
 
+                        {/* From Date */}
                         <input
                             type="date"
                             value={fromDate}
@@ -542,6 +561,8 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
                             aria-label={t("invoices.filter.from_date")}
                         />
+
+                        {/* To Date */}
                         <input
                             type="date"
                             value={toDate}
@@ -550,17 +571,29 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             aria-label={t("invoices.filter.to_date")}
                         />
 
-                        <select
-                            value={paymentFilter}
-                            onChange={(e) => setPaymentFilter(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                        {/* Payment Filter */}
+                        <Select
+                            options={[
+                                { value: "all", label: t("invoices.filter.all_payments") },
+                                { value: "paid", label: t("invoices.filter.paid") },
+                                { value: "unpaid", label: t("invoices.filter.unpaid") }
+                            ]}
+                            value={{
+                                value: paymentFilter,
+                                label:
+                                    paymentFilter === "all"
+                                        ? t("invoices.filter.all_payments")
+                                        : paymentFilter === "paid"
+                                            ? t("invoices.filter.paid")
+                                            : t("invoices.filter.unpaid")
+                            }}
+                            onChange={(v) => setPaymentFilter(v?.value || "all")}
+                            styles={customSelectStyles()}
                             aria-label={t("invoices.filter.payment")}
-                        >
-                            <option value="all">{t("invoices.filter.all_payments")}</option>
-                            <option value="paid">{t("invoices.filter.paid")}</option>
-                            <option value="unpaid">{t("invoices.filter.unpaid")}</option>
-                        </select>
+                            isClearable={false}
+                        />
 
+                        {/* Search */}
                         <div className="flex gap-2">
                             <input
                                 value={searchText}
@@ -571,6 +604,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                             />
                         </div>
                     </div>
+
 
                     <div className="mt-2 flex justify-between">
                         <div />
