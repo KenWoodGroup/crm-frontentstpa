@@ -225,60 +225,87 @@ export default function WarehouseProduct() {
             {/* Таблица */}
             {products?.length > 0 ? (
                 <>
-                    <Card className="overflow-x-auto shadow-sm border border-gray-200 dark:border-card-dark bg-card-light dark:bg-card-dark">
-                        <table className="w-full min-w-max table-auto text-left">
-                            <thead className="bg-gray-100 dark:bg-card-dark">
-                                <tr>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">№</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnProductName")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBatch")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnPurchasePrice")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnQuantity")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDraftQuantity")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBarcode")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDate")}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products.map((item, index) => {
-                                    const date = item?.createdAt;
-                                    const formattedDate = date ? new Date(date).toLocaleDateString("uz-UZ") : null;
-                                    return (
+                    <Card className="overflow-x-auto border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md">
+                        <div className="overflow-x-auto">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 dark:bg-[#424242]  ">
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            №
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("Направления товара")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnProductName")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnBatch")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnPurchasePrice")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnQuantity")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnDraftQuantity")}
+                                        </th>
+                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                            {t("columnBarcode")}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {products.map((item, index) => (
                                         <tr
                                             key={`${item.id}-${index}`}
-                                            className="border-b border-gray-200 dark:border-card-dark hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                                            className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/50'
+                                                }`}
                                         >
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{index + 1}</td>
-                                            <td className="p-4 text-gray-900 font-medium dark:text-text-dark">
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {index + 1}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="text-gray-500 dark:text-gray-400">-</span>
+                                            </td>
+                                            <td className="p-3 text-left  text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700">
                                                 {item.product?.name || "Nomsiz mahsulot"}
                                             </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
                                                 {item.batch || (
-                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                                                        <Info size={16} />
-                                                        <span>{t("noData")}</span>
-                                                    </span>
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
                                                 )}
                                             </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {item.purchase_price ? `${formatNumber(item.purchase_price)} UZS` : t("noData")}
-                                            </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.quantity}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.draft_quantity}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.barcode || t("noData")}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {formattedDate || (
-                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                                                        <Info size={16} />
-                                                        <span>{t("dateMissingMessage")}</span>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {item.purchase_price ? (
+                                                    <span className="text-green-600 dark:text-green-400 font-medium">
+                                                        {formatNumber(item.purchase_price)} UZS
                                                     </span>
+                                                ) : (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                )}
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="font-medium">
+                                                    {item.quantity}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                <span className="font-medium text-blue-600 dark:text-blue-400">
+                                                    {item.draft_quantity}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
+                                                {item.barcode || (
+                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
                                                 )}
                                             </td>
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </Card>
 
                     {/* Кнопка "Загрузить еще" показываем только если не идет поиск */}
