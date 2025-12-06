@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import AsyncSelect from 'react-select/async';
-import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy, Loader2, Newspaper } from "lucide-react";
+import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy, Loader2, Newspaper, FilePlus2, FilePlus, PlusCircle } from "lucide-react";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
@@ -439,18 +439,19 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
 
                     <div className="flex items-center flex-wrap gap-3">
                         {role === "factory" ?
-                            <button
-                                onClick={exportCurrentToCSV}
-                                className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
-                                aria-label={t("invoices.export_csv")}
-                                title={t("invoices.export_csv")}
-                            >
-                                <Newspaper size={16} />
-                                <span className="text-sm">{t("invoices.export_csv")}</span>
-                            </button>
+                            <NavLink to={"/factory/clients"}>
+                                <button
+                                    className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
+                                    aria-label={t("invoices.export_csv")}
+                                    title={t("invoices.export_csv")}
+                                >
+                                    <PlusCircle size={16} />
+                                    <span className="text-sm">{t("new_order")}</span>
+                                </button>
+                            </NavLink>
                             : <noscript></noscript>
                         }
-                        <button
+                        {/* <button
                             onClick={exportCurrentToCSV}
                             className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
                             aria-label={t("invoices.export_csv")}
@@ -478,7 +479,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                         >
                             <Copy size={16} />
                             <span className="text-sm">{t("invoices.inventory_log")}</span>
-                        </a>
+                        </a> */}
                     </div>
                 </header>
 
@@ -642,8 +643,8 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                             {columns.receiver_name && <th className="py-3 px-2">{t("table.receiver")}</th>}
                                             {columns.createdAt && <th className="py-3 px-2">{t("table.created")}</th>}
                                             {columns.status && <th className="py-3 px-2">{t("table.status")}</th>}
-                                            {columns.payment_status && <th className="py-3 px-2">{t("table.payment")}</th>}
-                                            {columns.total_sum && <th className="py-3 px-2">{t("table.total")}</th>}
+                                            {(columns.payment_status && role==="factory") && <th className="py-3 px-2">{t("table.payment")}</th>}
+                                            {(columns.total_sum && role==="factory") && <th className="py-3 px-2">{t("table.total")}</th>}
                                             {columns.actions && <th className="py-3 px-2">{t("table.actions")}</th>}
                                         </tr>
                                     </thead>
@@ -678,10 +679,10 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                                         </button>
                                                     </td>
                                                 )}
-                                                {columns.payment_status && (
+                                                {(columns.payment_status && role==="factory") && (
                                                     <td className="py-3 px-2 text-sm">{paymentBadge(inv.payment_status)}</td>
                                                 )}
-                                                {columns.total_sum && <td className="py-3 px-2 text-sm">{inv.total_sum}</td>}
+                                                {(columns.total_sum && role==="factory") && <td className="py-3 px-2 text-sm">{inv.total_sum}</td>}
                                                 {columns.actions && (
                                                     <td className="py-3 px-2 text-sm">
                                                         <div className="flex items-center gap-2">
