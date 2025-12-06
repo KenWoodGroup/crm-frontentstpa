@@ -46,4 +46,8 @@ class LocalProduct {
         const response = await $api.put(`/local-products/by-id/${id}`, data)
         return response;
     }
+    static SearchProduct = async (name) => {
+        const response = await $api.get(`/local-products/by-name/${name}`)
+        return response;
+    }
 } export { LocalProduct }
