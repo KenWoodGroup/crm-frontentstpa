@@ -7,10 +7,10 @@ import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import Cookies from "js-cookie";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNotifyStore } from "../../../store/useNotifyStore";
 import { notify } from "../../../utils/toast";
 import { useInventory } from "../../../context/InventoryContext";
 import { useNavigate } from "react-router-dom";
+import { useNotifyStore } from "../../../store/useNotifyStore";
 
 export default function ReceivedInvoices() {
     const { t } = useTranslation();
@@ -108,7 +108,7 @@ export default function ReceivedInvoices() {
             price: Number(raw.purchase_price || 0),
             origin_price: Number(raw.purchase_price || 0),
             quantity: raw.quantity || 1,
-            unit:  productObj.unit ,
+            unit: productObj.unit,
             product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
             barcode: raw.barcode || null,
             batch: is_raw_stock ? (raw.batch || "def") : null,
@@ -192,11 +192,12 @@ export default function ReceivedInvoices() {
                 <div className="flex items-center justify-between mb-6 relative">
                     <h1 className="text-2xl font-semibold text-slate-900 relative inline-flex items-center gap-2">
                         Kelib tushgan jo'natmalar
-
                         {/* Notification badge */}
-                        <span className="absolute -top-2 -right-6 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
-                            {data?.new}
-                        </span>
+                        {data?.new > 0 &&
+                            <span className="absolute -top-2 -right-6 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                                {data?.new}
+                            </span>
+                        }
                     </h1>
                 </div>
 
@@ -233,7 +234,7 @@ export default function ReceivedInvoices() {
                     isOpen={drawerOpen}
                     invoiceId={selectedId}
                     onClose={handleCloseDrawer}
-                    startLoading={createInvoiceLoading}                   
+                    startLoading={createInvoiceLoading}
                     onApplied={startInvoice}
                 />
             </div>
