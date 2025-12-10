@@ -35,6 +35,11 @@ class locationInfo {
         return response;
     }
 
+    static PostMainWarehouse = async (id, data) => {
+        const response = await $api.post(`/location-info/main/${id}`, data)
+        return response;
+    }
+
 }
 
 export { locationInfo };

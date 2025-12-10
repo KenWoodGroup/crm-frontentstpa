@@ -73,7 +73,7 @@ export default function FactoryWarehouse() {
                 <h1 className="text-2xl font-semibold">
                     {t("Warehouses")}
                 </h1>
-                <WarehouseCreate refresh={() => GetAll(page)} />
+                {/* <WarehouseCreate refresh={() => GetAll(page)} /> */}
             </div>
 
             {warehouses?.length > 0 ? (
@@ -106,14 +106,14 @@ export default function FactoryWarehouse() {
                                                 </IconButton>
                                             </Tooltip>
                                         </NavLink>
-                                        <WarehouseEdit
+                                        {/* <WarehouseEdit
                                             refresh={() => GetAll(page)}
                                             warehouse={w}
                                         />
                                         <WarehouseDelete
                                             refresh={() => GetAll(page)}
                                             warehouseId={w?.id}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
 

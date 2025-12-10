@@ -12,6 +12,9 @@ import {
 import { Button } from "@material-tailwind/react";
 import Eye from "../../UI/Icons/Eye";
 import Loading from "../../UI/Loadings/Loading";
+import WarehouseCreate from "./_components/WarehouseCreate";
+import WarehouseDelete from "./_components/WarehouseDelete";
+import WarehouseEdit from "./_components/WarehouseEdit";
 
 export default function ManagerFactoryDetail() {
     const { id } = useParams();
@@ -46,64 +49,87 @@ export default function ManagerFactoryDetail() {
 
     if (loading) return <Loading />;
 
-    // функция для форматирования чисел через пробелы
     const formatNumber = (num) => {
         if (num === null || num === undefined) return "—";
-        return Number(num).toLocaleString("ru-RU"); // 60000 -> 60 000
+        return Number(num).toLocaleString("ru-RU");
     };
 
     return (
         <div className="w-full text-gray-900 dark:text-gray-100">
             {/* Title */}
-            <h1 className="text-2xl font-bold mb-5 text-gray-900 dark:text-gray-100">
-                Складлар
-            </h1>
+            <div className="flex items-center mb-5 justify-between">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    Складлар
+                </h1>
+                <WarehouseCreate refresh={getWarehouse} />
+            </div>
 
             {/* LIST */}
             <div className="flex flex-col gap-4">
-                {warehouses.map((item) => (
-                    <div
-                        key={item.id}
-                        className="w-full bg-white dark:bg-[#1E1E22] shadow-md 
-                        dark:shadow-none border border-gray-200 dark:border-gray-700 
-                        rounded-xl p-5 hover:shadow-lg dark:hover:shadow-[0_0_10px_rgba(255,255,255,0.05)]
-                        transition"
-                    >
-                        {/* Header */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 mb-1">
-                                <Store className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                    {item.name}
-                                </h2>
+                {warehouses.map((item) => {
+                    const isMain = item.location_data?.some(
+                        (loc) => loc.key === "main"
+                    );
+
+                    return (
+                        <div
+                            key={item.id}
+                            className="w-full bg-white dark:bg-[#1E1E22] shadow-md 
+                            dark:shadow-none border border-gray-200 dark:border-gray-700 
+                            rounded-xl p-5 hover:shadow-lg dark:hover:shadow-[0_0_10px_rgba(255,255,255,0.05)]
+                            transition"
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Store className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                            {item.name}
+                                        </h2>
+                                    </div>
+
+                                    {/* MAIN BADGE */}
+                                    {isMain && (
+                                        <span className="inline-block mt-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-600 text-white dark:bg-green-500">
+                                            Основной склад
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-[10px]">
+
+                                    <NavLink to={`/manager/factory/warehouse/${item?.parent?.id}/${item?.id}`}>
+                                        <Button className="bg-blue-600 text-white hover:bg-blue-700 p-[8px] rounded-lg">
+                                            <Eye size={20} />
+                                        </Button>
+                                    </NavLink>
+
+                                    <WarehouseDelete warehouseId={item?.id} refresh={getWarehouse} />
+                                    <WarehouseEdit warehouse={item} refresh={getWarehouse} />
+                                </div>
                             </div>
 
-                            <NavLink to={`/manager/factory/warehouse/${item?.parent?.id}/${item?.id}`}>
-                                <Button className="bg-blue-600 text-white hover:bg-blue-700 p-[8px] rounded-lg">
-                                    <Eye size={20} />
-                                </Button>
-                            </NavLink>
+                            {/* Information */}
+                            <div className="space-y-2 mt-3 text-sm text-gray-700 dark:text-gray-300">
+                                <div className="flex items-start gap-2">
+                                    <MapPin className="w-4 h-4 mt-0.5 text-gray-500 dark:text-gray-400" />
+                                    <p>{item.address}</p>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Phone className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                    <p>{item.phone}</p>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                    <p>{formatNumber(item.balance)}</p>
+                                </div>
+                            </div>
                         </div>
-
-                        {/* Information */}
-                        <div className="space-y-2 mt-3 text-sm text-gray-700 dark:text-gray-300">
-                            <div className="flex items-start gap-2">
-                                <MapPin className="w-4 h-4 mt-0.5 text-gray-500 dark:text-gray-400" />
-                                <p>{item.address}</p>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                <p>{item.phone}</p>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                <p>{formatNumber(item.balance)}</p>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* PAGINATION */}
