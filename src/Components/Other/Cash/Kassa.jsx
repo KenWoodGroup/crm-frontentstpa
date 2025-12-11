@@ -13,8 +13,11 @@ import { Cash } from "../../../utils/Controllers/Cash";
 import CashDelete from "./_components/CashDelete";
 import CashEdit from "./_components/CashEdit";
 import { useTranslation } from "react-i18next";
+import Payment from "./_components/PaymentCash";
+import { useNavigate } from "react-router-dom";
 
 export default function Kassa() {
+    const navigate = useNavigate()
     const { t } = useTranslation()
     const [loading, setLoading] = useState(true);
     const [cashes, setCashes] = useState([]);
@@ -81,25 +84,33 @@ export default function Kassa() {
                                     return (
                                         <tr
                                             key={cash.id}
-                                            className={`border-x border-gray-300 dark:border-gray-700 ${index === cashes.length - 1
+                                            onClick={() => navigate(`/factory/cash/${cash?.id}`)}
+                                            className={`cursor-pointer border-x border-gray-300 dark:border-gray-700 
+                    ${index === cashes.length - 1
                                                     ? 'border-b border-gray-300 dark:border-gray-700'
                                                     : ''
-                                                } ${index % 2 === 0
+                                                } 
+                    ${index % 2 === 0
                                                     ? "bg-white dark:bg-gray-900"
                                                     : "bg-gray-50/50 dark:bg-gray-800/50"
-                                                } hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
+                                                }
+                    hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors`}
                                         >
                                             <td className="p-1 text-center text-sm font-medium text-gray-900 dark:text-gray-100 border-x border-gray-300 dark:border-gray-700">
                                                 {cash.name}
                                             </td>
-                                            <td className={`p-1 text-center text-sm font-semibold border-x border-gray-300 dark:border-gray-700 ${isPositive
+
+                                            <td className={`p-1 text-center text-sm font-semibold border-x border-gray-300 dark:border-gray-700 
+                    ${isPositive
                                                     ? 'text-green-600 dark:text-green-400'
                                                     : isNegative
                                                         ? 'text-red-600 dark:text-red-400'
                                                         : 'text-gray-700 dark:text-gray-300'
-                                                }`}>
+                                                }
+                `}>
                                                 {balance.toLocaleString()} so'm
                                             </td>
+
                                             <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                 {new Date(cash.createdAt).toLocaleDateString("ru-RU", {
                                                     day: "2-digit",
@@ -109,8 +120,13 @@ export default function Kassa() {
                                                     minute: "2-digit",
                                                 })}
                                             </td>
-                                            <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+
+                                            <td
+                                                className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700"
+                                                onClick={(e) => e.stopPropagation()}  // <<< ВАЖНО!
+                                            >
                                                 <div className="flex items-center justify-center gap-1">
+                                                    <Payment refresh={GetAllCash} cashId={cash?.id} />
                                                     <CashEdit id={cash?.id} data={cash} refresh={GetAllCash} />
                                                     <CashDelete id={cash?.id} refresh={GetAllCash} />
                                                 </div>
@@ -119,6 +135,7 @@ export default function Kassa() {
                                     );
                                 })}
                             </tbody>
+
                         </table>
                     </CardBody>
                 </Card>

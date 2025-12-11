@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
-import { Typography, Card, CardBody, Button, Tooltip, IconButton } from "@material-tailwind/react";
+import { Typography, Card, CardBody, IconButton, Tooltip } from "@material-tailwind/react";
 import Cookies from "js-cookie";
-import {
-    CreditCard,
-    FileText,
-    Calendar,
-    EyeIcon,
-} from "lucide-react";
+import { CreditCard, FileText, Calendar, EyeIcon } from "lucide-react";
 import EmptyData from "../../UI/NoData/EmptyData";
 import Loading from "../../UI/Loadings/Loading";
 import { PriceType } from "../../../utils/Controllers/PriceType";
@@ -15,36 +10,81 @@ import PriceTypeDelete from "./_components/PriceTypeDelete";
 import PriceTypeEdit from "./_components/PriceTypeEdit";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
+import { locationInfo } from "../../../utils/Controllers/locationInfo";
 
 export default function PriceTypePage() {
+    const [mainLocationId, setMainLocationId] = useState(null);
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true)
-    const { t } = useTranslation()
+    const [loading, setLoading] = useState(true);
+    const { t } = useTranslation();
 
-    const getAllPriceType = async () => {
-        setLoading(true)
+    const locationCookie = Cookies.get("ul_nesw");
+
+    // ------------------------- MAIN WAREHOUSE -------------------------
+    const getMainWarehouse = async () => {
         try {
-            const response = await PriceType?.PriceTypeGet(
-                Cookies.get("ul_nesw")
-            );
-            setData(response?.data || []);
+            setLoading(true);
+
+            const response = await locationInfo.GetWarehouseMain(locationCookie);
+
+
+            const locId = response?.data?.location?.id;
+
+            if (locId) {
+                setMainLocationId(locId);
+            } else {
+                console.warn("Main warehouse ID NOT FOUND in response");
+            }
         } catch (error) {
-            console.log(error);
+            console.error("Main warehouse error:", error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
+    // --------------------------- PRICE TYPES ---------------------------
+    const getAllPriceType = async (locId) => {
+        try {
+            setLoading(true);
+
+            if (!locId) {
+                console.warn("getAllPriceType called without locationId");
+                return;
+            }
+
+            const response = await PriceType.PriceTypeGet(locId);
+
+            console.log("PriceTypeGet response:", response);
+
+            setData(response?.data || []);
+        } catch (error) {
+            console.error("PriceTypeGet error:", {
+                message: error.message,
+                response: error?.response,
+                config: error?.config
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ---------------------------- EFFECT ------------------------------
     useEffect(() => {
-        getAllPriceType();
+        (async () => {
+            await getMainWarehouse();
+        })();
     }, []);
 
-    if (loading) {
-        return (
-            <Loading />
-        )
-    }
+    useEffect(() => {
+        if (mainLocationId) {
+            getAllPriceType(mainLocationId);
+        }
+    }, [mainLocationId]);
 
+    // ---------------------------- LOADING ------------------------------
+    if (loading) return <Loading />;
+
+    // ---------------------------- RENDER -------------------------------
     return (
         <div
             className={`min-h-screen transition-colors duration-300
@@ -53,14 +93,14 @@ export default function PriceTypePage() {
         >
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full md:w-auto mb-6">
                 <Typography variant="h4" className="font-semibold">
-                    {t('Price_type')}
+                    {t("Price_type")}
                 </Typography>
-                <PriceTypeCreate refresh={getAllPriceType} />
+
+                <PriceTypeCreate location_id={mainLocationId} refresh={() => getAllPriceType(mainLocationId)} />
             </div>
 
-            {/* Если данных нет */}
-            {(!data || data.length === 0) ? (
-                <EmptyData text={t('Empty_data')} />
+            {!data || data.length === 0 ? (
+                <EmptyData text={t("Empty_data")} />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.map((item) => (
@@ -77,21 +117,21 @@ export default function PriceTypePage() {
                                             {item.name}
                                         </Typography>
                                     </div>
+
                                     <div className="flex items-center gap-[10px]">
-                                        <NavLink to={`/factory/price-type/${item?.id}`}>
+                                        <NavLink to={`/factory/price-type/${item.id}`}>
                                             <Tooltip content={t("View")}>
-                                                <IconButton
-                                                    variant="text"
-                                                    color="blue"
-                                                >
+                                                <IconButton variant="text" color="blue">
                                                     <EyeIcon className="text-[18px]" />
                                                 </IconButton>
                                             </Tooltip>
                                         </NavLink>
-                                        <PriceTypeEdit item={item} refresh={getAllPriceType} />
-                                        <PriceTypeDelete id={item?.id} refresh={getAllPriceType} />
+
+                                        <PriceTypeEdit  item={item} refresh={() => getAllPriceType(mainLocationId)} />
+                                        <PriceTypeDelete id={item.id} refresh={() => getAllPriceType(mainLocationId)} />
                                     </div>
                                 </div>
+
                                 <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
                                     <FileText size={18} />
                                     <span>{item.note || "—"}</span>

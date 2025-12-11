@@ -34,9 +34,12 @@ class locationInfo {
         const response = await $api.get(`/location-info/barcode/${id}`)
         return response;
     }
-
     static PostMainWarehouse = async (id, data) => {
         const response = await $api.post(`/location-info/main/${id}`, data)
+        return response;
+    }
+    static GetWarehouseMain = async (id) =>{
+        const response = await $api.get(`/location-info/main/${id}`)
         return response;
     }
 

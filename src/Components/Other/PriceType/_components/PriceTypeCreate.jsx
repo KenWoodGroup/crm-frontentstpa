@@ -7,17 +7,16 @@ import {
     DialogFooter,
     Input,
 } from "@material-tailwind/react";
-import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 import { PriceType } from "../../../../utils/Controllers/PriceType";
 import { useTranslation } from "react-i18next";
 
 
-export default function PriceTypeCreate({ refresh }) {
+export default function PriceTypeCreate({ location_id, refresh }) {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
     const [form, setForm] = useState({
-        location_id: Cookies.get("ul_nesw") || "",
+        location_id: location_id,
         name: "",
         note: "",
     });
@@ -34,7 +33,7 @@ export default function PriceTypeCreate({ refresh }) {
             await PriceType.PriceTypeCreatee(form);
             Alert(`${t('success')}`, "success");
             setForm({
-                location_id: Cookies.get("ul_nesw") || "",
+                location_id: location_id|| "",
                 name: "",
                 note: "",
             });

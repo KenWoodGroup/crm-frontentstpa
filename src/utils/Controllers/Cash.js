@@ -9,6 +9,14 @@ class Cash {
         const response = await $api.get(`/cash/location/${id}`,)
         return response;
     }
+    static GetById = async (id) => {
+        const response = await $api.get(`/cash/${id}`,)
+        return response;
+    }
+    static GetKassaById = async (data) => {
+        const response = await $api.get(`/payments/cash/${data?.id}/page?page=${data?.page}`,)
+        return response;
+    }
     static DeleteKassa = async (id) => {
         const response = await $api.delete(`/cash/${id}`,)
         return response;

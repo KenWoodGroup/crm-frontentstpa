@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Card, Typography, Button } from "@material-tailwind/react";
-import { NavLink } from "react-router-dom";
 import { Stock } from "../../../utils/Controllers/Stock";
 import Cookies from "js-cookie";
 import Loading from "../../UI/Loadings/Loading";
@@ -9,6 +8,7 @@ import { formatNumber } from "../../../utils/Helpers/Formater";
 import { Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import socket from "../../../utils/Socket";
+import { locationInfo } from "../../../utils/Controllers/locationInfo";
 
 export default function StockApi() {
     const [loading, setLoading] = useState(false);
@@ -16,53 +16,92 @@ export default function StockApi() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+
+    const [mainLocationId, setMainLocationId] = useState(null);
     const { t } = useTranslation();
 
-    const locationId = Cookies?.get("ul_nesw");
+    const locationCookie = Cookies?.get("ul_nesw");
 
-    const GetAllProduct = async (pageNum = 1, append = false) => {
-        if (pageNum === 1) setLoading(true);
+    // ------------------------------ GET MAIN WAREHOUSE ------------------------------
+    const getMainWarehouse = async () => {
+        try {
+            setLoading(true);
+            const response = await locationInfo.GetWarehouseMain(locationCookie);
+            const locId = response?.data?.location?.id;
+            if (locId) {
+                setMainLocationId(locId);
+            }
+        } catch (error) {
+            console.log("Main warehouse error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ------------------------------ GET STOCK ------------------------------
+    const GetAllProduct = async (pageNum = 1, append = false, locId) => {
+        if (!locId) return;
+
+        if (pageNum === 1 && !append) setLoading(true);
         else setLoadingMore(true);
 
         try {
             const response = await Stock.StockGetByLocationId({
-                id: locationId,
+                id: locId,
                 page: pageNum,
             });
+
             const newProducts = response?.data?.data?.records || [];
             const total = Number(response?.data?.data?.pagination?.total_pages || 0);
+
             setTotalPages(total);
-            if (append) setProducts((prev) => [...prev, ...newProducts]);
+
+            if (append) setProducts(prev => [...prev, ...newProducts]);
             else setProducts(newProducts);
+
         } catch (error) {
-            console.log("Mahsulotlarni olishda xatolik:", error);
+            console.log("Stock load error:", error);
         } finally {
             setLoading(false);
             setLoadingMore(false);
         }
     };
 
+    // ------------------------------ FIRST LOAD ------------------------------
     useEffect(() => {
-        if (!locationId) return;
-        GetAllProduct(1);
+        getMainWarehouse();
+    }, [locationCookie]);
 
-        socket.emit("joinLocation", locationId);
+    // ------------------------------ WHEN WE GOT MAIN LOCATION ID ------------------------------
+    useEffect(() => {
+        if (!mainLocationId) return;
+
+        setPage(1);
+        GetAllProduct(1, false, mainLocationId);
+
+        // join socket room
+        socket.emit("joinLocation", mainLocationId);
 
         socket.on("stockUpdate", (data) => {
-            if (data.location_id === locationId) GetAllProduct(1);
+            if (data.location_id === mainLocationId) {
+                GetAllProduct(1, false, mainLocationId);
+            }
         });
 
-        return () => socket.disconnect("stockUpdate");
-    }, [locationId]);
+        return () => socket.off("stockUpdate");
 
+    }, [mainLocationId]);
+
+    // ------------------------------ LOAD NEXT PAGE ------------------------------
     const loadNextPage = () => {
-        const nextPage = page + 1;
-        if (nextPage <= totalPages) {
-            setPage(nextPage);
-            GetAllProduct(nextPage, true);
+        const next = page + 1;
+        if (next <= totalPages) {
+            setPage(next);
+            GetAllProduct(next, true, mainLocationId);
         }
     };
 
+    // ------------------------------ UI ------------------------------
     if (loading && products.length === 0) return <Loading />;
 
     return (
@@ -72,52 +111,97 @@ export default function StockApi() {
                     {t("warehouseTitle")}
                 </Typography>
             </div>
-            {products?.length > 0 ? (
+
+            {products.length > 0 ? (
                 <>
-                    <Card className="overflow-x-auto shadow-sm border border-gray-200 dark:border-card-dark bg-card-light dark:bg-card-dark">
-                        <table className="w-full min-w-max table-auto text-left">
-                            <thead className="bg-gray-100 dark:bg-card-dark">
-                                <tr>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">№</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnProductName")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBatch")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnPurchasePrice")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnQuantity")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDraftQuantity")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnBarcode")}</th>
-                                    <th className="p-4 font-semibold text-gray-700 dark:text-text-dark">{t("columnDate")}</th>
+                    <Card className="overflow-x-auto shadow-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50 dark:bg-[#424242] border-x border-t border-gray-300 dark:border-gray-700">
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        №
+                                    </th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        {t("columnProductName")}
+                                    </th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        {t("columnBatch")}
+                                    </th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        {t("columnPurchasePrice")}
+                                    </th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        {t("columnQuantity")}
+                                    </th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        {t("columnDraftQuantity")}
+                                    </th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        {t("columnBarcode")}
+                                    </th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-b border-gray-300 dark:border-gray-700">
+                                        {t("columnDate")}
+                                    </th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {products.map((item, index) => {
                                     const date = item?.createdAt;
-                                    const formattedDate = date ? new Date(date).toLocaleDateString("uz-UZ") : null;
+                                    const formattedDate = date
+                                        ? new Date(date).toLocaleDateString("uz-UZ")
+                                        : null;
+
                                     return (
                                         <tr
-                                            key={`${item.id}-${index}`}
-                                            className="border-b border-gray-200 dark:border-card-dark hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                                            key={item.id}
+                                            className={`
+                            border-x border-gray-300 dark:border-gray-700
+                            hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors
+                            ${index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/50 dark:bg-gray-800/50"}
+                            ${index === products.length - 1 ? "border-b border-gray-300 dark:border-gray-700" : ""}
+                        `}
                                         >
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{index + 1}</td>
-                                            <td className="p-4 text-gray-900 font-medium dark:text-text-dark">{item.product?.name}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {index + 1}
+                                            </td>
+
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {item.product?.name}
+                                            </td>
+
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                 {item.batch || (
-                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                                                    <span className="flex items-center justify-center gap-1 text-gray-500">
                                                         <Info size={16} />
-                                                        <span>{t("noData")}</span>
+                                                        {t("noData")}
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
-                                                {item.purchase_price ? `${formatNumber(item.purchase_price)} UZS` : t("noData")}
+
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {item.purchase_price
+                                                    ? `${formatNumber(item.purchase_price)} UZS`
+                                                    : t("noData")}
                                             </td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.quantity}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.draft_quantity}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">{item.barcode}</td>
-                                            <td className="p-4 text-gray-700 dark:text-text-dark">
+
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {item.quantity}
+                                            </td>
+
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {item.draft_quantity}
+                                            </td>
+
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                {item.barcode}
+                                            </td>
+
+                                            <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                 {formattedDate || (
-                                                    <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                                                    <span className="flex items-center justify-center gap-1 text-gray-500">
                                                         <Info size={16} />
-                                                        <span>{t("dateMissingMessage")}</span>
+                                                        {t("dateMissingMessage")}
                                                     </span>
                                                 )}
                                             </td>
@@ -128,6 +212,7 @@ export default function StockApi() {
                         </table>
                     </Card>
 
+
                     {page < totalPages && (
                         <div className="flex justify-center mt-6">
                             <Button
@@ -136,7 +221,7 @@ export default function StockApi() {
                                 size="sm"
                                 onClick={loadNextPage}
                                 disabled={loadingMore}
-                                className="rounded-full border-gray-400 dark:border-card-dark text-gray-800 dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700"
+                                className="dark:border-white dark:text-white"
                             >
                                 {loadingMore ? t("loadingMoreText") : t("loadMoreButton")}
                             </Button>

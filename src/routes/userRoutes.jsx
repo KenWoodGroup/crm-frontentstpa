@@ -2,6 +2,7 @@ import FactoryAnalitik from "../Components/Factory/FactoryAnalitik/FactoryAnalit
 import FactoryCategoryDetail from "../Components/Factory/FactoryCategoryDeltail/FactoryCategoryDetail";
 import FactoryDashboard from "../Components/Factory/FactoryDashboard/FactoryDashboard";
 import FactoryPartner from "../Components/Factory/FactoryPartner/FactoryPartnter";
+import FactoryPartnerDetail from "../Components/Factory/FactoryPartnerDetail/FactoryPartnerDetail";
 import FactoryProductCreate from "../Components/Factory/FactoryProduct/_component/FactoryProductCreate";
 import FactoryLocalProduct from "../Components/Factory/FactoryProduct/FactoryLocalProduct";
 import FactoryProduct from "../Components/Factory/FactoryProduct/FactoryProduct";
@@ -13,6 +14,7 @@ import FactoryWarehouse from "../Components/Factory/FactoryWarehouse/FactoryWare
 import WarehouseDetail from "../Components/Factory/WarehouseDetail/WarehouseDetail";
 import WarehouseUser from "../Components/Factory/WarehouseUser/WarehouseUser";
 import Kassa from "../Components/Other/Cash/Kassa";
+import CashDetail from "../Components/Other/CashDetail/CashDetail";
 import CategoryClient from "../Components/Other/ClientCategory/CategoryClient";
 import ClientDetail from "../Components/Other/ClientDetail/ClientDetail";
 import WarehouseClients from "../Components/Other/Clients/Clients";
@@ -196,5 +198,16 @@ export const userRoutes = [
     name: 'Factory user',
     element: <FactoryUserDetail />
   },
+    {
+    path: "/factory/cash/:id",
+    name: 'Factory cash detail',
+    element: <CashDetail />
+  },
+      {
+    path: "/factory/partner/:id",
+    name: 'Factory partner',
+    element: <FactoryPartnerDetail />
+  },
+
 
 ]

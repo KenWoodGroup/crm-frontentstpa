@@ -1,12 +1,10 @@
 import {
     Building2,
-    User,
-    MapPin,
-    Phone,
-    Mail,
     ChevronLeft,
     ChevronRight,
     CircleDollarSign,
+    MapPin,
+    Phone,
 } from "lucide-react";
 import { Alert } from "../../../utils/Alert";
 import { useEffect, useState } from "react";
@@ -20,12 +18,14 @@ import { Partner } from "../../../utils/Controllers/Partner";
 import PartnerEdit from "./_components/PartnerEdit";
 import PartnerDelete from "./_components/PartnerDelete";
 import PartnerPayment from "./_components/PartnerPayment";
+import { Card, CardBody } from "@material-tailwind/react";
+import { useNavigate } from "react-router-dom";
 
-export default function FactoryPartnter() {
+export default function FactoryPartner() {
     const { t } = useTranslation();
-
+    const navigate = useNavigate()
     const [loading, setLoading] = useState(true);
-    const [warehouses, setWarehouses] = useState([]);
+    const [partners, setPartners] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
@@ -44,7 +44,7 @@ export default function FactoryPartnter() {
 
             const records = response.data?.data?.records || [];
             const pagination = response.data?.data?.pagination || {};
-            setWarehouses(records);
+            setPartners(records);
 
             setTotalPages(Number(pagination.total_pages) || 1);
             setPage(Number(pagination.currentPage) || pageNumber);
@@ -57,7 +57,6 @@ export default function FactoryPartnter() {
         }
     };
 
-
     useEffect(() => {
         GetAll(page);
     }, []);
@@ -65,91 +64,75 @@ export default function FactoryPartnter() {
     if (loading) return <Loading />;
 
     return (
-        <div className="min-h-screen k text-text-light dark:text-text-dark transition-colors duration-300">
+        <div className="min-h-screen text-text-light dark:text-text-dark transition-colors duration-300">
             {/* Header */}
             <div className="flex items-center flex-wrap gap-[20px] justify-between mb-8">
-                <h1 className="text-2xl font-semibold">
-                    {t('partner')}
-                </h1>
+                <h1 className="text-2xl font-semibold">{t('partner')}</h1>
                 <PartnerCreate refresh={() => GetAll(page)} />
             </div>
 
-            {warehouses?.length > 0 ? (
-                <>
-                    {/* Warehouse Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {warehouses.map((w) => (
-                            <div
-                                key={w.id}
-                                className="bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 hover:shadow-md transition-colors duration-300"
-                            >
-                                <div className="flex items-center flex-wrap gap-[10px] justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
-                                            <Building2 className="w-6 h-6 text-text-light dark:text-text-dark" />
-                                        </div>
-                                        <h2 className="text-xl font-semibold">
-                                            {w.name}
-                                        </h2>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <PartnerPayment
-                                            refresh={() => GetAll(page)}
-                                            partner={w}
-                                        />
-                                        <PartnerEdit
-
-                                            refresh={() => GetAll(page)}
-                                            partner={w}
-                                        />
-                                        <PartnerDelete
-                                            refresh={() => GetAll(page)}
-                                            warehouseId={w?.id}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="w-5 h-5 opacity-70" />
-                                        <span>{w.address}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Phone className="w-5 h-5 opacity-70" />
-                                        <span>{w.phone}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <CircleDollarSign className="w-5 h-5 opacity-70" />
-                                        <span>{w?.balance}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+            {partners?.length > 0 ? (
+                <Card className="overflow-hidden bg-card-light dark:bg-card-dark transition-colors duration-300">
+                    <CardBody className="p-0 overflow-auto">
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50 dark:bg-[#424242] border-x border-t border-gray-300 dark:border-gray-700">
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">{t('Name')}</th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">{t('Phone')}</th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">{t('Address')}</th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">{t('Balance')}</th>
+                                    <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">{t('Actions')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {partners.map((p, index) => (
+                                    <tr
+                                        onClick={()=>navigate(`/factory/partner/${p?.id}`)}
+                                        key={p.id}
+                                        className={`cursor-pointer border-x border-gray-300 dark:border-gray-700 ${index === partners.length - 1 ? "border-b border-gray-300 dark:border-gray-700" : ""} ${index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/50 dark:bg-gray-800/50"}`}
+                                    >
+                                        <td className="p-2 text-left text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">{p.name}</td>
+                                        <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">{p.phone}</td>
+                                        <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">{p.address}</td>
+                                        <td className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                            <span className={`${p.balance < 0 ? 'text-red-600' : 'text-green-600'} font-medium`}>
+                                                {Number(p.balance).toLocaleString()} UZS
+                                            </span>
+                                        </td>
+                                        <td onClick={(e)=>stopPropagation(e.target.value)} className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                            <div className="flex items-center justify-center gap-2" onClick={e => e.stopPropagation()}>
+                                                <PartnerPayment refresh={() => GetAll(page)} partner={p} />
+                                                <PartnerEdit refresh={() => GetAll(page)} partner={p} />
+                                                <PartnerDelete refresh={() => GetAll(page)} warehouseId={p.id} />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </CardBody>
 
                     {/* Pagination */}
                     {totalCount > 15 && (
-                        <div className="flex justify-center mt-6 gap-4">
+                        <div className="flex justify-center mt-4 gap-4 p-3">
                             <button
                                 onClick={() => GetAll(page - 1)}
                                 disabled={page <= 1}
-                                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center transition-colors"
+                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center transition-colors"
                             >
-                                <ChevronLeft className="w-5 h-5" />
+                                <ChevronLeft />
                             </button>
-                            <span className="flex items-center px-2">
-                                {page} / {totalPages}
-                            </span>
+                            <span className="flex items-center px-2">{page} / {totalPages}</span>
                             <button
                                 onClick={() => GetAll(page + 1)}
                                 disabled={page >= totalPages}
-                                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center transition-colors"
+                                className="px-4 py-2 bg-gray-200  rounded hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center transition-colors"
                             >
-                                <ChevronRight className="w-5 h-5" />
+                                <ChevronRight />
                             </button>
                         </div>
                     )}
-                </>
+                </Card>
             ) : (
                 <EmptyData text={t("no_warehouses")} />
             )}

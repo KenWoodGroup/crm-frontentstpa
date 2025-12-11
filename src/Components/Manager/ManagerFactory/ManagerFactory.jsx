@@ -12,7 +12,7 @@ import Eye from "../../UI/Icons/Eye";
 export default function ManagerFactory() {
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
-    const [factories, setFactories] = useState([]);
+       const [factories, setFactories] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -67,7 +67,6 @@ export default function ManagerFactory() {
 
     return (
         <div className="min-h-screen text-gray-900 dark:text-gray-100">
-            {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <Typography variant="h4" className="font-semibold">
                     Fabrikalar
@@ -86,7 +85,6 @@ export default function ManagerFactory() {
                                            dark:bg-[#1E1E22] dark:border-gray-700 
                                            hover:shadow-lg transition-all rounded-xl"
                             >
-                                {/* Header Row */}
                                 <div className="flex items-center justify-between mb-2">
                                     <Typography
                                         variant="h6"
@@ -96,24 +94,18 @@ export default function ManagerFactory() {
                                     </Typography>
 
                                     <div className="flex items-center gap-2">
-                                        {/* View button */}
                                         <NavLink to={`/manager/factory/${factory.id}`}>
-                                            <Button
-                                                className="bg-blue-600 text-white hover:bg-blue-700 p-2 rounded-lg shadow-sm"
-                                            >
+                                            <Button className="bg-blue-600 text-white hover:bg-blue-700 p-2 rounded-lg shadow-sm">
                                                 <Eye size={20} />
                                             </Button>
                                         </NavLink>
 
-                                        {/* Delete */}
                                         <ManagerDealerDelete id={factory.id} refresh={refresh} />
-
-                                        {/* Edit */}
                                         <ManagerFactoryEdit data={factory} refresh={refresh} />
                                     </div>
                                 </div>
 
-                                {/* Info */}
+                                {/* Info (only real fields) */}
                                 <div className="space-y-1">
                                     <Typography className="text-gray-700 dark:text-gray-300 text-sm">
                                         <span className="font-medium">Manzil:</span> {factory.address || "—"}
@@ -124,8 +116,7 @@ export default function ManagerFactory() {
                                     </Typography>
 
                                     <Typography className="text-gray-700 dark:text-gray-300 text-sm">
-                                        <span className="font-medium">Login:</span>{" "}
-                                        {factory?.users?.[0]?.username || "—"}
+                                        <span className="font-medium">Balans:</span> {factory.balance} uzs
                                     </Typography>
                                 </div>
                             </Card>

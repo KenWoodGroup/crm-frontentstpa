@@ -54,6 +54,10 @@ class location {
         const response = await $api.get(`/locations/type/${data?.parent_id}/${data?.type}/${data?.searchName}/page?page=${data?.page}`)
         return response;
     }
+    static GetAllWarehouse = async (id) => {
+        const response = await $api.get(`/locations/warehouse-all/${id}`)
+        return response;
+    }
 }
 
 export { location };

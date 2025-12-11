@@ -21,4 +21,8 @@ class Partner {
         const response = await $api.put(`/locations/partner/${id}`, data)
         return response;
     }
+    static GetPartnerById = async (id) => {
+        const response = await $api.get(`/locations/partner/${id}`)
+        return response;
+    }
 } export { Partner }

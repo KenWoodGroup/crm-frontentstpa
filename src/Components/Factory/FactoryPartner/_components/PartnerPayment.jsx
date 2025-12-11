@@ -1,124 +1,176 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Button,
-    Dialog,
-    DialogHeader,
-    DialogBody,
-    DialogFooter,
-    Input,
-    Spinner,
-    Textarea,
+    Dialog, DialogHeader, DialogBody, DialogFooter,
+    Button, Input, IconButton, Tooltip, Textarea
 } from "@material-tailwind/react";
+import { BanknoteArrowDown } from "lucide-react";
 import Cookies from "js-cookie";
 import { Payment } from "../../../../utils/Controllers/Payment";
 import { Alert } from "../../../../utils/Alert";
+import { Cash } from "../../../../utils/Controllers/Cash";
+import { PaymentMethodApi } from "../../../../utils/Controllers/PaymentMethodApi";
 import { useTranslation } from "react-i18next";
+import { location } from "../../../../utils/Controllers/location";
 
-export default function ParentPayment({ refresh, partner }) {
+export default function PartnerPayment({ partner, refresh }) {
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [cashes, setCashes] = useState([]);
+    const [warehouse, setWarehouses] = useState([]);
+    const [paymentMethods, setPaymentMethods] = useState([]);
     const { t } = useTranslation();
 
     const [form, setForm] = useState({
-        amount: 0,
+        amount: "",
+        method_id: "",
         status: "confirmed",
-        payer_id: Cookies.get("ul_nesw") || "",
         receiver_id: partner?.id,
+        payer_id: "",
+        cash_id: "",
         note: "",
-        created_by: Cookies.get("us_nesw") || "",
+        created_by: Cookies?.get("us_nesw"),
     });
 
-    // ------------ FORMAT FUNCTIONS ---------------
+    const handleOpen = () => setOpen((p) => !p);
+
+    const GetAllCash = async () => {
+        try {
+            const response = await Cash.GetKassa(Cookies.get("ul_nesw"));
+            const data = response?.data || [];
+
+            setCashes(data);
+
+            if (data.length > 0) {
+                setForm((prev) => ({
+                    ...prev,
+                    cash_id: prev.cash_id || String(data[0].id)
+                }));
+            }
+        } catch {
+            setCashes([]);
+        }
+    };
+
+    const getAllPaymentMethod = async () => {
+        try {
+            const response = await PaymentMethodApi.PaymentTypeGet(Cookies.get("ul_nesw"));
+            const methods = response?.data || [];
+
+            setPaymentMethods(methods);
+
+            if (methods.length > 0) {
+                setForm((prev) => ({
+                    ...prev,
+                    method_id: prev.method_id || String(methods[0].id)
+                }));
+            }
+        } catch {
+            setPaymentMethods([]);
+        }
+    };
+
+    const getWarehouse = async () => {
+        try {
+            const response = await location.GetAllWarehouse(Cookies.get("ul_nesw"));
+            setWarehouses(response.data || []);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const formatNumber = (value) => {
         if (!value) return "";
-        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        const numeric = value.replace(/\D/g, "");
+        return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     };
 
-    const unFormatNumber = (value) => {
-        return value.replace(/\s/g, "");
-    };
-
-    // ------------ INPUT CHANGE HANDLER -----------
     const handleChange = (e) => {
         const { name, value } = e.target;
 
         if (name === "amount") {
-            const pure = unFormatNumber(value);
-
-            if (!/^\d*$/.test(pure)) return;
-
-            setForm((prev) => ({
-                ...prev,
-                amount: Number(pure), // <-- передаём как number
-            }));
+            setForm((prev) => ({ ...prev, amount: formatNumber(value) }));
         } else {
-            setForm((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
+            setForm((prev) => ({ ...prev, [name]: value }));
         }
     };
 
-    const handleOpen = () => setOpen(!open);
-
-    // ------------ CREATE PAYMENT ----------------
-    const CreatePayment = async () => {
-        setLoading(true);
+    const handleSubmit = async () => {
+        if (!form.cash_id) return Alert("Выберите кассу!", "warning");
+        if (!form.method_id) return Alert("Выберите метод оплаты!", "warning");
+        if (!form.payer_id) return Alert("Выберите склад!", "warning");
 
         try {
-            await Payment.PaymentPartner(form);
+            const numericAmount = Number(form.amount.replace(/\s/g, ""));
 
-            Alert(t(`success`), "success");
+            const payload = {
+                ...form,
+                amount: numericAmount,
+            };
+
+            await Payment.PaymentPartner(payload);
+
+            Alert(t("success"), "success");
+
+            handleOpen(); // закрыть модалку
 
             setForm({
-                amount: 0,
+                amount: "",
+                method_id: "",
                 status: "confirmed",
-                payer_id: Cookies.get("ul_nesw") || "",
-                receiver_id: partner?.id,
+                payer_id: partner?.id,
+                receiver_id: "",
+                cash_id: "",
                 note: "",
-                created_by: Cookies.get("us_nesw") || "",
+                created_by: Cookies?.get("us_nesw"),
             });
 
-            handleOpen();
-            refresh && refresh();
-
+            if (refresh) refresh();
         } catch (error) {
-            console.log(error);
-            Alert(t(`Error`), "error");
-        } finally {
-            setLoading(false);
+            console.log("Ошибка:", error);
+            Alert(t("Error_occurred"), "error");
         }
     };
+
+    useEffect(() => {
+        if (open) {
+            GetAllCash();
+            getWarehouse();
+            getAllPaymentMethod();
+        } else {
+            setForm({
+                amount: "",
+                method_id: "",
+                status: "confirmed",
+                payer_id: partner?.id,
+                receiver_id: "",
+                cash_id: "",
+                note: "",
+                created_by: Cookies?.get("us_nesw"),
+            });
+        }
+    }, [open]);
 
     return (
         <>
-            <Button
-                onClick={handleOpen}
-                className="bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 normal-case p-[8px]"
-            >
-                <svg className="text-[20px]" xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
-                    <path fill="currentColor" d="M3.5 3A2.5 2.5 0 0 0 1 5.5V6h14v-.5A2.5 2.5 0 0 0 12.5 3zM15 7H1v3.5A2.5 2.5 0 0 0 3.5 13h9a2.5 2.5 0 0 0 2.5-2.5zm-4.5 3h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1"></path>
-                </svg>
-            </Button>
+            <Tooltip content={t("Create_Payment")}>
+                <IconButton variant="text" color="green" onClick={handleOpen}>
+                    <BanknoteArrowDown size={18} />
+                </IconButton>
+            </Tooltip>
 
-            {/* Modal */}
-            <Dialog
-                className="dark:bg-card-dark dark:text-text-dark transition-colors duration-300"
-                open={open}
-                handler={handleOpen}
-                size="sm"
-            >
+            <Dialog open={open} handler={handleOpen} size="sm"
+                className="dark:bg-card-dark dark:text-text-dark bg-white text-gray-900 rounded-xl">
+
                 <DialogHeader className="flex justify-between items-center dark:text-text-dark">
-                    To‘lov qo‘shish
+                    {t("Create_Payment")}
                 </DialogHeader>
 
-                <DialogBody className="flex flex-col gap-4 dark:bg-card-dark dark:text-text-dark" divider>
+                <DialogBody divider className="flex flex-col gap-4">
 
+                    {/* Amount */}
                     <Input
-                        label={t('Price__sum')}
+                        label={t("Price__sum")}
                         name="amount"
-                        type="text"
-                        value={formatNumber(form.amount)}
+                        value={form.amount}
                         onChange={handleChange}
                         color="blue-gray"
                         className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
@@ -127,8 +179,85 @@ export default function ParentPayment({ refresh, partner }) {
                         }}
                     />
 
+                    {/* Warehouse Select */}
+                    <div>
+                        <label className="text-gray-700 dark:text-text-dark font-medium">
+                            {t("Warehouse")}
+                        </label>
+
+                        <select
+                            value={form.warehouse_id}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setForm(prev => ({
+                                    ...prev,
+                                    receiver_id: val || ""
+                                }));
+                            }}
+                            className="
+                                mt-1 w-full px-3 py-2 rounded-lg border border-gray-300
+                                dark:border-gray-700 dark:bg-gray-800 dark:text-white
+                                focus:ring-2 focus:ring-blue-500 outline-none transition
+                            "
+                        >
+                            <option value="">{t("")}</option>
+                            {warehouse.map(w => (
+                                <option key={w.id} value={w.id}>
+                                    {w.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Cash Select */}
+                    <div>
+                        <label className="text-gray-700 dark:text-text-dark font-medium">
+                            {t("Kassa")}
+                        </label>
+
+                        <select
+                            value={form.cash_id}
+                            onChange={(e) => setForm((p) => ({ ...p, cash_id: e.target.value }))}
+                            className="
+                                mt-1 w-full px-3 py-2 rounded-lg border border-gray-300
+                                dark:border-gray-700 dark:bg-gray-800 dark:text-white
+                                focus:ring-2 focus:ring-blue-500 outline-none transition
+                            "
+                        >
+                            {cashes.map((c) => (
+                                <option key={c.id} value={String(c.id)}>
+                                    {c.name} — {Number(c.balance).toLocaleString()} so'm
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Payment method */}
+                    <div>
+                        <label className="text-gray-700 dark:text-text-dark font-medium">
+                            {t("Payment_type")}
+                        </label>
+
+                        <select
+                            value={form.method_id}
+                            onChange={(e) => setForm((p) => ({ ...p, method_id: e.target.value }))}
+                            className="
+                                mt-1 w-full px-3 py-2 rounded-lg border border-gray-300
+                                dark:border-gray-700 dark:bg-gray-800 dark:text-white
+                                focus:ring-2 focus:ring-blue-500 outline-none transition
+                            "
+                        >
+                            {paymentMethods.map((method) => (
+                                <option key={method.id} value={String(method.id)}>
+                                    {method.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Note */}
                     <Textarea
-                        label={t('Comment')}
+                        label={t("Comment")}
                         name="note"
                         value={form.note}
                         onChange={handleChange}
@@ -141,18 +270,13 @@ export default function ParentPayment({ refresh, partner }) {
 
                 </DialogBody>
 
-                <DialogFooter className="flex justify-end gap-2">
+                <DialogFooter className="border-t dark:border-gray-700">
                     <Button variant="text" color="red" onClick={handleOpen}>
-                        {t('Cancel')}
+                        {t("Cancel")}
                     </Button>
 
-                    <Button
-                        onClick={CreatePayment}
-                        className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
-                        disabled={loading}
-                    >
-                        {loading && <Spinner size="sm" />}
-                        {t('Save')}
+                    <Button color="green" onClick={handleSubmit}>
+                        {t("Save")}
                     </Button>
                 </DialogFooter>
             </Dialog>

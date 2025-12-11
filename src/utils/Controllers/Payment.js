@@ -29,4 +29,12 @@ class Payment {
         const response = await $api.get(`/payments/supplier/${data?.location_id}/${data?.startDate}/${data?.endDate}/page?page=${data?.page}`)
         return response;
     }
+    static PaymentCash = async (data) => {
+        const response = await $api.post(`/payments/cash`, data)
+        return response;
+    }
+    static PaymentPartnerHistory = async (data) => {
+        const response = await $api.get(`/payments/partner/${data?.id}/page?page=${data?.page}`)
+        return response;
+    }
 } export { Payment }
