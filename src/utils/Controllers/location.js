@@ -58,11 +58,6 @@ class location {
         const response = await $api.get(`/locations/warehouse-all/${id}`)
         return response;
     }
-
-<<<<<<< HEAD
-
-=======
->>>>>>> 4a8e687f5bd84a56956bc702bf9497874758f4d1
 }
 
 export { location };
