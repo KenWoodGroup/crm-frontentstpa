@@ -54,6 +54,7 @@ class location {
         const response = await $api.get(`/locations/type/${data?.parent_id}/${data?.type}/${data?.searchName}/page?page=${data?.page}`)
         return response;
     }
+
 }
 
 export { location };

@@ -10,7 +10,6 @@ import {
     PieChart,
     Settings,
     Banknote,
-    ArrowDownToLine,
     DollarSign,
     ClipboardType,
     Blocks,
@@ -18,7 +17,8 @@ import {
     Car,
     BanknoteArrowDown,
     FileUser,
-    Move
+    Move,
+    ShoppingCart
 } from "lucide-react";
 import Logo from '../../../Images/image_2025-12-05_11-46-58.png'
 
@@ -138,12 +138,12 @@ export default function FactorySidebar() {
         {
             id: 2,
             title: t('Order'),
-            path: "/factory/history",
-            icon: <Move className="w-7 h-7" />,
+            path: "/factory/orders",
+            icon: <ShoppingCart className="w-7 h-7" />,
             isMenu: false
         },
         {
-            id: 2,
+            id: 20,
             title: t("Warehouses"),
             icon: <Warehouse className="w-7 h-7" />,
             isMenu: true,
@@ -174,6 +174,7 @@ export default function FactorySidebar() {
                 { id: 6, path: "/factory/payment", icon: <DollarSign className="w-4 h-4" />, label: t("Payment_History") },
                 { id: 10, path: "/factory/clients-sverka", icon: <ListChecks className="w-4 h-4" />, label: t("Clients_sverka") },
                 { id: 2, path: "/factory/kassa", icon: <Banknote className="w-4 h-4" />, label: t("Kassa") },
+                { id: 15, path: "/factory/history", icon: <Move />, label: t("operations") }
             ]
         },
         {

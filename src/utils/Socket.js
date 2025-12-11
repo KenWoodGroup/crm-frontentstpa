@@ -7,6 +7,7 @@ const socket = io(`https://api.usderp.uz`, {
     reconnectionAttempts: 10,
     reconnectionDelay: 2000,
     timeout: 20000, // 20s
+    autoConnect: false,
 });
 
 export default socket;

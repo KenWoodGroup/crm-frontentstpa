@@ -549,5 +549,9 @@
     "CreateAt": "Создана",
     "No_choise": "Не указан",
     "seller": "Продавец",
-    "new_order": "Новый заказ"
+    "new_order": "Новый заказ",
+    "operations": "Операции",
+    "order_history": "История заказов",
+    "order_subtitle": "Управление заказами и их отслеживание",
+    "button.create_order": "Создать заказ"
 }

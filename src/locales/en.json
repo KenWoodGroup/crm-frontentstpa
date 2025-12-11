@@ -542,5 +542,9 @@
   "Delete__text_Category": "Are you sure you want to delete this category? This action cannot be undone!",
   "Edit_Category": "Edit Category",
   "Category": "Category",
-  "new_order": "New Order"
+  "new_order": "New Order",
+  "operations": "Operations",
+  "order_history": "Order History",
+  "order_subtitle": "Audit, filters and exports for all factory orders",
+  "button.create_order": "Create Order"
 }

@@ -3,7 +3,7 @@ import { $api } from "../Headers"
 class ClientsApi {
 
     static ClientsCreate = async (data) => {
-        const response = await $api.post(`/locations/client`, data)
+        const response = await $api.post(`/locations/client`, data);
         return response;
     }
     static GetClients = async (data) => {

@@ -54,7 +54,12 @@ export const userRoutes = [
   {
     path: "factory/history",
     name: "factory history",
-    element: <WarehouseInvoiceHistory role="factory"/>
+    element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type = "invoice"/>
+  },
+  {
+    path:"factory/orders",
+    name:"factory orders",
+    element:<WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order"/>
   },
   {
     path: "factory/warehouse/user/:id",
