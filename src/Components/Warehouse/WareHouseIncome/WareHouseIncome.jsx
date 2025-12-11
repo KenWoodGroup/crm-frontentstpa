@@ -35,7 +35,8 @@ import {
     Move,
     PackagePlus,
     PackageMinus,
-    SendIcon
+    SendIcon,
+    Home
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
@@ -48,7 +49,7 @@ import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Staff } from "../../../utils/Controllers/Staff";
 import CancelInvoiceButton from "../WareHouseOutcome/sectionsWhO/CancelInvoiceButton";
 import { data } from "autoprefixer";
@@ -80,6 +81,7 @@ export default function WareHouseIncome({ role = "factory" }) {
 
     // --- Function section (i18n keys applied) ---
     // user / location
+    const navigate = useNavigate();
     const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
     const deUlName = sessionStorage.getItem("de_ul_name")
@@ -870,9 +872,10 @@ export default function WareHouseIncome({ role = "factory" }) {
         <section className="relative w-full min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-hidden transition-colors duration-300">
             <div
                 className={`fixed transition-all duration-300 text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px]
-        bg-card-light dark:bg-gray-800 shadow text-xl font-semibold z-30 flex items-center pr-8 justify-center
+        bg-card-light dark:bg-card-dark shadow text-xl font-semibold z-30 flex items-center pr-8 justify-center
         ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px]"}`}
             >
+
                 <h2 className="text-text-light dark:text-text-dark">
                     {role === "factory" && deUlName + " | "}
                     {!invoiceStarted?.[mode]
@@ -894,14 +897,14 @@ export default function WareHouseIncome({ role = "factory" }) {
                     <span />
                 )}
                 {(!invoiceStarted?.[mode] && role === "factory") ? (
-                    <div>
+                    <div className="flex items-center gap-[6px]">
                         {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
                         <Menu placement="right-start" allowHover offset={15}>
                             <MenuHandler>
-                                <div className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer 
-                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
-                        transition-all duration-300">
-                                    <Move className="w-8 h-8 mb-1" />
+                                <div className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
+                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
+                                        transition-all duration-300">
+                                    <Move className="w-8 h-8 mb-0" />
                                 </div>
                             </MenuHandler>
 
@@ -923,6 +926,11 @@ export default function WareHouseIncome({ role = "factory" }) {
                                 ))}
                             </MenuList>
                         </Menu>
+                        <div onClick={() => navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
+                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
+                                        transition-all duration-300">
+                            <Home className="w-8 h-8 mb-0" />
+                        </div>
                     </div>
                 ) :
                     <noscript></noscript>
