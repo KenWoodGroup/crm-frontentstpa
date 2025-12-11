@@ -433,7 +433,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
             <div className="mx-auto">
                 {/* Header */}
                 <header className="flex items-center flex-wrap gap-[10px] justify-between mb-6">
-                    <div>
+                    <div className="ml-6">
                         <h1 className="text-2xl font-semibold">{type === "order" ? t("order_history") : t("invoices.title")}</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                             {type === "order" ? t("order_subtitle") : t("invoices.subtitle")}

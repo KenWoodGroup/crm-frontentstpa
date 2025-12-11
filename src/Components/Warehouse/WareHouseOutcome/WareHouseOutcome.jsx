@@ -22,7 +22,8 @@ import {
     PackagePlus,
     PackageMinus,
     SendIcon,
-    Move
+    Move,
+    Home
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 // import { ProductApi } from "../../../utils/Controllers/ProductApi";
@@ -45,8 +46,8 @@ import { customSelectStyles } from "../WareHouseModals/ThemedReactTagsStyles";
 import Select, { components } from "react-select";
 import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 import { LocalCategory } from "../../../utils/Controllers/LocalCategory"
-import { Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { NavLink } from "react-router-dom";
+import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
+import { NavLink, useNavigate } from "react-router-dom";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -64,6 +65,7 @@ function useDebounce(value, delay) {
 export default function WareHouseOutcome({ role = "factory" }) {
     // (Place this inside your component function scope)
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const skladSubLinks = [
         { id: 1, label: t('Warehouse'), path: "/factory/warehouse/product", icon: Package },
         { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
@@ -644,6 +646,21 @@ export default function WareHouseOutcome({ role = "factory" }) {
             <div
                 className={`fixed transition-all duration-300 top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-card-light dark:bg-card-dark text-[rgb(25_118_210)] shadow flex items-center pr-8 justify-center ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px]"} text-xl font-semibold z-30`}
             >
+                {!invoiceStarted?.[mode] && role === "factory" && (
+                    <Button
+                        onClick={() => navigate(-1)}
+                        className={`backbtn px-4 py-[5px] rounded-xl transition-all duration-300 `}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
+                            <path
+                                fill="currentColor"
+                                fillRule="evenodd"
+                                d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                clipRule="evenodd"
+                            ></path>
+                        </svg>
+                    </Button>
+                )}
                 <h2 className="text-text-light dark:text-text-dark">
                     {role === "factory" && deUlName + " | "}
                     {!invoiceStarted?.out && t("out_header_not_started")}
@@ -664,15 +681,16 @@ export default function WareHouseOutcome({ role = "factory" }) {
                 ) : (
                     <span />
                 )}
+
                 {(!invoiceStarted?.[mode] && role === "factory") ? (
-                    <div>
+                    <div className="flex items-center gap-[6px]">
                         {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
                         <Menu placement="right-start" allowHover offset={15}>
                             <MenuHandler>
-                                <div className="flex flex-col items-center justify-center w-full py-3 px-3 rounded-xl cursor-pointer 
+                                <div className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
                                         text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
                                         transition-all duration-300">
-                                    <Move className="w-8 h-8 mb-1" />
+                                    <Move className="w-8 h-8 mb-0" />
                                 </div>
                             </MenuHandler>
 
@@ -694,6 +712,11 @@ export default function WareHouseOutcome({ role = "factory" }) {
                                 ))}
                             </MenuList>
                         </Menu>
+                        <div onClick={()=>navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
+                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
+                                        transition-all duration-300">
+                            <Home className="w-8 h-8 mb-0" />
+                        </div>
                     </div>
                 ) :
                     <noscript></noscript>
