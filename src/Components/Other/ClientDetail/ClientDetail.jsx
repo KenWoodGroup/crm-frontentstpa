@@ -27,6 +27,7 @@ import ClientInvoices from "./_components/ClientInvoices"
 import ClientPayment from "./_components/ClientPayment"
 import Socket from "../../../utils/Socket"
 import { useTranslation } from "react-i18next"
+import CreateOutgoingButton from "../../Warehouse/WareHouseOutcome/sectionsWhO/CreateOutgoingButton"
 
 export default function ClientDetail() {
     const { id } = useParams()
@@ -155,10 +156,14 @@ export default function ClientDetail() {
                                         </Typography>
                                     </div>
                                 </div>
-                                <ClientDetailPayment
-                                    client={clientData}
-                                    refresh={getUser}
-                                />
+                                <div className="flex flex-col md:flex-row gap-4">
+                                    
+                                    <CreateOutgoingButton client_id={clientData?.id} client_name={clientData?.name}/>
+                                    <ClientDetailPayment
+                                        client={clientData}
+                                        refresh={getUser}
+                                    />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
