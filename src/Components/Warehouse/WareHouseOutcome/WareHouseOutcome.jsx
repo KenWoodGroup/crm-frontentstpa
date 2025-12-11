@@ -282,7 +282,7 @@ export default function WareHouseOutcome({ role = "factory" }) {
                 receiver_name: getLocationNameById(selectedLocation),
                 sender_name: getLocationNameById(userLId),
                 carrier_id: selectedStaff,
-                note: "ok",
+                note: "",
             };
             if (!selectedStaff) {
                 delete payload.carrier_id

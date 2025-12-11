@@ -542,5 +542,9 @@
     "Delete__text_Category": "Siz ushbu kategoriyani o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!",
     "Edit_Category": "Kategoriya tahrirlash",
     "Category": "Kategoriya",
-    "new_order": "Yangi buyurtma"
+    "new_order": "Yangi buyurtma",
+    "operations": "Operatsiyalar",
+    "orders_history": "Buyurtmalar tarixi",
+    "order_subtitle": "Barcha buyurtmalarni ko‘rib chiqish, boshqarish va eksport qilish",
+    "button.create_order": "Yangi buyurtma yaratish"
 }

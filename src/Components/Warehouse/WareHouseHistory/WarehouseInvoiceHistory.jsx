@@ -82,7 +82,7 @@ function useDebounce(value, delay = 450) {
     return v;
 }
 
-export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
+export default function WarehouseInvoiceHistory({ role = "warehouse", type = "invoice" }) {
     const { t } = useTranslation();
     const defaultColsLabels = {
         id: "ID",
@@ -217,7 +217,10 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
         try {
             const baseId = Cookies.get("ul_nesw");
             const res = await location.getAllGroupLocations(baseId);
-            const items = (res?.data || []).map((l) => ({ value: l.id, label: l.name }));
+            let items = (res?.data || []).map((l) => ({ value: l.id, label: l.name, type: l.type }));
+            if(type === "order") {
+                items = items.filter((l)=> l.type === "client");
+            }
             // add "all" options
             setLocations([{ value: "all", label: `${t("allLocations")}` }, ...items]);
         } catch (err) {
@@ -238,7 +241,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
             loc_id: Cookies.get("ul_nesw"),
             startDate: fromDate || formatDateYMD(startOfMonth),
             endDate: toDate || formatDateYMD(today),
-            type: typeFilter || "all",
+            type: type === "order" ? "outgoing" : typeFilter || "all",
             sender: senderFilter?.value ?? "all",
             receiver: receiverFilter?.value ?? "all",
             status: statusFilter || "all",
@@ -281,7 +284,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
     useEffect(() => {
         setPage(1);
         fetchInvoices();
-    }, [typeFilter, senderFilter, receiverFilter, statusFilter, paymentFilter, fromDate, toDate, debouncedSearch]);
+    }, [type, typeFilter, senderFilter, receiverFilter, statusFilter, paymentFilter, fromDate, toDate, debouncedSearch]);
 
     // initial sync from query params
     useEffect(() => {
@@ -431,9 +434,9 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                 {/* Header */}
                 <header className="flex items-center flex-wrap gap-[10px] justify-between mb-6">
                     <div>
-                        <h1 className="text-2xl font-semibold">{t("invoices.title")}</h1>
+                        <h1 className="text-2xl font-semibold">{type === "order" ? t("order_history") : t("invoices.title")}</h1>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {t("invoices.subtitle")}
+                            {type === "order" ? t("order_subtitle") : t("invoices.subtitle")}
                         </p>
                     </div>
 
@@ -487,38 +490,42 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                 <div className="bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-gray-200 dark:border-gray-700 mb-6 shadow-sm transition-colors duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                         {/* Type Filter */}
-                        <Select
-                            options={[
-                                { value: "all", label: t("invoices.filter.all_types") },
-                                ...typesList.map((tKey) => ({
-                                    value: tKey,
-                                    label: nice.type[tKey] || tKey
-                                }))
-                            ]}
-                            value={{
-                                value: typeFilter,
-                                label:
-                                    typeFilter === "all"
-                                        ? t("invoices.filter.all_types")
-                                        : nice.type[typeFilter] || typeFilter
-                            }}
-                            onChange={(v) => setTypeFilter(v?.value || "all")}
-                            styles={customSelectStyles()}
-                            aria-label={t("invoices.filter.type")}
-                            isClearable={false}
-                        />
+                        {type === "invoice" && (
+                            <Select
+                                options={[
+                                    { value: "all", label: t("invoices.filter.all_types") },
+                                    ...typesList.map((tKey) => ({
+                                        value: tKey,
+                                        label: nice.type[tKey] || tKey
+                                    }))
+                                ]}
+                                value={{
+                                    value: typeFilter,
+                                    label:
+                                        typeFilter === "all"
+                                            ? t("invoices.filter.all_types")
+                                            : nice.type[typeFilter] || typeFilter
+                                }}
+                                onChange={(v) => setTypeFilter(v?.value || "all")}
+                                styles={customSelectStyles()}
+                                aria-label={t("invoices.filter.type")}
+                                isClearable={false}
+                            />
+                        )}
 
                         {/* Sender */}
-                        <Select
-                            options={locations}
-                            value={senderFilter}
-                            onChange={(v) => setSenderFilter(v)}
-                            placeholder={t("placeholder.sender_search")}
-                            isClearable
-                            isSearchable
-                            styles={customSelectStyles()}
-                            aria-label={t("placeholder.sender_search")}
-                        />
+                        {type === "invoice" && (
+                            <Select
+                                options={locations}
+                                value={senderFilter}
+                                onChange={(v) => setSenderFilter(v)}
+                                placeholder={t("placeholder.sender_search")}
+                                isClearable
+                                isSearchable
+                                styles={customSelectStyles()}
+                                aria-label={t("placeholder.sender_search")}
+                            />
+                        )}
 
                         {/* Receiver */}
                         <Select
@@ -701,12 +708,12 @@ export default function WarehouseInvoiceHistory({ role = "warehouse" }) {
                                                     {t("table.status")}
                                                 </th>
                                             )}
-                                            {(columns.payment_status && role==="factory") && (
+                                            {(columns.payment_status && role === "factory") && (
                                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                                     {t("table.payment")}
                                                 </th>
                                             )}
-                                            {(columns.total_sum && role==="factory") && (
+                                            {(columns.total_sum && role === "factory") && (
                                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b">
                                                     {t("table.total")}
                                                 </th>
