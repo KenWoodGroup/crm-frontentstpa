@@ -99,7 +99,7 @@ export default function ManagerFactoryDetail() {
 
                                 <div className="flex items-center gap-[10px]">
 
-                                    <NavLink to={`/manager/factory/warehouse/${item?.parent?.id}/${item?.id}`}>
+                                    <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}>
                                         <Button className="bg-blue-600 text-white hover:bg-blue-700 p-[8px] rounded-lg">
                                             <Eye size={20} />
                                         </Button>

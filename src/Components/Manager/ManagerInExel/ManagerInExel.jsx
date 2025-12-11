@@ -127,7 +127,7 @@ export default function ManagerInExel() {
                         />
 
                         <Button color="blue" fullWidth onClick={createInvoice}>
-                            Invoice yaratish
+                            Fayl yuklash 
                         </Button>
                     </CardBody>
                 </Card>
