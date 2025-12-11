@@ -21,12 +21,12 @@ export default function MainLayout() {
                 active={() => setActive((s) => !s)}
             />
             <div
-                className="FactoryLayout  mt-[95px] pb-[30px] ml-[100px] px-[15px] min-h-screen transition-all duration-300"
+                className={`FactoryLayout ${mode === "m_other" ? "mt-[95px]" : "mt-0"}    pb-[30px] ml-[100px] px-[15px] min-h-screen transition-all duration-300`}
                 style={{
                     width: "calc(100% - 100px)",
                 }}
             >
-                {mode === "m_other" ? <AdminHeader sidebarOpen={!active} /> : ""}
+                {mode === "m_other" ? <AdminHeader sidebarOpen={!active} /> : <noscript></noscript>}
                 <FactoryProvider mode={mode}>
                     <InnerGuard>
                         <Outlet />
