@@ -296,6 +296,7 @@ export default function StockApi() {
         };
 
     }, [mainLocationId]);
+    // fnjffefejferifjerijfierjf erifjerif jejfe ijfer
 
     // ------------------------------ LOAD NEXT PAGE ------------------------------
     const loadNextPage = () => {
@@ -316,7 +317,7 @@ export default function StockApi() {
     if (loading && products.length === 0) return <Loading />;
 
     return (
-        <div className="min-h-screen text-text-light dark:text-text-dark">
+        <div className="min-h-screen text-text-light dark:text-text-dark ">
             <div className="flex flex-col sm:flex-row items-center justify-between mb-5 gap-4">
                 <Typography variant="h4" className="font-semibold">
                     {t("warehouseTitle")}
@@ -336,6 +337,7 @@ export default function StockApi() {
                         labelProps={{
                             className: `!text-text-light dark:!text-text-dark`
                         }}
+                        // edit 
                         disabled={!mainLocationId}
                     />
                     {loadingSearch ? (
