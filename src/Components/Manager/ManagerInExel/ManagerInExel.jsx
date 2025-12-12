@@ -20,7 +20,11 @@ export default function ManagerInExel() {
     const [note, setNote] = useState("");
     const [createdInvoiceId, setCreatedInvoiceId] = useState(null);
 
+    const [selectedFile, setSelectedFile] = useState(null);
     const fileInputRef = useRef(null);
+
+    const [loadingCreate, setLoadingCreate] = useState(false);
+    const [loadingUpload, setLoadingUpload] = useState(false);
 
     // Fetch Partners
     const GetPartner = async () => {
@@ -49,6 +53,8 @@ export default function ManagerInExel() {
         };
 
         try {
+            setLoadingCreate(true);
+
             const response = await InvoicesApi.CreateInvoice(data);
             const invoiceId = response?.data?.invoice?.id;
 
@@ -61,29 +67,45 @@ export default function ManagerInExel() {
         } catch (error) {
             console.log(error);
             Alert("Xato invoice yaratishda", "error");
+        } finally {
+            setLoadingCreate(false);
         }
     };
 
-    // === UPLOAD EXCEL ===
-    const handleExcelUpload = async (event) => {
+    // === SAVE FILE ONLY (NO UPLOAD) ===
+    const handleFileSelect = (event) => {
         const file = event.target.files[0];
-        if (!file || !createdInvoiceId) return;
+        setSelectedFile(file);
+    };
+
+    // === UPLOAD FILE BY BUTTON CLICK ===
+    const uploadExcelFile = async () => {
+        if (!selectedFile) {
+            Alert("Iltimos, fayl tanlang", "error");
+            return;
+        }
 
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", selectedFile);
 
         try {
+            setLoadingUpload(true);
+
             await InvoicesApi.UploadExel(createdInvoiceId, formData);
             Alert("Excel muvaffaqiyatli yuklandi", "success");
 
-            // Сброс состояния после успешной загрузки
+            // Reset states
             setSenderId("");
             setNote("");
             setCreatedInvoiceId(null);
+            setSelectedFile(null);
+
             if (fileInputRef.current) fileInputRef.current.value = null;
         } catch (error) {
             console.log(error);
             Alert("Xato Excel yuklashda", "error");
+        } finally {
+            setLoadingUpload(false);
         }
     };
 
@@ -93,7 +115,8 @@ export default function ManagerInExel() {
 
     return (
         <div className="p-6 max-w-3xl mx-auto">
-            {/* === Step 1: Создание Invoice === */}
+
+            {/* === Step 1: CREATE INVOICE === */}
             {!createdInvoiceId && (
                 <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700">
                     <CardBody className="space-y-6">
@@ -108,7 +131,7 @@ export default function ManagerInExel() {
                             <select
                                 value={senderId}
                                 onChange={(e) => setSenderId(e.target.value)}
-                                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl p-3 bg-white dark:bg-[#2A2A2F] text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl p-3 bg-white dark:bg-[#2A2A2F] text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all"
                             >
                                 <option value="">Tanlang</option>
                                 {partners.map((p) => (
@@ -123,19 +146,31 @@ export default function ManagerInExel() {
                             label="Izoh"
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
-                            className="bg-white dark:bg-[#2A2A2F] text-gray-900 dark:text-gray-100"
+                            color="blue-gray"
+                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                            containerProps={{
+                                className: "!min-w-0",
+                            }}
+                            labelProps={{
+                                className: `!text-text-light dark:!text-text-dark  `
+                            }}
                         />
 
-                        <Button color="blue" fullWidth onClick={createInvoice}>
-                            Fayl yuklash 
+                        <Button
+                            color="blue"
+                            fullWidth
+                            onClick={createInvoice}
+                            disabled={loadingCreate}
+                        >
+                            {loadingCreate ? "Yaratilmoqda..." : "Fayl yuklash"}
                         </Button>
                     </CardBody>
                 </Card>
             )}
 
-            {/* === Step 2: Загрузка Excel === */}
+            {/* === Step 2: UPLOAD EXCEL === */}
             {createdInvoiceId && (
-                <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700">
+                <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700 mt-6">
                     <CardBody className="space-y-6">
                         <Typography variant="h5" className="font-semibold text-gray-900 dark:text-gray-100">
                             Excel yuklash
@@ -149,9 +184,23 @@ export default function ManagerInExel() {
                             type="file"
                             accept=".xlsx, .xls"
                             ref={fileInputRef}
-                            onChange={handleExcelUpload}
-                            className="block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                            onChange={handleFileSelect}
+                            className="block w-full text-sm text-gray-900 dark:text-gray-100 
+                                file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
+                                file:text-sm file:font-semibold file:bg-blue-600 file:text-white
+                                hover:file:bg-blue-700"
                         />
+
+                        {selectedFile && (
+                            <Button
+                                color="green"
+                                fullWidth
+                                onClick={uploadExcelFile}
+                                disabled={loadingUpload}
+                            >
+                                {loadingUpload ? "Yuklanmoqda..." : "Yuklash"}
+                            </Button>
+                        )}
                     </CardBody>
                 </Card>
             )}

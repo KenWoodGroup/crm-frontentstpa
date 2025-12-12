@@ -40,7 +40,7 @@ export default function WarehouseBarcodeCreate() {
                 sub_id: subCategoryId,
                 location_id: Cookies?.get('usd_nesw')
             }
-            const response = await LocalProduct?.GetMyProductLocation(data)
+            const response = await LocalProduct?.GetMyProductStock(data)
             setProductsData((prev) => ({
                 ...prev,
                 [subCategoryId]: response?.data || [],

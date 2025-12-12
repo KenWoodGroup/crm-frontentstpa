@@ -38,6 +38,10 @@ class LocalProduct {
         const response = await $api.get(`/local-products/products/${data?.location_id}/${data?.sub_id}`)
         return response;
     }
+     static GetMyProductStock = async (data) => {
+        const response = await $api.get(`/local-products/products-stock/${data?.location_id}/${data?.sub_id}`)
+        return response;
+    }
     static DeleteProduct = async (id) => {
         const response = await $api.delete(`/local-products/${id}`)
         return response;
