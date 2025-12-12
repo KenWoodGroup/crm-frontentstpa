@@ -426,7 +426,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
     const totalPages = Math.max(1, Math.ceil((total || 0) / PER_PAGE));
 
 
-    // — ensure: const { t } = useTranslation(); is present in function scope
+    // —- ensure: const { t } = useTranslation(); is present in function scope
 
     return (
         <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen rounded-xl transition-colors duration-300">
