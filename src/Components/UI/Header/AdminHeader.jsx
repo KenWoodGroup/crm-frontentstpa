@@ -129,7 +129,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                         }}
                     >
                         <Option value="ru">Ru</Option>
-                        <Option value="en">En</Option>
+                        <Option className="my-[2px]" value="en">En</Option>
                         <Option value="uz">Uz</Option>
                     </Select>
                 </div>

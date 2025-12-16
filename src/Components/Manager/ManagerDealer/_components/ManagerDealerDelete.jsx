@@ -43,7 +43,7 @@ export default function ManagerDealerDelete({ id, refresh }) {
                 >
                     Siz haqiqatdan ham bu zavodni o‘chirmoqchimisiz? Bu amalni qaytarib bo‘lmaydi!
                 </DialogBody>
-                <DialogFooter className="border-t border-gray-200 dark:border-gray-700 dark:bg-card-dark">
+                <DialogFooter className="border-t border-gray-200 dark:border-gray-700 dark:bg-card-dark rounded-b-lg">
                     <Button
                         variant="text"
                         color="gray"

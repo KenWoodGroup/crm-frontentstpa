@@ -9,6 +9,8 @@ import Cookies from "js-cookie";
 import { notify } from "../../utils/toast";
 import Spinner from "../../Components/UI/spinner/Spinner";
 import Offerta from "./_components/Offerta";
+import { Card } from "@material-tailwind/react";
+import logo from  "../../Images/photo_2025-12-16_09.54.57-removebg-preview__2_-removebg-preview.png"
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -237,14 +239,14 @@ export default function Login() {
   return (
     <div className="login-page flex items-center justify-center px-9 py-20 bg-white dark:bg-background-dark !important transition-colors duration-200 !important">
       <div className="login-card w-full max-w-[520px] rounded-[14px] p-[28px] border border-[#e6eef2] dark:border-gray-700 !important bg-white dark:bg-card-dark !important shadow-lg dark:shadow-gray-900/20 !important transition-colors duration-200 !important">
-        <div className="flex gap-3.5 items-center mb-4.5">
-          <div className="login-logo shadow-[0_8px_24px_rgba(19,102,214,0.12)] dark:shadow-[0_8px_24px_rgba(19,102,214,0.2)] !important w-16 h-16 rounded-[16px] flex items-center justify-center text-[#fff] font-bold text-[20px] bg-blue-600 dark:bg-blue-700 !important">
-            USD
-          </div>
+        <div className="flex gap-3.5 items-center mb-6">
+          <Card className="w-[80px]">
+              <img src={logo} className="w-full" alt="Logo" />
+          </Card>
           <div className="flex flex-col gap-0.5">
-            <h1 className="m-0 text-[18px] font-medium text-gray-900 dark:text-text-dark !important">USD sistem</h1>
+            <h1 className="m-0 text-[18px] font-medium text-gray-900 dark:text-text-dark !important">USD-SYSTEM</h1>
             <p className="m-0 text-[#6b7280] dark:text-gray-400 !important text-[13px]">
-              Ombor nazorati — tez, aniq va ishonchli
+              USD-ERP — tez, aniq, ishonchli biznes boshqaruvi.
             </p>
           </div>
         </div>
@@ -257,12 +259,11 @@ export default function Login() {
           )}
 
           <label className="login-field" htmlFor="login-username">
-            <span className="login-label text-gray-700 dark:text-gray-300 !important">Username</span>
             <input
               id="login-username"
               className="login-input border border-gray-300 dark:border-gray-600 !important bg-white dark:bg-card-dark !important text-gray-900 dark:text-gray-100 !important placeholder-gray-500 dark:placeholder-gray-400 !important"
               type="text"
-              placeholder="Username kiriting"
+              placeholder="Logini kiriting"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={loading}
@@ -270,11 +271,9 @@ export default function Login() {
           </label>
 
           <label className="login-field" htmlFor="login-password">
-            <div className="login-field-top">
-              <span className="login-label text-gray-700 dark:text-gray-300 !important">Parol</span>
-            </div>
+           
 
-            <div className="relative flex items-center">
+            <div className="relative flex items-center mt-[10px]">
               <input
                 id="login-password"
                 className="login-input login-input-with-icon border border-gray-300 dark:border-gray-600 !important bg-white dark:bg-gray-800 !important text-gray-900 dark:text-gray-100 !important placeholder-gray-500 dark:placeholder-gray-400 !important"
@@ -317,7 +316,7 @@ export default function Login() {
 
         <footer className="mt-4 text-center font-[3px] text-[#6b7280] dark:text-gray-400 !important">
           <small>
-            © {new Date().getFullYear()} USD sistem Barcha huquqlar himoyalangan.
+            © {new Date().getFullYear()} USD-SYSTEM Barcha huquqlar himoyalangan.
           </small>
         </footer>
       </div>

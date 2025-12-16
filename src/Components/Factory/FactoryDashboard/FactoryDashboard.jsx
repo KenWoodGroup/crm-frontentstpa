@@ -76,7 +76,7 @@ export default function FactoryDashboard() {
             icon: <Warehouse className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
         },
         {
-            title: t("dilers"),
+            title: t("Clients"),
             value: CardData ? CardData.countDealer : "...",
             icon: <Users className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
         },

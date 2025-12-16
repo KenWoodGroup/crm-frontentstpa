@@ -1,7 +1,10 @@
 import { Typography } from "@material-tailwind/react";
 import { Inbox } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function EmptyData({ text }) {
+        const { t } = useTranslation();
+    
     return (
         <div className="w-full flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 transition-colors duration-300">
             <div className="flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 dark:bg-gray-800 mb-5">
@@ -14,8 +17,7 @@ export default function EmptyData({ text }) {
                 {text}
             </Typography>
             <Typography className="text-gray-500 dark:text-gray-400 text-center max-w-md px-4">
-                Bu yerda hozircha hech qanday ma’lumot yo‘q. <br />
-                Yangi yozuv qo‘shib ko‘ring yoki keyinroq qaytib keling.
+                {t('empty_data_text')}
             </Typography>
         </div>
     );

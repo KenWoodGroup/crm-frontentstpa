@@ -214,9 +214,7 @@ export default function PaymentPage() {
                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Clients')}
                                 </th>
-                                <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
-                                    {t('Balance')}
-                                </th>
+                              
                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Payment_type')}
                                 </th>
@@ -224,7 +222,7 @@ export default function PaymentPage() {
                                     {t('Payment_price')}
                                 </th>
                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
-                                    {t('Kasa')}
+                                    {t('Kassa')}
                                 </th>
                                 <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 border-b transition-colors duration-200">
                                     {t('Creater')}
@@ -256,15 +254,9 @@ export default function PaymentPage() {
                                                 <span className="text-gray-400 dark:text-gray-500">-</span>
                                             )}
                                         </td>
-                                        <td className="p-1 text-center text-sm font-semibold text-red-600 dark:text-red-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
-                                            {Number(item?.payer?.balance).toLocaleString()} so'm
-                                        </td>
+                                     
                                         <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
-                                            {item.method === "cash"
-                                                ? "Наличный"
-                                                : item.method === "card"
-                                                    ? "Карта"
-                                                    : "Перечисление"}
+                                           {item?.method_id}
                                         </td>
                                         <td className="p-1 text-center text-sm font-semibold text-green-600 dark:text-green-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                             {Number(item.amount).toLocaleString()} so'm
