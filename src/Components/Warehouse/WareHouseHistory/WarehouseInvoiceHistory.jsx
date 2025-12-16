@@ -28,7 +28,7 @@ const LS_KEYS = {
 
 const PER_PAGE = 15;
 
-const defaultCols = {
+const BASE_COLS = {
     id: true,
     type: true,
     sender_name: true,
@@ -83,6 +83,14 @@ function useDebounce(value, delay = 450) {
 }
 
 export default function WarehouseInvoiceHistory({ role = "warehouse", type = "invoice" }) {
+    const defaultCols = useMemo(()=>{
+        if(role === "warehouse") {
+            const { payment_status, total_sum, ...rest } = BASE_COLS;
+            return rest;
+        }
+        return BASE_COLS;
+    },[role]);
+
     const { t } = useTranslation();
     const defaultColsLabels = {
         id: "ID",
@@ -426,7 +434,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
     const totalPages = Math.max(1, Math.ceil((total || 0) / PER_PAGE));
 
 
-    // —- ensure: const { t } = useTranslation(); is present in function scope
+    // — ensure: const { t } = useTranslation(); is present in function scope
 
     return (
         <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen rounded-xl transition-colors duration-300">
@@ -781,12 +789,12 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                         </button>
                                                     </td>
                                                 )}
-                                                {columns.payment_status && (
+                                                {(columns.payment_status && role==="factory") && (
                                                     <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                         {paymentBadge(inv.payment_status)}
                                                     </td>
                                                 )}
-                                                {columns.total_sum && (
+                                                {(columns.total_sum && role==="factory") && (
                                                     <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                         <span className="font-medium">
                                                             {inv.total_sum}
