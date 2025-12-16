@@ -10,61 +10,104 @@ export const $api = axios.create({
     },
 });
 
-// Добавление access token в заголовки
-$api.interceptors.request.use((config) => {
-    const token = Cookies.get('token');
-    if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
+/* ===============================
+   GLOBAL REFRESH STATE
+================================ */
+let isRefreshing = false;
+let failedQueue = [];
 
-// Обработка ответа
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
+/* ===============================
+   REQUEST INTERCEPTOR
+================================ */
+$api.interceptors.request.use(
+    (config) => {
+        const token = Cookies.get('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+/* ===============================
+   RESPONSE INTERCEPTOR
+================================ */
 $api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
+
+            // if refreshing wait
+            if (isRefreshing) {
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({
+                        resolve: (token) => {
+                            originalRequest.headers.Authorization = 'Bearer ' + token;
+                            resolve($api(originalRequest));
+                        },
+                        reject,
+                    });
+                });
+            }
+
             originalRequest._retry = true;
+            isRefreshing = true;
 
             try {
-                const refreshToken = Cookies.get('refresh_token'); // здесь нужен refresh_token!
+                const refreshToken = Cookies.get('refresh_token');
                 const userId = Cookies.get('us_nesw');
 
                 if (!refreshToken || !userId) {
-                    throw new Error('Refresh token yoki user ID topilmadi');
+                    throw new Error('Refresh token yoki user ID yo‘q');
                 }
 
-                // Отправляем запрос на обновление токена
-                const response = await axios.post(`${BASE_URL}/api/auth/refresh`, {
-                    refreshToken: refreshToken,
-                    userId: userId,
-                });
+                const { data } = await axios.post(
+                    `${BASE_URL}/api/auth/refresh`,
+                    { refreshToken, userId }
+                );
 
-                const newToken = response.data.access_token;
-                const refresh = response.data.refresh_token;
+                const newAccessToken = data.access_token;
+                const newRefreshToken = data.refresh_token;
 
-                // Сохраняем новый токен
-                Cookies.set('token', newToken);
-                Cookies.set('refresh_token', refresh)
+                Cookies.set('token', newAccessToken);
+                Cookies.set('refresh_token', newRefreshToken);
 
-                // Обновляем заголовок и повторяем запрос
-                originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                $api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
+
+                // Continue CRUDs in process queue
+                processQueue(null, newAccessToken);
+
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return $api(originalRequest);
 
-            } catch (refreshError) {
-                // localStorage.clear();
-                // window.location.href = '/login';
+            } catch (err) {
+                // 🔴 Refresh failed → all logout
+                processQueue(err, null);
+
                 Cookies.remove('token');
                 Cookies.remove('refresh_token');
                 Cookies.remove('us_nesw');
                 Cookies.remove('nesw');
+
                 window.location.href = '/login';
-                // useNavigate('/login');
-                return Promise.reject(refreshError);
+                return Promise.reject(err);
+
+            } finally {
+                isRefreshing = false;
             }
         }
 
