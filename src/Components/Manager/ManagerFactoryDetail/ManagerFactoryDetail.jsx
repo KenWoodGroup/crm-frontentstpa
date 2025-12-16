@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { location } from "../../../utils/Controllers/location";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import {
     Store,
     MapPin,
@@ -22,6 +22,7 @@ export default function ManagerFactoryDetail() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate()
 
     const getWarehouse = async () => {
         try {
@@ -58,9 +59,22 @@ export default function ManagerFactoryDetail() {
         <div className="w-full text-gray-900 dark:text-gray-100">
             {/* Title */}
             <div className="flex items-center mb-5 justify-between">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    Складлар
-                </h1>
+                <div className="flex items-center gap-[10px]">
+                <Button onClick={()=>navigate(-1)} className="p-[10px]">
+                     <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
+                        <path
+                            fill="currentColor"
+                            fillRule="evenodd"
+                            d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                            clipRule="evenodd"
+                        ></path>
+                    </svg>
+                </Button>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        Складлар
+                    </h1>
+                </div>
+
                 <WarehouseCreate refresh={getWarehouse} />
             </div>
 

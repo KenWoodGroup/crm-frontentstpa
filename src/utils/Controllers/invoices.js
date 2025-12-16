@@ -56,7 +56,7 @@ class InvoicesApi {
         return response
     }
     static UploadExel = async (id, data) => {
-        const response = await $api.post(`/invoice-items/upload/${id}`, data,
+        const response = await $api.post(`/invoice-items/upload-product/${id}`, data,
             {
                 headers: {
                     "Content-Type": "multipart/form-data",

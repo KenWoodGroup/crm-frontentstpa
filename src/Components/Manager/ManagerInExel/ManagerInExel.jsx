@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Partner } from "../../../utils/Controllers/Partner";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
@@ -19,6 +19,7 @@ export default function ManagerInExel() {
     const [senderId, setSenderId] = useState("");
     const [note, setNote] = useState("");
     const [createdInvoiceId, setCreatedInvoiceId] = useState(null);
+    const navigate = useNavigate()
 
     const [selectedFile, setSelectedFile] = useState(null);
     const fileInputRef = useRef(null);
@@ -114,8 +115,21 @@ export default function ManagerInExel() {
     }, []);
 
     return (
+        <>
+          <div >
+                <Button onClick={() => navigate(-1)} className="p-[10px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
+                        <path
+                            fill="currentColor"
+                            fillRule="evenodd"
+                            d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                            clipRule="evenodd"
+                        ></path>
+                    </svg>
+                </Button>
+            </div>
         <div className="p-6 max-w-3xl mx-auto">
-
+          
             {/* === Step 1: CREATE INVOICE === */}
             {!createdInvoiceId && (
                 <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700">
@@ -205,5 +219,6 @@ export default function ManagerInExel() {
                 </Card>
             )}
         </div>
+        </>
     );
 }
