@@ -795,7 +795,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                 )}
                                                 {columns.actions && (
                                                     <td className="p-3 text-center text-sm rounded-br-[10px] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700">
-                                                        <div className="flex items-center justify-center gap-2">
+                                                        <div className="flex items-start justify-start gap-2">
                                                             <button
                                                                 onClick={() => openDetail(inv.id)}
                                                                 className="text-sm px-3 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
