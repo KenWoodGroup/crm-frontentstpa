@@ -69,7 +69,7 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
 
     const handleProfile = () => {
         const nesw = Cookies.get("nesw");
-        if (nesw === "SefwfmgrUID") navigate("/factory/profile");
+        if (nesw === "SefwfmgrUID") navigate("/profile");
         else if (nesw === "SesdsdfmgrUID") navigate("/warehouse/profile");
         else navigate("/profile");
     };

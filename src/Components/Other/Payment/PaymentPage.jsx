@@ -262,7 +262,7 @@ export default function PaymentPage() {
                                             {Number(item.amount).toLocaleString()} so'm
                                         </td>
                                         <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
-                                            {item?.receiver?.name || (
+                                            {item?.cash_id || (
                                                 <span className="text-gray-400 dark:text-gray-500">-</span>
                                             )}
                                         </td>

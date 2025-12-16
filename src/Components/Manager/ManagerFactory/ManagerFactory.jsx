@@ -8,6 +8,7 @@ import ManagerFactoryEdit from "./_components/ManagetFactoryEdit";
 import ManagerDealerDelete from "../ManagerDealer/_components/ManagerDealerDelete";
 import { NavLink } from "react-router-dom";
 import Eye from "../../UI/Icons/Eye";
+import { User } from "lucide-react";
 
 export default function ManagerFactory() {
     const [loading, setLoading] = useState(false);
@@ -94,6 +95,11 @@ export default function ManagerFactory() {
                                     </Typography>
 
                                     <div className="flex items-center gap-2">
+                                        <NavLink to={`/manager/factory-users/${factory.id}`}>
+                                            <Button className="bg-blue-600 text-white hover:bg-blue-700 p-2 rounded-lg shadow-sm">
+                                                <User size={20} />
+                                            </Button>
+                                        </NavLink>
                                         <NavLink to={`/manager/factory/${factory.id}`}>
                                             <Button className="bg-blue-600 text-white hover:bg-blue-700 p-2 rounded-lg shadow-sm">
                                                 <Eye size={20} />

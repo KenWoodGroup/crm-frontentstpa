@@ -5,17 +5,17 @@ import Loading from "../../UI/Loadings/Loading";
 import { Alert } from "../../../utils/Alert";
 import { Button, Card, CardBody } from "@material-tailwind/react";
 import { User, Mail, CalendarDays, ShieldUser } from "lucide-react";
-import WarehouseUserCreate from "./_components/WarehouseUserCreate";
+import UserCreate from "./_components/UserCreate";
 import EmptyData from "../../UI/NoData/EmptyData";
-import WarehouseUserDelete from "./_components/WarehouseUserDelete";
-import WarehouseUserEdit from "./_components/WarehouseUserEdit";
+import UserDelete from "./_components/UserDelete";
+import UserEdit from "./_components/UserEdit";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
 import Eye from "../../UI/Icons/Eye";
 
 
-export default function WarehouseUser() {
-    const id = Cookies.get("ul_nesw")
+export default function Users() {
+    const {id} = useParams()
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const { t } = useTranslation()
@@ -54,7 +54,7 @@ export default function WarehouseUser() {
                 <h1 className="text-2xl font-semibold text-text-light dark:text-text-dark transition-colors duration-300">
                     {t('Warehouse_user')}
                 </h1>
-                {/* <WarehouseUserCreate refresh={() => GetUsers()} /> */}
+                <UserCreate refresh={() => GetUsers()} />
             </div>
             {/* Контент */}
             {users?.length > 0 ? (
@@ -74,15 +74,8 @@ export default function WarehouseUser() {
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2 mt-4">
-                                        <NavLink to={`/factory/user/${u?.id}`}>
-                                            <Button
-                                                className="bg-blue-600 text-white hover:bg-blue-700 normal-case p-[8px]"
-                                            >
-                                                <Eye size={20} />
-                                            </Button>
-                                        </NavLink>
-                                        <WarehouseUserEdit user={u} refresh={() => GetUsers()} />
-                                        {/* <WarehouseUserDelete id={u.id} refresh={() => GetUsers()} /> */}
+                                        <UserEdit user={u} refresh={() => GetUsers()} />
+                                        <UserDelete id={u.id} refresh={() => GetUsers()} />
                                     </div>
                                 </div>
 

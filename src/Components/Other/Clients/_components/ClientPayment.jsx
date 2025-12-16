@@ -179,43 +179,69 @@ export default function ClientPayment({ client, refresh }) {
                         }}
                     />
 
-                    <Select
-                        label={t('Kassa')}
-                        value={form.cash_id}
-                        onChange={(val) => setForm((p) => ({ ...p, cash_id: val }))}
-                        className="text-gray-900 dark:text-text-dark outline-none"
-                        labelProps={{
-                            className: "text-gray-700 dark:text-text-dark"
-                        }}
-                        menuProps={{
-                            className: "dark:bg-gray-800 dark:text-text-dark"
-                        }}
-                    >
-                        {cashes.map((cash) => (
-                            <Option key={cash.id} value={String(cash.id)}>
-                                {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm`}
-                            </Option>
-                        ))}
-                    </Select>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm text-gray-700 dark:text-text-dark">
+                            {t("Kassa")}
+                        </label>
 
-                    <Select
-                        label={t('Payment_type')}
-                        value={form.method_id}
-                        onChange={(val) => setForm((p) => ({ ...p, method_id: val }))}
-                        className="text-gray-900 dark:text-text-dark outline-none"
-                        labelProps={{
-                            className: "text-gray-700 dark:text-text-dark"
-                        }}
-                        menuProps={{
-                            className: "dark:bg-gray-800 dark:text-text-dark"
-                        }}
-                    >
-                        {paymentMethods.map((method) => (
-                            <Option key={method.id} value={String(method.id)}>
-                                {method.name || `Метод ${method.id}`}
-                            </Option>
-                        ))}
-                    </Select>
+                        <select
+                            value={form.cash_id}
+                            onChange={(e) =>
+                                setForm((p) => ({ ...p, cash_id: e.target.value }))
+                            }
+                            className="
+            w-full rounded-lg border border-gray-300 dark:border-gray-600
+            bg-white dark:bg-gray-800
+            px-3 py-2 text-sm
+            text-gray-900 dark:text-text-dark
+            focus:outline-none focus:ring-2 focus:ring-blue-500
+            transition
+        "
+                        >
+                            <option value="" disabled>
+                                {t("Select")}
+                            </option>
+
+                            {cashes.map((cash) => (
+                                <option key={cash.id} value={String(cash.id)}>
+                                    {`${cash.name} — ${Number(cash.balance).toLocaleString()} so'm`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm text-gray-700 dark:text-text-dark">
+                            {t("Payment_type")}
+                        </label>
+
+                        <select
+                            value={form.method_id}
+                            onChange={(e) =>
+                                setForm((p) => ({ ...p, method_id: e.target.value }))
+                            }
+                            className="
+            w-full rounded-lg border border-gray-300 dark:border-gray-600
+            bg-white dark:bg-gray-800
+            px-3 py-2 text-sm
+            text-gray-900 dark:text-text-dark
+            focus:outline-none focus:ring-2 focus:ring-blue-500
+            transition
+        "
+                        >
+                            <option value="" disabled>
+                                {t("Select")}
+                            </option>
+
+                            {paymentMethods.map((method) => (
+                                <option key={method.id} value={String(method.id)}>
+                                    {method.name || `Метод ${method.id}`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
 
                     <Textarea
                         label={t('Comment')}
