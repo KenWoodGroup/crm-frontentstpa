@@ -7,10 +7,11 @@ import {
     Phone,
     Wallet,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Package,
+    Layers
 } from "lucide-react";
 import { Button } from "@material-tailwind/react";
-import Eye from "../../UI/Icons/Eye";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseCreate from "./_components/WarehouseCreate";
 import WarehouseDelete from "./_components/WarehouseDelete";
@@ -22,7 +23,7 @@ export default function ManagerFactoryDetail() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const getWarehouse = async () => {
         try {
@@ -35,8 +36,8 @@ export default function ManagerFactoryDetail() {
             };
             const response = await location.GetLocationByType(data);
 
-            setWarehouses(response.data.data?.records);
-            setTotalPages(response.data.data?.pagination.total_pages);
+            setWarehouses(response.data.data?.records || []);
+            setTotalPages(response.data.data?.pagination?.total_pages || 1);
         } catch (error) {
             console.log(error);
         } finally {
@@ -57,11 +58,11 @@ export default function ManagerFactoryDetail() {
 
     return (
         <div className="w-full text-gray-900 dark:text-gray-100">
-            {/* Title */}
+            {/* TITLE */}
             <div className="flex items-center mb-5 justify-between">
-                <div className="flex items-center gap-[10px]">
-                <Button onClick={()=>navigate(-1)} className="p-[10px]">
-                     <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
+                <div className="flex items-center gap-2">
+                   <Button onClick={() => navigate(-1)} className="p-[10px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
                         <path
                             fill="currentColor"
                             fillRule="evenodd"
@@ -70,11 +71,8 @@ export default function ManagerFactoryDetail() {
                         ></path>
                     </svg>
                 </Button>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        Складлар
-                    </h1>
+                    <h1 className="text-2xl font-bold">Складлар</h1>
                 </div>
-
                 <WarehouseCreate refresh={getWarehouse} />
             </div>
 
@@ -88,58 +86,73 @@ export default function ManagerFactoryDetail() {
                     return (
                         <div
                             key={item.id}
-                            className="w-full bg-white dark:bg-[#1E1E22] shadow-md 
-                            dark:shadow-none border border-gray-200 dark:border-gray-700 
-                            rounded-xl p-5 hover:shadow-lg dark:hover:shadow-[0_0_10px_rgba(255,255,255,0.05)]
-                            transition"
+                            className="bg-white dark:bg-[#1E1E22]
+                            border border-gray-200 dark:border-gray-700
+                            rounded-xl p-5 shadow-sm hover:shadow-md transition"
                         >
-                            {/* Header */}
-                            <div className="flex items-center justify-between">
+                            {/* HEADER */}
+                            <div className="flex justify-between items-start">
                                 <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Store className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                    <div className="flex items-center gap-2">
+                                        <Store className="w-5 h-5 text-blue-600" />
+                                        <h2 className="text-lg font-semibold">
                                             {item.name}
                                         </h2>
                                     </div>
 
-                                    {/* MAIN BADGE */}
                                     {isMain && (
-                                        <span className="inline-block mt-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-600 text-white dark:bg-green-500">
+                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
                                             Основной склад
                                         </span>
                                     )}
                                 </div>
 
-                                <div className="flex items-center gap-[10px]">
-
-                                    <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}>
-                                        <Button className="bg-blue-600 text-white hover:bg-blue-700 p-[8px] rounded-lg">
-                                            <Eye size={20} />
-                                        </Button>
-                                    </NavLink>
-
-                                    <WarehouseDelete warehouseId={item?.id} refresh={getWarehouse} />
-                                    <WarehouseEdit warehouse={item} refresh={getWarehouse} />
+                                <div className="flex gap-2">
+                                    <WarehouseDelete
+                                        warehouseId={item.id}
+                                        refresh={getWarehouse}
+                                    />
+                                    <WarehouseEdit
+                                        warehouse={item}
+                                        refresh={getWarehouse}
+                                    />
                                 </div>
                             </div>
 
-                            {/* Information */}
-                            <div className="space-y-2 mt-3 text-sm text-gray-700 dark:text-gray-300">
-                                <div className="flex items-start gap-2">
-                                    <MapPin className="w-4 h-4 mt-0.5 text-gray-500 dark:text-gray-400" />
-                                    <p>{item.address}</p>
+                            {/* INFO */}
+                            <div className="space-y-2 mt-4 text-sm text-gray-700 dark:text-gray-300">
+                                <div className="flex gap-2">
+                                    <MapPin className="w-4 h-4" />
+                                    <span>{item.address || "—"}</span>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                    <Phone className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                    <p>{item.phone}</p>
+                                <div className="flex gap-2">
+                                    <Phone className="w-4 h-4" />
+                                    <span>{item.phone || "—"}</span>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                    <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                    <p>{formatNumber(item.balance)}</p>
+                                <div className="flex gap-2">
+                                    <Wallet className="w-4 h-4" />
+                                    <span>{formatNumber(item.balance)} uzs</span>
                                 </div>
+                            </div>
+
+                            {/* ACTIONS BOTTOM */}
+                            <div className="flex justify-between gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
+                                    className="flex items-center gap-2 text-blue-600 hover:underline"
+                                >
+                                    <Package size={18} />
+                                    Mahsulotlar
+                                </NavLink>
+
+                                <NavLink
+                                    to={`/manager/factory/warehouse-material/${id}/${item?.id}`}
+                                    className="flex items-center gap-2 text-green-600 hover:underline"
+                                >
+                                    <Layers size={18} />
+                                    Materialar
+                                </NavLink>
                             </div>
                         </div>
                     );
@@ -147,41 +160,25 @@ export default function ManagerFactoryDetail() {
             </div>
 
             {/* PAGINATION */}
-            <div className="flex items-center justify-center gap-4 mt-6">
+            <div className="flex justify-center gap-4 mt-6">
                 <button
                     disabled={page === 1}
                     onClick={() => setPage(page - 1)}
-                    className="
-                        flex items-center gap-1 px-4 py-2 border rounded-lg 
-                        border-gray-300 dark:border-gray-600
-                        bg-gray-50 dark:bg-[#2A2A2F]
-                        hover:bg-gray-100 dark:hover:bg-[#333338]
-                        disabled:opacity-35
-                        transition
-                    "
+                    className="px-4 py-2 border rounded-lg disabled:opacity-40"
                 >
-                    <ChevronLeft className="w-4 h-4" />
-                    Назад
+                    <ChevronLeft size={16} /> Назад
                 </button>
 
-                <span className="font-semibold text-lg text-gray-900 dark:text-gray-200">
+                <span className="font-semibold">
                     {page} / {totalPages}
                 </span>
 
                 <button
                     disabled={page === totalPages}
                     onClick={() => setPage(page + 1)}
-                    className="
-                        flex items-center gap-1 px-4 py-2 border rounded-lg 
-                        border-gray-300 dark:border-gray-600
-                        bg-gray-50 dark:bg-[#2A2A2F]
-                        hover:bg-gray-100 dark:hover:bg-[#333338]
-                        disabled:opacity-35
-                        transition
-                    "
+                    className="px-4 py-2 border rounded-lg disabled:opacity-40"
                 >
-                    Далее
-                    <ChevronRight className="w-4 h-4" />
+                    Далее <ChevronRight size={16} />
                 </button>
             </div>
         </div>
