@@ -218,8 +218,8 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
             const baseId = Cookies.get("ul_nesw");
             const res = await location.getAllGroupLocations(baseId);
             let items = (res?.data || []).map((l) => ({ value: l.id, label: l.name, type: l.type }));
-            if(type === "order") {
-                items = items.filter((l)=> l.type === "client");
+            if (type === "order") {
+                items = items.filter((l) => l.type === "client");
             }
             // add "all" options
             setLocations([{ value: "all", label: `${t("allLocations")}` }, ...items]);
@@ -789,10 +789,11 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                 {columns.total_sum && (
                                                     <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                         <span className="font-medium">
-                                                            {inv.total_sum}
+                                                            {Number(inv.total_sum).toLocaleString("ru-RU")}
                                                         </span>
                                                     </td>
                                                 )}
+
                                                 {columns.actions && (
                                                     <td className="p-3 text-center text-sm rounded-br-[10px] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700">
                                                         <div className="flex items-start justify-start gap-2">
