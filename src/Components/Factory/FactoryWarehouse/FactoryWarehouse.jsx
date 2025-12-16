@@ -98,7 +98,7 @@ export default function FactoryWarehouse() {
                                         <NavLink to={`/factory/warehouse-access/${w?.id}`}>
                                             <Tooltip content={t("View")}>
                                                 <IconButton
-                                                    className="bg-blue-500"
+                                                    className="bg-blue-500 hover:bg-blue-400"
                                                     variant="text"
                                                     color="white"
                                                 >
