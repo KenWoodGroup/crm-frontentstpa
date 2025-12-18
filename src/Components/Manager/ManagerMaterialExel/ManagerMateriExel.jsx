@@ -92,7 +92,7 @@ export default function ManagerMateriExel() {
         try {
             setLoadingUpload(true);
 
-            await InvoicesApi.UploadExel(createdInvoiceId, formData);
+            await InvoicesApi.UploadExelMaterial(createdInvoiceId, formData);
             Alert("Excel muvaffaqiyatli yuklandi", "success");
 
             // Reset states

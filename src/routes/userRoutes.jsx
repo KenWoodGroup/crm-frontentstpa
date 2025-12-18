@@ -20,6 +20,7 @@ import ClientDetail from "../Components/Other/ClientDetail/ClientDetail";
 import WarehouseClients from "../Components/Other/Clients/Clients";
 import Debtor from "../Components/Other/Debtor/Debtor";
 import Expensess from "../Components/Other/Expenses/Expensess";
+import MaterialCategory from "../Components/Other/FactoryProduct/MaterialCategory";
 import PaymentPage from "../Components/Other/Payment/PaymentPage";
 import PaymentType from "../Components/Other/PaymentType/PaymentType";
 import PriceTypePage from "../Components/Other/PriceType/PriceTypePage";
@@ -212,6 +213,11 @@ export const userRoutes = [
     path: "/factory/partner/:id",
     name: 'Factory partner',
     element: <FactoryPartnerDetail />
+  },
+  {
+    path: "/factory/materials",
+    name: 'Factory materials',
+    element: <MaterialCategory />
   },
 
 

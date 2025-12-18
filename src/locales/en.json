@@ -547,5 +547,6 @@
   "order_history": "Order History",
   "order_subtitle": "Audit, filters and exports for all factory orders",
   "button.create_order": "Create Order",
-  "empty_data_text": "There is no data here yet. Try adding a new entry or come back later."
+  "empty_data_text": "There is no data here yet. Try adding a new entry or come back later.",
+    "Material": "Materials"
 }
