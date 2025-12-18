@@ -75,7 +75,7 @@ function useDebounce(value, delay) {
 }
 
 /* ---------- Component ---------- */
-export default function WareHouseIncome({ role = "factory" }) {
+export default function WareHouseIncome({ role = "factory", prd_type="product" }) {
     // Ensure you have this import at the top of the file:
     // import { useTranslation } from 'react-i18next';
 
@@ -487,7 +487,7 @@ export default function WareHouseIncome({ role = "factory" }) {
                 const data = {
                     locationId: userLId,
                     search: debouncedSearch.trim(),
-                    fac_id: Cookies.get("usd_nesw"),
+                    fac_id: role === "warehouse" ? Cookies.get("usd_nesw") : Cookies.get("ul_nesw"),
                     operation_type: invoiceMeta?.[mode]?.operation_type
                 };
                 const res = await Stock.getLocationStocksBySearch({ data });
@@ -551,7 +551,7 @@ export default function WareHouseIncome({ role = "factory" }) {
             origin_price: Number(raw.purchase_price || 0),
             quantity: 1,
             unit: is_raw_stock ? productObj.unit : raw.unit || "-",
-            product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
+            product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id || raw.product_id || null,
             barcode: raw.barcode || null,
             batch: is_raw_stock ? (raw.batch || "def") : null,
             is_returning: false,
@@ -671,6 +671,7 @@ export default function WareHouseIncome({ role = "factory" }) {
                         sale_price: (invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") ? Number(it.s_price) : Number(it.s_price || 0),
                         discount: it.discount,
                         price_type_id: selectedSalePriceType?.[mode]?.value,
+                        product_type: prd_type,
                     }
                     // if (it.is_new_batch || it.batch === "def") {
                     //     delete item.batch
