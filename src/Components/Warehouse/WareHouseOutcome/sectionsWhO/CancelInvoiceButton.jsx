@@ -7,7 +7,7 @@ import { notify } from "../../../../utils/toast";
 import { useInventory } from "../../../../context/InventoryContext";
 import { useTranslation } from "react-i18next";
 
-const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
+const CancelInvoiceButton = ({ resetAll, appearance = "btn", id, disabled = true }) => {
     const { t } = useTranslation()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -119,14 +119,25 @@ const CancelInvoiceButton = ({ resetAll, appearance = "btn", id }) => {
                     <span>{t("cancelInvoice")}</span>
                 </motion.button>
                 :
-                <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    whileHover={{ scale: 1.08 }}
-                    onClick={() => setOpen(true)}
-                    className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 shadow-sm transition-all duration-200 flex items-center justify-center"
-                >
-                    <Trash2 className="w-5 h-5" />
-                </motion.button>
+                <div className="relative group">
+
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        whileHover={{ scale: 1.08 }}
+                        onClick={() => disabled ? null : setOpen(true)}
+                        className={`${disabled ? "opacity-50 cursor-not-allowed" : ""} p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 shadow-sm transition-all duration-200 flex items-center justify-center`}
+                    >
+                        <Trash2 className="w-5 h-5" />
+                    </motion.button>
+
+                    {disabled && 
+                        <div className="absolute right-0 bottom-full mb-1 
+                            hidden group-hover:block
+                            text-xs px-2 py-1 rounded 
+                            bg-gray-800 text-white whitespace-nowrap">
+                            {t("delete_only_zero")}
+                        </div> }
+                </div>
             }
 
             {/* ===== Modal ===== */}

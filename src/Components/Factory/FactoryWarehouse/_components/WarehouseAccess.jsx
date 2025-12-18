@@ -124,7 +124,7 @@ export default function WarehouseAccess() {
                             }
                             navigate('/factory/warehouse/stockin')
                         }}>
-                            Операций
+                            {t("operations")}
                         </Button>
                 </div>
 
