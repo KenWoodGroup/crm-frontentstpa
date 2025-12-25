@@ -20,11 +20,13 @@ import ClientDetail from "../Components/Other/ClientDetail/ClientDetail";
 import WarehouseClients from "../Components/Other/Clients/Clients";
 import Debtor from "../Components/Other/Debtor/Debtor";
 import Expensess from "../Components/Other/Expenses/Expensess";
-import MaterialCategory from "../Components/Other/FactoryProduct/MaterialCategory";
+import MaterialCategory from "../Components/Other/Materials/MaterialCategory";
+import MaterialCategoryDetail from "../Components/Other/MaterialsDetail/MaterialCategoryDetail";
 import PaymentPage from "../Components/Other/Payment/PaymentPage";
 import PaymentType from "../Components/Other/PaymentType/PaymentType";
 import PriceTypePage from "../Components/Other/PriceType/PriceTypePage";
 import PriceTypeStock from "../Components/Other/PriceTypeStock/PriceTypeStock";
+import ProductToMaterial from "../Components/Other/ProductToMaterial/ProductToMaterial";
 import StockApi from "../Components/Other/Stock/StockApi";
 import Sverka from "../Components/Other/Sverka/Sverka";
 import Carrier from "../Components/Other/Сarrier/Сarrier";
@@ -57,12 +59,12 @@ export const userRoutes = [
   {
     path: "factory/history",
     name: "factory history",
-    element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type = "invoice"/>
+    element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type="invoice" />
   },
   {
-    path:"factory/orders",
-    name:"factory orders",
-    element:<WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order"/>
+    path: "factory/orders",
+    name: "factory orders",
+    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order" />
   },
   {
     path: "factory/warehouse/user/:id",
@@ -204,12 +206,12 @@ export const userRoutes = [
     name: 'Factory user',
     element: <FactoryUserDetail />
   },
-    {
+  {
     path: "/factory/cash/:id",
     name: 'Factory cash detail',
     element: <CashDetail />
   },
-      {
+  {
     path: "/factory/partner/:id",
     name: 'Factory partner',
     element: <FactoryPartnerDetail />
@@ -218,6 +220,16 @@ export const userRoutes = [
     path: "/factory/materials",
     name: 'Factory materials',
     element: <MaterialCategory />
+  },
+  {
+    path: "/factory/materials/:id",
+    name: 'Factory materials',
+    element: <MaterialCategoryDetail />
+  },
+  {
+    path: "/factory/product/material/:id",
+    name: 'Factory product material',
+    element: <ProductToMaterial />
   },
 
 

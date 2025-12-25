@@ -12,22 +12,26 @@ import {
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie";
+import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 import { Alert } from "../../../../utils/Alert";
-import { LocalCategory } from "../../../../utils/Controllers/LocalCategory";
-import { MaterialCategoryApi } from "../../../../utils/Controllers/MaterialCategory";
 
-export default function MaterialCategoryEdit({ oldData, refresh }) {
+export default function MaterialEdit({ oldData, refresh }) {
     const { t } = useTranslation();
+    const location_id = Cookies.get("ul_nesw");
 
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
+    const [unit, setUnit] = useState("");
 
+    const units = ["to‘nna", "kg", "dona", "m.kub", "m.kv", "litr", "metr"];
 
     const handleOpen = () => setOpen(!open);
 
     useEffect(() => {
         if (open && oldData) {
             setName(oldData?.name || "");
+            setUnit(oldData?.unit || "");
         }
     }, [open, oldData]);
 
@@ -35,9 +39,12 @@ export default function MaterialCategoryEdit({ oldData, refresh }) {
         try {
             const data = {
                 name: name,
-                location_id: oldData?.location_id,
+                unit: unit,
+                location_id: location_id,
+                type:'material',
+                product_id: oldData?.product_id
             }
-            const response = await MaterialCategoryApi?.EditCategory(oldData?.id, data)
+            const response = await LocalProduct?.EditProduct(oldData?.id, data)
             Alert(t("success"), "success");
             refresh()
             handleOpen()
@@ -63,7 +70,7 @@ export default function MaterialCategoryEdit({ oldData, refresh }) {
                 <DialogHeader
                     className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
                 >
-                    {t("Edit_Category")}
+                    {t("Edit_material")}
                     <IconButton
                         variant="text"
                         color="red"
@@ -88,6 +95,26 @@ export default function MaterialCategoryEdit({ oldData, refresh }) {
                             className: `!text-text-light dark:!text-text-dark  `
                         }}
                     />
+
+                    {/* 🟩 Исправленный Select */}
+                    <Select
+                        label={t("Select_unit")}
+                        value={unit || ""}   // не даём undefined
+                        onChange={(val) => setUnit(val)}
+                        className="text-gray-900 dark:text-text-dark outline-none"
+                        labelProps={{
+                            className: "text-gray-700 dark:text-text-dark",
+                        }}
+                        menuProps={{
+                            className: "dark:bg-gray-800 dark:text-text-dark",
+                        }}
+                    >
+                        {units.map((u) => (
+                            <Option key={u} value={u}>
+                                {u}
+                            </Option>
+                        ))}
+                    </Select>
                 </DialogBody>
 
                 <DialogFooter className="justify-between">
@@ -98,7 +125,7 @@ export default function MaterialCategoryEdit({ oldData, refresh }) {
                     <Button
                         color="green"
                         onClick={updateProduct}
-                        disabled={!name}
+                        disabled={!name || !unit}
                     >
                         {t("Save")}
                     </Button>

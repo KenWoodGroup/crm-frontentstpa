@@ -14,6 +14,7 @@ export default function FactoryCategoryCreate({ refresh }) {
 
     const [data, setData] = useState({
         location_id: Cookies.get("ul_nesw"),
+        type:'product',
         name: ""
     });
 
@@ -23,8 +24,10 @@ export default function FactoryCategoryCreate({ refresh }) {
             handleOpen();
             Alert(`${t('success')}`, "success");
             setData({
-                location_id: Cookies.get("us_nesw"),
-                name: ""
+                location_id: Cookies.get("ul_nesw"),
+                name: "",
+        type:'product',
+
             })
             refresh()
         } catch (error) {
@@ -39,7 +42,7 @@ export default function FactoryCategoryCreate({ refresh }) {
 
             <Dialog className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
                 open={open} handler={handleOpen}>
-                <DialogHeader className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+                <DialogHeader className="bg-card-light rounded-t-[10px] dark:bg-card-dark text-text-light dark:text-text-dark"
                 >{t("Creaete_Category")}</DialogHeader>
 
                 <DialogBody className="flex flex-col gap-4">

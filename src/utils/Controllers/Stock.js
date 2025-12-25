@@ -12,11 +12,11 @@ class Stock {
         return response;
     }
     static getLocationStocksByChildId = async (location_id, id, operation_type) => {
-        const response = await $api.get(`/stock/category/${location_id}/${id}/${operation_type}`)
+        const response = await $api.get(`/stock/category-product/${location_id}/${id}/${operation_type}`)
         return response;
     }
     static getLocationStocksBySearch = async ({ data }) => {
-        const response = await $api.get(`/stock/search/${data.locationId}/${data.fac_id}/${data.operation_type}/${data.search}`)
+        const response = await $api.get(`/stock/search-product/${data.locationId}/${data.fac_id}/${data.operation_type}/${data.search}`)
         return response;
     }
     static getByBarcode = async ({payload}) => {

@@ -38,7 +38,8 @@ export default function FactoryProductCreate({ refresh }) {
                 name,
                 unit,
                 location_id,
-                category_id: id
+                type:'product',
+                category_id: id,
             };
             await LocalProduct?.CreateProduct(data)
             setName("");

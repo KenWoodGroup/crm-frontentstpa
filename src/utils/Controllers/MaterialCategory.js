@@ -13,6 +13,22 @@ class MaterialCategoryApi {
         const response = await $api.put(`/local-categories/${id}`, data)
         return response
     }
+        static DeleteCategoryMaterial = async (id, data) => {
+        const response = await $api.put(`/local-categories/${id}`, data)
+        return response
+    }
+     static CreateMaterialExel = async (id, data) => {
+        const response = await $api.post(
+            `/local-products/upload-material/${id}`,
+            data,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            }
+        );
+        return response;
+    };
 
 }
 

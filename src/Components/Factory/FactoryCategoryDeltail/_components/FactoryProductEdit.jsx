@@ -41,6 +41,7 @@ export default function FactoryProductEdit({ oldData, refresh }) {
                 name: name,
                 unit: unit,
                 location_id: location_id,
+                type:'material',
                 product_id: oldData?.product_id
             }
             const response = await LocalProduct?.EditProduct(oldData?.id, data)

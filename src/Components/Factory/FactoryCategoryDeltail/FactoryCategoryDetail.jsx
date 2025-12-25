@@ -30,6 +30,7 @@ export default function FactoryCategoryDetail() {
             const data = {
                 location_id,
                 category_id: id,
+                type: 'product',
                 page
             };
 
@@ -95,7 +96,11 @@ export default function FactoryCategoryDetail() {
 
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-end gap-2">
-
+                                                <NavLink to={`/factory/product/material/${product?.id}`}>
+                                                    <Button className="bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 normal-case p-[8px] transition-colors duration-200">
+                                                        <Eye size={20} />
+                                                    </Button>
+                                                </NavLink>
                                                 <FactoryCategoryDelete
                                                     id={product?.id}
                                                     refresh={() => GetLocalCategory(currentPage)}

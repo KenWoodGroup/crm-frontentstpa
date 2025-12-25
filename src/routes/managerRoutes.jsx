@@ -5,6 +5,7 @@ import ManagerFactory from "../Components/Manager/ManagerFactory/ManagerFactory"
 import ManagerFactoryDetail from "../Components/Manager/ManagerFactoryDetail/ManagerFactoryDetail";
 import ManagerInExel from "../Components/Manager/ManagerInExel/ManagerInExel";
 import ManagerMateriExel from "../Components/Manager/ManagerMaterialExel/ManagerMateriExel";
+import Option from "../Components/Other/Option/Option";
 import Users from "../Components/Other/Users/Users";
 
 export const managerRoutes = [
@@ -43,9 +44,14 @@ export const managerRoutes = [
         name: "Factory users",
         element: <Users />
     },
-        {
+    {
         path: "/manager/factory/warehouse-material/:facId/:warId",
         name: "Factory users",
         element: <ManagerMateriExel />
+    },
+    {
+        path: "/manager/option",
+        name: "Option",
+        element: <Option />
     },
 ]

@@ -544,9 +544,12 @@
     "Category": "Kategoriya",
     "new_order": "Yangi buyurtma",
     "operations": "Operatsiyalar",
-    "orders_history": "Buyurtmalar tarixi",
+    "order_history": "Buyurtmalar tarixi",
     "order_subtitle": "Barcha buyurtmalarni ko‘rib chiqish, boshqarish va eksport qilish",
     "button.create_order": "Yangi buyurtma yaratish",
     "empty_data_text": "Bu yerda hozircha hech qanday ma’lumot yo‘q. Yangi yozuv qo‘shib ko‘ring yoki keyinroq qaytib keling.",
-    "Material": "Xomashyo"
+    "Material": "Material",
+    "Create_material": "Material yaratish",
+    "Delete_material": "Material o'chirish",
+    "Edit_material": "Material o'zgartirish"
 }

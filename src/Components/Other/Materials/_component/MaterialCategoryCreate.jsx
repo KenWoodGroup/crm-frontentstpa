@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { LocalCategory } from "../../../../utils/Controllers/LocalCategory";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
-import { MaterialCategoryApi } from "../../../../utils/Controllers/MaterialCategory";
 
 
 export default function MaterialCategoryCreate({ refresh }) {
@@ -15,16 +14,18 @@ export default function MaterialCategoryCreate({ refresh }) {
 
     const [data, setData] = useState({
         location_id: Cookies.get("ul_nesw"),
-        name: ""
+        name: "",
+        type: 'material',
     });
 
     const CreateCategory = async () => {
         try {
-            await MaterialCategoryApi.CreateCategoryMaterial(data);
+            await LocalCategory.CreateCategory(data);
             handleOpen();
             Alert(`${t('success')}`, "success");
             setData({
-                location_id: Cookies.get("us_nesw"),
+                location_id: Cookies.get("ul_nesw"),
+                type: 'material',
                 name: ""
             })
             refresh()

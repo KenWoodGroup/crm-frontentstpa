@@ -143,16 +143,16 @@ export default function ManagerFactoryDetail() {
                                     className="flex items-center gap-2 text-blue-600 hover:underline"
                                 >
                                     <Package size={18} />
-                                    Mahsulotlar
+                                    Mahsulot
                                 </NavLink>
-
+{/* 
                                 <NavLink
                                     to={`/manager/factory/warehouse-material/${id}/${item?.id}`}
                                     className="flex items-center gap-2 text-green-600 hover:underline"
                                 >
                                     <Layers size={18} />
                                     Materialar
-                                </NavLink>
+                                </NavLink> */}
                             </div>
                         </div>
                     );

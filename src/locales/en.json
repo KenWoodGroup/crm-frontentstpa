@@ -548,5 +548,8 @@
   "order_subtitle": "Audit, filters and exports for all factory orders",
   "button.create_order": "Create Order",
   "empty_data_text": "There is no data here yet. Try adding a new entry or come back later.",
-    "Material": "Materials"
+  "delete_only_zero": "Only invoices with a total amount of 0 can be deleted",
+  "Material": "Material",
+  "Create_material": "Create material",
+  "Delete_material": "Delete material"
 }

@@ -5,9 +5,18 @@ class LocalProduct {
         const response = await $api.post(`/local-products`, data)
         return response;
     }
+    static GetByid = async (id)=>{
+        const response = await $api.get(`/local-products/${id}`)
+        return response
+    }
+    static GetAllProduct = async (data)=>{
+        const response = await $api.get(`/local-products/products/${data?.type}/${data?.location_id}/${data?.category_id}`)
+        return response
+    }
+
     static CreateProductExel = async (id, data) => {
         const response = await $api.post(
-            `/local-products/upload/${id}`,
+            `/local-products/upload-product/${id}`,
             data,
             {
                 headers: {
@@ -23,7 +32,7 @@ class LocalProduct {
         return response;
     }
     static GetProduct = async (data) => {
-        const response = await $api.get(`/local-products/paginate/${data?.location_id}/${data?.category_id}/page?page=${data?.page}`)
+        const response = await $api.get(`/local-products/paginate/${data?.type}/${data?.location_id}/${data?.category_id}/page?page=${data?.page}`)
         return response;
     }
     static GetCategory = async (id) => {
@@ -50,8 +59,8 @@ class LocalProduct {
         const response = await $api.put(`/local-products/by-id/${id}`, data)
         return response;
     }
-    static SearchProduct = async (name) => {
-        const response = await $api.get(`/stock/by-name/${name}`)
+    static SearchProduct = async (name, type) => {
+        const response = await $api.get(`/stock/by-name/${type}/${name}`)
         return response;
     }
 } export { LocalProduct }

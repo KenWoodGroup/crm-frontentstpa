@@ -14,17 +14,17 @@ import {
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
+import { Alert } from "../../../../utils/Alert";
 
-export default function FactoryProductModal() {
+export default function MaterialCreate({ refresh }) {
     const { id } = useParams()
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [unit, setUnit] = useState("");
     const { t } = useTranslation();
     const location_id = Cookies.get("ul_nesw");
-    const navigate = useNavigate()
 
     const units = ["tonna", "kg", "dona", "m.kub", "m.kv", "litr", "metr"];
 
@@ -38,12 +38,13 @@ export default function FactoryProductModal() {
                 name,
                 unit,
                 location_id,
-                subcategory_id: id
+                type:'material',
+                category_id: id,
             };
             await LocalProduct?.CreateProduct(data)
             setName("");
             setUnit("");
-            navigate(-2)
+            refresh()
             toggleOpen();
             Alert(`${t("success")}`, "success");
         } catch (error) {
@@ -62,7 +63,7 @@ export default function FactoryProductModal() {
                 <DialogHeader
                     className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
                 >
-                    {t("Create_product")}
+                    {t("Create_material")}
                     <IconButton
                         variant="text"
                         color="red"

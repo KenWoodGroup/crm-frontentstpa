@@ -5,7 +5,7 @@ import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 
-export default function FactoryProductExelModal({ id }) {
+export default function MaterialExel({ id }) {
 
     const { t } = useTranslation();
 

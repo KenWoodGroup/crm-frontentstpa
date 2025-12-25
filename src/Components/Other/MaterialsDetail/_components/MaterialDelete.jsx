@@ -3,9 +3,9 @@ import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@materia
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
-import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
+import { LocalCategory } from "../../../../utils/Controllers/LocalCategory";
 
-export default function FactoryProductDelete({ id, refresh }) {
+export default function MaterialDelete({ id, refresh }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ export default function FactoryProductDelete({ id, refresh }) {
     const handleDelete = async () => {
         try {
             setLoading(true);
-            await LocalProduct.DeleteProduct(id);
+            await LocalCategory.DeleteCategory(id);
             Alert(t("success"), "success");
             refresh();
             setOpen(false);
@@ -42,7 +42,7 @@ export default function FactoryProductDelete({ id, refresh }) {
                 className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300"
             >
                 <DialogHeader className="text-lg dark:text-text-dark font-semibold border-b border-gray-200 dark:border-gray-700 pb-4 bg-card-light dark:bg-card-dark rounded-t-xl">
-                    {t('Delete_product')}
+                    {t('Delete_material')}
                 </DialogHeader>
                 <DialogBody divider className="text-text-light dark:text-text-dark py-6">
                     {t('Delete_product_text')}

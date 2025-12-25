@@ -60,7 +60,6 @@ export default function StockApi() {
             const total = Number(response?.data?.data?.pagination?.total_pages || 0);
 
             setTotalPages(total);
-
             if (append) {
                 setProducts(prev => [...prev, ...newProducts]);
                 setOriginalProducts(prev => [...prev, ...newProducts]);
@@ -134,7 +133,8 @@ export default function StockApi() {
 
         try {
             // Используем API поиска только по имени
-            const response = await LocalProduct?.SearchProduct(query);
+            
+            const response = await LocalProduct?.SearchProduct(query, "product");
 
             // Обработка ответа в зависимости от структуры API
             let searchResults = [];

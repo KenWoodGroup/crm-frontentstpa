@@ -3,9 +3,10 @@ import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@materia
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
+import { MaterialCategoryApi } from "../../../../utils/Controllers/MaterialCategory";
 import { LocalCategory } from "../../../../utils/Controllers/LocalCategory";
 
-export default function FactoryCategoryDelete({ id, refresh }) {
+export default function MaterialCategoryDelete({ id, refresh }) {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);

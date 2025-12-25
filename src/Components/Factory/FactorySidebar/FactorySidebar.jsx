@@ -20,7 +20,7 @@ import {
     Move,
     ShoppingCart
 } from "lucide-react";
-import Logo from '../../../Images/image_2025-12-05_11-46-58.png'
+import Logo from '../../../Images/photo_2025-12-20 11.17.15.jpeg'
 
 export default function FactorySidebar() {
     const { t } = useTranslation();
