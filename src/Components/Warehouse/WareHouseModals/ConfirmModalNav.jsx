@@ -12,13 +12,13 @@ export default function ConfirmModalNav({ open, onConfirm, onCancel }) {
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-white p-6 rounded-2xl shadow-xl w-80 text-center"
+            className="bg-card-light dark:bg-card-dark p-6 rounded-2xl shadow-xl w-80 text-center"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 20 }}
           >
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">
+            <h3 className="text-lg font-semibold mb-3 text-text-light dark:text-text-dark">
               Sahifadan chiqmoqchimisiz?
             </h3>
             <p className="text-sm text-gray-600 mb-6">
@@ -27,7 +27,7 @@ export default function ConfirmModalNav({ open, onConfirm, onCancel }) {
             <div className="flex justify-center gap-4">
               <button
                 onClick={onCancel}
-                className="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 transition"
+                className="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
               >
                 Yo‘q
               </button>

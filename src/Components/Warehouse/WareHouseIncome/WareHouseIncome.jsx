@@ -329,14 +329,6 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
         setSelectedLocation(operationLocations?.find((it) => it.type === "default"))
     }, [selected])
 
-    // keep invoice receiver current when locations load (use context setter)
-    // useEffect(() => {
-    //     const name = getLocationNameById(userLId) || "Me";
-    //     // setInvoiceMeta expects (mode, value)
-    //     setInvoiceMeta(mode, { ...invoiceMeta?.[mode], receiver: name });
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [locations, userLId]);
-
     // ---------- Sidebar: get products by category ----------
     const handleCategoryClick = async (catId) => {
         setSelectedCategory(catId);
@@ -622,7 +614,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     function updateBatchNew(index, value, price, org_price) {
         if (price !== org_price) {
             // NOTE: you may want to add a translation key like 'new_batch_price_change_warning'
-            notify.warning(t("generic_error", { msg: "Price changed - new batch must be created" }));
+            notify.warning(t("generic_error", { msg: t("priceChangedNewBatchRequired") }));
             return;
         }
         updateBatch(index, value);
@@ -927,7 +919,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
         ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px] phone:pl-[140px]"} laptop:h-[52px]`}
             >
 
-                <h2 className="text-text-light dark:text-text-dark text-lg laptop:text-base leading-[16px] font-semibold laptop:leading-[16bpx]">
+                <h2 className="text-text-light dark:text-text-dark text-lg laptop:text-base leading-[16px] font-semibold laptop:leading-[16bpx] line-clamp-2">
                     {(role === "factory" && deUlName) && <span className="phone:text-sm">{deUlName} <span className="mid:hidden"> | </span></span>}
                     <span className="mid:hidden">
                         {!invoiceStarted?.[mode]
@@ -1107,8 +1099,8 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                 }
                             }}
                             className="mt-auto pb-1 flex flex-col items-center gap-1 cursor-n-resize desktop:hidden">
-                            <hr className="w-8 border-[1px] rounded-2xl" />
-                            <hr className="w-7 border-[1px] rounded-2xl" />
+                            <hr className="w-8 border-[1px] rounded-2xl border-card-dark dark:border-card-light opacity-70" />
+                            <hr className="w-7 border-[1px] rounded-2xl border-card-dark dark:border-card-light opacity-70" />
                         </button>
                     </div>
                 )}

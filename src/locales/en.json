@@ -554,5 +554,6 @@
   "discount": "Discount", 
   "Material": "Material",
   "Create_material": "Create material",
-  "Delete_material": "Delete material"
+  "Delete_material": "Delete material",
+  "priceChangedNewBatchRequired":"The price has changed; the current batch must be closed and a new batch opened"
 }
