@@ -288,7 +288,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     const fetchSalePriceTypes = async () => {
         try {
             setSaleTypesLoading(true);
-            const res = await PriceType.PriceTypeGet(userLId);
+            const res = await PriceType.PriceTypeGet(Cookies.get("ul_nesw"));
             if (res.status === 200 || res.status === 201) {
                 const options = res.data?.map((op) => ({ value: op.id, label: op.name }))
                 setSaleTypes(options)
