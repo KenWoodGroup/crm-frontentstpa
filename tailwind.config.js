@@ -28,9 +28,12 @@ module.exports = withMT({
       desktop: "1280px",
       laptop: { max: "1279px" },
       tablet: { max: "1023px" },
-      mid:{ max: "867px" },
+      mid: { max: "867px" },
       phone: { max: "639px" },
     },
   },
-  plugins: [require('tailwind-scrollbar'),],
+  plugins: [
+    require('tailwind-scrollbar'),
+    require('@tailwindcss/line-clamp'),
+  ],
 });

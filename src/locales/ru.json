@@ -564,5 +564,6 @@
     "Delete_material": "Удалить материал",
     "Product_materila_text": "Материалы для продукта",
     "total_prew": "Указано",
-    "Select_Material": "Выбрано материалов"
+    "Select_Material": "Выбрано материалов",
+    "priceChangedNewBatchRequired":"Цена изменена, текущая партия должна быть закрыта и создана новая"
 }
