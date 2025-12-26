@@ -18,7 +18,7 @@ import { useParams } from "react-router-dom";
 import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 import { Alert } from "../../../../utils/Alert";
 
-export default function FactoryProductCreate({ refresh }) {
+export default function MaterialCreate({ refresh }) {
     const { id } = useParams()
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
@@ -38,7 +38,7 @@ export default function FactoryProductCreate({ refresh }) {
                 name,
                 unit,
                 location_id,
-                type:'product',
+                type:'material',
                 category_id: id,
             };
             await LocalProduct?.CreateProduct(data)
@@ -63,7 +63,7 @@ export default function FactoryProductCreate({ refresh }) {
                 <DialogHeader
                     className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
                 >
-                    {t("Create_product")}
+                    {t("Create_material")}
                     <IconButton
                         variant="text"
                         color="red"

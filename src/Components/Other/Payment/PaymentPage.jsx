@@ -256,13 +256,13 @@ export default function PaymentPage() {
                                         </td>
                                      
                                         <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
-                                           {item?.method_id}
+                                           {item?.method?.name}
                                         </td>
                                         <td className="p-1 text-center text-sm font-semibold text-green-600 dark:text-green-400 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
                                             {Number(item.amount).toLocaleString()} so'm
                                         </td>
                                         <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700 transition-colors duration-200">
-                                            {item?.cash_id || (
+                                            {item?.cash?.name || (
                                                 <span className="text-gray-400 dark:text-gray-500">-</span>
                                             )}
                                         </td>

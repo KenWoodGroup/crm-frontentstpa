@@ -20,7 +20,7 @@ import {
     Move,
     ShoppingCart
 } from "lucide-react";
-import Logo from '../../../Images/image_2025-12-05_11-46-58.png'
+import Logo from '../../../Images/photo_2025-12-20 11.17.15.jpeg'
 
 export default function FactorySidebar() {
     const { t } = useTranslation();
@@ -184,6 +184,7 @@ export default function FactorySidebar() {
             isMenu: true,
             items: [
                 { id: 12, path: "/factory/product", icon: <Factory className="w-4 h-4" />, label: t("Production") },
+                { id: 122, path: "/factory/materials", icon: <Factory className="w-4 h-4" />, label: t("Material") },
                 { id: 5, path: "/factory/partner", icon: <Users className="w-4 h-4" />, label: t("partner") },
                 { id: 7, path: "/factory/payment-type", icon: <ClipboardType className="w-4 h-4" />, label: t("Payment_type") },
                 { id: 14, path: "/factory/users", icon: <Users className="w-4 h-4" />, label: t("workers") },

@@ -552,5 +552,8 @@
     "courier": "Kuryer",
     "comment": "Izoh",
     "discount": "Chegirma"
-
+    "Material": "Material",
+    "Create_material": "Material yaratish",
+    "Delete_material": "Material o'chirish",
+    "Edit_material": "Material o'zgartirish"
 }

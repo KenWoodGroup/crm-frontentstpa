@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import { Alert } from "../../../../utils/Alert";
 
 
-export default function FactoryCategoryCreate({ refresh }) {
+export default function MaterialCategoryCreate({ refresh }) {
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
@@ -14,8 +14,8 @@ export default function FactoryCategoryCreate({ refresh }) {
 
     const [data, setData] = useState({
         location_id: Cookies.get("ul_nesw"),
-        type:'product',
-        name: ""
+        name: "",
+        type: 'material',
     });
 
     const CreateCategory = async () => {
@@ -25,9 +25,8 @@ export default function FactoryCategoryCreate({ refresh }) {
             Alert(`${t('success')}`, "success");
             setData({
                 location_id: Cookies.get("ul_nesw"),
-                name: "",
-        type:'product',
-
+                type: 'material',
+                name: ""
             })
             refresh()
         } catch (error) {
@@ -42,7 +41,7 @@ export default function FactoryCategoryCreate({ refresh }) {
 
             <Dialog className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
                 open={open} handler={handleOpen}>
-                <DialogHeader className="bg-card-light rounded-t-[10px] dark:bg-card-dark text-text-light dark:text-text-dark"
+                <DialogHeader className="bg-card-light dark:bg-card-dark rounded-t-lg text-text-light dark:text-text-dark"
                 >{t("Creaete_Category")}</DialogHeader>
 
                 <DialogBody className="flex flex-col gap-4">

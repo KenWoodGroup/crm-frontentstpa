@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import EmptyData from "../../UI/NoData/EmptyData";
 import Loading from "../../UI/Loadings/Loading";
-import FactoryCategoryCreate from "./_component/FactoryCategoryCreate";
-import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
-import FactoryCategoryEdit from "./_component/FactoryCategoryEdit";
-import FactoryCategoryDelete from "./_component/FactoryCategoryDelete";
+import MaterialCategoryCreate from "./_component/MaterialCategoryCreate";
+import FactoryCategoryEdit from "./_component/MaterialCategoryEdit";
+import FactoryCategoryDelete from "./_component/MaterialCategoryDelete";
 import Eye from "../../UI/Icons/Eye";
 import { NavLink } from "react-router-dom";
 import Cookies from "js-cookie";
-import FactoryProductExelModal from "./_component/FactoryProductExelModal";
+import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
+import MaterialCategoryDelete from "./_component/MaterialCategoryDelete";
+import MaterialCategoryEdit from "./_component/MaterialCategoryEdit";
+import MaterialExel from "./_component/MaterialExel";
 
-export default function FactoryLocalProduct() {
+export default function MaterialCategory() {
     const { t } = useTranslation();
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -26,10 +28,10 @@ export default function FactoryLocalProduct() {
         try {
             const data = {
                 location_id: location_id,
-                type: 'product',
+                type:'material',
                 page
             };
-            const response = await LocalCategory?.GetallCateogry(data);
+            const response = await LocalCategory.GetallCateogry(data)
             const records = response?.data?.data?.records || [];
             const pagination = response?.data?.data?.pagination || {};
             setProducts(records);
@@ -55,16 +57,15 @@ export default function FactoryLocalProduct() {
 
     return (
         <div className="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-                    <div className="flex items-center flex-wrap gap-[20px] justify-between mb-4">
+            <div className="flex items-center flex-wrap gap-[20px] justify-between mb-4">
                 <Typography variant="h2" className="text-gray-900 dark:text-gray-100 font-bold">
                     {t('Category')}
                 </Typography>
                 <div className="flex items-center gap-[10px]">
-                    <FactoryProductExelModal/>
-                    <FactoryCategoryCreate refresh={() => GetLocalCategory(currentPage)} />
+                    <MaterialExel/>
+                    <MaterialCategoryCreate refresh={() => GetLocalCategory(currentPage)} />
                 </div>
             </div>
-
             {loading ? (
                 <Loading />
             ) : products.length > 0 ? (
@@ -92,16 +93,16 @@ export default function FactoryLocalProduct() {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-end gap-2">
-                                                <NavLink to={`/factory/category/${product?.id}`}>
+                                                <NavLink to={`/factory/materials/${product?.id}`}>
                                                     <Button className="bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 normal-case p-[8px] transition-colors duration-200">
                                                         <Eye size={20} />
                                                     </Button>
                                                 </NavLink>
-                                                <FactoryCategoryDelete
+                                                <MaterialCategoryDelete
                                                     id={product?.id}
                                                     refresh={() => GetLocalCategory(currentPage)}
                                                 />
-                                                <FactoryCategoryEdit
+                                                <MaterialCategoryEdit
                                                     oldData={product}
                                                     refresh={() => GetLocalCategory(currentPage)}
                                                 />

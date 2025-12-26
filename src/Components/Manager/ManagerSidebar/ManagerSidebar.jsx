@@ -55,6 +55,13 @@ export default function ManagerSidebar({ onClose, active, open }) {
                         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 26 26"><path fill="currentColor" d="M24.469.993a1 1 0 0 0-.999-.95h-2.849a1 1 0 0 0-.996.91L18 19.268V12h-2V9a1.002 1.002 0 0 0-1.554-.832L8.697 12H8V9a1.002 1.002 0 0 0-1.554-.832l-6 4A1 1 0 0 0 0 13v12a1 1 0 0 0 1 1h24.02c.553 0 .949-.352.949-.904c0-.086-1.5-24.103-1.5-24.103M5 14v3H3v-3zm5 0v3H8v-3zm5 0v3h-2v-3zM5 19v3H3v-3zm5 0v3H8v-3zm5 0v3h-2v-3z"></path></svg>
                     ),
                 },
+                {
+                    id: 3,
+                    title: "Options",
+                    path: "/manager/option",
+                    icon: (
+                        <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none"><circle cx="9" cy="16" r="2" fill="currentColor" opacity="0.16" /><circle cx="15" cy="8" r="2" fill="currentColor" opacity="0.16" /><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h9m4 0h3m-9 8h9M4 16h3" /><circle cx="9" cy="16" r="2" stroke="currentColor" stroke-width="2" /><circle cx="15" cy="8" r="2" stroke="currentColor" stroke-width="2" /></g></svg>),
+                },
             ],
         },
     ];

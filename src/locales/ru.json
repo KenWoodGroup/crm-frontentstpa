@@ -352,7 +352,7 @@
     "fetch_stock_error": "Ошибка получения остатков: {{msg}}",
     "product_missing_field": "Пожалуйста, укажите {{field}} для {{name}}",
     "enter_price": "цена",
-    "enter_quantity": "количество",
+    "enter_quantity": "Kоличество",
     "item_not_added": "Элемент не добавлен",
     "me_label": "Я",
     "other_label": "Другое",
@@ -559,4 +559,10 @@
     "courier": "Курьер",
     "comment": "Комментарий",
     "discount": "Скидка"
+    "Material":"Материалы",
+    "Create_material":"Создать материал",
+    "Delete_material": "Удалить материал",
+    "Product_materila_text": "Материалы для продукта",
+    "total_prew": "Указано",
+    "Select_Material": "Выбрано материалов"
 }

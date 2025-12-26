@@ -7,8 +7,7 @@ import {
     DialogHeader,
     IconButton,
     Input,
-    Select,
-    Option,
+
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -36,6 +35,7 @@ export default function FactoryCategoryEdit({ oldData, refresh }) {
             const data = {
                 name: name,
                 location_id: oldData?.location_id,
+                type: "product",
             }
             const response = await LocalCategory?.EditCategory(oldData?.id, data)
             Alert(t("success"), "success");
@@ -63,7 +63,7 @@ export default function FactoryCategoryEdit({ oldData, refresh }) {
                 <DialogHeader
                     className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
                 >
-                    {t("Edit_Category")}
+                    {t("Edit_Product")}
                     <IconButton
                         variant="text"
                         color="red"

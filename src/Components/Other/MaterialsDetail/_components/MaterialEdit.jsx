@@ -1,4 +1,4 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import {
     Button,
     Dialog,
@@ -6,79 +6,86 @@ import {
     DialogFooter,
     DialogHeader,
     IconButton,
-    Typography,
     Input,
     Select,
     Option,
 } from "@material-tailwind/react";
-import { useState } from "react";
-import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import Cookies from "js-cookie";
 import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 import { Alert } from "../../../../utils/Alert";
 
-export default function FactoryProductCreate({ refresh }) {
-    const { id } = useParams()
-    const [open, setOpen] = useState(false);
-    const [name, setName] = useState("");
-    const [unit, setUnit] = useState("");
+export default function MaterialEdit({ oldData, refresh }) {
     const { t } = useTranslation();
     const location_id = Cookies.get("ul_nesw");
 
-    const units = ["tonna", "kg", "dona", "m.kub", "m.kv", "litr", "metr"];
+    const [open, setOpen] = useState(false);
+    const [name, setName] = useState("");
+    const [unit, setUnit] = useState("");
 
-    const toggleOpen = () => setOpen(!open);
+    const units = ["to‘nna", "kg", "dona", "m.kub", "m.kv", "litr", "metr"];
 
-    const createProduct = async () => {
-        if (!name || !unit) return;
+    const handleOpen = () => setOpen(!open);
 
+    useEffect(() => {
+        if (open && oldData) {
+            setName(oldData?.name || "");
+            setUnit(oldData?.unit || "");
+        }
+    }, [open, oldData]);
+
+    const updateProduct = async () => {
         try {
             const data = {
-                name,
-                unit,
-                location_id,
-                type:'product',
-                category_id: id,
-            };
-            await LocalProduct?.CreateProduct(data)
-            setName("");
-            setUnit("");
+                name: name,
+                unit: unit,
+                location_id: location_id,
+                type:'material',
+                product_id: oldData?.product_id
+            }
+            const response = await LocalProduct?.EditProduct(oldData?.id, data)
+            Alert(t("success"), "success");
             refresh()
-            toggleOpen();
-            Alert(`${t("success")}`, "success");
+            handleOpen()
         } catch (error) {
-            console.error("Error creating product:", error);
-            Alert(`${t("Error")}`, "error");
+            console.log(error)
+            Alert(t("Error"), "error");
         }
-    };
+    }
 
     return (
         <>
-            <Button color="blue" onClick={toggleOpen}>{t('Add')}</Button>
+            <Button
+                onClick={handleOpen}
+                className="bg-yellow-600 dark:bg-yellow-500 p-[8px] text-white dark:text-text-dark 
+                hover:bg-yellow-700 dark:hover:bg-yellow-600 active:bg-yellow-800 transition-colors"
+            >
+                <PencilSquareIcon className="w-5 h-5" />
+            </Button>
 
             <Dialog
                 className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
-                open={open} size="md" handler={toggleOpen}>
+                open={open} size="md" handler={handleOpen}>
                 <DialogHeader
                     className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark"
                 >
-                    {t("Create_product")}
+                    {t("Edit_material")}
                     <IconButton
                         variant="text"
                         color="red"
-                        onClick={toggleOpen}
+                        onClick={handleOpen}
                         className="ml-auto"
                     >
                         <XMarkIcon className="h-5 w-5" />
                     </IconButton>
                 </DialogHeader>
+
                 <DialogBody divider className="space-y-4">
                     <Input
                         label={t("Name")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder={t("Type product name")}
                         color="blue-gray"
                         className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
                         containerProps={{
@@ -88,10 +95,12 @@ export default function FactoryProductCreate({ refresh }) {
                             className: `!text-text-light dark:!text-text-dark  `
                         }}
                     />
+
+                    {/* 🟩 Исправленный Select */}
                     <Select
                         label={t("Select_unit")}
-                        value={unit}
-                        onChange={(value) => setUnit(value)}
+                        value={unit || ""}   // не даём undefined
+                        onChange={(val) => setUnit(val)}
                         className="text-gray-900 dark:text-text-dark outline-none"
                         labelProps={{
                             className: "text-gray-700 dark:text-text-dark",
@@ -107,13 +116,15 @@ export default function FactoryProductCreate({ refresh }) {
                         ))}
                     </Select>
                 </DialogBody>
+
                 <DialogFooter className="justify-between">
-                    <Button variant="text" color="red" onClick={toggleOpen}>
+                    <Button variant="text" color="red" onClick={handleOpen}>
                         {t("Close")}
                     </Button>
+
                     <Button
                         color="green"
-                        onClick={createProduct}
+                        onClick={updateProduct}
                         disabled={!name || !unit}
                     >
                         {t("Save")}

@@ -1,14 +1,10 @@
 import { $api } from "../Headers"
 
 class ProductApi {
-
-
-
     static CreateProduct = async (data) => {
         const response = await $api.post(`/products`, data)
         return response
     }
-
     static GetAllCategory = async () => {
         const response = await $api.get(`/categories`)
         return response
