@@ -549,6 +549,9 @@
   "button.create_order": "Create Order",
   "empty_data_text": "There is no data here yet. Try adding a new entry or come back later.",
   "delete_only_zero": "Only invoices with a total amount of 0 can be deleted",
+  "courier": "Courier",
+  "comment": "Comment",
+  "discount": "Discount"  
   "Material": "Material",
   "Create_material": "Create material",
   "Delete_material": "Delete material"

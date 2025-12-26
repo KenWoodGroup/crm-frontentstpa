@@ -548,6 +548,10 @@
     "order_subtitle": "Barcha buyurtmalarni ko‘rib chiqish, boshqarish va eksport qilish",
     "button.create_order": "Yangi buyurtma yaratish",
     "empty_data_text": "Bu yerda hozircha hech qanday ma’lumot yo‘q. Yangi yozuv qo‘shib ko‘ring yoki keyinroq qaytib keling.",
+    "delete_only_zero": "Faqat summasi 0 bo‘lgan invoice o‘chiriladi",
+    "courier": "Kuryer",
+    "comment": "Izoh",
+    "discount": "Chegirma"
     "Material": "Material",
     "Create_material": "Material yaratish",
     "Delete_material": "Material o'chirish",

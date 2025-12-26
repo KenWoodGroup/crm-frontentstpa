@@ -62,7 +62,7 @@ function useDebounce(value, delay) {
     return debounced;
 }
 
-export default function WareHouseOutcome({ role = "factory" }) {
+export default function WareHouseOutcome({ role = "factory", prd_type="product" }) {
     // (Place this inside your component function scope)
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -167,7 +167,7 @@ export default function WareHouseOutcome({ role = "factory" }) {
         try {
             setGroupLoading(true);
             const LocationId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw");
-            const res = await LocalCategory.GetAll(LocationId);
+            const res = await LocalCategory.GetAll(LocationId, prd_type);
             if (res?.status === 200) setCategories(res.data || []);
             else setCategories(res?.data || []);
         } catch (err) {
@@ -254,7 +254,7 @@ export default function WareHouseOutcome({ role = "factory" }) {
         try {
             setProductLoading(true);
             // for outgoing, we fetch stocks of current location (we will take from this location)
-            const res = await Stock.getLocationStocksByChildId(userLId, catId, type);
+            const res = await Stock.getLocationStocksByChildId(prd_type, userLId, catId, type);
             if (res?.status === 200) setProducts(res.data || []);
             else setProducts(res?.data || []);
         } catch (err) {
@@ -434,7 +434,7 @@ export default function WareHouseOutcome({ role = "factory" }) {
             quantity: 1,
             stock_quantity: invoiceMeta?.[mode]?.operation_type === "disposal" ? raw?.quantity : raw?.draft_quantity,
             unit: is_raw_stock ? productObj.unit : raw.unit || "-",
-            product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id,
+            product_id: is_raw_stock ? (raw.product_id || productObj.id) : raw.id || raw.product_id || null,
             barcode: raw.barcode || null,
             batch: raw.batch ?? null,
             fixed_quantity: raw.fixed_quantity,

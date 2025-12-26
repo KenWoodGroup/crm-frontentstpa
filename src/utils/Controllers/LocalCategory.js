@@ -13,8 +13,8 @@ class LocalCategory {
         const response = await $api.get(`/local-categories/page/${data?.type}/${data?.location_id}?page=${data?.page}`)
         return response;
     }
-    static GetAll = async (id) => {
-        const response = await $api.get(`/local-categories/all/${id}`)
+    static GetAll = async (id, type) => {
+        const response = await $api.get(`/local-categories/all/${type}/${id}`)
         return response;
     }
     static EditCategory = async (id, data) => {

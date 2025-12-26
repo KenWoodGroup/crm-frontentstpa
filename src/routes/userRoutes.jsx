@@ -62,6 +62,21 @@ export const userRoutes = [
     element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type="invoice" />
   },
   {
+    path: "/factory/history/:invoiceId",
+    name: "factory detail history by id",
+    element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type="invoice" />
+  },
+  {
+    path: "factory/orders",
+    name: "factory orders",
+    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order" />
+  },
+  {
+    path: "/factory/orders/:invoiceId",
+    name: "factory detail history by id",
+    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order"/>
+  },
+  {
     path: "factory/orders",
     name: "factory orders",
     element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order" />

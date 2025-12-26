@@ -7,3 +7,6 @@ export const unformatNumber = (formattedValue) => {
     if (!formattedValue) return 0;
     return Number(formattedValue.toString().replace(/\s/g, ""));
 };
+
+// const x = document.getElementsByName("body");
+// x.style.display = "none"

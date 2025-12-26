@@ -11,8 +11,8 @@ class Stock {
         const response = await $api.post(`/stock`, data)
         return response;
     }
-    static getLocationStocksByChildId = async (location_id, id, operation_type) => {
-        const response = await $api.get(`/stock/category-product/${location_id}/${id}/${operation_type}`)
+    static getLocationStocksByChildId = async (prd_type, location_id, id, operation_type) => {
+        const response = await $api.get(`/stock/category/${prd_type}/${location_id}/${id}/${operation_type}`)
         return response;
     }
     static getLocationStocksBySearch = async ({ data }) => {
