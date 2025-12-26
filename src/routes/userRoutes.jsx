@@ -56,12 +56,22 @@ export const userRoutes = [
   {
     path: "factory/history",
     name: "factory history",
-    element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type = "invoice"/>
+    element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type="invoice" />
   },
   {
-    path:"factory/orders",
-    name:"factory orders",
-    element:<WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order"/>
+    path: "/factory/history/:invoiceId",
+    name: "factory detail history by id",
+    element: <WarehouseInvoiceHistory key={"factory-history"} role="factory" type="invoice" />
+  },
+  {
+    path: "factory/orders",
+    name: "factory orders",
+    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order" />
+  },
+  {
+    path: "/factory/orders/:invoiceId",
+    name: "factory detail history by id",
+    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order"/>
   },
   {
     path: "factory/warehouse/user/:id",
@@ -203,12 +213,12 @@ export const userRoutes = [
     name: 'Factory user',
     element: <FactoryUserDetail />
   },
-    {
+  {
     path: "/factory/cash/:id",
     name: 'Factory cash detail',
     element: <CashDetail />
   },
-      {
+  {
     path: "/factory/partner/:id",
     name: 'Factory partner',
     element: <FactoryPartnerDetail />

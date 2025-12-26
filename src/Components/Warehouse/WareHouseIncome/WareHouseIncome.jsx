@@ -36,7 +36,8 @@ import {
     PackagePlus,
     PackageMinus,
     SendIcon,
-    Home
+    Home,
+    DropletsIcon
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 import { ProductApi } from "../../../utils/Controllers/ProductApi";
@@ -60,6 +61,7 @@ import CarrierCreateModal from "../WareHouseModals/CarrierCreateModal";
 import { PriceType } from "../../../utils/Controllers/PriceType";
 import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
+import { ArrowDropDown } from "@mui/icons-material";
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -75,7 +77,7 @@ function useDebounce(value, delay) {
 }
 
 /* ---------- Component ---------- */
-export default function WareHouseIncome({ role = "factory", prd_type="product" }) {
+export default function WareHouseIncome({ role = "factory", prd_type = "product" }) {
     // Ensure you have this import at the top of the file:
     // import { useTranslation } from 'react-i18next';
 
@@ -206,7 +208,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
         try {
             setGroupLoading(true);
             const LocationId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw");
-            const res = await LocalCategory.GetAll(LocationId);
+            const res = await LocalCategory.GetAll(LocationId, prd_type);
             if (res?.status === 200) setCategories(res.data || []);
             else setCategories(res?.data || []);
         } catch (err) {
@@ -341,7 +343,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
         setViewMode("product");
         try {
             setProductLoading(true);
-            const res = await Stock.getLocationStocksByChildId(userLId, catId, invoiceMeta?.[mode]?.operation_type);
+            const res = await Stock.getLocationStocksByChildId(prd_type, userLId, catId, invoiceMeta?.[mode]?.operation_type);
             if (res?.status === 200) setProducts(res.data || []);
             else setProducts(res?.data || []);
         } catch (err) {
@@ -671,7 +673,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                         sale_price: (invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") ? Number(it.s_price) : Number(it.s_price || 0),
                         discount: it.discount,
                         price_type_id: selectedSalePriceType?.[mode]?.value,
-                        product_type: prd_type,
+                        // product_type: prd_type,
                     }
                     // if (it.is_new_batch || it.batch === "def") {
                     //     delete item.batch
@@ -706,13 +708,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
     };
 
     // ---------- Modal open/close and actions ----------
-    // useEffect(() => {
-    //     if (!invoiceStarted?.[mode]) return;
-    //     const t = setInterval(() => {
-    //         setInvoiceMeta(mode, { ...invoiceMeta?.[mode], time: new Date().toLocaleString() });
-    //     }, 1000);
-    //     return () => clearInterval(t);
-    // }, [invoiceStarted?.[mode]]); // eslint-disable-line
+
 
     useEffect(() => {
         const onKey = (e) => {
@@ -866,30 +862,86 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
         );
     };
 
-    // Replace your component's original `return(...)` with the JSX below.
-    // IMPORTANT: make sure `const { t } = useTranslation()` (from 'react-i18next') is present in your component scope before using this JSX.
+    // category sidebar drag Y
+    const initialHeight = window.innerWidth > 1279 ? window.innerHeight - 84 : 56
+    const maxHeight = window.innerHeight - 84
+    const minHeight = 56
+
+    const [height, setHeight] = useState(initialHeight)
+    const isResizing = useRef(false)
+    const containerRef = useRef(null)
+
+    const startResizing = (e) => {
+        e.preventDefault()
+        isResizing.current = true
+        document.addEventListener("mousemove", handleMouseMove)
+        document.addEventListener("mouseup", stopResizing)
+        document.addEventListener("touchmove", handleTouchMove)
+        document.addEventListener("touchend", stopResizing)
+        document.body.style.cursor = "row-resize"
+    }
+
+    const stopResizing = () => {
+        isResizing.current = false
+        document.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mouseup", stopResizing)
+        document.removeEventListener("touchmove", handleTouchMove)
+        document.removeEventListener("touchend", stopResizing)
+        document.body.style.cursor = "default"
+    }
+
+    const handleMouseMove = (e) => {
+        if (!isResizing.current || !containerRef.current) return
+        const rect = containerRef.current.getBoundingClientRect()
+        const newHeight = e.clientY - rect.top
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
+            setHeight(newHeight)
+        }
+    }
+
+    const handleTouchMove = (e) => {
+        if (!isResizing.current || !containerRef.current) return
+        const rect = containerRef.current.getBoundingClientRect()
+        const touch = e.touches[0]
+        const newHeight = touch.clientY - rect.top
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
+            setHeight(newHeight)
+        }
+    };
+    useEffect(() => {
+        if (height < 95) {
+            const timer = setTimeout(() => {
+                if(height < 95) {
+                    setHeight(minHeight);
+                }
+            }, 800);
+            return () => clearTimeout(timer);
+        }        
+    }, [height]);
 
     return (
         <section className="relative w-full min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-hidden transition-colors duration-300">
             <div
                 className={`fixed transition-all duration-300 text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px]
         bg-card-light dark:bg-card-dark shadow text-xl font-semibold z-30 flex items-center pr-8 justify-center
-        ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px]"}`}
+        ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px] phone:pl-[140px]"} laptop:h-[52px]`}
             >
 
-                <h2 className="text-text-light dark:text-text-dark">
-                    {role === "factory" && deUlName + " | "}
-                    {!invoiceStarted?.[mode]
-                        ? t("income_header_not_started")
-                        : invoiceMeta?.[mode]?.operation_type === "incoming"
-                            ? t("income_header_incoming")
-                            : invoiceMeta?.[mode]?.operation_type === "transfer_in"
-                                ? t("income_header_transfer")
-                                : invoiceMeta?.[mode]?.operation_type === "return_in"
-                                    ? t("income_header_return")
-                                    : invoiceMeta?.[mode]?.operation_type === "return_dis"
-                                        ? t("income_header_return_disposal")
-                                        : t("income_header_unknown")}
+                <h2 className="text-text-light dark:text-text-dark text-lg laptop:text-base leading-[16px] font-semibold laptop:leading-[16bpx]">
+                    {(role === "factory" && deUlName) && <span className="phone:text-sm">{deUlName} <span className="mid:hidden"> | </span></span>}
+                    <span className="mid:hidden">
+                        {!invoiceStarted?.[mode]
+                            ? t("income_header_not_started")
+                            : invoiceMeta?.[mode]?.operation_type === "incoming"
+                                ? t("income_header_incoming")
+                                : invoiceMeta?.[mode]?.operation_type === "transfer_in"
+                                    ? t("income_header_transfer")
+                                    : invoiceMeta?.[mode]?.operation_type === "return_in"
+                                        ? t("income_header_return")
+                                        : invoiceMeta?.[mode]?.operation_type === "return_dis"
+                                            ? t("income_header_return_disposal")
+                                            : t("income_header_unknown")}
+                    </span>
                 </h2>
 
                 {invoiceStarted?.[mode] ? (
@@ -898,28 +950,28 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                     <span />
                 )}
                 {(!invoiceStarted?.[mode] && role === "factory") ? (
-                    <div className="flex items-center gap-[6px]">
+                    <div className="flex items-center gap-[6px] tablet:gap-1">
                         {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
                         <Menu placement="right-start" allowHover offset={15}>
                             <MenuHandler>
                                 <div className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
                                         text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
-                                        transition-all duration-300">
-                                    <Move className="w-8 h-8 mb-0" />
+                                        transition-all duration-300 laptop:p-1 phone:rounded-md">
+                                    <Move className="w-8 h-8 mb-0 phone:w-6 phone:h-6" />
                                 </div>
                             </MenuHandler>
 
-                            <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300">
+                            <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300 phone:p-2 phone:gap-1 phone:w-[180px]">
                                 <Typography
                                     variant="small"
                                     color="gray"
-                                    className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400"
+                                    className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400 phone:text-xs"
                                 >
                                     {t('Opt_warehouse')}
                                 </Typography>
                                 {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
                                     <NavLink key={id} to={path}>
-                                        <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all">
+                                        <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all phone:text-xs phone:py-2 phone:px-3">
                                             <Icon className="w-4 h-4" />
                                             {label}
                                         </MenuItem>
@@ -929,8 +981,8 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                         </Menu>
                         <div onClick={() => navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
                                         text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
-                                        transition-all duration-300">
-                            <Home className="w-8 h-8 mb-0" />
+                                        transition-all duration-300 laptop:p-1 phone:rounded-md phone:p-1">
+                            <Home className="w-8 h-8 mb-0 phone:w-6 phone:h-6" />
                         </div>
                     </div>
                 ) :
@@ -943,13 +995,17 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                 invoiceMeta?.[mode]?.operation_type !== "return_in" &&
                 invoiceMeta?.[mode]?.operation_type !== "return_dis" && (
                     <div
-                        className={`absolute z-20 left-0 top-[68px] ${getSidebarWidth()} h-[calc(100vh-68px)]
-            bg-card-light dark:bg-card-dark shadow-lg transition-all duration-500 ease-in-out flex flex-col border-r border-gray-200 dark:border-gray-700`}
+                        className={`absolute z-20 left-0 top-[73px] ${getSidebarWidth()} h-[calc(100vh-78px)]
+            bg-white/70 dark:bg-black/70 backdrop-blur-sm shadow-lg transition-[width] duration-500 ease-in-out flex flex-col desktop:border-r desktop:border-gray-200 dark:border-gray-700 laptop:shadow-sm laptop:shadow-white laptop:rounded-lg laptop:top-[68px] laptop:left-4 laptop:min-h-[52px]`}
+                        ref={containerRef}
+                        style={{
+                            height: `${height}px`
+                        }}
                     >
-                        <div className="flex items-center justify-between p-2 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex mb-0.5 items-center justify-between p-2 border-b border-gray-200 dark:border-gray-700 laptop:h-[44px]">
                             <button
                                 onClick={toggleSidebar}
-                                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition focus:outline-none focus:ring-2 focus:ring-blue-400 laptop:p-0"
                                 title={t("toggle_sidebar_size_title")}
                                 aria-label={t("aria_toggle_sidebar")}
                             >
@@ -987,7 +1043,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                             )}
                         </div>
 
-                        {(isMedium || isWide) && (
+                        {((isMedium || isWide) && height > 80) && (
                             <div className={`overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 dark:scrollbar-thumb-black dark:scrollbar-track-gray-600 p-3 grid gap-3 overflow-x-scroll grid-cols-[repeat(auto-fill,minmax(auto,1fr))]`}>
                                 {viewMode === "category" ? (
                                     groupLoading ? (
@@ -1002,7 +1058,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                                 key={cat.id}
                                                 onClick={() => handleCategoryClick(cat.id)}
                                                 className={`cursor-pointer border rounded-xl shadow-sm hover:shadow-md p-3 text-left
-                        ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50 dark:bg-blue-900 dark:text-white" : "border-gray-300  bg-white dark:bg-card-dark dark:text-text-dark"}`}
+                        ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50 dark:bg-blue-900 dark:text-white/50" : "border-gray-300  bg-transparent   dark:text-text-dark"}`}
                                             >
                                                 <div className="text-sm font-medium">{cat.name}</div>
                                             </button>
@@ -1040,15 +1096,29 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                 )}
                             </div>
                         )}
+                        <button
+                            onMouseDown={startResizing}
+                            onTouchStart={startResizing}
+                            onDoubleClick={() => {
+                                if (height === minHeight) {
+                                    setHeight(maxHeight)
+                                } else {
+                                    setHeight(minHeight)
+                                }
+                            }}
+                            className="mt-auto pb-1 flex flex-col items-center gap-1 cursor-n-resize desktop:hidden">
+                            <hr className="w-8 border-[1px] rounded-2xl" />
+                            <hr className="w-7 border-[1px] rounded-2xl" />
+                        </button>
                     </div>
                 )}
 
             {/* Main content */}
-            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[0px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} p-6`}>
-                <div className="bg-background-light dark:bg-background-dark rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-4 transition-colors duration-300">
+            <div className={`transition-all duration-500 ease-in-out pt-[68px] ${sidebarMode === 0 ? "ml-[69px]" : sidebarMode === 1 ? "ml-[25%]" : "ml-[33.3%]"} px-6 laptop:ml-0  laptop:px-0 phone:pl-2 phone:pr-1`}>
+                <div className="bg-background-light dark:bg-background-dark rounded-2xl min-h-[calc(100vh-68px)] p-4 flex flex-col gap-2 transition-colors duration-300 tablet:p-2">
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (
-                        <div>
+                        <div className="p-0">
                             {/* Operation selection */}
                             <div className="flex flex-col gap-4 mb-4">
                                 {/* Transfer_in */}
@@ -1058,11 +1128,11 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                         setSendToTrash(false);
                                     }}
                                     className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200
-                  ${selected === "incoming" ? "bg-blue-50 border-blue-500 text-blue-700 shadow dark:bg-blue-900 dark:text-white" : "border-gray-300 hover:border-blue-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-blue-600"}`}
+                  ${selected === "incoming" ? "bg-blue-50 border-blue-500 text-blue-700 shadow dark:bg-blue-900 dark:text-white" : "border-gray-300 hover:border-blue-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-blue-600"} laptop:px-4 laptop:py-3 laptop:rounded-lg phone:px-3 phone:py-2 phone:rounded-md`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <Truck size={22} />
-                                        <span className="text-lg font-medium">{t("op_incoming_card")}</span>
+                                        <span className="text-lg font-medium phone:text-sm">{t("op_incoming_card")}</span>
                                     </div>
                                 </button>
 
@@ -1072,11 +1142,11 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                         setSendToTrash(false);
                                     }}
                                     className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-200
-                  ${selected === "transfer_in" ? "bg-blue-50 border-blue-500 text-blue-700 shadow dark:bg-blue-900 dark:text-white" : "border-gray-300 hover:border-blue-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-blue-600"}`}
+                  ${selected === "transfer_in" ? "bg-blue-50 border-blue-500 text-blue-700 shadow dark:bg-blue-900 dark:text-white" : "border-gray-300 hover:border-blue-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-blue-600"} laptop:px-4 laptop:py-3 laptop:rounded-lg phone:px-3 phone:py-2 phone:rounded-md`}
                                 >
                                     <div className="flex items-center gap-3">
                                         <Truck size={22} />
-                                        <span className="text-lg font-medium">{t("op_transfer_card")}</span>
+                                        <span className="text-lg font-medium phone:text-sm">{t("op_transfer_card")}</span>
                                     </div>
                                 </button>
 
@@ -1084,12 +1154,12 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                 {role === "factory" &&
                                     <div
                                         className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200
-                  ${selected === "return_in" ? "bg-green-50 border-green-500 text-green-700 shadow dark:bg-green-900 dark:text-white" : "border-gray-300 hover:border-green-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-green-600"}`}
+                  ${selected === "return_in" ? "bg-green-50 border-green-500 text-green-700 shadow dark:bg-green-900 dark:text-white" : "border-gray-300 hover:border-green-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-green-600"} laptop:px-4 laptop:py-3 laptop:rounded-lg phone:px-3 phone:py-2 phone:rounded-md`}
                                     >
                                         <div onClick={() => setSelected("return_in")} className="flex items-center justify-between cursor-pointer">
                                             <div className="flex items-center gap-3">
                                                 <Undo2 size={22} />
-                                                <span className="text-lg font-medium">{t("op_return_card")}</span>
+                                                <span className="text-lg font-medium phone:text-sm">{t("op_return_card")}</span>
                                             </div>
                                         </div>
 
@@ -1098,7 +1168,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                             <label className="flex items-center justify-between bg-gray-50 dark:bg-[#2a2a2a] p-3 rounded-lg cursor-pointer">
                                                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                                     <Trash2 size={18} />
-                                                    <span>{t("return_disposal_label")}</span>
+                                                    <span className="phone:text-base">{t("return_disposal_label")}</span>
                                                 </div>
                                                 <input
                                                     type="checkbox"
@@ -1234,15 +1304,16 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                 </motion.div>
                             )}
 
-                            <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-4 px-3 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-4 px-3 shadow-sm border border-gray-200 dark:border-gray-700 laptop:rounded-lg laptop:grid laptop:grid-cols-4 laptop:h-auto laptop:py-3 mid:grid-cols-2 phone:rounded-md phone:px-2 phone:py-2">
                                 {(selected !== "return_in" && selected !== "return_dis") && (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 laptop:col-span-2 laptop:w-full">
                                         {locationsLoading ? (
                                             <div className="flex items-center gap-2">
                                                 <Spinner /> {t("loading")}
                                             </div>
                                         ) : (
                                             <Select
+                                                className="w-full phone:w-full phone:text-sm"
                                                 isClearable
                                                 isSearchable
                                                 options={operationLocations.filter((item) => String(item.value) !== String(userLId) && String(item.type) !== "other" && String(item.type) !== "disposal")}
@@ -1265,7 +1336,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                     </div>
                                 )}
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 laptop:col-span-2">
                                     {staffsLoading ? (
                                         <div className="flex items-center gap-2">
                                             <Spinner /> {t("loading")}
@@ -1273,6 +1344,7 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                     ) : (
                                         <>
                                             <Select
+                                                className="w-full phone:w-full phone:text-sm"
                                                 placeholder={t("select_staff_placeholder")}
                                                 options={staffs}
                                                 value={selectedStaff}
@@ -1295,11 +1367,11 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                     )}
                                 </div>
 
-                                <div className="ml-auto">
+                                <div className="ml-auto laptop:col-span-2 laptop:col-start-3 mid:col-start-1 ">
                                     <button
                                         disabled={createInvoiceLoading}
                                         onClick={startInvoice}
-                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 px-3 py-2`}
+                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 px-3 py-2 phone:w-full phone:text-sm phone:py-[2px] phone:px-3 phone:rounded-md phone:font-medium`}
                                         aria-label={t("aria_start_invoice")}
                                     >
                                         {!createInvoiceLoading ? (
@@ -1319,21 +1391,8 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                         </div>
                     ) : (
                         (invoiceMeta?.[mode]?.operation_type !== "return_in" && invoiceMeta?.[mode]?.operation_type !== "return_dis") && (
-                            <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-3 px-3 shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder={t("product_search_placeholder")}
-                                        className="border rounded px-3 py-2 w-[420px] bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
-                                        aria-label={t("aria_search")}
-                                    />
-                                    <button onClick={() => setSearchQuery((s) => s.trim())} className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 dark:bg-[#2b2b2b] hover:bg-gray-300 dark:hover:bg-[#3a3a3a]" aria-label={t("aria_search")}>
-                                        <SearchIcon size={16} /> {t("search_button")}
-                                    </button>
-                                </div>
-
-                                <div className="ml-auto flex items-center gap-2">
+                            <div>
+                                <div className="flex justify-end items-center gap-2 mb-2 desktop:hidden">
                                     <button
                                         onClick={() => { setBarcodeEnabled((s) => !s); setBarcodeInput(""); }}
                                         className={`flex items-center gap-2 px-3 py-2 rounded ${barcodeEnabled ? "bg-green-600 text-white animate-[pulse_1.5s_infinite]" : "bg-gray-200 dark:bg-[#2b2b2b] text-gray-800 dark:text-text-dark"}`}
@@ -1356,6 +1415,45 @@ export default function WareHouseIncome({ role = "factory", prd_type="product" }
                                             {barcodeLoading && <Spinner size="sm" />}
                                         </div>
                                     )}
+                                </div>
+                                <div className="h-[65px] bg-white dark:bg-card-dark rounded-lg flex items-center gap-3 px-3 shadow-sm border border-gray-200 dark:border-gray-700">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder={t("product_search_placeholder")}
+                                            className="border rounded px-3 py-2 w-[420px] bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
+                                            aria-label={t("aria_search")}
+                                        />
+                                        <button onClick={() => setSearchQuery((s) => s.trim())} className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 dark:bg-[#2b2b2b] hover:bg-gray-300 dark:hover:bg-[#3a3a3a]" aria-label={t("aria_search")}>
+                                            <SearchIcon size={16} /> {t("search_button")}
+                                        </button>
+                                    </div>
+
+                                    <div className="ml-auto flex items-center gap-2 laptop:hidden">
+                                        <button
+                                            onClick={() => { setBarcodeEnabled((s) => !s); setBarcodeInput(""); }}
+                                            className={`flex items-center gap-2 px-3 py-2 rounded ${barcodeEnabled ? "bg-green-600 text-white animate-[pulse_1.5s_infinite]" : "bg-gray-200 dark:bg-[#2b2b2b] text-gray-800 dark:text-text-dark"}`}
+                                            aria-pressed={barcodeEnabled}
+                                            aria-label={t("barcode_button")}
+                                        >
+                                            <BarcodeIcon size={16} /> {t("barcode_button")}
+                                        </button>
+                                        {barcodeEnabled && (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    ref={barcodeRef}
+                                                    value={barcodeInput}
+                                                    onChange={(e) => setBarcodeInput(e.target.value)}
+                                                    placeholder={t("barcode_input_placeholder")}
+                                                    className="border rounded px-3 py-2 w-[200px] bg-white dark:bg-[#1e1e1e] text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400"
+                                                    inputMode="numeric"
+                                                    aria-label={t("barcode_button")}
+                                                />
+                                                {barcodeLoading && <Spinner size="sm" />}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import AsyncSelect from 'react-select/async';
-import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy, Loader2, Newspaper, FilePlus2, FilePlus, PlusCircle } from "lucide-react";
+import { Pencil, ArrowLeft, Download, Filter, FileText, ChevronLeft, ChevronRight, Copy, Loader2, Newspaper, FilePlus2, FilePlus, PlusCircle, Minimize, Minimize2, LucideMinimize, Minimize2Icon, FilterX, Phone, UserX, UserX2, MessageSquareOff, WholeWordIcon } from "lucide-react";
 import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { location } from "../../../utils/Controllers/location";
 import Cookies from "js-cookie";
@@ -10,6 +10,8 @@ import Select from "react-select";
 import CancelInvoiceButton from "../WareHouseOutcome/sectionsWhO/CancelInvoiceButton";
 import { customSelectStyles } from "../WareHouseModals/ThemedReactTagsStyles";
 import { useTranslation } from "react-i18next";
+import clsx from "clsx";
+import { downloadInvoiceDocx } from "../../../utils/FileGenerators/downloadInvoiceDocx";
 /*
   WarehouseInvoiceHistory.jsx
   - Keeps full original logic but modernized and fixed per requirements
@@ -83,13 +85,13 @@ function useDebounce(value, delay = 450) {
 }
 
 export default function WarehouseInvoiceHistory({ role = "warehouse", type = "invoice" }) {
-    const defaultCols = useMemo(()=>{
-        if(role === "warehouse") {
+    const defaultCols = useMemo(() => {
+        if (role === "warehouse") {
             const { payment_status, total_sum, ...rest } = BASE_COLS;
             return rest;
         }
         return BASE_COLS;
-    },[role]);
+    }, [role]);
 
     const { t } = useTranslation();
     const defaultColsLabels = {
@@ -114,6 +116,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
     const [total, setTotal] = useState(0);
 
     // filters
+    const [filtersCollapsed, setFiltersCollapsed] = useState(false)
     const [typeFilter, setTypeFilter] = useState("all");
     const [senderFilter, setSenderFilter] = useState(null); // { value: id, label: name }
     const [receiverFilter, setReceiverFilter] = useState(null);
@@ -182,34 +185,34 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
 
     function typeBadge(t) {
         const map = {
-            incoming: "bg-green-300 text-green-900",
-            transfer_in: "bg-green-100 text-green-700",
-            transfer_out: "bg-blue-100 text-blue-700",
-            outgoing: "bg-yellow-100 text-yellow-800",
-            return_in: "bg-indigo-100 text-indigo-700",
+            incoming: "bg-green-200 text-green-900",
+            transfer_in: "bg-green-100 text-green-800",
+            transfer_out: "bg-blue-100 text-blue-800",
+            outgoing: "bg-yellow-100 text-yellow-900",
+            return_in: "bg-indigo-100 text-indigo-800",
             return_dis: "bg-red-100 text-red-700",
             disposal: "bg-red-50 text-red-700",
         };
-        return <span className={`px-2 py-0.5 text-xs rounded ${map[t] || "bg-gray-100 text-gray-700"}`}>{nice.type[t] || t}</span>;
+        return <span className={`px-2 py-0.5 text-xs whitespace-nowrap inline-flex items-center rounded ${map[t] || "bg-gray-100 text-gray-700"}`}>{nice.type[t] || t}</span>;
     }
 
     function statusBadge(s) {
         const map = {
-            draft: "bg-gray-100 text-gray-700",
-            received: "bg-green-100 text-green-700",
+            draft: "bg-gray-100 text-gray-800",
+            received: "bg-green-100 text-green-900",
             sent: "bg-blue-100 text-blue-700",
             cancelled: "bg-red-100 text-red-700",
         };
-        return <span className={`px-4 py-1 text-sm font-semibold rounded ${map[s] || "bg-gray-100 text-gray-700"}`}>{nice.status[s] || s}</span>;
+        return <span className={`px-4 py-1 whitespace-nowrap text-sm font-bold rounded ${map[s] || "bg-gray-100 text-gray-700"}`}>{nice.status[s] || s}</span>;
     }
 
     function paymentBadge(p) {
         const map = {
-            paid: "bg-green-50 text-green-700",
-            unpaid: "bg-yellow-50 text-yellow-700",
+            paid: "bg-green-50 text-green-800",
+            unpaid: "bg-yellow-50 text-yellow-900",
             partlyPaid: "bg-blue-50 text-blue-700",
         };
-        return <span className={`px-2 py-0.5 text-xs rounded ${map[p] || "bg-gray-100 text-gray-700"}`}>{nice.payment[p] || p}</span>;
+        return <span className={`px-2 py-0.5 whitespace-nowrap font-bold text-xs rounded ${map[p] || "bg-gray-100 text-gray-700"}`}>{nice.payment[p] || p}</span>;
     }
 
     const toggleColumn = (k) => {
@@ -329,17 +332,20 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
     }, [invoiceId]);
 
     const openDetail = (id) => {
+        const path = type === "order" ? "orders" : "history";
         const qp = new URLSearchParams(searchParams.toString());
         qp.set("page", String(page));
         qp.set("perPage", String(PER_PAGE));
-        navigate(`/warehouse/history/${id}?${qp.toString()}`);
+        navigate(`/${role}/${path}/${id}?${qp.toString()}`);
+        console.log("ok");
     };
 
     const closeDetail = () => {
+        const path = type === "order" ? "orders" : "history";
         const qp = new URLSearchParams(searchParams.toString());
         qp.set("page", String(page));
         qp.set("perPage", String(PER_PAGE));
-        navigate(`/warehouse/history?${qp.toString()}`);
+        navigate(`/${role}/${path}?${qp.toString()}`);
     };
 
     const openEditInvoice = (inv) => setEditingInvoice(inv);
@@ -440,10 +446,10 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
         <div className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen rounded-xl transition-colors duration-300">
             <div className="mx-auto">
                 {/* Header */}
-                <header className="flex items-center flex-wrap gap-[10px] justify-between mb-6">
-                    <div className="ml-6">
+                <header className="flex items-center flex-wrap gap-[10px] justify-between mb-6 ml-6">
+                    <div>
                         <h1 className="text-2xl font-semibold">{type === "order" ? t("order_history") : t("invoices.title")}</h1>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 phone:hidden">
                             {type === "order" ? t("order_subtitle") : t("invoices.subtitle")}
                         </p>
                     </div>
@@ -462,6 +468,16 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                             </NavLink>
                             : <noscript></noscript>
                         }
+                        {filtersCollapsed && (
+                            <button
+                                onClick={() => setFiltersCollapsed(false)}
+                                className="flex items-center gap-2 px-3 py-2 border rounded-lg transition hover:shadow"
+                            >
+                                <Filter size={16} />
+                                <span className="text-sm">Filters</span>
+                            </button>
+                        )}
+
                         {/* <button
                             onClick={exportCurrentToCSV}
                             className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
@@ -470,209 +486,212 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                         >
                             <Download size={16} />
                             <span className="text-sm">{t("invoices.export_csv")}</span>
-                        </button>
-
-                        <button
-                            onClick={() => alert(t("invoices.export_pdf_alert"))}
-                            className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
-                            aria-label={t("invoices.export_pdf")}
-                            title={t("invoices.export_pdf")}
-                        >
-                            <FileText size={16} />
-                            <span className="text-sm">{t("invoices.export_pdf")}</span>
-                        </button>
-
-                        <a
-                            href="/warehouse/inventory-adjustments"
-                            className="flex items-center gap-2 px-3 py-2 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
-                            aria-label={t("invoices.inventory_log")}
-                            title={t("invoices.inventory_log")}
-                        >
-                            <Copy size={16} />
-                            <span className="text-sm">{t("invoices.inventory_log")}</span>
-                        </a> */}
+                        </button> */}
                     </div>
                 </header>
 
                 {/* Filters */}
-                <div className="bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-gray-200 dark:border-gray-700 mb-6 shadow-sm transition-colors duration-300">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        {/* Type Filter */}
-                        {type === "invoice" && (
-                            <Select
-                                options={[
-                                    { value: "all", label: t("invoices.filter.all_types") },
-                                    ...typesList.map((tKey) => ({
-                                        value: tKey,
-                                        label: nice.type[tKey] || tKey
-                                    }))
-                                ]}
-                                value={{
-                                    value: typeFilter,
-                                    label:
-                                        typeFilter === "all"
-                                            ? t("invoices.filter.all_types")
-                                            : nice.type[typeFilter] || typeFilter
-                                }}
-                                onChange={(v) => setTypeFilter(v?.value || "all")}
-                                styles={customSelectStyles()}
-                                aria-label={t("invoices.filter.type")}
-                                isClearable={false}
-                            />
-                        )}
-
-                        {/* Sender */}
-                        {type === "invoice" && (
-                            <Select
-                                options={locations}
-                                value={senderFilter}
-                                onChange={(v) => setSenderFilter(v)}
-                                placeholder={t("placeholder.sender_search")}
-                                isClearable
-                                isSearchable
-                                styles={customSelectStyles()}
-                                aria-label={t("placeholder.sender_search")}
-                            />
-                        )}
-
-                        {/* Receiver */}
-                        <Select
-                            options={locations}
-                            value={receiverFilter}
-                            onChange={(v) => setReceiverFilter(v)}
-                            placeholder={t("placeholder.receiver_search")}
-                            isClearable
-                            isSearchable
-                            styles={customSelectStyles()}
-                            aria-label={t("placeholder.receiver_search")}
-                        />
-
-                        {/* Status Filter */}
-                        <Select
-                            options={[
-                                { value: "all", label: t("invoices.filter.all_statuses") },
-                                ...statusesList.map((s) => ({
-                                    value: s,
-                                    label: nice.status[s] || s
-                                }))
-                            ]}
-                            value={{
-                                value: statusFilter,
-                                label:
-                                    statusFilter === "all"
-                                        ? t("invoices.filter.all_statuses")
-                                        : nice.status[statusFilter] || statusFilter
-                            }}
-                            onChange={(v) => setStatusFilter(v?.value || "all")}
-                            styles={customSelectStyles()}
-                            aria-label={t("invoices.filter.status")}
-                            isClearable={false}
-                        />
-
-                        {/* From Date */}
-                        <input
-                            type="date"
-                            value={fromDate}
-                            onChange={(e) => setFromDate(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
-                            aria-label={t("invoices.filter.from_date")}
-                        />
-
-                        {/* To Date */}
-                        <input
-                            type="date"
-                            value={toDate}
-                            onChange={(e) => setToDate(e.target.value)}
-                            className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
-                            aria-label={t("invoices.filter.to_date")}
-                        />
-
-                        {/* Payment Filter */}
-                        <Select
-                            options={[
-                                { value: "all", label: t("invoices.filter.all_payments") },
-                                { value: "paid", label: t("invoices.filter.paid") },
-                                { value: "unpaid", label: t("invoices.filter.unpaid") }
-                            ]}
-                            value={{
-                                value: paymentFilter,
-                                label:
-                                    paymentFilter === "all"
-                                        ? t("invoices.filter.all_payments")
-                                        : paymentFilter === "paid"
-                                            ? t("invoices.filter.paid")
-                                            : t("invoices.filter.unpaid")
-                            }}
-                            onChange={(v) => setPaymentFilter(v?.value || "all")}
-                            styles={customSelectStyles()}
-                            aria-label={t("invoices.filter.payment")}
-                            isClearable={false}
-                        />
-
-                        {/* Search */}
-                        <div className="flex gap-2">
-                            <input
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                                placeholder={t("placeholder.search_invoice")}
-                                className="flex-1 border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
-                                aria-label={t("placeholder.search_invoice")}
-                            />
-                        </div>
-                    </div>
+                <div className={clsx(
+                    "relative overflow-hidden transition-[width,opacity] duration-300 ease-out",
+                    filtersCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+                )}>
+                    <div className={clsx(
+                        "overflow-hidden transition-[max-height,padding] duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)]",
+                        filtersCollapsed ? "max-h-0" : "max-h-[900px]"
+                    )}>
 
 
-                    <div className="mt-2 flex justify-between">
-                        <div />
-                        <div className="flex gap-[10px]">
-                            <button
-                                onClick={() => {
-                                    setTypeFilter("all");
-                                    setSenderFilter(null);
-                                    setReceiverFilter(null);
-                                    setStatusFilter("all");
-                                    setPaymentFilter("all");
-                                    setFromDate(formatDateYMD(startOfMonth));
-                                    setToDate(formatDateYMD(today));
-                                    setSearchText("");
-                                    setPage(1);
-                                }}
-                                className="px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg transition"
-                            >
-                                {t("button.reset")}
-                            </button>
 
-                            <button
-                                onClick={() => fetchInvoices()}
-                                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg transition"
-                            >
-                                {t("button.apply")}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center gap-3">
-                        <Filter size={16} />
-                        <div className="flex items-center gap-2 flex-wrap">
-                            {Object.keys(columns).map((k) => (
-                                <label
-                                    key={k}
-                                    className="flex items-center gap-2 text-sm bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={columns[k]}
-                                        onChange={() => toggleColumn(k)}
+                        <div className="bg-card-light dark:bg-card-dark pl-4 pr-2 pt-4 pb-2 rounded-2xl border border-gray-200 dark:border-gray-700 mb-6 shadow-sm transition-colors duration-300">
+                            <div className="grid grid-cols-4 gap-3 mr-2 laptop:grid-cols-3 tablet:grid-cols-2 phone:grid-cols-1">
+                                {/* Type Filter */}
+                                {type === "invoice" && (
+                                    <Select
+                                        options={[
+                                            { value: "all", label: t("invoices.filter.all_types") },
+                                            ...typesList.map((tKey) => ({
+                                                value: tKey,
+                                                label: nice.type[tKey] || tKey
+                                            }))
+                                        ]}
+                                        value={{
+                                            value: typeFilter,
+                                            label:
+                                                typeFilter === "all"
+                                                    ? t("invoices.filter.all_types")
+                                                    : nice.type[typeFilter] || typeFilter
+                                        }}
+                                        onChange={(v) => setTypeFilter(v?.value || "all")}
+                                        styles={customSelectStyles()}
+                                        aria-label={t("invoices.filter.type")}
+                                        isClearable={false}
                                     />
-                                    <span className="capitalize">{defaultColsLabels[Object.keys(defaultColsLabels).find((l) => l === k)]}</span>
-                                </label>
-                            ))}
+                                )}
+
+                                {/* Sender */}
+                                {type === "invoice" && (
+                                    <Select
+                                        options={locations}
+                                        value={senderFilter}
+                                        onChange={(v) => setSenderFilter(v)}
+                                        placeholder={t("placeholder.sender_search")}
+                                        isClearable
+                                        isSearchable
+                                        styles={customSelectStyles()}
+                                        aria-label={t("placeholder.sender_search")}
+                                    />
+                                )}
+
+                                {/* Receiver */}
+                                <Select
+                                    options={locations}
+                                    value={receiverFilter}
+                                    onChange={(v) => setReceiverFilter(v)}
+                                    placeholder={t("placeholder.receiver_search")}
+                                    isClearable
+                                    isSearchable
+                                    styles={customSelectStyles()}
+                                    aria-label={t("placeholder.receiver_search")}
+                                />
+
+                                {/* Status Filter */}
+                                <Select
+                                    options={[
+                                        { value: "all", label: t("invoices.filter.all_statuses") },
+                                        ...statusesList.map((s) => ({
+                                            value: s,
+                                            label: nice.status[s] || s
+                                        }))
+                                    ]}
+                                    value={{
+                                        value: statusFilter,
+                                        label:
+                                            statusFilter === "all"
+                                                ? t("invoices.filter.all_statuses")
+                                                : nice.status[statusFilter] || statusFilter
+                                    }}
+                                    onChange={(v) => setStatusFilter(v?.value || "all")}
+                                    styles={customSelectStyles()}
+                                    aria-label={t("invoices.filter.status")}
+                                    isClearable={false}
+                                />
+
+                                {/* From Date */}
+                                <input
+                                    type="date"
+                                    value={fromDate}
+                                    onChange={(e) => setFromDate(e.target.value)}
+                                    className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                                    aria-label={t("invoices.filter.from_date")}
+                                />
+
+                                {/* To Date */}
+                                <input
+                                    type="date"
+                                    value={toDate}
+                                    onChange={(e) => setToDate(e.target.value)}
+                                    className="border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                                    aria-label={t("invoices.filter.to_date")}
+                                />
+
+                                {/* Payment Filter */}
+                                <Select
+                                    options={[
+                                        { value: "all", label: t("invoices.filter.all_payments") },
+                                        { value: "paid", label: t("invoices.filter.paid") },
+                                        { value: "unpaid", label: t("invoices.filter.unpaid") }
+                                    ]}
+                                    value={{
+                                        value: paymentFilter,
+                                        label:
+                                            paymentFilter === "all"
+                                                ? t("invoices.filter.all_payments")
+                                                : paymentFilter === "paid"
+                                                    ? t("invoices.filter.paid")
+                                                    : t("invoices.filter.unpaid")
+                                    }}
+                                    onChange={(v) => setPaymentFilter(v?.value || "all")}
+                                    styles={customSelectStyles()}
+                                    aria-label={t("invoices.filter.payment")}
+                                    isClearable={false}
+                                />
+
+                                {/* Search */}
+                                <div className="flex gap-2">
+                                    <input
+                                        value={searchText}
+                                        onChange={(e) => setSearchText(e.target.value)}
+                                        placeholder={t("placeholder.search_invoice")}
+                                        className="flex-1 border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark rounded-lg p-2 text-sm"
+                                        aria-label={t("placeholder.search_invoice")}
+                                    />
+                                </div>
+                            </div>
+
+
+                            <div className="mt-2 mr-2 flex justify-between">
+                                <div />
+                                <div className="flex gap-[10px]">
+                                    <button
+                                        onClick={() => {
+                                            setTypeFilter("all");
+                                            setSenderFilter(null);
+                                            setReceiverFilter(null);
+                                            setStatusFilter("all");
+                                            setPaymentFilter("all");
+                                            setFromDate(formatDateYMD(startOfMonth));
+                                            setToDate(formatDateYMD(today));
+                                            setSearchText("");
+                                            setPage(1);
+                                        }}
+                                        className="px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg transition"
+                                    >
+                                        {t("button.reset")}
+                                    </button>
+
+                                    <button
+                                        onClick={() => fetchInvoices()}
+                                        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg transition phone:hidden"
+                                    >
+                                        {t("button.apply")}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 flex items-start laptop:items-end justify-between gap-3 phone:justify-end">
+                                <div className="flex items-center gap-3 phone:hidden">
+                                    <Filter size={16} className="phone:hidden" />
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        {Object.keys(columns).map((k) => (
+                                            <label
+                                                key={k}
+                                                className="flex items-center gap-2 text-sm bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={columns[k]}
+                                                    onChange={() => toggleColumn(k)}
+                                                />
+                                                <span className="capitalize">{defaultColsLabels[Object.keys(defaultColsLabels).find((l) => l === k)]}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setFiltersCollapsed(true)}
+                                    className="flex items-center gap-2 px-1 py-1 bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition"
+                                    aria-label={t("filters")}
+                                    title={t("filters")}
+                                >
+                                    <FilterX size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* List area */}
-                <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-300 dark:border-gray-700 shadow-sm transition">
+                 <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-300 dark:border-gray-700 shadow-sm transition tablet:max-w-[calc(100vw_-_164px)]">
                     {loading ? (
                         <div className="py-10 text-center text-gray-500 dark:text-gray-400">
                             {t("loading")}
@@ -680,9 +699,9 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                     ) : error ? (
                         <div className="py-10 text-center text-red-500">{error}</div>
                     ) : (
-                        <div>
+                        <div className="rounded-2xl pb-2 overflow-x-auto tablet:overflow-x-scroll phone:overflow-visible">
                             {/* Table - Desktop */}
-                            <div className="hidden md:block">
+                            <div className="phone:hidden">
                                 <table className="w-full border-collapse">
                                     <thead>
                                         <tr className="bg-gray-50 dark:bg-[#424242]  ">
@@ -755,7 +774,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                     </td>
                                                 )}
                                                 {columns.type && (
-                                                    <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                                    <td className="p-3 font-bold text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                         {typeBadge(inv.type)}
                                                     </td>
                                                 )}
@@ -789,12 +808,12 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                         </button>
                                                     </td>
                                                 )}
-                                                {(columns.payment_status && role==="factory") && (
+                                                {(columns.payment_status && role === "factory") && (
                                                     <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                         {paymentBadge(inv.payment_status)}
                                                     </td>
                                                 )}
-                                                {(columns.total_sum && role==="factory") && (
+                                                {(columns.total_sum && role === "factory") && (
                                                     <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                         <span className="font-medium">
                                                             {Number(inv.total_sum).toLocaleString("ru-RU")}
@@ -811,12 +830,12 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                             >
                                                                 {t("button.open")}
                                                             </button>
-                                                                <CancelInvoiceButton
-                                                                    resetAll={() => fetchInvoices()}
-                                                                    appearance="icn"
-                                                                    id={inv?.id}
-                                                                    disabled={Number(inv.total_sum) !== 0}
-                                                                />
+                                                            <CancelInvoiceButton
+                                                                resetAll={() => fetchInvoices()}
+                                                                appearance="icn"
+                                                                id={inv?.id}
+                                                                disabled={Number(inv.total_sum) !== 0}
+                                                            />
                                                         </div>
                                                     </td>
                                                 )}
@@ -827,7 +846,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                             </div>
 
                             {/* Mobile cards */}
-                            <div className="md:hidden grid gap-3">
+                            <div className="hidden gap-3 phone:grid">
                                 {invoices.map((inv) => (
                                     <div
                                         key={inv.id}
@@ -835,11 +854,20 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                     >
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <div className="text-sm font-medium">
-                                                    {inv.type} — {String(inv.id).slice(0, 8)}
+                                                <div className="text-sm font-medium mb-1">
+                                                    {typeBadge(inv.type)}
+                                                </div>
+                                                <div
+                                                    className="text-sm"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: highlightMatch(inv.invoice_number || inv.id, searchText),
+                                                    }}
+                                                />
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                    {t("table.sender")} : {inv.sender_name || inv.sender?.name}
                                                 </div>
                                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    {inv.sender_name || inv.sender?.name}
+                                                    {t("table.receiver")} : {inv.receiver_name || inv.sender?.name || "-"}
                                                 </div>
                                                 <div className="text-xs text-gray-500 dark:text-gray-400">
                                                     {formatDateISO(inv.createdAt)}
@@ -870,7 +898,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                             </div>
 
                             {/* Pagination */}
-                            <div className="mt-4 flex items-center flex-wrap justify-between">
+                            <div className="mt-4 flex gap-1 items-center flex-wrap justify-between">
                                 <div className="text-sm text-gray-600 dark:text-gray-400">
                                     {t("invoices.showing_range", {
                                         from: (page - 1) * PER_PAGE + 1,
@@ -924,8 +952,12 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
 
                 {/* Detail drawer/modal */}
                 {invoiceId && (
-                    <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center p-6">
-                        <div className="bg-card-light dark:bg-card-dark  w-full max-w-4xl rounded-2xl shadow-2xl p-6 overflow-auto max-h-[90vh] transition-colors duration-300">
+                    <div
+                        onClick={closeDetail}
+                        className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center p-6 phone:p-4">
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-card-light dark:bg-card-dark  w-full max-w-4xl rounded-2xl shadow-md shadow-background-light dark:shadow-background-light p-6 overflow-auto max-h-[90vh] transition-colors duration-300 phone:p-3">
                             {/* Header */}
                             <div className="flex items-center gap-3 mb-4">
                                 <button
@@ -939,15 +971,18 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
 
                                 <h2 className="text-lg font-semibold text-text-light dark:text-text-dark">
                                     {t("detail.title")}
+                                    <span className="text-sm text-gray-500 dark:text-gray-400 hidden phone:block">
+                                        {detailLoading ? t("loading") : formatDateISO(selectedInvoice?.createdAt)}
+                                    </span>
                                 </h2>
 
-                                <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
+                                <div className="ml-auto text-sm text-gray-500 dark:text-gray-400 phone:hidden">
                                     {detailLoading ? t("loading") : formatDateISO(selectedInvoice?.createdAt)}
                                 </div>
 
                                 <button
                                     onClick={() => openEditInvoice(selectedInvoice)}
-                                    className="ml-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    className="ml-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors phone:ml-auto"
                                     title={t("button.edit")}
                                 >
                                     <Pencil size={16} className="text-text-light dark:text-text-dark" />
@@ -958,7 +993,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                             {detailLoading ? (
                                 <div className="py-10 text-center text-gray-500 dark:text-gray-400">{t("loading")}</div>
                             ) : selectedInvoice ? (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-3 tablet:grid-cols-2 items-start gap-4">
                                     {/* Left Side */}
                                     <div className="col-span-2">
                                         <div className="mb-4 bg-gray-50 dark:bg-[#2A2A2A] p-4 rounded-lg transition-colors">
@@ -969,7 +1004,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                 {t("detail.status")}: <span className="font-medium">{nice.status[selectedInvoice.status] || selectedInvoice.status}</span>
                                             </div>
                                             <div className="text-sm text-gray-600 dark:text-gray-300">
-                                                {t("detail.payment")}: <span className="font-medium">{selectedInvoice.payment_status}</span>
+                                                {t("detail.payment")}: <span className="font-medium">{nice.payment[selectedInvoice.payment_status] || selectedInvoice.payment_status}</span>
                                             </div>
                                             <div className="text-sm text-gray-600 dark:text-gray-300">
                                                 {t("detail.total")}: <span className="font-medium">{selectedInvoice.total_sum}</span>
@@ -993,7 +1028,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                                 {t("detail.barcode")}: {it.barcode}
                                                             </div>
                                                             <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                                {t("detail.qty")}: {it.quantity} {it?.product?.unit} × {t("detail.price")}: {it.price} {t("detail.total")}: {+it.quantity * +it.price}
+                                                                {t("detail.qty")}: {it.quantity} {it?.product?.unit} × {t("detail.price")}: {selectedInvoice?.type === "outgoing" ? it?.sale_price : it?.purchase_price} {t("detail.total")}: {+it.quantity * (selectedInvoice?.type === "outgoing" ? +it?.sale_price : +it?.purchase_price)} {it?.discount > 0 ? `- ${it?.discount}% (${t('discount')}) = ${+it.quantity * (selectedInvoice?.type === "outgoing" ? +it?.sale_price : +it?.purchase_price) * (100 - +it?.discount) / 100}` : ""}
                                                             </div>
                                                         </div>
 
@@ -1014,7 +1049,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                     </div>
 
                                     {/* Right Side (Aside) */}
-                                    <aside className="p-4 bg-gray-50 dark:bg-[#2A2A2A] rounded-lg transition-colors">
+                                    <aside className="p-4 tablet:col-span-2 bg-gray-50 dark:bg-[#2A2A2A] rounded-lg transition-colors">
                                         <div className="text-sm text-gray-500 dark:text-gray-400">{t("detail.sender")}</div>
                                         <div className="font-medium text-text-light dark:text-text-dark">
                                             {selectedInvoice.sender?.name || selectedInvoice.sender_name || "—"}
@@ -1029,13 +1064,29 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                         <div className="font-medium text-text-light dark:text-text-dark">
                                             {selectedInvoice.created?.full_name}
                                         </div>
+                                        <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">{t("courier")}</div>
+                                        <div className="font-medium text-text-light dark:text-text-dark">
+                                            {selectedInvoice.carrier?.full_name || <UserX2 size={14} className="inline-block mr-1 mb-1" />}
+                                            {selectedInvoice?.carrier?.phone && (
+                                                <a href={`tel:${selectedInvoice?.carrier?.phone}`} className="block">
+                                                    <Phone size={14} className="inline-block mr-1 mb-1" />
+                                                    {selectedInvoice?.carrier?.phone}
+                                                </a>
+                                            )}
+
+                                        </div>
+                                        <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">{t("comment")}</div>
+                                        <div className="font-medium text-text-light dark:text-text-dark">
+                                            {selectedInvoice?.note || <MessageSquareOff size={14} className="inline-block mr-1 mb-1" />}
+                                        </div>
 
                                         <div className="mt-4">
                                             <button
-                                                className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                                onClick={() => alert(t("detail.print_alert"))}
+                                                className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors active:scale-95 flex items-center justify-center"
+                                                onClick={() => downloadInvoiceDocx(selectedInvoice, localStorage.getItem("lang") || "ru")}
                                             >
-                                                {t("button.print")}
+                                                <Download size={18} className="inline-block mr-1 mb-1" />
+                                                DOCX
                                             </button>
                                         </div>
                                     </aside>
@@ -1068,8 +1119,12 @@ function EditInvoiceModal({ invoice, onClose, onSave }) {
     }, [invoice]);
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-card-light dark:bg-card-dark rounded-2xl p-6 w-full max-w-2xl shadow-2xl transition-colors duration-300">
+        <div
+            onClick={onClose}
+            className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6 phone:p-4">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-card-light dark:bg-card-dark rounded-2xl p-6 w-full max-w-2xl shadow-2xl transition-colors duration-300">
 
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
@@ -1134,8 +1189,13 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
         : invoice?.status === "sent" ? statusBase.filter((st) => st.id === 1)
             : statusBase?.filter((st) => st.id > org_status_id)
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-2xl dark:bg-background-dark">
+        <div
+            onClick={onClose}
+            className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6 phone:p-4">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-2xl p-6 w-full max-w-2xl dark:bg-background-dark"
+            >
                 <div className="flex items-center gap-3 mb-4">
                     <h3 className="text-lg font-semibold">Edit Status</h3>
                     <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
@@ -1183,8 +1243,13 @@ function EditItemModal({ item, onClose, onSave }) {
     const [form, setForm] = useState(() => ({ ...item }));
     useEffect(() => setForm({ ...item }), [item]);
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-lg shadow-lg transition-colors duration-300">
+        <div
+            onClick={onClose}
+            className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6 phone:p-4">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-lg shadow-lg transition-colors duration-300"
+            >
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
