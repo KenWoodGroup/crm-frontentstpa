@@ -115,6 +115,7 @@ export default function ManagerFactoryDetail() {
                                         </span>
                                     )}
                                 </div>
+                                {/* ffwfwef */}
 
                                 <div className="flex gap-2">
                                     <WarehouseDelete
