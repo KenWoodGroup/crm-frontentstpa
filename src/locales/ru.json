@@ -558,7 +558,7 @@
     "delete_only_zero": "Удаление возможно только для счетов с суммой 0",
     "courier": "Курьер",
     "comment": "Комментарий",
-    "discount": "Скидка"
+    "discount": "Скидка",
     "Material":"Материалы",
     "Create_material":"Создать материал",
     "Delete_material": "Удалить материал",
