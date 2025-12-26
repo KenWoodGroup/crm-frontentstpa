@@ -36,6 +36,7 @@ export default function WarehouseEdit({ warehouse, refresh }) {
 
     // Проверяем — склад основной?
     const isMain = warehouse?.location_data?.some(l => l.key === "main");
+    const isMaterial = warehouse?.location_data?.some(l => l.key === "material");
 
     const parseAddress = (address) => {
         if (!address) return { region_id: "", district_id: "" };
@@ -183,6 +184,24 @@ export default function WarehouseEdit({ warehouse, refresh }) {
             Alert("Ошибка при установке основного склада", "error");
         }
     };
+    const setMaterialWarehouse = async () => {
+        try {
+            const body = {
+                location_id: warehouse?.id,
+                key: "material",
+                value: id
+            };
+
+            await locationInfo.PostMaterialWarehouse(body);
+
+            Alert("Склад сделан материальным", "success");
+
+            refresh();
+        } catch (error) {
+            console.log(error);
+            Alert("Ошибка при установке основного склада", "error");
+        }
+    };
 
     const availableDistricts = getDistrictsByRegion(data.region_id);
 
@@ -283,6 +302,13 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                         checked={isMain}
                         onChange={setMainWarehouse}
                         label="Сделать основным складом"
+                        className="checked:bg-blue-600"
+                    />
+                    <Switch
+                        id={`material-${warehouse?.id}`}
+                        checked={isMaterial}
+                        onChange={setMaterialWarehouse}
+                        label="Сделать материальным складом"
                         className="checked:bg-blue-600"
                     />
                 </DialogBody>
