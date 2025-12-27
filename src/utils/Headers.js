@@ -104,13 +104,13 @@ $api.interceptors.response.use(
                 Cookies.remove('nesw');
 
                 window.location.href = '/login';
+
                 return Promise.reject(err);
 
             } finally {
                 isRefreshing = false;
             }
         }
-
         return Promise.reject(error);
     }
 );

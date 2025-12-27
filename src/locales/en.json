@@ -555,5 +555,6 @@
   "Material": "Material",
   "Create_material": "Create material",
   "Delete_material": "Delete material",
-  "priceChangedNewBatchRequired":"The price has changed; the current batch must be closed and a new batch opened"
+  "priceChangedNewBatchRequired":"The price has changed; the current batch must be closed and a new batch opened",
+  "warehouse_type_missing":"Warehouse type not specified"
 }

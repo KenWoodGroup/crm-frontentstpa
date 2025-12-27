@@ -62,6 +62,7 @@ import { PriceType } from "../../../utils/Controllers/PriceType";
 import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
 import { ArrowDropDown } from "@mui/icons-material";
+import { locationInfo } from "../../../utils/Controllers/locationInfo";
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -85,8 +86,9 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     // user / location
     const navigate = useNavigate();
     const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
+    const factoryId = role === "factory" ? Cookies.get("ul_nesw")  : Cookies.get("usd_nesw")
     const createdBy = Cookies.get("us_nesw");
-    const deUlName = sessionStorage.getItem("de_ul_name")
+    const deUlName = sessionStorage.getItem("de_ul_name");
 
     // Context (per-mode provider)
     const {
@@ -192,6 +194,23 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
 
     const [invoiceResults, setInvoiceResults] = useState([]);
     const [selectedInvoices, setSelectedInvoices] = useState([]);
+
+    const[isMainWarehouse, setIsMainWarehouse] = useState(false);
+
+    // get main warehouse info
+    const getMainWarehouse = async ()=> {
+        try {
+            const res = await locationInfo.GetMainWarehouse(factoryId);
+            const id = res.data?.location_id || res.data?.location?.id || null;
+            if(userLId === id) {
+                setIsMainWarehouse(true)
+            }
+        }catch {}
+    };
+    useEffect(()=>{
+        getMainWarehouse()
+    },[]);
+
 
     function addInvoice(inv) {
         if (selectedInvoices.find(i => i.id === inv.id)) return; // duplicate oldini olish
@@ -719,10 +738,11 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
         } else if (!mixData || mixData.length === 0) {
             notify.warning(t("no_products_added_error"));
             return;
-        } else if (!selectedSalePriceType?.[mode]?.value && role === "factory") {
-            notify.warning(t("sale_price_type_not_selected_warning"));
-            return;
-        }
+        } 
+        // else if (!selectedSalePriceType?.[mode]?.value && role === "factory") {
+        //     notify.info(t("sale_price_type_not_selected_warning"));
+        //     // return;
+        // }
         const value_spaces = mixData.filter((item) => !item.price || (item.quantity === "" || item.quantity === 0));
         if (value_spaces.length > 0) {
             value_spaces.forEach((err) => {
@@ -855,13 +875,23 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     };
 
     // category sidebar drag Y
-    const initialHeight = window.innerWidth > 1279 ? window.innerHeight - 84 : 56
+    // const [feelWidth, setFeelWidth] = useState(true);
+    let initialHeight = window.innerWidth > 1279 ? window.innerHeight - 84 : 56
     const maxHeight = window.innerHeight - 84
     const minHeight = 56
 
-    const [height, setHeight] = useState(initialHeight)
+    const [height, setHeight] = useState(initialHeight);
     const isResizing = useRef(false)
-    const containerRef = useRef(null)
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        // setFeelWidth(!feelWidth);
+        if (window.innerWidth > 1279) {
+            setHeight(window.innerHeight - 84)
+        } else {
+            setHeight(56)
+        }
+    }, [window.innerWidth]);
 
     const startResizing = (e) => {
         e.preventDefault()
@@ -903,12 +933,12 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     useEffect(() => {
         if (height < 95) {
             const timer = setTimeout(() => {
-                if(height < 95) {
+                if (height < 95) {
                     setHeight(minHeight);
                 }
             }, 800);
             return () => clearTimeout(timer);
-        }        
+        }
     }, [height]);
 
     return (
@@ -944,33 +974,35 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                 {(!invoiceStarted?.[mode] && role === "factory") ? (
                     <div className="flex items-center gap-[6px] tablet:gap-1">
                         {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
-                        <Menu placement="right-start" allowHover offset={15}>
-                            <MenuHandler>
-                                <div className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
+                        {prd_type === "product" &&
+                            <Menu placement="right-start" allowHover offset={15}>
+                                <MenuHandler>
+                                    <div className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
                                         text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
                                         transition-all duration-300 laptop:p-1 phone:rounded-md">
-                                    <Move className="w-8 h-8 mb-0 phone:w-6 phone:h-6" />
-                                </div>
-                            </MenuHandler>
+                                        <Move className="w-8 h-8 mb-0 phone:w-6 phone:h-6" />
+                                    </div>
+                                </MenuHandler>
 
-                            <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300 phone:p-2 phone:gap-1 phone:w-[180px]">
-                                <Typography
-                                    variant="small"
-                                    color="gray"
-                                    className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400 phone:text-xs"
-                                >
-                                    {t('Opt_warehouse')}
-                                </Typography>
-                                {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
-                                    <NavLink key={id} to={path}>
-                                        <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all phone:text-xs phone:py-2 phone:px-3">
-                                            <Icon className="w-4 h-4" />
-                                            {label}
-                                        </MenuItem>
-                                    </NavLink>
-                                ))}
-                            </MenuList>
-                        </Menu>
+                                <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300 phone:p-2 phone:gap-1 phone:w-[180px]">
+                                    <Typography
+                                        variant="small"
+                                        color="gray"
+                                        className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400 phone:text-xs"
+                                    >
+                                        {t('Opt_warehouse')}
+                                    </Typography>
+                                    {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
+                                        <NavLink key={id} to={path}>
+                                            <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all phone:text-xs phone:py-2 phone:px-3">
+                                                <Icon className="w-4 h-4" />
+                                                {label}
+                                            </MenuItem>
+                                        </NavLink>
+                                    ))}
+                                </MenuList>
+                            </Menu>
+                        }
                         <div onClick={() => navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
                                         text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
                                         transition-all duration-300 laptop:p-1 phone:rounded-md phone:p-1">
@@ -1050,7 +1082,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                                 key={cat.id}
                                                 onClick={() => handleCategoryClick(cat.id)}
                                                 className={`cursor-pointer border rounded-xl shadow-sm hover:shadow-md p-3 text-left
-                        ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50 dark:bg-blue-900 dark:text-white/50" : "border-gray-300  bg-transparent   dark:text-text-dark"}`}
+                        ${selectedCategory === cat.id ? "border-blue-500 bg-blue-50 dark:bg-blue-900 dark:text-white" : "border-gray-300  bg-transparent   dark:text-text-dark"}`}
                                             >
                                                 <div className="text-sm font-medium">{cat.name}</div>
                                             </button>
@@ -1143,7 +1175,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                 </button>
 
                                 {/* Return_in */}
-                                {role === "factory" &&
+                                {(role === "factory" && prd_type === "product") &&
                                     <div
                                         className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200
                   ${selected === "return_in" ? "bg-green-50 border-green-500 text-green-700 shadow dark:bg-green-900 dark:text-white" : "border-gray-300 hover:border-green-300 text-gray-700 dark:border-gray-600 dark:text-text-dark dark:hover:border-green-600"} laptop:px-4 laptop:py-3 laptop:rounded-lg phone:px-3 phone:py-2 phone:rounded-md`}
@@ -1363,7 +1395,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                     <button
                                         disabled={createInvoiceLoading}
                                         onClick={startInvoice}
-                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 px-3 py-2 phone:w-full phone:text-sm phone:py-[2px] phone:px-3 phone:rounded-md phone:font-medium`}
+                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 px-3 py-2 desktop:w-[246px] phone:w-full phone:text-sm phone:py-[2px] phone:px-3 phone:rounded-md phone:font-medium`}
                                         aria-label={t("aria_start_invoice")}
                                     >
                                         {!createInvoiceLoading ? (
@@ -1473,7 +1505,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                         <div className="font-semibold text-lg text-text-light dark:text-text-dark">{(total || 0).toLocaleString()} sum</div>
                                     </div>
                                 </div>
-                                {role === "factory" &&
+                                {(role === "factory" && isMainWarehouse) &&
                                     <div className="max-w-80">
                                         <div className="text-xs text-gray-500 dark:text-gray-400 dark:bg-card-dark mb-2">{t("sale_price_type_label")}</div>
                                         <Select

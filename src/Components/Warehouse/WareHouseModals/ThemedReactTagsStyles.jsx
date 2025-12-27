@@ -6,7 +6,6 @@ export const customSelectStyles = () => ({
         borderColor: state.isFocused ? "var(--select-hover)" : "var(--select-border)",
         borderRadius: "0.75rem",
         minHeight: "40px",
-        maxWidth:"40vw",
         boxShadow: state.isFocused ? "0 0 0 1px var(--select-border)" : "none",
         transition: "all 0.2s ease",
         "&:hover": {

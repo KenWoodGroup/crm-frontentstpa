@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie"
+import { notify } from "../../../../utils/toast";
 
 // форматирование чисел 70000 → 70 000
 const formatNumber = (num) => {
@@ -58,6 +59,9 @@ export default function WarehouseAccess() {
     const [access, setAccess] = useState([]);
     const [sellAccess, setSellAccess] = useState(false);
 
+    // warehouse type is detected before starting operations
+    const [warehouseType, setWarehouseType] = useState("");
+
     const navigate = useNavigate()
 
     const GetWarehouse = async () => {
@@ -74,6 +78,7 @@ export default function WarehouseAccess() {
             const response = await locationInfo.GetLocationInfo(id);
             if (response?.status === 200) {
                 // Приводим ответ к массиву элементов
+                setWarehouseType(response.data?.key)
                 const list = normalizeList(response.data);
                 setAccess(list);
                 const found = list.find((item) => item.key === "sell_access");
@@ -116,16 +121,25 @@ export default function WarehouseAccess() {
                     >
                         {t("Warehouse_Info")}
                     </Typography>
-                        <Button onClick={()=>{
+                    <Button onClick={() => {
+                        if (!warehouseType) {
+                            notify.warning(t("warehouse_type_missing"));
+                            return;
+                        } else {
                             sessionStorage.setItem("de_ul_name", warehouse?.name)
                             Cookies.set('de_ul_nesw', warehouse?.id);
-                            if(true) {
+                            if (true) {
                                 Cookies.set("sedqwdqdqwd", "terrwerwerw")
+                            };
+                            if (warehouseType === "material") {
+                                navigate('/factory/materials/warehouse/stockin')
+                            } else if (warehouseType === "product" || "main") {
+                                navigate('/factory/warehouse/stockin');
                             }
-                            navigate('/factory/warehouse/stockin')
-                        }}>
-                            {t("operations")}
-                        </Button>
+                        }
+                    }}>
+                        {t("operations")}
+                    </Button>
                 </div>
 
                 {warehouse ? (
@@ -162,7 +176,7 @@ export default function WarehouseAccess() {
                     </Typography>
                 )}
 
-              
+
             </Card>
         </div>
     );

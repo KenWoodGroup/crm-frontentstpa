@@ -556,5 +556,6 @@
     "Create_material": "Material yaratish",
     "Delete_material": "Material o'chirish",
     "Edit_material": "Material o'zgartirish",
-    "priceChangedNewBatchRequired": "Narx o‘zgardi, amaldagi partiya yopilib, yangi partiya ochilishi lozim"
+    "priceChangedNewBatchRequired": "Narx o‘zgardi, amaldagi partiya yopilib, yangi partiya ochilishi lozim",
+    "warehouse_type_missing":"Ombor turi aniqlanmadi"
 }
