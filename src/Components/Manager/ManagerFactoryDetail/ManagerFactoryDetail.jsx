@@ -1,196 +1,207 @@
 import { useEffect, useState } from "react";
-import { location } from "../../../utils/Controllers/location";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+    Card,
+    CardBody,
+    Typography,
+    Switch,
+    Button
+} from "@material-tailwind/react";
 import {
     Store,
     MapPin,
     Phone,
     Wallet,
-    ChevronLeft,
-    ChevronRight,
-    Package,
-    Layers
+    Package
 } from "lucide-react";
-import { Button } from "@material-tailwind/react";
+
+import { location } from "../../../utils/Controllers/location";
+import { LocationOptions } from "../../../utils/Controllers/LocationOptions";
+import { OptionApi } from "../../../utils/Controllers/OptionApi";
 import Loading from "../../UI/Loadings/Loading";
-import WarehouseCreate from "./_components/WarehouseCreate";
-import WarehouseDelete from "./_components/WarehouseDelete";
-import WarehouseEdit from "./_components/WarehouseEdit";
+import WarehouseGet from "./_components/WarehouseGet";
 
 export default function ManagerFactoryDetail() {
     const { id } = useParams();
-    const [warehouses, setWarehouses] = useState([]);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+
+    const [factory, setFactory] = useState(null);
+    const [options, setOptions] = useState([]);
+    const [locationOptions, setLocationOptions] = useState([]);
+    const [optimisticOptions, setOptimisticOptions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
-    const getWarehouse = async () => {
+    /* ================= API ================= */
+
+    const getFactory = async () => {
+        const res = await location.Get(id);
+        setFactory(res.data);
+    };
+
+    const getLocationOptions = async () => {
+        const res = await LocationOptions.GetByLocationId(id);
+        setLocationOptions(res.data);
+    };
+
+    const getOptions = async () => {
+        const res = await OptionApi.GetAllOptions();
+        setOptions(res.data);
+    };
+
+    /* ===== sync optimistic state ===== */
+    useEffect(() => {
+        setOptimisticOptions(locationOptions);
+    }, [locationOptions]);
+
+    /* ================= SWITCH HANDLER ================= */
+
+    const handleToggle = async (optionId, checked) => {
+        const prevState = [...optimisticOptions];
+
+        // 🔥 1. МГНОВЕННЫЙ UI
+        if (checked) {
+            setOptimisticOptions((prev) => [
+                ...prev,
+                { option_id: optionId }
+            ]);
+        } else {
+            setOptimisticOptions((prev) =>
+                prev.filter((lo) => lo.option_id !== optionId)
+            );
+        }
+
         try {
-            setLoading(true);
-            const data = {
-                parent_id: id,
-                type: "warehouse",
-                searchName: "all",
-                page,
-            };
-            const response = await location.GetLocationByType(data);
+            // 🕐 2. REQUEST В ФОНЕ
+            if (checked) {
+                await LocationOptions.CreateLocationOption({
+                    location_id: id,
+                    option_id: optionId
+                });
+            } else {
+                const current = locationOptions.find(
+                    (lo) => lo.option_id === optionId
+                );
+                if (current) {
+                    await LocationOptions.DeleteLocationOption(current.id);
+                }
+            }
 
-            setWarehouses(response.data.data?.records || []);
-            setTotalPages(response.data.data?.pagination?.total_pages || 1);
+            // 🔄 3. СИНХРОНИЗАЦИЯ
+            await getLocationOptions();
         } catch (error) {
             console.log(error);
-        } finally {
-            setLoading(false);
+
+            // ❌ 4. ROLLBACK
+            setOptimisticOptions(prevState);
         }
     };
 
+    /* ================= INIT ================= */
+
     useEffect(() => {
-        getWarehouse();
-    }, [page]);
+        Promise.all([
+            getFactory(),
+            getLocationOptions(),
+            getOptions()
+        ]).finally(() => setLoading(false));
+    }, []);
 
     if (loading) return <Loading />;
 
-    const formatNumber = (num) => {
-        if (num === null || num === undefined) return "—";
-        return Number(num).toLocaleString("ru-RU");
-    };
+    /* ================= UI ================= */
 
     return (
-        <div className="w-full text-gray-900 dark:text-gray-100">
-            {/* TITLE */}
-            <div className="flex items-center mb-5 justify-between">
-                <div className="flex items-center gap-2">
-                    <Button onClick={() => navigate(-1)} className="p-[10px]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
-                            <path
-                                fill="currentColor"
-                                fillRule="evenodd"
-                                d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
-                                clipRule="evenodd"
-                            ></path>
-                        </svg>
-                    </Button>
-                    <h1 className="text-2xl font-bold">Складлар</h1>
-                </div>
-                <WarehouseCreate refresh={getWarehouse} />
-            </div>
+        <div className="space-y-6 text-gray-900 dark:text-gray-100">
 
-            {/* LIST */}
-            <div className="flex flex-col gap-4">
-                {warehouses.map((item) => {
-                    const isMain = item.location_data?.some(
-                        (loc) => loc.key === "main"
-                    );
-                    const isMaterial = item.location_data?.some(
-                        (loc) => loc.key === "material"
-                    );
+            {/* ===== Factory info ===== */}
+            <Card className="dark:bg-card-dark">
+                <CardBody className="space-y-4">
+                    <div className="flex items-center gap-[5px]">
+                        <Button onClick={() => navigate(-1)} className="p-[10px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
+                                <path
+                                    fill="currentColor"
+                                    fillRule="evenodd"
+                                    d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                    clipRule="evenodd"
+                                ></path>
+                            </svg>
+                        </Button>
+                        <Typography variant="h5" className="flex items-center gap-2 dark:text-text-dark">
+                            <Store size={20} /> {factory.name}
+                        </Typography>
+                    </div>
 
-                    return (
-                        <div
-                            key={item.id}
-                            className="bg-white dark:bg-[#1E1E22]
-                            border border-gray-200 dark:border-gray-700
-                            rounded-xl p-5 shadow-sm hover:shadow-md transition"
-                        >
-                            {/* HEADER */}
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <Store className="w-5 h-5 text-blue-600" />
-                                        <h2 className="text-lg font-semibold">
-                                            {item.name}
-                                        </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                            <MapPin size={16} />
+                            <span>{factory.address}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Phone size={16} />
+                            <span>{factory.phone}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Wallet size={16} />
+                            <span>Баланс: {factory.balance}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Package size={16} />
+                            <span>Тип: {factory.type}</span>
+                        </div>
+                    </div>
+                </CardBody>
+            </Card>
+
+            {/* ===== Options ===== */}
+            <Card className="dark:bg-card-dark">
+                <CardBody>
+                    <Typography variant="h6" className="mb-4 dark:text-text-dark">
+                        Опции фабрики
+                    </Typography>
+
+                    <div className="space-y-4">
+                        {options.map((opt) => {
+                            const checked = optimisticOptions.some(
+                                (lo) => lo.option_id === opt.id
+                            );
+
+                            return (
+                                <div
+                                    key={opt.id}
+                                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 transition-all"
+                                >
+                                    <div>
+                                        <Typography className="font-medium dark:text-text-dark">
+                                            {opt.name}
+                                        </Typography>
+                                        {opt.note && (
+                                            <Typography className="text-xs opacity-70 dark:text-text-dark">
+                                                {opt.note}
+                                            </Typography>
+                                        )}
                                     </div>
 
-                                    {isMain && (
-                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                            Assosiy ombor
-                                        </span>
-                                    )}
-
-                                    {isMaterial && (
-                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                            Xomashyo ombori
-                                        </span>
-                                    )}
-                                </div>
-                                {/* ffwfwef */}
-
-                                <div className="flex gap-2">
-                                    <WarehouseDelete
-                                        warehouseId={item.id}
-                                        refresh={getWarehouse}
-                                    />
-                                    <WarehouseEdit
-                                        warehouse={item}
-                                        refresh={getWarehouse}
+                                    <Switch
+                                        color="green"
+                                        checked={checked}
+                                        onChange={(e) =>
+                                            handleToggle(
+                                                opt.id,
+                                                e.target.checked
+                                            )
+                                        }
                                     />
                                 </div>
-                            </div>
-
-                            {/* INFO */}
-                            <div className="space-y-2 mt-4 text-sm text-gray-700 dark:text-gray-300">
-                                <div className="flex gap-2">
-                                    <MapPin className="w-4 h-4" />
-                                    <span>{item.address || "—"}</span>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <Phone className="w-4 h-4" />
-                                    <span>{item.phone || "—"}</span>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <Wallet className="w-4 h-4" />
-                                    <span>{formatNumber(item.balance)} uzs</span>
-                                </div>
-                            </div>
-
-                            {/* ACTIONS BOTTOM */}
-                            <div className="flex justify-between gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
-                                    className="flex items-center gap-2 text-blue-600 hover:underline"
-                                >
-                                    <Package size={18} />
-                                    Mahsulot
-                                </NavLink>
-                                {/* 
-                                <NavLink
-                                    to={`/manager/factory/warehouse-material/${id}/${item?.id}`}
-                                    className="flex items-center gap-2 text-green-600 hover:underline"
-                                >
-                                    <Layers size={18} />
-                                    Materialar
-                                </NavLink> */}
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* PAGINATION */}
-            <div className="flex justify-center gap-4 mt-6">
-                <button
-                    disabled={page === 1}
-                    onClick={() => setPage(page - 1)}
-                    className="px-4 py-2 border rounded-lg disabled:opacity-40"
-                >
-                    <ChevronLeft size={16} />
-                </button>
-
-                <span className="font-semibold">
-                    {page} / {totalPages}
-                </span>
-
-                <button
-                    disabled={page === totalPages}
-                    onClick={() => setPage(page + 1)}
-                    className="px-4 py-2 border rounded-lg disabled:opacity-40"
-                >
-                    <ChevronRight size={16} />
-                </button>
-            </div>
+                            );
+                        })}
+                    </div>
+                </CardBody>
+            </Card>
+            <WarehouseGet />
         </div>
     );
 }

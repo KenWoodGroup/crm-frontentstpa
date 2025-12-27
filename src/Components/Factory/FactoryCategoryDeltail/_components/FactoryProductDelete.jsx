@@ -4,6 +4,7 @@ import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
 import { LocalCategory } from "../../../../utils/Controllers/LocalCategory";
+import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 
 export default function FactoryProductDelete({ id, refresh }) {
     const { t } = useTranslation();
@@ -15,7 +16,7 @@ export default function FactoryProductDelete({ id, refresh }) {
     const handleDelete = async () => {
         try {
             setLoading(true);
-            await LocalCategory.DeleteCategory(id);
+            await LocalProduct.DeleteProduct(id);
             Alert(t("success"), "success");
             refresh();
             setOpen(false);

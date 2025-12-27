@@ -15,10 +15,12 @@ import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
 import { LocalProduct } from "../../../../utils/Controllers/LocalProduct";
 import { Alert } from "../../../../utils/Alert";
+import { useParams } from "react-router-dom";
 
 export default function FactoryProductEdit({ oldData, refresh }) {
     const { t } = useTranslation();
     const location_id = Cookies.get("ul_nesw");
+    const {id} = useParams()
 
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
@@ -41,8 +43,8 @@ export default function FactoryProductEdit({ oldData, refresh }) {
                 name: name,
                 unit: unit,
                 location_id: location_id,
-                type:'material',
-                product_id: oldData?.product_id
+                type:'product',
+                category_id: id
             }
             const response = await LocalProduct?.EditProduct(oldData?.id, data)
             Alert(t("success"), "success");

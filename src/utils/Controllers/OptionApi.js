@@ -9,6 +9,10 @@ class OptionApi {
         const response = await $api.get(`/options/paginate/page?page=${page}`,)
         return response
     }
+    static GetAllOptions = async (page) => {
+        const response = await $api.get(`/options`,)
+        return response
+    }
     static DeleteOption = async (id) => {
         const response = await $api.delete(`/options/${id}`,)
         return response

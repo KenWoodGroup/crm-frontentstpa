@@ -11,9 +11,13 @@ import FactoryCategoryEdit from "../FactoryProduct/_component/FactoryCategoryEdi
 import FactoryCategoryDelete from "../FactoryProduct/_component/FactoryCategoryDelete";
 import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 import Cookies from "js-cookie";
+import { useOutletContext } from "react-router-dom";
+import FactoryProductDelete from "./_components/FactoryProductDelete";
+import FactoryProductEdit from "./_components/FactoryProductEdit";
 
 
 export default function FactoryCategoryDetail() {
+    const { factoryOptions } = useOutletContext();
     const { t } = useTranslation();
     const { id } = useParams();
     const [products, setProducts] = useState([]);
@@ -22,6 +26,13 @@ export default function FactoryCategoryDetail() {
     const [loading, setLoading] = useState(false);
 
     const location_id = Cookies.get("ul_nesw");
+
+
+    const hasXomAshyo = Array.isArray(factoryOptions)
+        && factoryOptions.some(
+            item => item?.option?.name === "Xom ashyo"
+        );
+
 
     const GetLocalCategory = async (page = 1) => {
         setLoading(true);
@@ -96,16 +107,19 @@ export default function FactoryCategoryDetail() {
 
                                         <td className="px-4 py-3">
                                             <div className="flex items-center justify-end gap-2">
-                                                <NavLink to={`/factory/product/material/${product?.id}`}>
-                                                    <Button className="bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 normal-case p-[8px] transition-colors duration-200">
-                                                        <Eye size={20} />
-                                                    </Button>
-                                                </NavLink>
-                                                <FactoryCategoryDelete
+                                                {!hasXomAshyo && (
+                                                    <NavLink to={`/factory/product/material/${product?.id}`}>
+                                                        <Button className="bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 normal-case p-[8px] transition-colors duration-200">
+                                                            <Eye size={20} />
+                                                        </Button>
+                                                    </NavLink>
+                                                )}
+
+                                                <FactoryProductDelete
                                                     id={product?.id}
                                                     refresh={() => GetLocalCategory(currentPage)}
                                                 />
-                                                <FactoryCategoryEdit
+                                                <FactoryProductEdit
                                                     oldData={product}
                                                     refresh={() => GetLocalCategory(currentPage)}
                                                 />

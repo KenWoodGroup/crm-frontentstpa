@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Logo from '../../../Images/photo_2025-12-20 11.17.15.jpeg'
 
-export default function FactorySidebar() {
+export default function FactorySidebar({ data }) {
     const { t } = useTranslation();
 
     // Получаем права доступа из cookies
@@ -126,6 +126,9 @@ export default function FactorySidebar() {
         // Для меню показываем только если есть хотя бы один доступный пункт
         return filteredItems && filteredItems.length > 0;
     };
+    const hasXomAshyo = Array.isArray(data)
+        && data.some(item => item?.option?.name === "Xom ashyo");
+
     // Главные меню-кнопки
     const mainMenuItems = [
         {
@@ -184,7 +187,14 @@ export default function FactorySidebar() {
             isMenu: true,
             items: [
                 { id: 12, path: "/factory/product", icon: <Factory className="w-4 h-4" />, label: t("Production") },
-                { id: 122, path: "/factory/materials", icon: <Factory className="w-4 h-4" />, label: t("Material") },
+                ...(hasXomAshyo
+                    ? [{
+                        id: 122,
+                        path: "/factory/materials",
+                        icon: <Factory className="w-4 h-4" />,
+                        label: t("Material")
+                    }]
+                    : []),
                 { id: 5, path: "/factory/partner", icon: <Users className="w-4 h-4" />, label: t("partner") },
                 { id: 7, path: "/factory/payment-type", icon: <ClipboardType className="w-4 h-4" />, label: t("Payment_type") },
                 { id: 14, path: "/factory/users", icon: <Users className="w-4 h-4" />, label: t("workers") },
@@ -194,6 +204,9 @@ export default function FactorySidebar() {
             ]
         }
     ];
+
+
+
 
     const menuListClass = `
         mt-[12px] bg-transparent backdrop-blur-md 

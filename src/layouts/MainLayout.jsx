@@ -1,21 +1,41 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FactorySidebar from "../Components/Factory/FactorySidebar/FactorySidebar";
 import AdminHeader from "../Components/UI/Header/AdminHeader";
 import { FactoryProvider } from "../context/FactoryContext";
 import { useInventory } from "../context/InventoryContext";
 import useConfirmNavigation from "../hooks/useConfirmNavigation";
 import ConfirmModalNav from "../Components/Warehouse/WareHouseModals/ConfirmModalNav";
+import { LocationOptions } from "../utils/Controllers/LocationOptions";
+import Cookies from "js-cookie";
+
 
 export default function MainLayout() {
-    const [active, setActive] = useState(false); // true = открыт сайдбар
+    const [active, setActive] = useState(false);
     const location = useLocation();
+    const FactoryId = Cookies?.get('ul_nesw')
+    const [data, setData] = useState([])
     const mode = location.pathname.includes("/warehouse/stockout")
         ? "out" : location.pathname.includes("/warehouse/stockin") ? "in" : "m_other";
+
+
+    const GetFactory = async () => {
+        try {
+            const response = await LocationOptions?.GetByLocationId(FactoryId)
+            setData(response?.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        GetFactory()
+    }, [])
 
     return (
         <div className="flex w-full overflow-hidden bg-background-light dark:bg-background-dark transition-colors relative min-h-screen">
             <FactorySidebar
+                data={data}
                 open={active}
                 onClose={() => setActive(false)}
                 active={() => setActive((s) => !s)}
@@ -29,7 +49,7 @@ export default function MainLayout() {
                 {mode === "m_other" ? <AdminHeader sidebarOpen={!active} /> : <noscript></noscript>}
                 <FactoryProvider mode={mode}>
                     <InnerGuard>
-                        <Outlet />
+                        <Outlet context={{ factoryOptions: data }} />
                     </InnerGuard>
                 </FactoryProvider>
 
