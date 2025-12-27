@@ -49,7 +49,12 @@ export const userRoutes = [
   {
     path: "factory/warehouse/stockin",
     name: "factory de warehouse stockin",
-    element: <WareHouseIncome role="factory" />
+    element: <WareHouseIncome key={"factory-product"} role="factory" />
+  },
+  {
+    path: "factory/materials/warehouse/stockin",
+    name: "factory materials de warehouse stockin",
+    element: <WareHouseIncome key={"factory-material"}  role="factory" prd_type="material"/>
   },
   {
     path: "factory/warehouse/stockout",
@@ -75,11 +80,6 @@ export const userRoutes = [
     path: "/factory/orders/:invoiceId",
     name: "factory detail history by id",
     element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order"/>
-  },
-  {
-    path: "factory/orders",
-    name: "factory orders",
-    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order" />
   },
   {
     path: "factory/warehouse/user/:id",

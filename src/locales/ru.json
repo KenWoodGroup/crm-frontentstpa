@@ -565,5 +565,6 @@
     "Product_materila_text": "Материалы для продукта",
     "total_prew": "Указано",
     "Select_Material": "Выбрано материалов",
-    "priceChangedNewBatchRequired":"Цена изменена, текущая партия должна быть закрыта и создана новая"
+    "priceChangedNewBatchRequired":"Цена изменена, текущая партия должна быть закрыта и создана новая",
+    "warehouse_type_missing":"Тип склада не определён"
 }
