@@ -60,7 +60,7 @@ export default function WarehouseGet() {
             {/* TITLE */}
             <div className="flex items-center mb-5 justify-between">
                 <div className="flex items-center gap-2">
-                  
+
                     <h1 className="text-2xl font-bold">Складлар</h1>
                 </div>
                 <WarehouseCreate refresh={getWarehouse} />
@@ -138,20 +138,22 @@ export default function WarehouseGet() {
 
                             {/* ACTIONS BOTTOM */}
                             <div className="flex justify-between gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
-                                    className="flex items-center gap-2 text-blue-600 hover:underline"
-                                >
-                                    <Package size={18} />
-                                    Mahsulot
-                                </NavLink>
-                                {/* 
-                                <NavLink
-                                    to={`/manager/factory/warehouse-material/${id}/${item?.id}`}
-                                    className="flex items-center gap-2 text-green-600 hover:underline"
-                                >
-                                    <Layers size={18} />
-                                    Materialar
-                                </NavLink> */}
+                                {isMain ? (
+                                    <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
+                                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                                    >
+                                        <Package size={18} />
+                                        Mahsulot
+                                    </NavLink>
+                                ) : (
+                                    <NavLink
+                                        to={`/manager/factory/warehouse-material/${id}/${item?.id}`}
+                                        className="flex items-center gap-2 text-green-600 hover:underline"
+                                    >
+                                        <Layers size={18} />
+                                        Materialar
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
                     );
