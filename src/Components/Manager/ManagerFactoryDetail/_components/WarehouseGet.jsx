@@ -138,7 +138,7 @@ export default function WarehouseGet() {
 
                             {/* ACTIONS BOTTOM */}
                             <div className="flex justify-between gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                {isMain ? (
+                                {!isMaterial ? (
                                     <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
                                         className="flex items-center gap-2 text-blue-600 hover:underline"
                                     >
