@@ -23,7 +23,6 @@ export default function WarehouseGet() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
     const getWarehouse = async () => {
         try {

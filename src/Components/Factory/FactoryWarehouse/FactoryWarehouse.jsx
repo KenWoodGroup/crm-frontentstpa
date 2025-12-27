@@ -80,33 +80,41 @@ export default function FactoryWarehouse() {
                 <>
                     {/* Warehouse Cards */}
                     <div className="grid grid-cols-1 gap-6">
-                        {warehouses.map((w) => (
-                            <div
-                                key={w.id}
-                                className="bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 hover:shadow-md transition-colors duration-300"
-                            >
-                                <div className="flex items-center flex-wrap gap-[20px] justify-between mb-4">
-                                    <div className="flex items-center flex-wrap gap-3">
-                                        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
-                                            <Building2 className="w-6 h-6 text-text-light dark:text-text-dark" />
+                        {warehouses.map((w) => {
+                            const isMain = w.location_data?.some(
+                                (loc) => loc.key === "main"
+                            );
+                            const isMaterial = w.location_data?.some(
+                                (loc) => loc.key === "material"
+                            );
+                            return (
+                                <div
+                                    key={w.id}
+                                    className="bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm p-6 hover:shadow-md transition-colors duration-300"
+                                >
+                                    <div className="flex items-center flex-wrap gap-[20px] justify-between mb-2">
+                                        <div className="flex items-center flex-wrap gap-3">
+                                            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-xl">
+                                                <Building2 className="w-6 h-6 text-text-light dark:text-text-dark" />
+                                            </div>
+                                            <h2 className="text-xl font-semibold">
+                                                {w.name}
+                                            </h2>
                                         </div>
-                                        <h2 className="text-xl font-semibold">
-                                            {w.name}
-                                        </h2>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <NavLink to={`/factory/warehouse-access/${w?.id}`}>
-                                            <Tooltip content={t("View")}>
-                                                <IconButton
-                                                    className="bg-blue-500 hover:bg-blue-400"
-                                                    variant="text"
-                                                    color="white"
-                                                >
-                                                    <EyeIcon className="text-[18px]" />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </NavLink>
-                                        {/* <WarehouseEdit
+
+                                        <div className="flex items-center gap-2">
+                                            <NavLink to={`/factory/warehouse-access/${w?.id}`}>
+                                                <Tooltip content={t("View")}>
+                                                    <IconButton
+                                                        className="bg-blue-500 hover:bg-blue-400"
+                                                        variant="text"
+                                                        color="white"
+                                                    >
+                                                        <EyeIcon className="text-[18px]" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </NavLink>
+                                            {/* <WarehouseEdit
                                             refresh={() => GetAll(page)}
                                             warehouse={w}
                                         />
@@ -114,27 +122,39 @@ export default function FactoryWarehouse() {
                                             refresh={() => GetAll(page)}
                                             warehouseId={w?.id}
                                         /> */}
+                                        </div>
+                                    </div>
+                                    {isMain && (
+                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
+                                            Assosiy ombor
+                                        </span>
+                                    )}
+
+                                    {isMaterial && (
+                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
+                                            Xomashyo ombori
+                                        </span>
+                                    )}
+
+                                    <div className="space-y-3 mt-[5px]">
+                                        <div className="flex items-center gap-2">
+                                            <Mail className="w-5 h-5 opacity-70" />
+                                            <span>{w?.users[0]?.username || "—"}</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="w-5 h-5 opacity-70" />
+                                            <span>{w.address}</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <Phone className="w-5 h-5 opacity-70" />
+                                            <span>{w.phone}</span>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2">
-                                        <Mail className="w-5 h-5 opacity-70" />
-                                        <span>{w?.users[0]?.username || "—"}</span>
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="w-5 h-5 opacity-70" />
-                                        <span>{w.address}</span>
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        <Phone className="w-5 h-5 opacity-70" />
-                                        <span>{w.phone}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
 
                     {/* Pagination */}
