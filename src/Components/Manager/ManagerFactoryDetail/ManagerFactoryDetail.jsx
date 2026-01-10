@@ -30,6 +30,8 @@ export default function ManagerFactoryDetail() {
     const [optimisticOptions, setOptimisticOptions] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate()
+    const isAnyOptionEnabled = optimisticOptions.length > 0;
+
 
     /* ================= API ================= */
 
@@ -71,7 +73,6 @@ export default function ManagerFactoryDetail() {
         }
 
         try {
-            // 🕐 2. REQUEST В ФОНЕ
             if (checked) {
                 await LocationOptions.CreateLocationOption({
                     location_id: id,
@@ -201,7 +202,7 @@ export default function ManagerFactoryDetail() {
                     </div>
                 </CardBody>
             </Card>
-            <WarehouseGet />
+            <WarehouseGet Allowed={isAnyOptionEnabled} />
         </div>
     );
 }

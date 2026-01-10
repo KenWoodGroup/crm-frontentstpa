@@ -17,12 +17,13 @@ import WarehouseDelete from "./WarehouseDelete";
 import WarehouseEdit from "./WarehouseEdit";
 import Loading from "../../../UI/Loadings/Loading";
 
-export default function WarehouseGet() {
+export default function WarehouseGet({ Allowed }) {
     const { id } = useParams();
     const [warehouses, setWarehouses] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
+
 
     const getWarehouse = async () => {
         try {
@@ -63,7 +64,7 @@ export default function WarehouseGet() {
 
                     <h1 className="text-2xl font-bold">Складлар</h1>
                 </div>
-                <WarehouseCreate refresh={getWarehouse} />
+                <WarehouseCreate Allowed={Allowed} refresh={getWarehouse} />
             </div>
             {/* LIST */}
             <div className="flex flex-col gap-4">
