@@ -19,7 +19,7 @@ export default function FactoryLocalProduct() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
-    const location_id = Cookies.get("usd_nesw");
+    const location_id = Cookies.get("ul_nesw");
 
     const GetLocalCategory = async (page = 1) => {
         setLoading(true);
