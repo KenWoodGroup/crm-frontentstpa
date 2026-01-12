@@ -6,21 +6,24 @@ import {
     DialogBody,
     DialogFooter,
     Input,
+    Switch,
 } from "@material-tailwind/react";
 import { Alert } from "../../../../utils/Alert";
 import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
-import Cookies from "js-cookie";
 import Regions from "../../../../utils/Regions/regions.json";
 import Districts from "../../../../utils/Regions/districts.json";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 
-export default function WarehouseCreate({ refresh }) {
-    const {id} = useParams()
+export default function WarehouseCreate({ refresh, Allowed }) {
+    const { id } = useParams(); // factory / location id
+    const { t } = useTranslation();
+
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
-    const { t } = useTranslation();
+    const [isMaterial, setIsMaterial] = useState(false);
 
     const initialData = {
         name: "",
@@ -35,14 +38,19 @@ export default function WarehouseCreate({ refresh }) {
 
     const [data, setData] = useState(initialData);
 
+    /* ================= helpers ================= */
+
     const getDistrictsByRegion = (regionId) => {
         if (!regionId) return [];
-        return Districts.filter((district) => district.region_id === parseInt(regionId));
+        return Districts.filter(
+            (d) => d.region_id === parseInt(regionId)
+        );
     };
 
     const handleOpen = () => {
         setOpen(!open);
         setErrors({});
+        setIsMaterial(false);
         setData(initialData);
     };
 
@@ -63,11 +71,11 @@ export default function WarehouseCreate({ refresh }) {
 
     const handleRegionChange = (e) => {
         const value = e.target.value;
-        setData({
-            ...data,
+        setData((prev) => ({
+            ...prev,
             region_id: value,
-            district_id: "", // Сбрасываем район при смене региона
-        });
+            district_id: "",
+        }));
 
         if (errors.region_id) {
             setErrors((prev) => ({ ...prev, region_id: "" }));
@@ -76,33 +84,65 @@ export default function WarehouseCreate({ refresh }) {
 
     const handleDistrictChange = (e) => {
         const value = e.target.value;
-        setData({
-            ...data,
+        setData((prev) => ({
+            ...prev,
             district_id: value,
-        });
+        }));
 
         if (errors.district_id) {
             setErrors((prev) => ({ ...prev, district_id: "" }));
         }
     };
 
+    /* ================= validation ================= */
+
     const validateFields = () => {
         const newErrors = {};
 
-        if (!data.name.trim()) newErrors.name = t("Field_required", { field: t("Warehouse_name") });
-        if (!data.username.trim()) newErrors.username = t("Field_required", { field: t("Warehouse_login") });
-        if (!data.full_name.trim()) newErrors.full_name = t("Field_required", { field: t("Warehouse_owner_name") });
-        if (!data.phone.trim()) newErrors.phone = t("Field_required", { field: t("Phone_number") });
-        else if (!/^\+998\d{9}$/.test(data.phone)) newErrors.phone = t("Phone_format_error");
-        if (!data.password.trim()) newErrors.password = t("Field_required", { field: t("Password") });
-        else if (data.password.length < 6) newErrors.password = t("Password_min_error");
-        if (!data.confirm_password.trim()) newErrors.confirm_password = t("Field_required", { field: t("Confirm_password") });
-        else if (data.password !== data.confirm_password) newErrors.confirm_password = t("Passwords_not_match");
-        if (!data.region_id) newErrors.region_id = t("Field_required", { field: t("Region") });
-        if (!data.district_id) newErrors.district_id = t("Field_required", { field: t("District") });
+        if (!data.name.trim())
+            newErrors.name = t("Field_required", { field: t("Warehouse_name") });
+
+        if (!data.username.trim())
+            newErrors.username = t("Field_required", { field: t("Warehouse_login") });
+
+        if (!data.full_name.trim())
+            newErrors.full_name = t("Field_required", { field: t("Warehouse_owner_name") });
+
+        if (!data.phone.trim())
+            newErrors.phone = t("Field_required", { field: t("Phone_number") });
+        else if (!/^\+998\d{9}$/.test(data.phone))
+            newErrors.phone = t("Phone_format_error");
+
+        if (!data.password.trim())
+            newErrors.password = t("Field_required", { field: t("Password") });
+        else if (data.password.length < 6)
+            newErrors.password = t("Password_min_error");
+
+        if (!data.confirm_password.trim())
+            newErrors.confirm_password = t("Field_required", { field: t("Confirm_password") });
+        else if (data.password !== data.confirm_password)
+            newErrors.confirm_password = t("Passwords_not_match");
+
+        if (!data.region_id)
+            newErrors.region_id = t("Field_required", { field: t("Region") });
+
+        if (!data.district_id)
+            newErrors.district_id = t("Field_required", { field: t("District") });
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    /* ================= API ================= */
+
+    const setMaterialWarehouse = async (warehouseId) => {
+        const body = {
+            location_id: warehouseId,
+            key: "material",
+            value: id,
+        };
+
+        await locationInfo.PostMaterialWarehouse(body);
     };
 
     const createWarehouse = async () => {
@@ -111,8 +151,12 @@ export default function WarehouseCreate({ refresh }) {
         try {
             setLoading(true);
 
-            const selectedRegion = Regions.find((region) => region.id === parseInt(data.region_id));
-            const selectedDistrict = Districts.find((district) => district.id === parseInt(data.district_id));
+            const region = Regions.find(
+                (r) => r.id === parseInt(data.region_id)
+            );
+            const district = Districts.find(
+                (d) => d.id === parseInt(data.district_id)
+            );
 
             const payload = {
                 name: data.name,
@@ -121,17 +165,25 @@ export default function WarehouseCreate({ refresh }) {
                 phone: data.phone,
                 password: data.password,
                 type: "warehouse",
-                address: `${selectedRegion?.name_uz || ""}, ${selectedDistrict?.name_uz || ""},`,
+                address: `${region?.name_uz || ""}, ${district?.name_uz || ""}`,
                 parent_id: id,
             };
 
-            await WarehouseApi.CreateWarehouse(payload);
+            const res = await WarehouseApi.CreateWarehouse(payload);
+            const warehouseId = res?.data?.id;
+
+            if (isMaterial && warehouseId) {
+                await setMaterialWarehouse(warehouseId);
+            }
 
             Alert(t("success"), "success");
             handleOpen();
             refresh();
         } catch (error) {
-            Alert(`Xatolik yuz berdi: ${error?.response?.data?.message || error.message}`, "error");
+            Alert(
+                error?.response?.data?.message || error.message,
+                "error"
+            );
         } finally {
             setLoading(false);
         }
@@ -139,187 +191,78 @@ export default function WarehouseCreate({ refresh }) {
 
     const availableDistricts = getDistrictsByRegion(data.region_id);
 
+    /* ================= UI ================= */
+
     return (
         <>
             <Button
                 onClick={handleOpen}
-                className="bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+                className="bg-blue-600 text-white hover:bg-blue-700"
             >
                 {t("New_Warehouse")}
             </Button>
 
             <Dialog
-                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
-                open={open} handler={handleOpen} size="sm">
-                <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">{t("Create_Warehouse")}</DialogHeader>
-                <DialogBody divider className="space-y-4 overflow-y-auto h-[500px]">
-                    <div>
-                        <Input
-                            label={t("Warehouse_name")}
-                            name="name"
-                            value={data.name}
-                            onChange={handleChange}
-                            error={!!errors.name}
-                            color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
-                            labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
-                            }}
+                open={open}
+                handler={handleOpen}
+                size="sm"
+                className="dark:bg-card-dark"
+            >
+                <DialogHeader>{t("Create_Warehouse")}</DialogHeader>
+
+                <DialogBody divider className="space-y-4 h-[500px] overflow-y-auto">
+
+                    <Input label={t("Warehouse_name")} name="name" value={data.name} onChange={handleChange} error={!!errors.name} />
+                    <Input label={t("Warehouse_login")} name="username" value={data.username} onChange={handleChange} error={!!errors.username} />
+                    <Input label={t("Warehouse_owner_name")} name="full_name" value={data.full_name} onChange={handleChange} error={!!errors.full_name} />
+                    <Input label={t("Phone_number")} name="phone" value={data.phone} onChange={handleChange} error={!!errors.phone} />
+                    <Input label={t("Password")} type="password" name="password" value={data.password} onChange={handleChange} error={!!errors.password} />
+                    <Input label={t("Confirm_password")} type="password" name="confirm_password" value={data.confirm_password} onChange={handleChange} error={!!errors.confirm_password} />
+
+                    <select
+                        value={data.region_id}
+                        onChange={handleRegionChange}
+                        className="w-full p-3 border rounded-lg"
+                    >
+                        <option value="">{t("Select_region")}</option>
+                        {Regions.map((r) => (
+                            <option key={r.id} value={r.id}>
+                                {r.name_uz}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={data.district_id}
+                        onChange={handleDistrictChange}
+                        disabled={!data.region_id}
+                        className="w-full p-3 border rounded-lg"
+                    >
+                        <option value="">{t("Select_district")}</option>
+                        {availableDistricts.map((d) => (
+                            <option key={d.id} value={d.id}>
+                                {d.name_uz}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* SWITCH ТОЛЬКО ЕСЛИ Allowed === true */}
+                    {Allowed && (
+                        <Switch
+                            checked={isMaterial}
+                            onChange={(e) => setIsMaterial(e.target.checked)}
+                            label="Сделать материальным складом"
+                            className="checked:bg-blue-600"
                         />
-                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                    </div>
+                    )}
 
-                    <div>
-                        <Input
-                            label={t("Warehouse_login")}
-                            name="username"
-                            value={data.username}
-                            onChange={handleChange}
-                            error={!!errors.username}
-                            color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
-                            labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
-                            }}
-                        />
-                        {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
-                    </div>
-
-                    <div>
-                        <Input
-                            label={t("Warehouse_owner_name")}
-                            name="full_name"
-                            value={data.full_name}
-                            onChange={handleChange}
-                            error={!!errors.full_name}
-                            color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
-                            labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
-                            }}
-                        />
-                        {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
-                    </div>
-
-                    <div>
-                        <Input
-                            label={t("Phone_number")}
-                            name="phone"
-                            value={data.phone}
-                            onChange={handleChange}
-                            error={!!errors.phone}
-                            color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
-                            labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
-                            }}
-                        />
-                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                    </div>
-
-                    {/* Выбор региона */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-text-dark ">{t("Region")}</label>
-                        <select
-                            value={data.region_id}
-                            onChange={handleRegionChange}
-                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black dark:border-text-dark focus:border-black"
-                                }`}
-                        >
-                            <option value="">{t("Select_region")}</option>
-                            {Regions.map((region) => (
-                                <option key={region.id} value={region.id}>
-                                    {region.name_uz}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.region_id && <p className="text-red-500 text-xs mt-1">{errors.region_id}</p>}
-                    </div>
-
-                    {/* Выбор района */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-text-dark">{t("District")}</label>
-                        <select
-                            value={data.district_id}
-                            onChange={handleDistrictChange}
-                            disabled={!data.region_id}
-                            className={`w-full p-3 border rounded-lg outline-none ${errors.region_id ? "border-red-500 focus:border-red-500" : "border-black dark:border-text-dark focus:border-black"
-                                }`}
-                        >
-                            <option value="">{t("Select_district")}</option>
-                            {availableDistricts.map((district) => (
-                                <option key={district.id} value={district.id}>
-                                    {district.name_uz}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.district_id && <p className="text-red-500 text-xs mt-1">{errors.district_id}</p>}
-                        {!data.region_id && <p className="text-gray-500 text-xs mt-1">{t("Select_region_first")}</p>}
-                    </div>
-
-                    <div>
-                        <Input
-                            label={t("Password")}
-                            name="password"
-                            type="password"
-                            value={data.password}
-                            onChange={handleChange}
-                            color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
-                            labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
-                            }}
-                            error={!!errors.password}
-                        />
-                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-                    </div>
-
-                    <div>
-                        <Input
-                            label={t("Confirm_password")}
-                            name="confirm_password"
-                            type="password"
-                            value={data.confirm_password}
-                            onChange={handleChange}
-                            color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
-                            labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
-                            }}
-                            error={!!errors.confirm_password}
-                        />
-                        {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password}</p>}
-                    </div>
                 </DialogBody>
 
-                <DialogFooter className="flex justify-end gap-2">
-                    <Button variant="text" color="gray" onClick={handleOpen} disabled={loading} className="mr-2 normal-case text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800"
-                    >
+                <DialogFooter>
+                    <Button variant="text" onClick={handleOpen}>
                         {t("Cancel")}
                     </Button>
-                    <Button
-                        onClick={createWarehouse}
-                        disabled={loading}
-                        className={`bg-blue-600 dark:bg-blue-500 text-white dark:text-text-dark hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
-                    >
+                    <Button onClick={createWarehouse} disabled={loading}>
                         {loading ? t("Saving") : t("Save")}
                     </Button>
                 </DialogFooter>

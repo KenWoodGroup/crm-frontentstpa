@@ -24,7 +24,7 @@ export default function FactoryProductExelModal({ id }) {
             const formData = new FormData();
             formData.append("file", file);
 
-            await LocalProduct.CreateProductExel(Cookies.get("ul_nesw"),
+            await LocalProduct.CreateProductExelProduct(Cookies.get("ul_nesw"),
                 formData);
 
             handleOpen();

@@ -10,7 +10,7 @@ class LocalCategory {
         return response
     }
     static GetallCateogry = async (data) => {
-        const response = await $api.get(`/local-categories/page/${data?.type}/${data?.location_id}?page=${data?.page}`)
+        const response = await $api.get(`/local-categories/paginate/${data?.type}/${data?.location_id}/page?page=${data?.page}`)
         return response;
     }
     static GetAll = async (id, type) => {

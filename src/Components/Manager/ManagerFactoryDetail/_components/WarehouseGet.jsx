@@ -17,12 +17,13 @@ import WarehouseDelete from "./WarehouseDelete";
 import WarehouseEdit from "./WarehouseEdit";
 import Loading from "../../../UI/Loadings/Loading";
 
-export default function WarehouseGet() {
+export default function WarehouseGet({ Allowed }) {
     const { id } = useParams();
     const [warehouses, setWarehouses] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
+
 
     const getWarehouse = async () => {
         try {
@@ -63,7 +64,7 @@ export default function WarehouseGet() {
 
                     <h1 className="text-2xl font-bold">Складлар</h1>
                 </div>
-                <WarehouseCreate refresh={getWarehouse} />
+                <WarehouseCreate Allowed={Allowed} refresh={getWarehouse} />
             </div>
             {/* LIST */}
             <div className="flex flex-col gap-4">
@@ -138,7 +139,7 @@ export default function WarehouseGet() {
 
                             {/* ACTIONS BOTTOM */}
                             <div className="flex justify-between gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                {isMain ? (
+                                {!isMaterial ? (
                                     <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
                                         className="flex items-center gap-2 text-blue-600 hover:underline"
                                     >

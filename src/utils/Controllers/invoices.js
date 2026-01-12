@@ -75,5 +75,6 @@ class InvoicesApi {
         )
         return response
     }
+
 }
 export { InvoicesApi }

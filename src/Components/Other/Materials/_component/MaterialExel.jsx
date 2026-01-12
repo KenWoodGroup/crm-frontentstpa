@@ -23,10 +23,8 @@ export default function MaterialExel({ id }) {
         try {
             const formData = new FormData();
             formData.append("file", file);
-
-            await LocalProduct.CreateProductExel(Cookies.get("ul_nesw"),
+            await LocalProduct.CreateProductExelMaterial(Cookies.get("ul_nesw"),
                 formData);
-
             handleOpen();
             setFile(null);
             Alert(t("success"), "success");

@@ -297,20 +297,22 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                         </select>
                         {errors.district_id && <p className="text-red-500 text-xs mt-1">{errors.district_id}</p>}
                     </div>
-                    <Switch
-                        id={`main-${warehouse?.id}`}
-                        checked={isMain}
-                        onChange={setMainWarehouse}
-                        label="Сделать основным складом"
-                        className="checked:bg-blue-600"
-                    />
-                    <Switch
-                        id={`material-${warehouse?.id}`}
-                        checked={isMaterial}
-                        onChange={setMaterialWarehouse}
-                        label="Сделать материальным складом"
-                        className="checked:bg-blue-600"
-                    />
+                    <div className="flex items-start justify-start flex-col gap-[10px]">
+                        <Switch
+                            id={`main-${warehouse?.id}`}
+                            checked={isMain}
+                            onChange={setMainWarehouse}
+                            label="Сделать основным складом"
+                            className="checked:bg-blue-600"
+                        />
+                        <Switch
+                            id={`material-${warehouse?.id}`}
+                            checked={isMaterial}
+                            onChange={setMaterialWarehouse}
+                            label="Сделать материальным складом"
+                            className="checked:bg-blue-600"
+                        />
+                    </div>
                 </DialogBody>
 
                 <DialogFooter className="border-t border-gray-200 dark:border-gray-600">
