@@ -5,7 +5,7 @@ import { Alert } from "../../../../utils/Alert";
 import { Staff } from "../../../../utils/Controllers/Staff";
 import { useTranslation } from "react-i18next";
 
-export default function СarrierDelete({ id, refresh }) {
+export default function CarrierDelete({ id, refresh }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const { t } = useTranslation();

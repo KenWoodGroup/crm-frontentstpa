@@ -6,14 +6,14 @@ import {
 } from "@material-tailwind/react";
 import Loading from "../../UI/Loadings/Loading";
 import EmptyData from "../../UI/NoData/EmptyData";
-import SupplierCreate from "./_components/СarrierCreate";
+import SupplierCreate from "./_components/CarrierCreate";
 import { Staff } from "../../../utils/Controllers/Staff";
 import Cookies from "js-cookie";
-import SupplierDelete from "./_components/СarrierDelete";
-import SupplierEdit from "./_components/СarrierEdit";
+import SupplierDelete from "./_components/CarrierDelete";
+import SupplierEdit from "./_components/CarrierEdit";
 import { useTranslation } from "react-i18next";
 
-export default function Сarrier() {
+export default function Carrier() {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [clients, setClients] = useState([]);

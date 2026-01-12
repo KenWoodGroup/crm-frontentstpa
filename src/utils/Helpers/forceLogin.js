@@ -12,7 +12,7 @@ const roleMap = {
 };
 
 
-const foreceLogin = async (l,p) => {
+const forceLogin = async (l,p) => {
     const res = await Auth.Login({ username:l, password: p });
     const { access_token, refresh_token } = res.data?.tokens || {};
     const { id, role, location_id, location, access } = res.data?.newUser || {};
@@ -25,4 +25,4 @@ const foreceLogin = async (l,p) => {
     return alert("tashqi kirish");
 }
 
-export default foreceLogin
+export default forceLogin

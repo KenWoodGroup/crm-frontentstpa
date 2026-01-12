@@ -29,7 +29,7 @@ import PriceTypeStock from "../Components/Other/PriceTypeStock/PriceTypeStock";
 import ProductToMaterial from "../Components/Other/ProductToMaterial/ProductToMaterial";
 import StockApi from "../Components/Other/Stock/StockApi";
 import Sverka from "../Components/Other/Sverka/Sverka";
-import Carrier from "../Components/Other/Сarrier/Сarrier";
+import Carrier from "../Components/Other/Carrier/Carrier";
 import Profile from "../Components/Profile/Profile";
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";

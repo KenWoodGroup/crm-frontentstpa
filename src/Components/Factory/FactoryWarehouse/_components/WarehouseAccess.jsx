@@ -68,6 +68,7 @@ export default function WarehouseAccess() {
         try {
             const response = await WarehouseApi.GetWarehouseDetail(id);
             if (response?.status === 200) setWarehouse(response.data);
+            if (response?.data?.type) setWarehouseType(response.data.type);
         } catch (error) {
             console.log("Warehouse error:", error);
         }
@@ -78,7 +79,6 @@ export default function WarehouseAccess() {
             const response = await locationInfo.GetLocationInfo(id);
             if (response?.status === 200) {
                 // Приводим ответ к массиву элементов
-                setWarehouseType(response.data?.key)
                 const list = normalizeList(response.data);
                 setAccess(list);
                 const found = list.find((item) => item.key === "sell_access");
