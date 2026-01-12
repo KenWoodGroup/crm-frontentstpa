@@ -107,8 +107,8 @@ export default function SAusers() {
                 }
                 const ready = {
                     location_id: form.location_id,
-                    full_name: form.full_name,
-                    email: form.email,
+                    username: form.full_name,
+                    // email: form.email,
                     role: locations.find((item) => item.id == form.location_id).type
                 }
                 await user.Put(editData.id, ready);
@@ -119,8 +119,9 @@ export default function SAusers() {
                 }
                 const ready = {
                     location_id: form.location_id,
+                    username: form.full_name,
                     full_name: form.full_name,
-                    email: form.email,
+                    // email: form.email,
                     role: locations.find((item) => item.id == form.location_id).type,
                     password: form.password
                 }
