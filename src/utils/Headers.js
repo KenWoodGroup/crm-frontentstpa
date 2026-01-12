@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import forceLogin from "./Helpers/forceLogin";
 
 export const BASE_URL = "https://api.usderp.uz/crm";
 
@@ -101,15 +102,15 @@ $api.interceptors.response.use(
                 Cookies.remove('token');
                 Cookies.remove('refresh_token');
                 Cookies.remove('us_nesw');
-                Cookies.remove('nesw');
 
+                Cookies.remove('nesw');
                 window.location.href = '/login';
 
                 return Promise.reject(err);
-
             } finally {
                 isRefreshing = false;
             }
+
         }
         return Promise.reject(error);
     }

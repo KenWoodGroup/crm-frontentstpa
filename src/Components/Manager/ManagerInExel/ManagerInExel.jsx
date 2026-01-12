@@ -15,8 +15,8 @@ import { Alert } from "../../../utils/Alert";
 export default function ManagerInExel() {
     const { facId, warId } = useParams();
 
-    const [partners, setPartners] = useState([]);
-    const [senderId, setSenderId] = useState("");
+    // const [partners, setPartners] = useState([]);
+    // const [senderId, setSenderId] = useState("");
     const [note, setNote] = useState("");
     const [createdInvoiceId, setCreatedInvoiceId] = useState(null);
     const navigate = useNavigate()
@@ -28,25 +28,25 @@ export default function ManagerInExel() {
     const [loadingUpload, setLoadingUpload] = useState(false);
 
     // Fetch Partners
-    const GetPartner = async () => {
-        try {
-            const response = await Partner.GetAllPartner(facId);
-            setPartners(response?.data || []);
-        } catch (error) {
-            console.log("Xatolik partnerlarni olishda:", error);
-        }
-    };
+    // const GetPartner = async () => {
+    //     try {
+    //         const response = await Partner.GetAllPartner(facId);
+    //         setPartners(response?.data || []);
+    //     } catch (error) {
+    //         console.log("Xatolik partnerlarni olishda:", error);
+    //     }
+    // };
 
     // === CREATE INVOICE ===
     const createInvoice = async () => {
-        if (!senderId) {
-            Alert("Iltimos, yuboruvchini tanlang", "error");
-            return;
-        }
+        // if (!senderId) {
+        //     Alert("Iltimos, yuboruvchini tanlang", "error");
+        //     return;
+        // }
 
         const data = {
             type: "incoming",
-            sender_id: senderId,
+            sender_id: facId,
             receiver_id: warId,
             status: "received",
             note,
@@ -110,9 +110,9 @@ export default function ManagerInExel() {
         }
     };
 
-    useEffect(() => {
-        GetPartner();
-    }, []);
+    // useEffect(() => {
+    //     GetPartner();
+    // }, []);
 
     return (
         <>
@@ -142,7 +142,7 @@ export default function ManagerInExel() {
                             <Typography variant="small" className="text-gray-700 dark:text-gray-300">
                                 Yuboruvchi
                             </Typography>
-                            <select
+                            {/* <select
                                 value={senderId}
                                 onChange={(e) => setSenderId(e.target.value)}
                                 className="w-full border border-gray-300 dark:border-gray-600 rounded-xl p-3 bg-white dark:bg-[#2A2A2F] text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all"
@@ -153,7 +153,7 @@ export default function ManagerInExel() {
                                         {p.name}
                                     </option>
                                 ))}
-                            </select>
+                            </select> */}
                         </div>
 
                         <Input

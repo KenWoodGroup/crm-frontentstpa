@@ -152,7 +152,7 @@ export default function WarehouseGet({ Allowed }) {
                                         className="flex items-center gap-2 text-green-600 hover:underline"
                                     >
                                         <Layers size={18} />
-                                        Materialar
+                                        Materiallar
                                     </NavLink>
                                 )}
                             </div>
