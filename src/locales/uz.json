@@ -557,5 +557,16 @@
     "Delete_material": "Material o'chirish",
     "Edit_material": "Material o'zgartirish",
     "priceChangedNewBatchRequired": "Narx o‘zgardi, amaldagi partiya yopilib, yangi partiya ochilishi lozim",
-    "warehouse_type_missing":"Ombor turi aniqlanmadi"
+    "warehouse_type_missing": "Ombor turi aniqlanmadi",
+    "uploadExelTitle": "Excel faylni yuklash",
+    "uploadSkipeTitle": "Yuklash natijalari",
+    "uploadSkipeSummaryTitle": "Yuklash bo‘yicha umumiy ma’lumot",
+    "uploadSkipeSummarySucces": "Mahsulotlar muvaffaqiyatli yaratildi",
+    "uploadSkipedProduct": "O‘tkazib yuborilgan mahsulotlar (allaqachon mavjud)",
+    "ExelTotalProduct": "Jami qayta ishlangan",
+    "ExelSuccessCreated": "Muvaffaqiyatli yaratildi",
+    "ExelSiped": "O‘tkazib yuborildi (allaqachon mavjud)",
+    "uploadSkipeMaterialSucces": "Materiallar muvaffaqiyatli yaratildi",
+    "Upload": "Yuklash",
+    "Uploading...": "Yuklanmoqda..."
 }

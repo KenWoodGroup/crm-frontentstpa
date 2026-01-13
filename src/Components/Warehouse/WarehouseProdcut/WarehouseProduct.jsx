@@ -233,9 +233,7 @@ export default function WarehouseProduct() {
                                         <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
                                             №
                                         </th>
-                                        <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                            {t("Направления товара")}
-                                        </th>
+                                      
                                         <th className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
                                             {t("columnProductName")}
                                         </th>
@@ -266,9 +264,7 @@ export default function WarehouseProduct() {
                                             <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
                                                 {index + 1}
                                             </td>
-                                            <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700">
-                                                <span className="text-gray-500 dark:text-gray-400">-</span>
-                                            </td>
+                                         
                                             <td className="p-3 text-left  text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700">
                                                 {item.product?.name || "Nomsiz mahsulot"}
                                             </td>

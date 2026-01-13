@@ -19,6 +19,7 @@ export default function ProductM({ selectedMaterials, onUpdateMaterial, onRemove
   const { t } = useTranslation();
 
 
+
   // Форматирование числа с пробелами
   const formatNumber = (num) => {
     if (!num && num !== 0) return "";
@@ -58,9 +59,10 @@ export default function ProductM({ selectedMaterials, onUpdateMaterial, onRemove
     onUpdateMaterial(id, { count: parsedValue });
   };
 
-  // Обработчик изменения единицы измерения
-  const handleUnitChange = (id, unit) => {
-    onUpdateMaterial(id, { unit });
+  // Получение текста единицы измерения
+  const getUnitText = (unitValue) => {
+    const unit = units.find(u => u.value === unitValue);
+    return unit ? unit.label : unitValue;
   };
 
   // Проверка, заполнено ли количество
@@ -142,12 +144,20 @@ export default function ProductM({ selectedMaterials, onUpdateMaterial, onRemove
                     >
                       <div className="p-4">
                         <div className="flex justify-between items-start mb-3">
-                          <Typography
-                            variant="h6"
-                            className="font-semibold text-gray-800 dark:text-gray-100"
-                          >
-                            {material.name}
-                          </Typography>
+                          <div>
+                            <Typography
+                              variant="h6"
+                              className="font-semibold text-gray-800 dark:text-gray-100"
+                            >
+                              {material.name}
+                            </Typography>
+                            <Typography
+                              variant="small"
+                              className="text-gray-500 dark:text-gray-400 mt-1"
+                            >
+                              Единица измерения: {getUnitText(material.unit)}
+                            </Typography>
+                          </div>
 
                           <IconButton
                             variant="text"
@@ -177,6 +187,7 @@ export default function ProductM({ selectedMaterials, onUpdateMaterial, onRemove
 
                             <div className="relative">
                               <input
+                                id={`count-${material.id}`}
                                 type="text"
                                 value={formatNumber(material.count)}
                                 onChange={(e) =>
@@ -215,33 +226,33 @@ export default function ProductM({ selectedMaterials, onUpdateMaterial, onRemove
                             </div>
                           </div>
 
-                          {/* Единицы измерения */}
+                          {/* Отображение единицы измерения */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               {t("table_col_unit")}
                             </label>
 
-                            <div className="relative">
-                              <select
-                                value={material.unit}
-                                onChange={(e) =>
-                                  handleUnitChange(material.id, e.target.value)
-                                }
-                                className={`
+                            <div className={`
                               w-full px-3 py-2.5 rounded-md border
-                              bg-white dark:bg-[#1e1e1e]
-                              text-gray-700 dark:text-gray-100
-                              focus:outline-none focus:ring-1 focus:ring-blue-500
-                              cursor-pointer appearance-none
+                              bg-gray-50 dark:bg-[#1a1a1a]
+                              text-gray-700 dark:text-gray-300
                               ${getBorderColor(material.count, false)}
-                            `}
-                              >
-                                {units.map((unit) => (
-                                  <option key={unit.value} value={unit.value}>
-                                    {unit.label}
-                                  </option>
-                                ))}
-                              </select>
+                            `}>
+                              <div className="flex items-center justify-between">
+                                <span>{getUnitText(material.unit)}</span>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-gray-400"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -254,11 +265,7 @@ export default function ProductM({ selectedMaterials, onUpdateMaterial, onRemove
                                 {t("total_prew")}:
                               </span>
                               <span className="font-bold text-green-600 dark:text-green-400">
-                                {formatNumber(material.count)}{" "}
-                                {units
-                                  .find((u) => u.value === material.unit)
-                                  ?.label.split("(")[1]
-                                  ?.replace(")", "") || material.unit}
+                                {formatNumber(material.count)} {getUnitText(material.unit).split("(")[1]?.replace(")", "") || material.unit}
                               </span>
                             </div>
                           </div>
@@ -273,6 +280,5 @@ export default function ProductM({ selectedMaterials, onUpdateMaterial, onRemove
         </CardBody>
       </Card>
     </div>
-
   );
 }

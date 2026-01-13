@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Option, Select } from "@material-tailwind/react";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
+import { Auth } from "../../../utils/Controllers/Auth";
 
 export default function AdminHeader({ active, sidebarOpen, ...props }) {
     const navigate = useNavigate();
@@ -44,9 +45,16 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.clear();
-        navigate("/login");
+    const handleLogout = async () => {
+        try {
+            const response = await Auth.Logout({ userId: Cookies.get('us_nesw') })
+            Object.keys(Cookies.get()).forEach((cookieName) => {
+                Cookies.remove(cookieName);
+            });
+            navigate('/login')
+        } catch (error) {
+            console.log(error)
+        }
     };
 
     // Закрытие дропдауна при клике вне его

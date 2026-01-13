@@ -60,7 +60,7 @@ export default function FactoryLocalProduct() {
                     {t('Category')}
                 </Typography>
                 <div className="flex items-center gap-[10px]">
-                    <FactoryProductExelModal/>
+                    <FactoryProductExelModal refresh={() => GetLocalCategory(currentPage)}/>
                     <FactoryCategoryCreate refresh={() => GetLocalCategory(currentPage)} />
                 </div>
             </div>

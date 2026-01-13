@@ -35,7 +35,21 @@ export default function WarehouseSidebar() {
         { id: 5, label: t("notifies"), path: "/warehouse/notifications", icon: SendIcon }
     ];
 
+    // Классы для стилизации
+    const menuListClass = `
+        mt-[12px] bg-white/95 dark:bg-gray-900 backdrop-blur-md 
+        p-4 w-[230px] translate-x-3  
+        shadow-2xl rounded-xl flex flex-col gap-2
+        border border-gray-200 dark:border-gray-700 shadow-gray-900/20
+    `;
 
+    const menuItemClass = `
+        flex items-center gap-2 text-sm rounded-md px-3 py-2
+        text-gray-700 dark:text-gray-300
+        hover:bg-[#4DA057]/10 hover:text-[#4DA057]
+        dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400
+        transition-all duration-200
+    `;
 
     return (
         <Card
@@ -48,11 +62,11 @@ export default function WarehouseSidebar() {
             "
         >
             {/* === Верхняя часть === */}
-
             <div className="flex flex-col items-center gap-4">
                 <div className="flex items-center justify-center">
                     <img src={Logo} alt="Foto" className="w-[70%]  rounded-[8px]" />
                 </div>
+
                 {mainLinks.map(({ id, label, path, icon: Icon }) => (
                     <NavLink
                         key={id}
@@ -81,7 +95,7 @@ export default function WarehouseSidebar() {
                         </div>
                     </MenuHandler>
 
-                    <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300">
+                    <MenuList className={menuListClass}>
                         <Typography
                             variant="small"
                             color="gray"
@@ -91,47 +105,46 @@ export default function WarehouseSidebar() {
                         </Typography>
                         {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
                             <NavLink key={id} to={path}>
-                                <MenuItem className="relative flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[white] dark:hover:bg-[#4DA057]/20 dark:hover:text-[white] transition-all px-3 py-2">
+                                {({ isActive }) => (
+                                    <MenuItem className={`
+                                        ${menuItemClass}
+                                        ${isActive
+                                            ? "bg-[#4DA057]/20 text-[#4DA057] dark:bg-[#4DA057]/30 dark:text-green-400"
+                                            : ""
+                                        }
+                                    `}>
+                                        <Icon className="w-4 h-4" />
+                                        <span className="flex-1">{label}</span>
 
-                                    <Icon className="w-4 h-4" />
-                                    <span>{label}</span>
-
-                                    {/* Faqat notifications uchun badge */}
-                                    {id === 5 && unreadCount > 0 && (
-                                        <span className="absolute right-2 top-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 leading-none">
-                                            {unreadCount}
-                                        </span>
-                                    )}
-
-                                </MenuItem>
+                                        {/* Faqat notifications uchun badge */}
+                                        {id === 5 && unreadCount > 0 && (
+                                            <span className="absolute right-2 top-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5 leading-none">
+                                                {unreadCount}
+                                            </span>
+                                        )}
+                                    </MenuItem>
+                                )}
                             </NavLink>
                         ))}
                     </MenuList>
                 </Menu>
+
                 {/* === Настройки === */}
-                <Menu placement="right-start" allowHover offset={15}>
-                    <NavLink
-                        to={`/warehouse/settings`}
-                        className={({ isActive }) =>
-                            `flex flex-col items-center justify-center w-full rounded-xl transition-all duration-300 
-                            ${isActive
-                                ? "bg-white/80 text-[#4DA057] shadow-md scale-105 dark:bg-gray-800 dark:text-[white]"
-                                : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]"
-                            }`
-                        }
-                    >
-                        <div
-                            className="flex flex-col items-center justify-center w-full py-3 rounded-xl cursor-pointer
-                            text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3]
-                            dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]
-                            transition-all duration-300"
-                        >
-                            <Settings className="w-8 h-8 mb-1" />
-                            <span className="text-[11px] font-medium text-center">{t(`Settings`)}</span>
-                        </div>
-                    </NavLink>
-                </Menu>
+                <NavLink
+                    to={`/warehouse/settings`}
+                    className={({ isActive }) =>
+                        `flex flex-col items-center justify-center w-full py-3 rounded-xl transition-all duration-300 
+                        ${isActive
+                            ? "bg-white/80 text-[#4DA057] shadow-md scale-105 dark:bg-gray-800 dark:text-[white]"
+                            : "text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[white]"
+                        }`
+                    }
+                >
+                    <Settings className="w-8 h-8 mb-1" />
+                    <span className="text-[11px] font-medium text-center">{t(`Settings`)}</span>
+                </NavLink>
             </div>
+
             <div className="flex justify-center mt-4">
                 {/* <LogoutButton /> */}
             </div>

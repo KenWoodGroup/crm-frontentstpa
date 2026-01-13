@@ -62,7 +62,7 @@ export default function MaterialCategory() {
                     {t('Category')}
                 </Typography>
                 <div className="flex items-center gap-[10px]">
-                    <MaterialExel/>
+                    <MaterialExel refresh={() => GetLocalCategory(currentPage)} />
                     <MaterialCategoryCreate refresh={() => GetLocalCategory(currentPage)} />
                 </div>
             </div>

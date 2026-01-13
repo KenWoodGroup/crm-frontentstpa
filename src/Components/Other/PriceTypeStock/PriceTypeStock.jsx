@@ -23,6 +23,7 @@ export default function PriceTypeStock() {
     const [priceType, setPriceType] = useState(null);
     const [updatingPrices, setUpdatingPrices] = useState({});
     const [mainLocationId, setMainLocationId] = useState(null);
+    const [editingValues, setEditingValues] = useState({}); // Для хранения временных значений
     const { t } = useTranslation();
 
     const locationCookie = Cookies.get("ul_nesw");
@@ -119,8 +120,43 @@ export default function PriceTypeStock() {
         } : null;
     };
 
+    // Форматирование числа с пробелами
+    const formatPriceInput = (value) => {
+        if (!value && value !== 0) return "";
+
+        // Удаляем все нецифровые символы кроме точки и запятой
+        const cleanValue = value.toString().replace(/[^\d.,]/g, '');
+
+        // Заменяем запятую на точку для корректного парсинга
+        const normalizedValue = cleanValue.replace(',', '.');
+
+        // Парсим число
+        const numValue = parseFloat(normalizedValue);
+
+        if (isNaN(numValue)) return "";
+
+        // Форматируем с пробелами между тысячами
+        return numValue.toLocaleString('ru-RU', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }).replace(/,/g, ' '); // Заменяем запятые на пробелы
+    };
+
+    // Преобразование форматированной строки обратно в число
+    const parseFormattedPrice = (formattedValue) => {
+        if (!formattedValue) return 0;
+
+        // Удаляем все пробелы и заменяем запятые на точки
+        const cleanValue = formattedValue.replace(/\s/g, '').replace(',', '.');
+
+        const numValue = parseFloat(cleanValue);
+        return isNaN(numValue) ? 0 : numValue;
+    };
+
     const handlePriceChange = async (stockId, newPrice, existingSalePriceType) => {
-        if (!newPrice || newPrice <= 0) {
+        const numericPrice = parseFormattedPrice(newPrice);
+
+        if (numericPrice < 0) {
             alert("Iltimos, to'g'ri narx kiriting");
             return;
         }
@@ -136,7 +172,7 @@ export default function PriceTypeStock() {
             const data = {
                 stock_id: stockId,
                 price_type_id: priceType.id,
-                sale_price: parseFloat(newPrice)
+                sale_price: numericPrice
             };
 
             let response;
@@ -165,14 +201,48 @@ export default function PriceTypeStock() {
     };
 
     const handleInputChange = (stockId, value, existingSalePriceType) => {
+        // Сохраняем временное значение
+        setEditingValues(prev => ({
+            ...prev,
+            [stockId]: value
+        }));
+
         // Debounce implementation - wait 1 second after user stops typing
         clearTimeout(window.priceUpdateTimeout);
 
         window.priceUpdateTimeout = setTimeout(() => {
-            if (value && value > 0) {
+            const numericPrice = parseFormattedPrice(value);
+            if (numericPrice >= 0) {
                 handlePriceChange(stockId, value, existingSalePriceType);
             }
         }, 1000);
+    };
+
+    // Обработчик для фокуса на input
+    const handleFocus = (stockId, currentValue) => {
+        // При фокусе показываем чистое число без форматирования
+        if (currentValue) {
+            const numericValue = parseFormattedPrice(currentValue);
+            setEditingValues(prev => ({
+                ...prev,
+                [stockId]: numericValue.toString()
+            }));
+        }
+    };
+
+    // Обработчик для потери фокуса
+    const handleBlur = (stockId, value, existingSalePriceType) => {
+        // При потере фокуса форматируем значение
+        const formattedValue = formatPriceInput(value);
+        setEditingValues(prev => ({
+            ...prev,
+            [stockId]: formattedValue
+        }));
+
+        const numericPrice = parseFormattedPrice(value);
+        if (numericPrice >= 0) {
+            handlePriceChange(stockId, value, existingSalePriceType);
+        }
     };
 
     useEffect(() => {
@@ -268,15 +338,21 @@ export default function PriceTypeStock() {
                                     const date = item?.createdAt;
                                     const formattedDate = date ? new Date(date).toLocaleDateString("uz-UZ") : null;
                                     const salePriceData = getSalePriceForPriceType(item);
-                                    const salePrice = salePriceData?.price;
+                                    const salePrice = salePriceData?.price || 0; // Если нет значения, используем 0
                                     const isUpdating = updatingPrices[item.id];
+                                    const currentEditingValue = editingValues[item.id];
+
+                                    // Определяем отображаемое значение
+                                    const displayValue = currentEditingValue !== undefined
+                                        ? currentEditingValue
+                                        : formatPriceInput(salePrice);
 
                                     return (
                                         <tr
                                             key={`${item.id}-${index}`}
                                             className={`border-x border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${index === products.length - 1
-                                                    ? "border-b border-gray-300 dark:border-gray-700"
-                                                    : ""
+                                                ? "border-b border-gray-300 dark:border-gray-700"
+                                                : ""
                                                 } ${index % 2 === 0
                                                     ? "bg-white dark:bg-gray-900"
                                                     : "bg-gray-50/50 dark:bg-gray-800/50"
@@ -298,29 +374,44 @@ export default function PriceTypeStock() {
                                             </td>
                                             <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                 <div className="relative">
-                                                    <Input
-                                                        type="number"
-                                                        defaultValue={salePrice || ""}
-                                                        className={`!border !border-gray-300 dark:!border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-full max-w-[150px] mx-auto ${isUpdating ? 'opacity-50' : ''
-                                                            }`}
-                                                        placeholder={salePrice ? t("enterPrice") : t("priceNotSet")}
-                                                        onBlur={(e) => {
-                                                            const value = e.target.value;
-                                                            if (value && value > 0) {
-                                                                handlePriceChange(item.id, value, salePriceData);
-                                                            }
-                                                        }}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            handleInputChange(item.id, value, salePriceData);
-                                                        }}
-                                                        disabled={isUpdating}
-                                                    />
-                                                    {isUpdating && (
-                                                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                                                    <div className="relative w-full max-w-[180px] mx-auto">
+                                                        <input
+                                                            type="text"
+                                                            value={displayValue}
+                                                            className={`
+                                                                w-full px-3 py-2 text-sm 
+                                                                border ${isUpdating ? 'border-yellow-400' : 'border-gray-300 dark:border-gray-600'} 
+                                                                rounded-lg 
+                                                                bg-white dark:bg-gray-800 
+                                                                text-gray-900 dark:text-white
+                                                                text-right
+                                                                font-medium
+                                                                transition-all duration-200
+                                                                focus:outline-none 
+                                                                focus:ring-2 
+                                                                focus:ring-blue-500 
+                                                                focus:border-transparent
+                                                                ${isUpdating ? 'opacity-80 bg-yellow-50 dark:bg-yellow-900/20' : ''}
+                                                                placeholder:text-gray-400 dark:placeholder:text-gray-500
+                                                            `}
+                                                            placeholder="0"
+                                                            onChange={(e) => {
+                                                                handleInputChange(item.id, e.target.value, salePriceData);
+                                                            }}
+                                                            onFocus={() => handleFocus(item.id, displayValue)}
+                                                            onBlur={(e) => handleBlur(item.id, e.target.value, salePriceData)}
+                                                            disabled={isUpdating}
+                                                        />
+                                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm">
+                                                            UZS
                                                         </div>
-                                                    )}
+                                                        {isUpdating && (
+                                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                   
                                                 </div>
                                             </td>
                                             <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">

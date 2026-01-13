@@ -556,5 +556,17 @@
   "Create_material": "Create material",
   "Delete_material": "Delete material",
   "priceChangedNewBatchRequired":"The price has changed; the current batch must be closed and a new batch opened",
-  "warehouse_type_missing":"Warehouse type not specified"
+  "warehouse_type_missing":"Warehouse type not specified",
+
+  "Upload":"Upload",
+  "Uploading...":"Uploading...",
+  "uploadExelTitle":"Upload Excel File",
+  "uploadSkipeTitle":"Upload Results",
+  "uploadSkipeSummaryTitle":"Upload Summary",
+  "uploadSkipeSummarySucces":"Successfully Created Products",
+  "uploadSkipedProduct":"Skipped Products (Already Exist)",
+  "ExelTotalProduct":"Total processed",
+  "ExelSuccessCreated":"Successfully created",
+  "ExelSiped":"Skipped (already exist)",
+  "uploadSkipeMaterialSucces":"Successfully Created Materials"
 }
