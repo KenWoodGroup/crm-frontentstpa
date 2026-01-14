@@ -33,7 +33,7 @@ export default function WarehouseGet({ Allowed }) {
                 searchName: "all",
                 page,
             };
-            const response = await location.GetLocationByType(data);
+            const response = await location.GetLocationWarehouse(data);
 
             setWarehouses(response.data.data?.records || []);
             setTotalPages(response.data.data?.pagination?.total_pages || 1);
@@ -68,7 +68,6 @@ export default function WarehouseGet({ Allowed }) {
             {/* LIST */}
             <div className="flex flex-col gap-4">
                 {warehouses?.map((item) => {
-
                     return (
                         <div
                             key={item.id}
@@ -86,16 +85,15 @@ export default function WarehouseGet({ Allowed }) {
                                         </h2>
                                     </div>
                                     <div className="flex items-center gap-[10px]">
-                                        {item?.type === 'm_warehouse' ? (
+                                        {item?.type === 'm_warehouse' && (
                                             <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
                                                 Xomashyo ombori
                                             </span>
-                                        ) : item?.is_main === true ? (
+                                        )}
+                                        {item?.is_main && (
                                             <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
                                                 Assosiy ombor
                                             </span>
-                                        ) : (
-                                            <></>
                                         )}
                                     </div>
                                 </div>
