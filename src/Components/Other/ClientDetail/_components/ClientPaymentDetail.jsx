@@ -219,7 +219,7 @@ export default function ClientPaymentDetail({ data }) {
                                                     <th className="px-4 py-2">Название</th>
                                                     <th className="px-4 py-2">Штрихкод</th>
                                                     <th className="px-4 py-2">Количество</th>
-                                                    <th className="px-4 py-2">Цена</th>
+                                                    <th className="px-4 py-2">Цена покупки</th>
                                                     <th className="px-4 py-2">Итого</th>
                                                     <th className="px-4 py-2">Ед. изм.</th>
                                                 </tr>
@@ -235,7 +235,7 @@ export default function ClientPaymentDetail({ data }) {
                                                             <td className="px-4 py-2">{item.product?.name || "—"}</td>
                                                             <td className="px-4 py-2">{item.barcode || "—"}</td>
                                                             <td className="px-4 py-2">{item.quantity}</td>
-                                                            <td className="px-4 py-2">{formatNumber(item.price)} UZS</td>
+                                                            <td className="px-4 py-2">{formatNumber(item.purchase_price)} UZS</td>
                                                             <td className="px-4 py-2">{formatNumber(total)} UZS</td>
                                                             <td className="px-4 py-2">{item.product?.unit || "—"}</td>
                                                         </tr>

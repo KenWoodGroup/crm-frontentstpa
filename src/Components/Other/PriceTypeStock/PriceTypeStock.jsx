@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, Typography, Button, Input } from "@material-tailwind/react";
 import { NavLink, useParams } from "react-router-dom";
 import { Stock } from "../../../utils/Controllers/Stock";
@@ -23,8 +23,10 @@ export default function PriceTypeStock() {
     const [priceType, setPriceType] = useState(null);
     const [updatingPrices, setUpdatingPrices] = useState({});
     const [mainLocationId, setMainLocationId] = useState(null);
-    const [editingValues, setEditingValues] = useState({}); // Для хранения временных значений
+    const [editingValues, setEditingValues] = useState({});
     const { t } = useTranslation();
+
+    const timeoutRefs = useRef({}); // Для хранения timeout'ов по stockId
 
     const locationCookie = Cookies.get("ul_nesw");
 
@@ -104,7 +106,6 @@ export default function PriceTypeStock() {
         }
     };
 
-    // Функция для получения цены по price type для конкретного stock
     const getSalePriceForPriceType = (stock) => {
         if (!priceType || !stock.sale_price_type || !Array.isArray(stock.sale_price_type)) {
             return null;
@@ -120,41 +121,46 @@ export default function PriceTypeStock() {
         } : null;
     };
 
-    // Форматирование числа с пробелами
+    // Форматирование числа с пробелами и пустая строка для 0
     const formatPriceInput = (value) => {
-        if (!value && value !== 0) return "";
+        if (value === null || value === undefined || value === "") return "";
+        if (value === 0) return "";
 
-        // Удаляем все нецифровые символы кроме точки и запятой
-        const cleanValue = value.toString().replace(/[^\d.,]/g, '');
-
-        // Заменяем запятую на точку для корректного парсинга
-        const normalizedValue = cleanValue.replace(',', '.');
-
-        // Парсим число
-        const numValue = parseFloat(normalizedValue);
-
+        const numValue = parseFloat(value);
         if (isNaN(numValue)) return "";
 
-        // Форматируем с пробелами между тысячами
         return numValue.toLocaleString('ru-RU', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 2
-        }).replace(/,/g, ' '); // Заменяем запятые на пробелы
+        }).replace(/,/g, ' ');
     };
 
-    // Преобразование форматированной строки обратно в число
+    // Преобразование форматированной строки в число
     const parseFormattedPrice = (formattedValue) => {
-        if (!formattedValue) return 0;
+        if (!formattedValue || formattedValue === "") return null;
 
-        // Удаляем все пробелы и заменяем запятые на точки
         const cleanValue = formattedValue.replace(/\s/g, '').replace(',', '.');
-
         const numValue = parseFloat(cleanValue);
-        return isNaN(numValue) ? 0 : numValue;
+        return isNaN(numValue) ? null : numValue;
+    };
+
+    // Преобразование строки ввода в числовой формат (удаление лишних символов)
+    const cleanInputValue = (value) => {
+        // Разрешаем цифры, точку и запятую
+        const cleaned = value.replace(/[^\d.,]/g, '');
+
+        // Заменяем запятую на точку
+        return cleaned.replace(',', '.');
     };
 
     const handlePriceChange = async (stockId, newPrice, existingSalePriceType) => {
         const numericPrice = parseFormattedPrice(newPrice);
+
+        // Если цена null или undefined, не отправляем запрос
+        if (numericPrice === null) return;
+
+        // Если цена 0, тоже не отправляем (пустая строка)
+        if (numericPrice === 0) return;
 
         if (numericPrice < 0) {
             alert("Iltimos, to'g'ri narx kiriting");
@@ -177,15 +183,12 @@ export default function PriceTypeStock() {
 
             let response;
             if (existingSalePriceType?.salePriceTypeId) {
-                // Edit existing price
                 response = await PriceType.SalePriceTypeEdit(existingSalePriceType.salePriceTypeId, data);
             } else {
-                // Create new price
                 response = await PriceType.SalePriceTypeCreate(data);
             }
 
             if (response?.status === 200 || response?.status === 201) {
-                // Refresh the products list to get updated prices
                 if (mainLocationId) {
                     GetAllProduct(mainLocationId, page, false);
                 }
@@ -201,56 +204,102 @@ export default function PriceTypeStock() {
     };
 
     const handleInputChange = (stockId, value, existingSalePriceType) => {
-        // Сохраняем временное значение
+        // Очищаем значение от форматирования при вводе
+        const cleanedValue = cleanInputValue(value);
+
+        // Сохраняем очищенное значение
         setEditingValues(prev => ({
             ...prev,
-            [stockId]: value
+            [stockId]: cleanedValue
         }));
 
-        // Debounce implementation - wait 1 second after user stops typing
-        clearTimeout(window.priceUpdateTimeout);
-
-        window.priceUpdateTimeout = setTimeout(() => {
-            const numericPrice = parseFormattedPrice(value);
-            if (numericPrice >= 0) {
-                handlePriceChange(stockId, value, existingSalePriceType);
-            }
-        }, 1000);
-    };
-
-    // Обработчик для фокуса на input
-    const handleFocus = (stockId, currentValue) => {
-        // При фокусе показываем чистое число без форматирования
-        if (currentValue) {
-            const numericValue = parseFormattedPrice(currentValue);
-            setEditingValues(prev => ({
-                ...prev,
-                [stockId]: numericValue.toString()
-            }));
+        // Очищаем предыдущий timeout для этого stockId
+        if (timeoutRefs.current[stockId]) {
+            clearTimeout(timeoutRefs.current[stockId]);
         }
+
+        // Устанавливаем новый timeout с задержкой 1.5 секунды
+        timeoutRefs.current[stockId] = setTimeout(() => {
+            // Форматируем значение для отправки
+            const formattedValue = formatPriceInput(cleanedValue);
+            const numericPrice = parseFormattedPrice(formattedValue);
+
+            // Проверяем, изменилась ли цена
+            const currentSalePrice = existingSalePriceType?.price || null;
+
+            // Отправляем только если цена изменилась и не пустая
+            if (numericPrice !== currentSalePrice && numericPrice !== null) {
+                handlePriceChange(stockId, formattedValue, existingSalePriceType);
+            }
+
+            // Очищаем timeout из ref
+            delete timeoutRefs.current[stockId];
+        }, 1500);
     };
 
-    // Обработчик для потери фокуса
+    const handleFocus = (stockId, currentValue, existingSalePriceType) => {
+        // При фокусе показываем числовое значение без форматирования
+        let rawValue = "";
+
+        if (currentValue !== undefined && currentValue !== "") {
+            // Если есть текущее редактируемое значение
+            rawValue = currentValue.toString();
+        } else if (existingSalePriceType?.price) {
+            // Если есть сохраненная цена
+            rawValue = existingSalePriceType.price.toString();
+        }
+
+        // Очищаем от форматирования
+        rawValue = cleanInputValue(rawValue);
+
+        setEditingValues(prev => ({
+            ...prev,
+            [stockId]: rawValue
+        }));
+    };
+
     const handleBlur = (stockId, value, existingSalePriceType) => {
-        // При потере фокуса форматируем значение
-        const formattedValue = formatPriceInput(value);
+        // Очищаем timeout при потере фокуса
+        if (timeoutRefs.current[stockId]) {
+            clearTimeout(timeoutRefs.current[stockId]);
+            delete timeoutRefs.current[stockId];
+        }
+
+        // Форматируем значение для отображения
+        const cleanedValue = cleanInputValue(value);
+        const formattedValue = formatPriceInput(cleanedValue);
+
         setEditingValues(prev => ({
             ...prev,
             [stockId]: formattedValue
         }));
 
-        const numericPrice = parseFormattedPrice(value);
-        if (numericPrice >= 0) {
-            handlePriceChange(stockId, value, existingSalePriceType);
+        // Немедленно отправляем на сервер при потере фокуса
+        const numericPrice = parseFormattedPrice(formattedValue);
+        const currentSalePrice = existingSalePriceType?.price || null;
+
+        if (numericPrice !== currentSalePrice && numericPrice !== null) {
+            handlePriceChange(stockId, formattedValue, existingSalePriceType);
         }
     };
+
+    // Очистка всех timeout'ов при размонтировании
+    useEffect(() => {
+        return () => {
+            Object.values(timeoutRefs.current).forEach(timeout => {
+                clearTimeout(timeout);
+            });
+        };
+    }, []);
 
     useEffect(() => {
         initializeData();
         getPriceTypeById();
 
         return () => {
-            clearTimeout(window.priceUpdateTimeout);
+            Object.values(timeoutRefs.current).forEach(timeout => {
+                clearTimeout(timeout);
+            });
         };
     }, []);
 
@@ -338,14 +387,15 @@ export default function PriceTypeStock() {
                                     const date = item?.createdAt;
                                     const formattedDate = date ? new Date(date).toLocaleDateString("uz-UZ") : null;
                                     const salePriceData = getSalePriceForPriceType(item);
-                                    const salePrice = salePriceData?.price || 0; // Если нет значения, используем 0
                                     const isUpdating = updatingPrices[item.id];
                                     const currentEditingValue = editingValues[item.id];
 
                                     // Определяем отображаемое значение
                                     const displayValue = currentEditingValue !== undefined
                                         ? currentEditingValue
-                                        : formatPriceInput(salePrice);
+                                        : salePriceData?.price
+                                            ? formatPriceInput(salePriceData.price)
+                                            : "";
 
                                     return (
                                         <tr
@@ -398,7 +448,7 @@ export default function PriceTypeStock() {
                                                             onChange={(e) => {
                                                                 handleInputChange(item.id, e.target.value, salePriceData);
                                                             }}
-                                                            onFocus={() => handleFocus(item.id, displayValue)}
+                                                            onFocus={() => handleFocus(item.id, displayValue, salePriceData)}
                                                             onBlur={(e) => handleBlur(item.id, e.target.value, salePriceData)}
                                                             disabled={isUpdating}
                                                         />
@@ -411,7 +461,6 @@ export default function PriceTypeStock() {
                                                             </div>
                                                         )}
                                                     </div>
-                                                   
                                                 </div>
                                             </td>
                                             <td className="p-1 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
