@@ -38,7 +38,7 @@ export default function Login() {
       const response = await locationInfo?.GetInfo(locationId);
       return response?.data;
     } catch (error) {
-      console.log("Error checking offerta status:", error);
+      // console.log("Error checking offerta status:", error);
       return false;
     }
   };

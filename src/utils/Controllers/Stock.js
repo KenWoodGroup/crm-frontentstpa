@@ -16,7 +16,7 @@ class Stock {
         return response;
     }
     static getLocationStocksBySearch = async ({ data }) => {
-        const response = await $api.get(`/stock/search-product/${data.locationId}/${data.fac_id}/${data.operation_type}/${data.search}`)
+        const response = await $api.get(`/stock/search/${data.prd_type}/${data.locationId}/${data.fac_id}/${data.operation_type}/${data.search}`)
         return response;
     }
     static getByBarcode = async ({payload}) => {

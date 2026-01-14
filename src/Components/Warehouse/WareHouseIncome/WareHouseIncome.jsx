@@ -86,10 +86,10 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     // user / location
     const navigate = useNavigate();
     const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
-    const factoryId = role === "factory" ? Cookies.get("ul_nesw")  : Cookies.get("usd_nesw")
+    const factoryId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw")
     const createdBy = Cookies.get("us_nesw");
-    const deUlName = sessionStorage.getItem("de_ul_name");
-
+    const [deUlName, setDeUlName] = useState(null);
+    
     // Context (per-mode provider)
     const {
         mode, // 'in' or 'out' provided by WarehouseLayout -> WarehouseProvider
@@ -164,7 +164,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
 
     const [selected, setSelected] = useState("incoming");
     const [sendToTrash, setSendToTrash] = useState(false);
-    const operationLocations = (selected === "incoming" ? locations?.filter((loc) => loc.type === "partner" || loc.type === "default") : selected === "transfer_in" ? locations?.filter((loc) => loc.type === "warehouse" || loc.type === "default") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client" || loc.type === "default")) || []
+    const operationLocations = (selected === "incoming" ? locations?.filter((loc) =>  loc.type === (prd_type==="product" ? "partner" : "m_partner") || loc.type === "default") : selected === "transfer_in" ? locations?.filter((loc) => loc.type === "warehouse" || loc.type === "default") : locations?.filter((loc) => loc.type === "dealer" || loc.type === "client" || loc.type === "default")) || []
 
     // search & barcode (local UI)
     const [searchQuery, setSearchQuery] = useState("");
@@ -195,21 +195,20 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     const [invoiceResults, setInvoiceResults] = useState([]);
     const [selectedInvoices, setSelectedInvoices] = useState([]);
 
-    const[isMainWarehouse, setIsMainWarehouse] = useState(false);
-
+    const [isMainWarehouse, setIsMainWarehouse] = useState(false);
     // get main warehouse info
-    const getMainWarehouse = async ()=> {
+    const getMainWarehouse = async () => {
         try {
             const res = await locationInfo.GetMainWarehouse(factoryId);
             const id = res.data?.location_id || res.data?.location?.id || null;
-            if(userLId === id) {
+            if (userLId === id) {
                 setIsMainWarehouse(true)
             }
-        }catch {}
+        } catch { }
     };
-    useEffect(()=>{
+    useEffect(() => {
         getMainWarehouse()
-    },[]);
+    }, []);
 
 
     function addInvoice(inv) {
@@ -253,6 +252,8 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                 setLocations([{ value: null, label: t("select_sender_placeholder"), type: "default" }, ...formedOptions])
             }
             else setLocations(res || []);
+            const deUl = res.data.find((loc) => String(loc.id) === String(userLId));
+            if (deUl) { setDeUlName(deUl.name); }
         } catch (err) {
             notify.error(t("fetch_locations_error", { msg: err?.message || err }));
         } finally {
@@ -498,6 +499,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
             try {
                 setSearchLoading(true);
                 const data = {
+                    prd_type,
                     locationId: userLId,
                     search: debouncedSearch.trim(),
                     fac_id: role === "warehouse" ? Cookies.get("usd_nesw") : Cookies.get("ul_nesw"),
@@ -681,7 +683,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                         barcode: it.barcode || "",
                         is_new_batch: it.batch === "def" ? false : it.is_new_batch,
                         batch: it.batch === "def" ? null : it.batch || null,
-                        sale_price: (invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") ? Number(it.s_price) : Number(it.s_price || 0),
+                        sale_price: Number(it.s_price || 0),
                         discount: it.discount,
                         price_type_id: selectedSalePriceType?.[mode]?.value,
                         // product_type: prd_type,
@@ -738,7 +740,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
         } else if (!mixData || mixData.length === 0) {
             notify.warning(t("no_products_added_error"));
             return;
-        } 
+        }
         // else if (!selectedSalePriceType?.[mode]?.value && role === "factory") {
         //     notify.info(t("sale_price_type_not_selected_warning"));
         //     // return;
@@ -1145,7 +1147,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                         <div className="p-0">
                             {/* Operation selection */}
                             <div className="flex flex-col gap-4 mb-4">
-                                {/* Transfer_in */}
+                                {/* Incoming */}
                                 <button
                                     onClick={() => {
                                         setSelected("incoming");
@@ -1159,7 +1161,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                         <span className="text-lg font-medium phone:text-sm">{t("op_incoming_card")}</span>
                                     </div>
                                 </button>
-
+                                {/* Transfer_in */}
                                 <button
                                     onClick={() => {
                                         setSelected("transfer_in");
@@ -1174,7 +1176,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                     </div>
                                 </button>
 
-                                {/* Return_in */}
+                                {/* Return_in + dis */}
                                 {(role === "factory" && prd_type === "product") &&
                                     <div
                                         className={`flex flex-col gap-3 p-4 rounded-xl border transition-all duration-200
@@ -1523,42 +1525,44 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                             </div>
 
                             {(invoiceMeta?.[mode]?.operation_type !== "return_in" && invoiceMeta?.[mode]?.operation_type !== "return_dis") ? (
-                                <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm border border-gray-200 dark:border-gray-700">
-                                    <div className="text-sm font-medium mb-2 flex items-center justify-between">
-                                        <h4 className="text-text-light dark:text-text-dark">{t("search_results_title")}</h4>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => setSearchResults([])}
-                                                className="p-2 rounded-full border border-gray-600 text-gray-900 dark:text-gray-200 hover:text-red-500 hover:border-red-800 transition-all duration-200"
-                                                title={t("clear_results_title")}
-                                                aria-label={t("clear_results_title")}
-                                            >
-                                                <Eraser size={18} />
-                                            </button>
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">{t("results_count_label", { count: searchResults.length })}</div>
+                                !searchQuery || (
+                                    <div className="bg-white dark:bg-card-dark rounded-lg p-3 shadow-sm border border-gray-200 dark:border-gray-700">
+                                        <div className="text-sm font-medium mb-2 flex items-center justify-between">
+                                            <h4 className="text-text-light dark:text-text-dark">{t("search_results_title")}</h4>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => setSearchResults([])}
+                                                    className="p-2 rounded-full border border-gray-600 text-gray-900 dark:text-gray-200 hover:text-red-500 hover:border-red-800 transition-all duration-200"
+                                                    title={t("clear_results_title")}
+                                                    aria-label={t("clear_results_title")}
+                                                >
+                                                    <Eraser size={18} />
+                                                </button>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400">{t("results_count_label", { count: searchResults.length })}</div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {searchLoading ? (
-                                        <div className="p-4 flex items-center gap-2 text-gray-500 dark:text-gray-400"><Spinner /> {t("loading")}</div>
-                                    ) : searchResults.length === 0 ? (
-                                        <div className="text-gray-500 dark:text-gray-400">{t("search_nothing_found")}</div>
-                                    ) : (
-                                        <div className="flex gap-3 flex-wrap">
-                                            {searchResults
-                                                .sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: "base" }))
-                                                .map((r) => (
-                                                    <button key={r.id || r.stock_id || generateId()} onClick={() => onSelectSearchResult(r)} className="bg-white dark:bg-card-dark border rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px]">
-                                                        <div className="text-sm font-medium text-text-light dark:text-text-dark">{r.product?.name || r.name}</div>
-                                                        <div className="flex items-center justify-center gap-3">
-                                                            <div className="text-xs text-gray-600 dark:text-gray-400">{t("product_barcode_label")} {r.barcode || ""}</div>
-                                                            <div className="text-xs text-gray-600 dark:text-gray-400">{t("product_batch_label")} {r.batch === null ? t("default_label") : r.batch}</div>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                        </div>
-                                    )}
-                                </div>
+                                        {searchLoading ? (
+                                            <div className="p-4 flex items-center gap-2 text-gray-500 dark:text-gray-400"><Spinner /> {t("loading")}</div>
+                                        ) : searchResults.length === 0 ? (
+                                            <div className="text-gray-500 dark:text-gray-400">{t("search_nothing_found")}</div>
+                                        ) : (
+                                            <div className="flex gap-3 flex-wrap">
+                                                {searchResults
+                                                    .sort((a, b) => (a.product?.name || "").localeCompare(b.product?.name || "", undefined, { numeric: true, sensitivity: "base" }))
+                                                    .map((r) => (
+                                                        <button key={r.id || r.stock_id || generateId()} onClick={() => onSelectSearchResult(r)} className="bg-white dark:bg-card-dark border rounded p-2 shadow-sm hover:shadow-md active:scale-[0.98] transition flex flex-col items-center gap-1 min-w-[100px]">
+                                                            <div className="text-sm font-medium text-text-light dark:text-text-dark">{r.product?.name || r.name}</div>
+                                                            <div className="flex items-center justify-center gap-3">
+                                                                <div className="text-xs text-gray-600 dark:text-gray-400">{t("product_barcode_label")} {r.barcode || ""}</div>
+                                                                <div className="text-xs text-gray-600 dark:text-gray-400">{t("product_batch_label")} {r.batch === null ? t("default_label") : r.batch}</div>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )
                             ) : (
                                 <div className="dark:bg-card-dark">
                                     <ReturnedInvoiceProcessor />
@@ -1579,7 +1583,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                                     <th key={th} className="p-2">{th}</th>
                                                 ))}
                                             <th className="p-2">{t("table_col_unit")}</th>
-                                            {role === "factory" &&
+                                            {(role === "factory" && isMainWarehouse) &&
                                                 <th className="p-2">{t("table_col_sale_price")}</th>
                                             }
                                             <th className="p-2">{t("table_col_total")}</th>
@@ -1634,7 +1638,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                                     )}
 
                                                     <td className="p-2 align-center w-[120px] ">{it?.unit || "-"}</td>
-                                                    {role === "factory" &&
+                                                    {(role === "factory" && isMainWarehouse) &&
                                                         < td className="p-2 align-center w-[120px] ">
                                                             {selectedSalePriceType?.[mode]?.value ? (
                                                                 ((invoiceMeta?.[mode]?.operation_type === "return_in" || invoiceMeta?.[mode]?.operation_type === "return_dis") && !it.is_new_batch) ? t("price_type_not_selected") :

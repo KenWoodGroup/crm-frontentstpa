@@ -38,7 +38,7 @@ const ReturnedInvoiceProcessor = () => {
             batch: raw.batch || null,
             return_quantity: Number(raw.quantity || 0),
             is_returning:true,
-            s_price:0
+            s_price: +(raw.sale_price || 0)
         };
     };
 
