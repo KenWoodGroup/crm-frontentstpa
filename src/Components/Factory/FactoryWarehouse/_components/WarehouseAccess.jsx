@@ -68,11 +68,9 @@ export default function WarehouseAccess() {
         try {
             const response = await WarehouseApi.GetWarehouseDetail(id);
             if (response?.status === 200) setWarehouse(response.data);
-            if (response?.data?.key) {
-                setWarehouseType(response.data.key);
-            } else {
-                setWarehouseType("product");
-            }
+            if (response?.data?.type) {
+                setWarehouseType(response.data.type);
+            };
         } catch (error) {
             console.log("Warehouse error:", error);
         }
@@ -127,13 +125,13 @@ export default function WarehouseAccess() {
                     </Typography>
                     <Button onClick={() => {
                         switch (warehouseType) {
-                            case "material":
+                            case "m_warehouse":
                                 Cookies.set('de_ul_nesw', warehouse?.id);
                                 Cookies.set("sedqwdqdqwd", "terrwerwerw");
                                 navigate('/factory/materials/warehouse/stockin');
                                 break;
-                            case "product":
-                            case "main":
+                            case "warehouse":
+                            // case "main":
                                 Cookies.set("sedqwdqdqwd", "terrwerwerw");
                                 Cookies.set('de_ul_nesw', warehouse?.id);
                                 navigate('/factory/warehouse/stockin');

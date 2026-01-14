@@ -107,6 +107,7 @@ export default function WarehouseSidebar() {
                             <NavLink key={id} to={path}>
                                 {({ isActive }) => (
                                     <MenuItem className={`
+                                        ${id === 5 ? "relative" : ""}
                                         ${menuItemClass}
                                         ${isActive
                                             ? "bg-[#4DA057]/20 text-[#4DA057] dark:bg-[#4DA057]/30 dark:text-green-400"

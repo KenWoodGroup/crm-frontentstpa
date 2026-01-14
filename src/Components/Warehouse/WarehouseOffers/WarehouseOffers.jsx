@@ -24,6 +24,7 @@ export default function ReceivedInvoices() {
     const userLid = Cookies.get("ul_nesw");
     const userId = Cookies.get("us_nesw");
     const { unreadCount } = useNotifyStore();
+    const changeNotifyCount = useNotifyStore((s) => s.setUnreadCount)
     const [selectedInv, setSelectedInv] = useState({})
 
 
@@ -75,7 +76,8 @@ export default function ReceivedInvoices() {
             // adapt to your response shape (sample you provided has data.records)
             const records = res.data?.data ?? {};
             setData(records);
-            setTotal(res.data?.data?.pagination?.total_count)
+            setTotal(res.data?.data?.pagination?.total_count);
+            changeNotifyCount(res.data?.data?.new || 0);
         } catch (err) {
             console.error(err);
             setError('Ro\'yxatni yuklashda xatolik yuz berdi');
@@ -180,11 +182,6 @@ export default function ReceivedInvoices() {
             setCreateInvoiceLoading(false);
         }
     };
-
-
-    console.log(selectedInv);
-
-
 
     return (
         <div className="p-6 min-h-screen transition-all duration-300 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
