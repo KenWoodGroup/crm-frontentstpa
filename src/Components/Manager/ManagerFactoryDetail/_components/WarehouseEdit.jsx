@@ -14,7 +14,6 @@ import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import Regions from "../../../../utils/Regions/regions.json";
 import Districts from "../../../../utils/Regions/districts.json";
 import { useTranslation } from "react-i18next";
-import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 import { useParams } from "react-router-dom";
 
 export default function WarehouseEdit({ warehouse, refresh }) {
@@ -26,6 +25,8 @@ export default function WarehouseEdit({ warehouse, refresh }) {
     const [warehouseId, setWarehouseId] = useState("");
     const [errors, setErrors] = useState({});
 
+    const [isMainState, setIsMainState] = useState(false);
+
     const [data, setData] = useState({
         name: "",
         phone: "",
@@ -34,14 +35,10 @@ export default function WarehouseEdit({ warehouse, refresh }) {
         district_id: "",
     });
 
-    // Проверяем — склад основной?
-    const isMain = warehouse?.location_data?.some(l => l.key === "main");
-    const isMaterial = warehouse?.location_data?.some(l => l.key === "material");
-
     const parseAddress = (address) => {
         if (!address) return { region_id: "", district_id: "" };
 
-        const parts = address.split(', ');
+        const parts = address.split(", ");
         if (parts.length < 2) return { region_id: "", district_id: "" };
 
         const [regionName, districtName] = parts;
@@ -79,10 +76,10 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                 district_id: a.district_id,
             });
 
-            setWarehouseId(warehouse?.id);
+            setWarehouseId(warehouse.id);
+            setIsMainState(warehouse?.is_main);
         }
     }, [warehouse]);
-
 
     const getDistrictsByRegion = (regionId) => {
         if (!regionId) return [];
@@ -102,43 +99,20 @@ export default function WarehouseEdit({ warehouse, refresh }) {
 
     const handleRegionChange = (e) => {
         const value = e.target.value;
-
         setData(prev => ({
             ...prev,
             region_id: value,
             district_id: ""
         }));
-
-        setErrors(prev => ({ ...prev, region_id: "" }));
     };
 
     const handleDistrictChange = (e) => {
         const value = e.target.value;
         setData(prev => ({ ...prev, district_id: value }));
-        setErrors(prev => ({ ...prev, district_id: "" }));
     };
 
-    const validateFields = () => {
-        const newErrors = {};
-
-        if (!data.name.trim())
-            newErrors.name = t("Field_required", { field: t("Warehouse_name") });
-
-        if (!data.phone.trim())
-            newErrors.phone = t("Field_required", { field: t("Phone_number") });
-
-        if (!data.region_id)
-            newErrors.region_id = t("Field_required", { field: t("Region") });
-
-        if (!data.district_id)
-            newErrors.district_id = t("Field_required", { field: t("District") });
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
 
     const EditWarehouse = async () => {
-        if (!validateFields()) return;
 
         try {
             setLoading(true);
@@ -150,6 +124,7 @@ export default function WarehouseEdit({ warehouse, refresh }) {
                 name: data.name,
                 phone: data.phone,
                 address: `${selectedRegion?.name_uz || ""}, ${selectedDistrict?.name_uz || ""}`,
+                is_main: isMainState,
                 ...(data.password && { password: data.password }),
             };
 
@@ -165,157 +140,70 @@ export default function WarehouseEdit({ warehouse, refresh }) {
         }
     };
 
-    // 🔥 УСТАНОВИТЬ ОСНОВНОЙ СКЛАД
-    const setMainWarehouse = async () => {
-        try {
-            const body = {
-                location_id: warehouse?.id,
-                key: "main",
-                value: id
-            };
-
-            await locationInfo.PostMainWarehouse(id, body);
-
-            Alert("Склад сделан основным", "success");
-
-            refresh();
-        } catch (error) {
-            console.log(error);
-            Alert("Ошибка при установке основного склада", "error");
-        }
-    };
-    const setMaterialWarehouse = async () => {
-        try {
-            const body = {
-                location_id: warehouse?.id,
-                key: "material",
-                value: id
-            };
-
-            await locationInfo.PostMaterialWarehouse(body);
-
-            Alert("Склад сделан материальным", "success");
-
-            refresh();
-        } catch (error) {
-            console.log(error);
-            Alert("Ошибка при установке основного склада", "error");
-        }
-    };
-
     const availableDistricts = getDistrictsByRegion(data.region_id);
 
     return (
         <>
-            {/* 🔥 Toggle + кнопка редактирования */}
-            <div className="flex items-center gap-3">
-
-
-                <Button
-                    onClick={handleOpen}
-                    className="bg-yellow-600 dark:bg-yellow-500 p-[8px] text-white dark:text-text-dark hover:bg-yellow-700 dark:hover:bg-yellow-600 active:bg-yellow-800 transition-colors"
-                >
-                    <Edit size={20} />
-                </Button>
-            </div>
-
-            {/* МОДАЛКА */}
-            <Dialog
-                open={open}
-                handler={handleOpen}
-                size="sm"
-                className="bg-card-light dark:bg-card-dark text-text-light dark:text-text-dark"
+            <Button
+                onClick={handleOpen}
+                className="bg-yellow-600 p-[8px] text-white hover:bg-yellow-700"
             >
-                <DialogHeader className="border-b border-gray-200 dark:border-gray-600 dark:text-text-dark">
-                    {t("Warehouse_Edit")}
-                </DialogHeader>
+                <Edit size={20} />
+            </Button>
+
+            <Dialog open={open} handler={handleOpen} size="sm">
+                <DialogHeader>{t("Warehouse_Edit")}</DialogHeader>
 
                 <DialogBody divider className="space-y-4">
-                    {/* — имя */}
-                    <div>
-                        <Input
-                            label={t("Warehouse_name")}
-                            name="name"
-                            value={data.name}
-                            onChange={handleChange}
-                            error={!!errors.name}
-                        />
-                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                    </div>
+                    <Input
+                        label={t("Warehouse_name")}
+                        name="name"
+                        value={data.name}
+                        onChange={handleChange}
+                        error={!!errors.name}
+                    />
 
-                    {/* — телефон */}
-                    <div>
-                        <Input
-                            label={t("Phone_number")}
-                            name="phone"
-                            value={data.phone}
-                            onChange={handleChange}
-                            error={!!errors.phone}
-                        />
-                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                    </div>
+                    <Input
+                        label={t("Phone_number")}
+                        name="phone"
+                        value={data.phone}
+                        onChange={handleChange}
+                        error={!!errors.phone}
+                    />
 
-                    {/* — регион */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1">{t("Region")} *</label>
-                        <select
-                            value={data.region_id}
-                            onChange={handleRegionChange}
-                            className={`w-full p-3 border rounded-lg ${errors.region_id
-                                ? "border-red-500"
-                                : "border-gray-300"
-                                }`}
-                        >
-                            <option value="">{t("Select_region")}</option>
-                            {Regions.map((r) => (
-                                <option key={r.id} value={r.id}>
-                                    {r.name_uz}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.region_id && <p className="text-red-500 text-xs mt-1">{errors.region_id}</p>}
-                    </div>
+                    <select
+                        value={data.region_id}
+                        onChange={handleRegionChange}
+                        className="w-full p-3 border rounded-lg"
+                    >
+                        <option value="">{t("Select_region")}</option>
+                        {Regions.map(r => (
+                            <option key={r.id} value={r.id}>{r.name_uz}</option>
+                        ))}
+                    </select>
 
-                    {/* — район */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1">{t("District")} *</label>
-                        <select
-                            value={data.district_id}
-                            onChange={handleDistrictChange}
-                            disabled={!data.region_id}
-                            className={`w-full p-3 border rounded-lg ${errors.district_id
-                                ? "border-red-500"
-                                : "border-gray-300"
-                                }`}
-                        >
-                            <option value="">{t("Select_district")}</option>
-                            {availableDistricts.map((d) => (
-                                <option key={d.id} value={d.id}>
-                                    {d.name_uz}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.district_id && <p className="text-red-500 text-xs mt-1">{errors.district_id}</p>}
-                    </div>
-                    <div className="flex items-start justify-start flex-col gap-[10px]">
+                    <select
+                        value={data.district_id}
+                        onChange={handleDistrictChange}
+                        disabled={!data.region_id}
+                        className="w-full p-3 border rounded-lg"
+                    >
+                        <option value="">{t("Select_district")}</option>
+                        {availableDistricts.map(d => (
+                            <option key={d.id} value={d.id}>{d.name_uz}</option>
+                        ))}
+                    </select>
+
+                    <div className="flex flex-col gap-3">
                         <Switch
-                            id={`main-${warehouse?.id}`}
-                            checked={isMain}
-                            onChange={setMainWarehouse}
+                            checked={isMainState}
+                            onChange={(e) => setIsMainState(e.target.checked)}
                             label="Сделать основным складом"
-                            className="checked:bg-blue-600"
-                        />
-                        <Switch
-                            id={`material-${warehouse?.id}`}
-                            checked={isMaterial}
-                            onChange={setMaterialWarehouse}
-                            label="Сделать материальным складом"
-                            className="checked:bg-blue-600"
                         />
                     </div>
                 </DialogBody>
 
-                <DialogFooter className="border-t border-gray-200 dark:border-gray-600">
+                <DialogFooter>
                     <Button variant="text" onClick={handleOpen}>
                         {t("Cancel")}
                     </Button>

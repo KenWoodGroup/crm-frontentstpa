@@ -14,10 +14,9 @@ import Regions from "../../../../utils/Regions/regions.json";
 import Districts from "../../../../utils/Regions/districts.json";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { locationInfo } from "../../../../utils/Controllers/locationInfo";
 
 export default function WarehouseCreate({ refresh, Allowed }) {
-    const { id } = useParams(); // factory / location id
+    const { id } = useParams(); // parent (factory / location) id
     const { t } = useTranslation();
 
     const [open, setOpen] = useState(false);
@@ -42,9 +41,7 @@ export default function WarehouseCreate({ refresh, Allowed }) {
 
     const getDistrictsByRegion = (regionId) => {
         if (!regionId) return [];
-        return Districts.filter(
-            (d) => d.region_id === parseInt(regionId)
-        );
+        return Districts.filter(d => d.region_id === parseInt(regionId));
     };
 
     const handleOpen = () => {
@@ -62,36 +59,25 @@ export default function WarehouseCreate({ refresh, Allowed }) {
             val = value.replace(/[^\d+]/g, "");
         }
 
-        setData((prev) => ({ ...prev, [name]: val }));
+        setData(prev => ({ ...prev, [name]: val }));
 
         if (errors[name]) {
-            setErrors((prev) => ({ ...prev, [name]: "" }));
+            setErrors(prev => ({ ...prev, [name]: "" }));
         }
     };
 
     const handleRegionChange = (e) => {
         const value = e.target.value;
-        setData((prev) => ({
+        setData(prev => ({
             ...prev,
             region_id: value,
             district_id: "",
         }));
-
-        if (errors.region_id) {
-            setErrors((prev) => ({ ...prev, region_id: "" }));
-        }
     };
 
     const handleDistrictChange = (e) => {
         const value = e.target.value;
-        setData((prev) => ({
-            ...prev,
-            district_id: value,
-        }));
-
-        if (errors.district_id) {
-            setErrors((prev) => ({ ...prev, district_id: "" }));
-        }
+        setData(prev => ({ ...prev, district_id: value }));
     };
 
     /* ================= validation ================= */
@@ -135,46 +121,27 @@ export default function WarehouseCreate({ refresh, Allowed }) {
 
     /* ================= API ================= */
 
-    const setMaterialWarehouse = async (warehouseId) => {
-        const body = {
-            location_id: warehouseId,
-            key: "material",
-            value: id,
-        };
-
-        await locationInfo.PostMaterialWarehouse(body);
-    };
-
     const createWarehouse = async () => {
         if (!validateFields()) return;
 
         try {
             setLoading(true);
 
-            const region = Regions.find(
-                (r) => r.id === parseInt(data.region_id)
-            );
-            const district = Districts.find(
-                (d) => d.id === parseInt(data.district_id)
-            );
-
+            const region = Regions.find(r => r.id === parseInt(data.region_id));
+            const district = Districts.find(d => d.id === parseInt(data.district_id));
             const payload = {
                 name: data.name,
                 username: data.username,
                 full_name: data.full_name,
                 phone: data.phone,
                 password: data.password,
-                type: "warehouse",
                 address: `${region?.name_uz || ""}, ${district?.name_uz || ""}`,
                 parent_id: id,
+
+                ...({ type: isMaterial ? "m_warehouse" : "warehouse" }),
             };
 
-            const res = await WarehouseApi.CreateWarehouse(payload);
-            const warehouseId = res?.data?.id;
-
-            if (isMaterial && warehouseId) {
-                await setMaterialWarehouse(warehouseId);
-            }
+            await WarehouseApi.CreateWarehouse(payload);
 
             Alert(t("success"), "success");
             handleOpen();
@@ -202,16 +169,10 @@ export default function WarehouseCreate({ refresh, Allowed }) {
                 {t("New_Warehouse")}
             </Button>
 
-            <Dialog
-                open={open}
-                handler={handleOpen}
-                size="sm"
-                className="dark:bg-card-dark"
-            >
+            <Dialog open={open} handler={handleOpen} size="sm">
                 <DialogHeader>{t("Create_Warehouse")}</DialogHeader>
 
                 <DialogBody divider className="space-y-4 h-[500px] overflow-y-auto">
-
                     <Input label={t("Warehouse_name")} name="name" value={data.name} onChange={handleChange} error={!!errors.name} />
                     <Input label={t("Warehouse_login")} name="username" value={data.username} onChange={handleChange} error={!!errors.username} />
                     <Input label={t("Warehouse_owner_name")} name="full_name" value={data.full_name} onChange={handleChange} error={!!errors.full_name} />
@@ -225,10 +186,8 @@ export default function WarehouseCreate({ refresh, Allowed }) {
                         className="w-full p-3 border rounded-lg"
                     >
                         <option value="">{t("Select_region")}</option>
-                        {Regions.map((r) => (
-                            <option key={r.id} value={r.id}>
-                                {r.name_uz}
-                            </option>
+                        {Regions.map(r => (
+                            <option key={r.id} value={r.id}>{r.name_uz}</option>
                         ))}
                     </select>
 
@@ -239,10 +198,8 @@ export default function WarehouseCreate({ refresh, Allowed }) {
                         className="w-full p-3 border rounded-lg"
                     >
                         <option value="">{t("Select_district")}</option>
-                        {availableDistricts.map((d) => (
-                            <option key={d.id} value={d.id}>
-                                {d.name_uz}
-                            </option>
+                        {availableDistricts.map(d => (
+                            <option key={d.id} value={d.id}>{d.name_uz}</option>
                         ))}
                     </select>
 
@@ -255,7 +212,6 @@ export default function WarehouseCreate({ refresh, Allowed }) {
                             className="checked:bg-blue-600"
                         />
                     )}
-
                 </DialogBody>
 
                 <DialogFooter>

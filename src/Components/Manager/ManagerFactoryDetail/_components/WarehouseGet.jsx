@@ -10,7 +10,6 @@ import {
     Package,
     Layers
 } from "lucide-react";
-import { Button } from "@material-tailwind/react";
 import { location } from "../../../../utils/Controllers/location";
 import WarehouseCreate from "./WarehouseCreate";
 import WarehouseDelete from "./WarehouseDelete";
@@ -68,13 +67,7 @@ export default function WarehouseGet({ Allowed }) {
             </div>
             {/* LIST */}
             <div className="flex flex-col gap-4">
-                {warehouses.map((item) => {
-                    const isMain = item.location_data?.some(
-                        (loc) => loc.key === "main"
-                    );
-                    const isMaterial = item.location_data?.some(
-                        (loc) => loc.key === "material"
-                    );
+                {warehouses?.map((item) => {
 
                     return (
                         <div
@@ -92,18 +85,19 @@ export default function WarehouseGet({ Allowed }) {
                                             {item.name}
                                         </h2>
                                     </div>
-
-                                    {isMain && (
-                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                            Assosiy ombor
-                                        </span>
-                                    )}
-
-                                    {isMaterial && (
-                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                            Xomashyo ombori
-                                        </span>
-                                    )}
+                                    <div className="flex items-center gap-[10px]">
+                                        {item?.type === 'm_warehouse' ? (
+                                            <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
+                                                Xomashyo ombori
+                                            </span>
+                                        ) : item?.is_main === true ? (
+                                            <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
+                                                Assosiy ombor
+                                            </span>
+                                        ) : (
+                                            <></>
+                                        )}
+                                    </div>
                                 </div>
                                 {/* ffwfwef */}
 
@@ -139,7 +133,7 @@ export default function WarehouseGet({ Allowed }) {
 
                             {/* ACTIONS BOTTOM */}
                             <div className="flex justify-between gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                {!isMaterial ? (
+                                {/* {!isMaterial ? (
                                     <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
                                         className="flex items-center gap-2 text-blue-600 hover:underline"
                                     >
@@ -154,7 +148,7 @@ export default function WarehouseGet({ Allowed }) {
                                         <Layers size={18} />
                                         Materiallar
                                     </NavLink>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     );

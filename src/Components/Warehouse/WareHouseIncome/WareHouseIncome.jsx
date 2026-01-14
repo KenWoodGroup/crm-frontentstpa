@@ -995,7 +995,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                         {t('Opt_warehouse')}
                                     </Typography>
                                     {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
-                                        <NavLink key={id} to={path}>
+                                        <NavLink key={id} to={`${path}/${id}`}>
                                             <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all phone:text-xs phone:py-2 phone:px-3">
                                                 <Icon className="w-4 h-4" />
                                                 {label}

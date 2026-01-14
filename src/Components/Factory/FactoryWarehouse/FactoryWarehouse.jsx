@@ -81,12 +81,7 @@ export default function FactoryWarehouse() {
                     {/* Warehouse Cards */}
                     <div className="grid grid-cols-1 gap-6">
                         {warehouses.map((w) => {
-                            const isMain = w.location_data?.some(
-                                (loc) => loc.key === "main"
-                            );
-                            const isMaterial = w.location_data?.some(
-                                (loc) => loc.key === "material"
-                            );
+
                             return (
                                 <div
                                     key={w.id}
@@ -124,23 +119,22 @@ export default function FactoryWarehouse() {
                                         /> */}
                                         </div>
                                     </div>
-                                    {isMain && (
-                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                            Assosiy ombor
-                                        </span>
-                                    )}
-
-                                    {isMaterial && (
-                                        <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                            Xomashyo ombori
-                                        </span>
-                                    )}
+                                    <div className="flex items-center gap-[10px]">
+                                        {w?.type === 'm_warehouse' ? (
+                                            <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
+                                                Xomashyo ombori
+                                            </span>
+                                        ) : w?.is_main === true ? (
+                                            <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
+                                                Assosiy ombor
+                                            </span>
+                                        ) : (
+                                            <></>
+                                        )}
+                                    </div>
 
                                     <div className="space-y-3 mt-[5px]">
-                                        <div className="flex items-center gap-2">
-                                            <Mail className="w-5 h-5 opacity-70" />
-                                            <span>{Array.isArray(w?.users) && w?.users?.length > 0 && w?.users[0]?.username || "—"}</span>
-                                        </div>
+
 
                                         <div className="flex items-center gap-2">
                                             <MapPin className="w-5 h-5 opacity-70" />
