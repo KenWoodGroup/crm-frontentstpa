@@ -52,11 +52,12 @@ export default function WarehouseLayout() {
     };
     useEffect(() => {
         fetchNotify();
+        socket.connect();
         socket.emit("joinLocation", userLid);
 
         socket.on("invoiceUpdate", (data) => {
             console.log(data);
-            
+
             if (data.location_id === userLid) {
                 fetchNotify();
                 toast.custom((t) => (
@@ -72,7 +73,10 @@ export default function WarehouseLayout() {
             };
         });
 
-        return () => socket.off("invoiceUpdate");
+        return () => {
+            socket.off("invoiceUpdate");
+            socket.disconnect();
+        }
     }, [userLid]);
 
     return (
