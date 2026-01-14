@@ -55,6 +55,8 @@ export default function WarehouseLayout() {
         socket.emit("joinLocation", userLid);
 
         socket.on("invoiceUpdate", (data) => {
+            console.log(data);
+            
             if (data.location_id === userLid) {
                 fetchNotify();
                 toast.custom((t) => (

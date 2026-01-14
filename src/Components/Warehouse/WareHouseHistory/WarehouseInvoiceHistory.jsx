@@ -337,7 +337,6 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
         qp.set("page", String(page));
         qp.set("perPage", String(PER_PAGE));
         navigate(`/${role}/${path}/${id}?${qp.toString()}`);
-        console.log("ok");
     };
 
     const closeDetail = () => {

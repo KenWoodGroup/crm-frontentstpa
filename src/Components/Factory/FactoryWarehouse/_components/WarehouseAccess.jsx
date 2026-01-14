@@ -68,7 +68,11 @@ export default function WarehouseAccess() {
         try {
             const response = await WarehouseApi.GetWarehouseDetail(id);
             if (response?.status === 200) setWarehouse(response.data);
-            if (response?.data?.type) setWarehouseType(response.data.type);
+            if (response?.data?.key) {
+                setWarehouseType(response.data.key);
+            } else {
+                setWarehouseType("product");
+            }
         } catch (error) {
             console.log("Warehouse error:", error);
         }
@@ -122,20 +126,20 @@ export default function WarehouseAccess() {
                         {t("Warehouse_Info")}
                     </Typography>
                     <Button onClick={() => {
-                        if (!warehouseType) {
-                            notify.warning(t("warehouse_type_missing"));
-                            return;
-                        } else {
-                            sessionStorage.setItem("de_ul_name", warehouse?.name)
-                            Cookies.set('de_ul_nesw', warehouse?.id);
-                            if (true) {
-                                Cookies.set("sedqwdqdqwd", "terrwerwerw")
-                            };
-                            if (warehouseType === "material") {
-                                navigate('/factory/materials/warehouse/stockin')
-                            } else if (warehouseType === "product" || "main") {
+                        switch (warehouseType) {
+                            case "material":
+                                Cookies.set('de_ul_nesw', warehouse?.id);
+                                Cookies.set("sedqwdqdqwd", "terrwerwerw");
+                                navigate('/factory/materials/warehouse/stockin');
+                                break;
+                            case "product":
+                            case "main":
+                                Cookies.set("sedqwdqdqwd", "terrwerwerw");
+                                Cookies.set('de_ul_nesw', warehouse?.id);
                                 navigate('/factory/warehouse/stockin');
-                            }
+                                break;
+                            default:
+                                notify.warning(t("warehouse_type_missing"));
                         }
                     }}>
                         {t("operations")}
