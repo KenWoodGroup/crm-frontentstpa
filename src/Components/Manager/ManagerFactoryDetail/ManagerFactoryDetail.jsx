@@ -129,29 +129,29 @@ export default function ManagerFactoryDetail() {
                             </svg>
                         </Button>
                         <Typography variant="h5" className="flex items-center gap-2 dark:text-text-dark">
-                            <Store size={20} /> {factory.name}
+                            <Store size={20} /> {factory?.name}
                         </Typography>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div className="flex items-center gap-2">
                             <MapPin size={16} />
-                            <span>{factory.address}</span>
+                            <span>{factory?.address}</span>
                         </div>
 
                         <div className="flex items-center gap-2">
                             <Phone size={16} />
-                            <span>{factory.phone}</span>
+                            <span>{factory?.phone}</span>
                         </div>
 
                         <div className="flex items-center gap-2">
                             <Wallet size={16} />
-                            <span>Баланс: {factory.balance}</span>
+                            <span>Баланс: {factory?.balance}</span>
                         </div>
 
                         <div className="flex items-center gap-2">
                             <Package size={16} />
-                            <span>Тип: {factory.type}</span>
+                            <span>Тип: {factory?.type}</span>
                         </div>
                     </div>
                 </CardBody>
