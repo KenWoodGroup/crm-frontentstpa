@@ -66,11 +66,16 @@ export default function WareHouseOutcome({ role = "factory", prd_type = "product
     // (Place this inside your component function scope)
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const skladSubLinks = [
+    const skladSubLinks = prd_type === "product" ? [
         { id: 1, label: t('Warehouse'), path: "/factory/warehouse/stock", icon: Package },
         { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: t('Shipment'), path: "/factory/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon }
+        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon },
+    ] : [
+        { id: 1, label: t('Warehouse'), path: "/factory/materials/warehouse/stock", icon: Package },
+        { id: 3, label: t('Coming'), path: "/factory/materials/warehouse/stockin", icon: PackagePlus },
+        { id: 4, label: t('Shipment'), path: "/factory/materials/warehouse/stockout", icon: PackageMinus },
+        { id: 5, label: t("notifies"), path: "/factory/materials/warehouse/notifications", icon: SendIcon },
     ];
     // user / location
     const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
@@ -187,7 +192,7 @@ export default function WareHouseOutcome({ role = "factory", prd_type = "product
             else setLocations(res || []);
             const deUl = res.data.find((loc) => String(loc.id) === String(userLId));
             if (deUl) { setDeUlName(deUl.name); }
-            if(deUl?.is_main) setSaleAccess(true);
+            if (deUl?.is_main) setSaleAccess(true);
         } catch (err) {
             notify.error(t("fetch_locations_error", { msg: err?.message || err }));
         } finally {

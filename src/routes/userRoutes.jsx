@@ -53,6 +53,11 @@ export const userRoutes = [
     element: <WarehouseStockPage key={"factory-stock"} role="factory" productType="product"/>
   },
   {
+    path: "factory/materials/warehouse/stock",
+    name: "factory materials de warehouse stock",
+    element: <WarehouseStockPage key={"factory-material-stock"} role="factory" productType="material"/>
+  },
+  {
     path: "factory/warehouse/stockin",
     name: "factory de warehouse stockin",
     element: <WareHouseIncome key={"factory-product"} role="factory" />
@@ -65,7 +70,12 @@ export const userRoutes = [
   {
     path: "factory/warehouse/stockout",
     name: "factory de warehouse stockout",
-    element: <WareHouseOutcome role="factory" />
+    element: <WareHouseOutcome role="factory" key={"stockout"}/>
+  },
+  {
+    path: "factory/materials/warehouse/stockout",
+    name: "factory materials de warehouse stockout",
+    element: <WareHouseOutcome key={"factory-stockout"} role="factory" prd_type="material" />
   },
   {
     path: "factory/history",
