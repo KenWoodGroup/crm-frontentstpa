@@ -119,10 +119,10 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     // i18n hook
     const { t } = useTranslation();
     const skladSubLinks = [
-        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/product", icon: Package },
+        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/stock", icon: Package },
         { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: t('Shipment'), path: "/factory/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon }
+        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon },
     ];
 
     // Local UI state
@@ -995,7 +995,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                         {t('Opt_warehouse')}
                                     </Typography>
                                     {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
-                                        <NavLink key={id} to={`${path}/${id}`}>
+                                        <NavLink key={id} to={`${path}`}>
                                             <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all phone:text-xs phone:py-2 phone:px-3">
                                                 <Icon className="w-4 h-4" />
                                                 {label}

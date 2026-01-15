@@ -34,6 +34,7 @@ import Profile from "../Components/Profile/Profile";
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
 import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
+import WarehouseStockPage from "../Components/Warehouse/WarehouseStock/WarehouseStockPage";
 
 export const userRoutes = [
   {
@@ -45,6 +46,11 @@ export const userRoutes = [
     path: "factory/warehouse",
     name: "Warehouse",
     element: <FactoryWarehouse />
+  },
+  {
+    path: "factory/warehouse/stock",
+    name: "factory de warehouse stock",
+    element: <WarehouseStockPage key={"factory-stock"} role="factory" productType="product"/>
   },
   {
     path: "factory/warehouse/stockin",
