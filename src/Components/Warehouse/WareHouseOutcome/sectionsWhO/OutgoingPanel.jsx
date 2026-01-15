@@ -8,10 +8,9 @@ import { ChevronDown, Plus } from "lucide-react";
 import CarrierCreateModal from "../../WareHouseModals/CarrierCreateModal";
 import { useTranslation } from "react-i18next";
 
-const OutgoingPanel = ({ receiverLocations, getStaffs, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver, role }) => {
+const OutgoingPanel = ({access, receiverLocations, getStaffs, staffs, selectStaff, selectedStaff, isLoading, selectOprType, selectStatus, selectReceiver, startOperation, selectedReceiver, role }) => {
     // Komponent ichida (funksiya scope) joylashtiring:
     const { t } = useTranslation();
-    const access = Cookies.get("sedqwdqdqwd") === "terrwerwerw";
 
     const [operationType, setOperationType] = useState("outgoing");
     const [status, setStatus] = useState("draft");

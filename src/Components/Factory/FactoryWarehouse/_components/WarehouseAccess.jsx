@@ -127,12 +127,10 @@ export default function WarehouseAccess() {
                         switch (warehouseType) {
                             case "m_warehouse":
                                 Cookies.set('de_ul_nesw', warehouse?.id);
-                                Cookies.set("sedqwdqdqwd", "terrwerwerw");
                                 navigate('/factory/materials/warehouse/stockin');
                                 break;
                             case "warehouse":
                             // case "main":
-                                Cookies.set("sedqwdqdqwd", "terrwerwerw");
                                 Cookies.set('de_ul_nesw', warehouse?.id);
                                 navigate('/factory/warehouse/stockin');
                                 break;

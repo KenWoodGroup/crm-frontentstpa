@@ -34,6 +34,7 @@ import Profile from "../Components/Profile/Profile";
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
 import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
+import WarehouseStockPage from "../Components/Warehouse/WarehouseStock/WarehouseStockPage";
 
 export const userRoutes = [
   {
@@ -45,6 +46,16 @@ export const userRoutes = [
     path: "factory/warehouse",
     name: "Warehouse",
     element: <FactoryWarehouse />
+  },
+  {
+    path: "factory/warehouse/stock",
+    name: "factory de warehouse stock",
+    element: <WarehouseStockPage key={"factory-stock"} role="factory" productType="product"/>
+  },
+  {
+    path: "factory/materials/warehouse/stock",
+    name: "factory materials de warehouse stock",
+    element: <WarehouseStockPage key={"factory-material-stock"} role="factory" productType="material"/>
   },
   {
     path: "factory/warehouse/stockin",
@@ -59,7 +70,12 @@ export const userRoutes = [
   {
     path: "factory/warehouse/stockout",
     name: "factory de warehouse stockout",
-    element: <WareHouseOutcome role="factory" />
+    element: <WareHouseOutcome role="factory" key={"stockout"}/>
+  },
+  {
+    path: "factory/materials/warehouse/stockout",
+    name: "factory materials de warehouse stockout",
+    element: <WareHouseOutcome key={"factory-stockout"} role="factory" prd_type="material" />
   },
   {
     path: "factory/history",

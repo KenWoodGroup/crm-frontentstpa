@@ -9,6 +9,7 @@ import SettingsWareHouse from "../Components/Warehouse/SettingsWareHouse/Setting
 import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/WarehouseInvoiceHistory";
 import Profile from "../Components/Profile/Profile";
 import ReceivedInvoices from "../Components/Warehouse/WarehouseOffers/WarehouseOffers";
+import WarehouseStockPage from "../Components/Warehouse/WarehouseStock/WarehouseStockPage";
 
 export const warehouseRoutes = [
     {
@@ -19,7 +20,7 @@ export const warehouseRoutes = [
     {
         path: "/warehouse/product",
         name: "Warehouse Product",
-        element: <WarehouseProdcut />
+        element: <WarehouseStockPage productType="product" role="warehouse"/>
     },
     {
         path: "/warehouse/barcode/create",

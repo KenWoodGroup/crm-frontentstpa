@@ -62,20 +62,27 @@ function useDebounce(value, delay) {
     return debounced;
 }
 
-export default function WareHouseOutcome({ role = "factory", prd_type="product" }) {
+export default function WareHouseOutcome({ role = "factory", prd_type = "product" }) {
     // (Place this inside your component function scope)
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const skladSubLinks = [
-        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/product", icon: Package },
+    const skladSubLinks = prd_type === "product" ? [
+        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/stock", icon: Package },
         { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: t('Shipment'), path: "/factory/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon }
+        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon },
+    ] : [
+        { id: 1, label: t('Warehouse'), path: "/factory/materials/warehouse/stock", icon: Package },
+        { id: 3, label: t('Coming'), path: "/factory/materials/warehouse/stockin", icon: PackagePlus },
+        { id: 4, label: t('Shipment'), path: "/factory/materials/warehouse/stockout", icon: PackageMinus },
+        { id: 5, label: t("notifies"), path: "/factory/materials/warehouse/notifications", icon: SendIcon },
     ];
     // user / location
     const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
-    const deUlName = sessionStorage.getItem("de_ul_name")
+    const [deUlName, setDeUlName] = useState(null);
+    const facId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw");
+    const [saleAccess, setSaleAccess] = useState(false);
 
     // context (per-mode)
     const {
@@ -183,6 +190,9 @@ export default function WareHouseOutcome({ role = "factory", prd_type="product" 
             const res = await location.getAllGroupLocalLocations(userLId);
             if (res?.status === 200 || res?.status === 201) setLocations(res.data || []);
             else setLocations(res || []);
+            const deUl = res.data.find((loc) => String(loc.id) === String(userLId));
+            if (deUl) { setDeUlName(deUl.name); }
+            if (deUl?.is_main) setSaleAccess(true);
         } catch (err) {
             notify.error(t("fetch_locations_error", { msg: err?.message || err }));
         } finally {
@@ -214,7 +224,7 @@ export default function WareHouseOutcome({ role = "factory", prd_type="product" 
     const fetchSalePriceTypes = async () => {
         try {
             setSaleTypesLoading(true);
-            const res = await PriceType.PriceTypeGet(userLId);
+            const res = await PriceType.PriceTypeGet(facId);
             if (res.status === 200 || res.status === 201) {
                 const options = res.data?.map((op) => ({ value: op.id, label: op.name })) || []
                 setSaleTypes(options);
@@ -337,7 +347,7 @@ export default function WareHouseOutcome({ role = "factory", prd_type="product" 
             }
             try {
                 setSearchLoading(true);
-                const data = { locationId: userLId, search: debouncedSearch.trim(), fac_id: Cookies.get("usd_nesw"), operation_type: invoiceMeta?.[mode]?.operation_type };
+                const data = { prd_type, locationId: userLId, search: debouncedSearch.trim(), fac_id: facId, operation_type: invoiceMeta?.[mode]?.operation_type };
                 const res = await Stock.getLocationStocksBySearch({ data });
                 if (res?.status === 200 || res?.status === 201) setSearchResults(res.data || []);
             } catch (err) {
@@ -712,7 +722,7 @@ export default function WareHouseOutcome({ role = "factory", prd_type="product" 
                                 ))}
                             </MenuList>
                         </Menu>
-                        <div onClick={()=>navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
+                        <div onClick={() => navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
                                         text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
                                         transition-all duration-300">
                             <Home className="w-8 h-8 mb-0" />
@@ -832,6 +842,7 @@ export default function WareHouseOutcome({ role = "factory", prd_type="product" 
                     {/* HEAD */}
                     {!invoiceStarted?.[mode] ? (
                         <OutgoingPanel
+                            access={saleAccess}
                             receiverLocations={locationsLoading ? [{ id: 0, name: t("loading") }] : locations?.filter((item) => item.id !== userLId)}
                             selectedReceiver={selectedLocation}
                             selectReceiver={setSelectedLocation}
