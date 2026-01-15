@@ -13,48 +13,17 @@ import { NavLink } from "react-router-dom";
 import { locationInfo } from "../../../utils/Controllers/locationInfo";
 
 export default function PriceTypePage() {
-    const [mainLocationId, setMainLocationId] = useState(null);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const { t } = useTranslation();
 
     const locationCookie = Cookies.get("ul_nesw");
 
-    // ------------------------- MAIN WAREHOUSE -------------------------
-    const getMainWarehouse = async () => {
-        try {
-            setLoading(true);
-
-            const response = await locationInfo.GetWarehouseMain(locationCookie);
-
-
-            const locId = response?.data?.location?.id;
-
-            if (locId) {
-                setMainLocationId(locId);
-            } else {
-                console.warn("Main warehouse ID NOT FOUND in response");
-            }
-        } catch (error) {
-            console.error("Main warehouse error:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     // --------------------------- PRICE TYPES ---------------------------
-    const getAllPriceType = async (locId) => {
+    const getAllPriceType = async () => {
         try {
             setLoading(true);
-
-            if (!locId) {
-                console.warn("getAllPriceType called without locationId");
-                return;
-            }
-
-            const response = await PriceType.PriceTypeGet(locId);
-
-            console.log("PriceTypeGet response:", response);
+            const response = await PriceType.PriceTypeGet(locationCookie);
 
             setData(response?.data || []);
         } catch (error) {
@@ -76,15 +45,11 @@ export default function PriceTypePage() {
     }, []);
 
     useEffect(() => {
-        if (mainLocationId) {
-            getAllPriceType(mainLocationId);
-        }
-    }, [mainLocationId]);
+        getAllPriceType();
+    }, []);
 
-    // ---------------------------- LOADING ------------------------------
     if (loading) return <Loading />;
 
-    // ---------------------------- RENDER -------------------------------
     return (
         <div
             className={`min-h-screen transition-colors duration-300
@@ -96,7 +61,7 @@ export default function PriceTypePage() {
                     {t("Price_type")}
                 </Typography>
 
-                <PriceTypeCreate location_id={mainLocationId} refresh={() => getAllPriceType(mainLocationId)} />
+                <PriceTypeCreate location_id={locationCookie} refresh={getAllPriceType} />
             </div>
 
             {!data || data.length === 0 ? (
@@ -127,14 +92,14 @@ export default function PriceTypePage() {
                                             </Tooltip>
                                         </NavLink>
 
-                                        <PriceTypeEdit  item={item} refresh={() => getAllPriceType(mainLocationId)} />
-                                        <PriceTypeDelete id={item.id} refresh={() => getAllPriceType(mainLocationId)} />
+                                        <PriceTypeEdit item={item} refresh={getAllPriceType} />
+                                        <PriceTypeDelete id={item.id} refresh={getAllPriceType} />
                                     </div>
                                 </div>
 
                                 <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
                                     <FileText size={18} />
-                                    <span>{item.note || "—"}</span>
+                                    <span>{item.note || "Izoh berilmagan"}</span>
                                 </div>
 
                                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">

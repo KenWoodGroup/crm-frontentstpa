@@ -134,7 +134,7 @@ export default function FactoryPartner() {
                     )}
                 </Card>
             ) : (
-                <EmptyData text={t("no_warehouses")} />
+                <EmptyData text={t("Empty_data")} />
             )}
         </div>
     );

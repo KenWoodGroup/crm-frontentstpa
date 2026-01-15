@@ -297,7 +297,7 @@ export default function Sverka() {
                     ) : (
                         <Card className="flex items-center justify-center h-[300px] border-[2px] border-gray-200 dark:border-gray-700 bg-card-light dark:bg-card-dark transition-colors duration-200">
                             <h2 className="text-text-light dark:text-text-dark transition-colors duration-200">
-                                Нет данных
+                                {t('Empty_data')}
                             </h2>
                         </Card>
                     )}

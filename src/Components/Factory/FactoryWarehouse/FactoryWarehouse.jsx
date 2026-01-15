@@ -120,16 +120,15 @@ export default function FactoryWarehouse() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-[10px]">
-                                        {w?.type === 'm_warehouse' ? (
+                                        {w?.type === 'm_warehouse' && (
                                             <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                                Xomashyo ombori
+                                                {t('MaterialWarehouse')}
                                             </span>
-                                        ) : w?.is_main === true ? (
+                                        )}
+                                        {w?.is_main && (
                                             <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-green-600 text-white">
-                                                Assosiy ombor
+                                                {t('MainWarehouse')}
                                             </span>
-                                        ) : (
-                                            <></>
                                         )}
                                     </div>
 

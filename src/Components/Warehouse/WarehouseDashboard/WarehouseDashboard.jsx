@@ -62,11 +62,6 @@ export default function WarehouseDashboard() {
     }, [year, month]);
     const stats = [
         {
-            title: t("dilers"),
-            value: CardData ? CardData.countDealer : "...",
-            icon: <Users className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
-        },
-        {
             title: t("products"),
             value: CardData ? CardData.countProduct : "...",
             icon: <Package className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
@@ -77,23 +72,12 @@ export default function WarehouseDashboard() {
             icon: <DollarSign className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
         },
         {
-            title: t("Receipts_in_month"),
-            value: CardData ? `${CardData.transferIn?.toLocaleString()} so'm` : "...",
-            icon: <BanknoteArrowDown className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
-        },
-        {
-            title: t('Sells_inMonth'),
-            value: CardData ? `${CardData.income?.toLocaleString()} so'm` : "...",
-            icon: <DollarSign className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white " />,
-        },
-        {
             title: t("Output_in_mont"),
             value: CardData ? `${CardData.transferOut?.toLocaleString()} so'm` : "...",
             icon: <BanknoteArrowUp className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
             textColor: "text-red-500 dark:text-red-400",
 
         },
-
         {
             title: t('Grin'),
             value: CardData ? `${CardData?.profit?.toLocaleString()} so'm` : "...",

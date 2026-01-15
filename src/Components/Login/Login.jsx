@@ -70,6 +70,7 @@ export default function Login() {
       cashier: "CesdsdfmgrUID",
       storekeeper: "KesdsdfmgrUID",
       seller: "SdsdfmgrUID",
+      m_warehouse: "SesdsdfmgrUID",
     };
 
     Cookies.set("nesw", roleMap[role] || "");
@@ -159,6 +160,7 @@ export default function Login() {
         { role: "warehouse", vektor: "/warehouse/dashboard" },
         { role: "cashier", vektor: "/factory/dashboard" },
         { role: "storekeeper", vektor: "/factory/dashboard" },
+        { role: "m_warehouse", vektor: "/warehouse/dashboard" },
         { role: "seller", vektor: "/factory/dashboard" },
       ];
       const vektor_obj = roleLinks.find((item) => item.role === role);
@@ -188,7 +190,6 @@ export default function Login() {
         setError("Username yoki Parol xato");
         return;
       }
-
       const { locationId, userData, role } = saveUserData(data);
       notify.success("Login muvaffaqiyatli!");
 

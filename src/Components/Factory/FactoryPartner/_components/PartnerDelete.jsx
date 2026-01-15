@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@material-tailwind/react";
-import { WarehouseApi } from "../../../../utils/Controllers/WarehouseApi";
 import Delete from "../../../UI/Icons/Delete";
 import { Alert } from "../../../../utils/Alert";
 import { useTranslation } from "react-i18next";
@@ -15,12 +14,12 @@ export default function PartnerDelete({ warehouseId, refresh }) {
         try {
             setLoading(true);
             await Partner.PartnerDelete(warehouseId);
-            Alert(t("Warehouse_deleted_success"), "success");
+            Alert(t("success"), "success");
             refresh();
             setOpen(false);
         } catch (error) {
             console.error(error);
-            Alert(t("Error_occurred"), "error");
+            Alert(t("Error"), "error");
         } finally {
             setLoading(false);
         }

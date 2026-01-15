@@ -131,14 +131,7 @@ export default function WarehouseGet({ Allowed }) {
 
                             {/* ACTIONS BOTTOM */}
                             <div className="flex justify-between gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                {/* {!isMaterial ? (
-                                    <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
-                                        className="flex items-center gap-2 text-blue-600 hover:underline"
-                                    >
-                                        <Package size={18} />
-                                        Mahsulot
-                                    </NavLink>
-                                ) : (
+                                {item?.type === 'm_warehouse' ? (
                                     <NavLink
                                         to={`/manager/factory/warehouse-material/${id}/${item?.id}`}
                                         className="flex items-center gap-2 text-green-600 hover:underline"
@@ -146,7 +139,15 @@ export default function WarehouseGet({ Allowed }) {
                                         <Layers size={18} />
                                         Materiallar
                                     </NavLink>
-                                )} */}
+                                ) : (
+                                    <NavLink to={`/manager/factory/warehouse/${id}/${item?.id}`}
+                                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                                    >
+                                        <Package size={18} />
+                                        Mahsulot
+                                    </NavLink>
+                                )}
+                            
                             </div>
                         </div>
                     );

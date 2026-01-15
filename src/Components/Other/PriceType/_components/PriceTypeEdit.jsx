@@ -123,7 +123,7 @@ export default function PriceTypeEdit({ item, refresh }) {
                         onClick={handleSubmit}
                         className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors"
                     >
-                        {t('Saving')}
+                        {t('Save')}
                     </Button>
                 </DialogFooter>
             </Dialog>

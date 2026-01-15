@@ -57,7 +57,7 @@ export default function MaterialCategoryDetail() {
         <div className="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
             <div className="flex items-center flex-wrap gap-[20px] justify-between mb-4">
                 <Typography variant="h2" className="text-gray-900 dark:text-gray-100 font-bold">
-                    {t('Product')}
+                    {t('Material')}
                 </Typography>
                 <MaterialCreate refresh={GetLocalCategory} />
             </div>

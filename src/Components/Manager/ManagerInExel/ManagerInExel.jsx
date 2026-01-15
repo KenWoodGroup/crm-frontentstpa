@@ -15,8 +15,6 @@ import { Alert } from "../../../utils/Alert";
 export default function ManagerInExel() {
     const { facId, warId } = useParams();
 
-    // const [partners, setPartners] = useState([]);
-    // const [senderId, setSenderId] = useState("");
     const [note, setNote] = useState("");
     const [createdInvoiceId, setCreatedInvoiceId] = useState(null);
     const navigate = useNavigate()
@@ -85,22 +83,15 @@ export default function ManagerInExel() {
             Alert("Iltimos, fayl tanlang", "error");
             return;
         }
-
         const formData = new FormData();
         formData.append("file", selectedFile);
-
         try {
             setLoadingUpload(true);
-
             await InvoicesApi.UploadExel(createdInvoiceId, formData);
             Alert("Excel muvaffaqiyatli yuklandi", "success");
-
-            // Reset states
-            setSenderId("");
             setNote("");
             setCreatedInvoiceId(null);
             setSelectedFile(null);
-
             if (fileInputRef.current) fileInputRef.current.value = null;
         } catch (error) {
             console.log(error);
@@ -116,7 +107,7 @@ export default function ManagerInExel() {
 
     return (
         <>
-          <div >
+            <div >
                 <Button onClick={() => navigate(-1)} className="p-[10px]">
                     <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
                         <path
@@ -128,21 +119,21 @@ export default function ManagerInExel() {
                     </svg>
                 </Button>
             </div>
-        <div className="p-6 max-w-3xl mx-auto">
-          
-            {/* === Step 1: CREATE INVOICE === */}
-            {!createdInvoiceId && (
-                <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700">
-                    <CardBody className="space-y-6">
-                        <Typography variant="h5" className="font-semibold text-gray-900 dark:text-gray-100">
-                            Invoice yaratish
-                        </Typography>
+            <div className="p-6 max-w-3xl mx-auto">
 
-                        <div className="space-y-1">
-                            <Typography variant="small" className="text-gray-700 dark:text-gray-300">
-                                Yuboruvchi
+                {/* === Step 1: CREATE INVOICE === */}
+                {!createdInvoiceId && (
+                    <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700">
+                        <CardBody className="space-y-6">
+                            <Typography variant="h5" className="font-semibold text-gray-900 dark:text-gray-100">
+                                Invoice yaratish
                             </Typography>
-                            {/* <select
+
+                            <div className="space-y-1">
+                                <Typography variant="small" className="text-gray-700 dark:text-gray-300">
+                                    Yuboruvchi
+                                </Typography>
+                                {/* <select
                                 value={senderId}
                                 onChange={(e) => setSenderId(e.target.value)}
                                 className="w-full border border-gray-300 dark:border-gray-600 rounded-xl p-3 bg-white dark:bg-[#2A2A2F] text-gray-900 dark:text-gray-100 shadow-sm focus:ring-2 focus:ring-blue-500 transition-all"
@@ -154,71 +145,71 @@ export default function ManagerInExel() {
                                     </option>
                                 ))}
                             </select> */}
-                        </div>
+                            </div>
 
-                        <Input
-                            label="Izoh"
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            color="blue-gray"
-                            className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
-                            containerProps={{
-                                className: "!min-w-0",
-                            }}
-                            labelProps={{
-                                className: `!text-text-light dark:!text-text-dark  `
-                            }}
-                        />
+                            <Input
+                                label="Izoh"
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                color="blue-gray"
+                                className="!text-text-light dark:!text-text-dark placeholder-gray-500 dark:placeholder-gray-400"
+                                containerProps={{
+                                    className: "!min-w-0",
+                                }}
+                                labelProps={{
+                                    className: `!text-text-light dark:!text-text-dark  `
+                                }}
+                            />
 
-                        <Button
-                            color="blue"
-                            fullWidth
-                            onClick={createInvoice}
-                            disabled={loadingCreate}
-                        >
-                            {loadingCreate ? "Yaratilmoqda..." : "Fayl yuklash"}
-                        </Button>
-                    </CardBody>
-                </Card>
-            )}
+                            <Button
+                                color="blue"
+                                fullWidth
+                                onClick={createInvoice}
+                                disabled={loadingCreate}
+                            >
+                                {loadingCreate ? "Yaratilmoqda..." : "Fayl yuklash"}
+                            </Button>
+                        </CardBody>
+                    </Card>
+                )}
 
-            {/* === Step 2: UPLOAD EXCEL === */}
-            {createdInvoiceId && (
-                <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700 mt-6">
-                    <CardBody className="space-y-6">
-                        <Typography variant="h5" className="font-semibold text-gray-900 dark:text-gray-100">
-                            Excel yuklash
-                        </Typography>
+                {/* === Step 2: UPLOAD EXCEL === */}
+                {createdInvoiceId && (
+                    <Card className="shadow-lg rounded-xl bg-white dark:bg-[#1E1E22] border border-gray-200 dark:border-gray-700 mt-6">
+                        <CardBody className="space-y-6">
+                            <Typography variant="h5" className="font-semibold text-gray-900 dark:text-gray-100">
+                                Excel yuklash
+                            </Typography>
 
-                        <Typography variant="small" className="text-gray-700 dark:text-gray-300">
-                            Invoice ID: {createdInvoiceId}
-                        </Typography>
+                            <Typography variant="small" className="text-gray-700 dark:text-gray-300">
+                                Invoice ID: {createdInvoiceId}
+                            </Typography>
 
-                        <input
-                            type="file"
-                            accept=".xlsx, .xls"
-                            ref={fileInputRef}
-                            onChange={handleFileSelect}
-                            className="block w-full text-sm text-gray-900 dark:text-gray-100 
+                            <input
+                                type="file"
+                                accept=".xlsx, .xls"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                className="block w-full text-sm text-gray-900 dark:text-gray-100 
                                 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold file:bg-blue-600 file:text-white
                                 hover:file:bg-blue-700"
-                        />
+                            />
 
-                        {selectedFile && (
-                            <Button
-                                color="green"
-                                fullWidth
-                                onClick={uploadExcelFile}
-                                disabled={loadingUpload}
-                            >
-                                {loadingUpload ? "Yuklanmoqda..." : "Yuklash"}
-                            </Button>
-                        )}
-                    </CardBody>
-                </Card>
-            )}
-        </div>
+                            {selectedFile && (
+                                <Button
+                                    color="green"
+                                    fullWidth
+                                    onClick={uploadExcelFile}
+                                    disabled={loadingUpload}
+                                >
+                                    {loadingUpload ? "Yuklanmoqda..." : "Yuklash"}
+                                </Button>
+                            )}
+                        </CardBody>
+                    </Card>
+                )}
+            </div>
         </>
     );
 }

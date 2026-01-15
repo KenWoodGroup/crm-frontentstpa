@@ -16,7 +16,7 @@ import {
     Settings,
     SendIcon,
 } from "lucide-react";
-import Logo from '../../../Images/photo_2025-12-20 11.17.15.jpeg'
+import Logo from '../../../Images/2025-12-16 11.03.29.jpg'
 import { useTranslation } from "react-i18next";
 import { useNotifyStore } from "../../../store/useNotifyStore";
 

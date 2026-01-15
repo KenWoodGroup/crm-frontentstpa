@@ -577,6 +577,7 @@
     "ExelTotalProduct": "Всего обработано",
     "ExelSuccessCreated": "Успешно создано",
     "ExelSiped": "Пропущено (уже существует)",
-    "uploadSkipeMaterialSucces": "Материалы успешно созданы"
-    
+    "uploadSkipeMaterialSucces": "Материалы успешно созданы",
+    "MainWarehouse": "Основной склад",
+    "MaterialWarehouse": "Материальный склад"
 }

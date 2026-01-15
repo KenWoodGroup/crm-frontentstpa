@@ -356,7 +356,7 @@ export default function StockApi() {
             </div>
 
             {!mainLocationId && !loading ? (
-                <EmptyData text={t("loadingLocation") || "Ombor yuklanmoqda..."} />
+                <EmptyData text={t("Empty_data") || "Ombor yuklanmoqda..."} />
             ) : products.length > 0 ? (
                 <>
                     {isSearchActive && searchQuery && (

@@ -121,6 +121,7 @@ export default function UserCreate({ refresh }) {
                         <Option value="seller">{t("seller")}</Option>
                         <Option value="cashier">{t("Kassir")}</Option>
                         <Option value="storekeeper">{t("Warehouser")}</Option>
+                        <Option value="factory">{t("Director")}</Option>
                     </Select>
                 </DialogBody>
 

@@ -524,7 +524,7 @@
     "Exp_sum": "Xarajatlar summasi",
     "Pay_sum": "To'lovlar summasi",
     "More": "Batafsil ma'lumot",
-    "Grin": "Sof foyda",
+    "Grin": "Tushum (joriy oyda)",
     "status_m": "Holat",
     "Grin2": "Foydali",
     "bad2": "Zararli",
@@ -552,7 +552,7 @@
     "courier": "Kuryer",
     "comment": "Izoh",
     "discount": "Chegirma",
-    "Material": "Material",
+    "Material": "Xomashyolar",
     "Create_material": "Material yaratish",
     "Delete_material": "Material o'chirish",
     "Edit_material": "Material o'zgartirish",
@@ -568,5 +568,7 @@
     "ExelSiped": "O‘tkazib yuborildi (allaqachon mavjud)",
     "uploadSkipeMaterialSucces": "Materiallar muvaffaqiyatli yaratildi",
     "Upload": "Yuklash",
-    "Uploading...": "Yuklanmoqda..."
+    "Uploading...": "Yuklanmoqda...",
+    "MainWarehouse": "Asosiy ombor",
+    "MaterialWarehouse": "Materiallar ombori"
 }

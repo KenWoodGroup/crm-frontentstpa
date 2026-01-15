@@ -77,7 +77,7 @@ export default function FactoryDashboard() {
         },
         {
             title: t("Clients"),
-            value: CardData ? CardData.countDealer : "...",
+            value: CardData ? CardData.countClient : "...",
             icon: <Users className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
         },
         {
@@ -90,13 +90,6 @@ export default function FactoryDashboard() {
             value: CardData ? `${CardData.sumProduct.toLocaleString()} so'm` : "...",
             icon: <DollarSign className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
             textColor: "text-red-500 dark:text-red-400",
-        },
-        {
-            title: t("Receipts_in_month"),
-            value: CardData ? `${CardData.income.toLocaleString()} so'm` : "...",
-            icon: <BanknoteArrowDown className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 text-black dark:text-white" />,
-            textColor: "text-green-500 dark:text-green-400",
-
         },
     ];
 

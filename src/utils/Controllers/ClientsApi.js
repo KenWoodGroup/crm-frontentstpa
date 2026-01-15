@@ -18,5 +18,14 @@ class ClientsApi {
         const response = await $api.put(`/locations/client/${id}`, data);
         return response;
     };
+    static ExelClientUpload = async (id, data) => {
+        const response = await $api.post(`/locations/upload-client/${id}`, data,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            });
+        return response;
+    };
 
 } export { ClientsApi }

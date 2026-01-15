@@ -73,10 +73,9 @@ export default function PaymentCash({ cashId, refresh }) {
             return;
         }
         try {
-            const numericAmount = Number(form.amount.replace(/\s/g, ""));
             const payload = {
                 ...form,
-                amount: numericAmount,
+                amount: form.amount.replace(/\s/g, ""),
                 cash_id: form.cash_id,
                 method_id: form.method_id,
             };
