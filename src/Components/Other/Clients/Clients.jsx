@@ -18,7 +18,7 @@ import Cookies from "js-cookie";
 import ClientPayment from "./_components/ClientPayment";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import ExelClientCreate from "./_components/ExelClientCreate";
+import ExelLocation from "../Import/ExelLocation";
 
 export default function Clients() {
     const { t } = useTranslation();
@@ -74,7 +74,7 @@ export default function Clients() {
                 </Typography>
 
                 <div className="flex items-center gap-3">
-                    <ExelClientCreate refresh={() => GetAllClient(search, page)} />
+                    <ExelLocation type="client"/>
                     <ClientsCreate refresh={() => GetAllClient(search, page)} />
                 </div>
             </div>

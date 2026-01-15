@@ -20,6 +20,7 @@ import { LocationOptions } from "../../../utils/Controllers/LocationOptions";
 import { OptionApi } from "../../../utils/Controllers/OptionApi";
 import Loading from "../../UI/Loadings/Loading";
 import WarehouseGet from "./_components/WarehouseGet";
+import ExelClientCreate from "./_components/ExelClientCreate";
 
 export default function ManagerFactoryDetail() {
     const { id } = useParams();
@@ -117,20 +118,23 @@ export default function ManagerFactoryDetail() {
             {/* ===== Factory info ===== */}
             <Card className="dark:bg-card-dark">
                 <CardBody className="space-y-4">
-                    <div className="flex items-center gap-[5px]">
-                        <Button onClick={() => navigate(-1)} className="p-[10px]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
-                                <path
-                                    fill="currentColor"
-                                    fillRule="evenodd"
-                                    d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
-                                    clipRule="evenodd"
-                                ></path>
-                            </svg>
-                        </Button>
-                        <Typography variant="h5" className="flex items-center gap-2 dark:text-text-dark">
-                            <Store size={20} /> {factory?.name}
-                        </Typography>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-[5px]">
+                            <Button onClick={() => navigate(-1)} className="p-[10px]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
+                                    <path
+                                        fill="currentColor"
+                                        fillRule="evenodd"
+                                        d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
+                                        clipRule="evenodd"
+                                    ></path>
+                                </svg>
+                            </Button>
+                            <Typography variant="h5" className="flex items-center gap-2 dark:text-text-dark">
+                                <Store size={20} /> {factory?.name}
+                            </Typography>
+                        </div>
+                        <ExelClientCreate />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">

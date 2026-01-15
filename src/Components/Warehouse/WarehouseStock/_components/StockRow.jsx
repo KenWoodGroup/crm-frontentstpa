@@ -66,13 +66,11 @@ export function StockRow({ item, role, highlight }) {
           </p>
         </div>
       </div>
-
       {/* QUANTITY */}
       <div className="col-span-2 flex items-center gap-2 text-text-light dark:text-text-dark">
         <Layers size={16} />
         <span>{quantity ?? "—"}</span>
       </div>
-
       {/* DRAFT */}
       <div className="col-span-2">
         <span className={draft_quantity > 0 ? "text-orange-500" : ""}>

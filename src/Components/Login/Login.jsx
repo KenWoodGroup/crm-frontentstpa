@@ -70,7 +70,7 @@ export default function Login() {
       cashier: "CesdsdfmgrUID",
       storekeeper: "KesdsdfmgrUID",
       seller: "SdsdfmgrUID",
-      m_warehouse: "SesdsdfmgrUID",
+      m_warehouse: "SesdsdfmgrUIM",
     };
 
     Cookies.set("nesw", roleMap[role] || "");

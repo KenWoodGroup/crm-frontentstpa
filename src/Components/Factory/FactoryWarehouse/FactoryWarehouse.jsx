@@ -20,6 +20,7 @@ import { Button, IconButton, Tooltip } from "@material-tailwind/react";
 import { NavLink } from "react-router-dom";
 import EmptyData from "../../UI/NoData/EmptyData";
 import { useTranslation } from "react-i18next";
+import ExelLocation from "../../Other/Import/ExelLocation";
 
 export default function FactoryWarehouse() {
     const { t } = useTranslation();
@@ -73,7 +74,7 @@ export default function FactoryWarehouse() {
                 <h1 className="text-2xl font-semibold">
                     {t("Warehouses")}
                 </h1>
-                {/* <WarehouseCreate refresh={() => GetAll(page)} /> */}
+                <ExelLocation type={'warehouse'}/>
             </div>
 
             {warehouses?.length > 0 ? (

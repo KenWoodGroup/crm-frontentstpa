@@ -20,6 +20,7 @@ import PartnerDelete from "./_components/PartnerDelete";
 import PartnerPayment from "./_components/PartnerPayment";
 import { Card, CardBody } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
+import ExelLocation from "../../Other/Import/ExelLocation";
 
 export default function FactoryPartner() {
     const { t } = useTranslation();
@@ -68,7 +69,10 @@ export default function FactoryPartner() {
             {/* Header */}
             <div className="flex items-center flex-wrap gap-[20px] justify-between mb-8">
                 <h1 className="text-2xl font-semibold">{t('partner')}</h1>
-                <PartnerCreate refresh={() => GetAll(page)} />
+                <div className="flex items-center gap-[10px]">
+                    <ExelLocation type={'partner'} />
+                    <PartnerCreate refresh={() => GetAll(page)} />
+                </div>
             </div>
 
             {partners?.length > 0 ? (
@@ -87,7 +91,7 @@ export default function FactoryPartner() {
                             <tbody>
                                 {partners.map((p, index) => (
                                     <tr
-                                        onClick={()=>navigate(`/factory/partner/${p?.id}`)}
+                                        onClick={() => navigate(`/factory/partner/${p?.id}`)}
                                         key={p.id}
                                         className={`cursor-pointer border-x border-gray-300 dark:border-gray-700 ${index === partners.length - 1 ? "border-b border-gray-300 dark:border-gray-700" : ""} ${index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/50 dark:bg-gray-800/50"}`}
                                     >
@@ -99,7 +103,7 @@ export default function FactoryPartner() {
                                                 {Number(p.balance).toLocaleString()} UZS
                                             </span>
                                         </td>
-                                        <td onClick={(e)=>stopPropagation(e.target.value)} className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
+                                        <td onClick={(e) => stopPropagation(e.target.value)} className="p-2 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                             <div className="flex items-center justify-center gap-2" onClick={e => e.stopPropagation()}>
                                                 <PartnerPayment refresh={() => GetAll(page)} partner={p} />
                                                 <PartnerEdit refresh={() => GetAll(page)} partner={p} />

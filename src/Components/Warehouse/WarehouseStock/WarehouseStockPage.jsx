@@ -79,6 +79,7 @@ export default function WarehouseStockPage({
       // CATEGORY PRODUCTS (API)
       if (activeCategory) {
         const res = await Stock.getLocationStocksByChildId(
+
           productType,
           locationId,
           activeCategory,
@@ -132,7 +133,7 @@ export default function WarehouseStockPage({
 
   /* ================= RENDER ================= */
   return (
-    <div className="w-full min-h-screen p-6 space-y-6 bg-background-light dark:bg-background-dark">
+    <div className="w-full min-h-screen space-y-6 bg-background-light dark:bg-background-dark">
 
       {/* ===== HEADER ===== */}
       <div className="space-y-1">
