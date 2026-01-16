@@ -156,8 +156,7 @@ export default function ClientDetail() {
                                         </Typography>
                                     </div>
                                 </div>
-                                <div className="flex flex-col md:flex-row gap-4">
-                                    
+                                <div className="flex flex-col md:flex-row gap-4">                                   
                                     <CreateOutgoingButton client_id={clientData?.id} client_name={clientData?.name}/>
                                     <ClientDetailPayment
                                         client={clientData}
