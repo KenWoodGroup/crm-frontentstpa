@@ -79,7 +79,7 @@ ${t("ExelSiped")}: ${uploadResult.skipped}`;
     return (
         <>
             <Button color="blue" onClick={handleOpen}>
-                {t("Exel")}
+                Klient yuklash
             </Button>
 
             <Dialog
