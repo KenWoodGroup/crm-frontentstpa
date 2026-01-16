@@ -28,6 +28,7 @@ import ClientPayment from "./_components/ClientPayment"
 import Socket from "../../../utils/Socket"
 import { useTranslation } from "react-i18next"
 import CreateOutgoingButton from "../../Warehouse/WareHouseOutcome/sectionsWhO/CreateOutgoingButton"
+import ClientInvoiceReturn from "./_components/ClientInvoiceReturn"
 
 export default function ClientDetail() {
     const { id } = useParams()
@@ -317,7 +318,7 @@ export default function ClientDetail() {
                         />
                     )}
                     {activeTab === "returns" && (
-                        <sClientInvoiceReturn
+                        <ClientInvoiceReturn
                             clientData={clientData}
                             refreshKey={refreshKey}
                         />
