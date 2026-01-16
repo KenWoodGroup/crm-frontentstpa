@@ -37,12 +37,6 @@ export default function PriceTypePage() {
         }
     };
 
-    // ---------------------------- EFFECT ------------------------------
-    useEffect(() => {
-        (async () => {
-            await getMainWarehouse();
-        })();
-    }, []);
 
     useEffect(() => {
         getAllPriceType();
