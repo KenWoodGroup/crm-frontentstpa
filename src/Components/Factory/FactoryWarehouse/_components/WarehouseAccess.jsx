@@ -60,16 +60,13 @@ export default function WarehouseAccess() {
     const [sellAccess, setSellAccess] = useState(false);
 
     // warehouse type is detected before starting operations
-    const [warehouseType, setWarehouseType] = useState("");
 
-    const navigate = useNavigate()
 
     const GetWarehouse = async () => {
         try {
             const response = await WarehouseApi.GetWarehouseDetail(id);
             if (response?.status === 200) setWarehouse(response.data);
             if (response?.data?.type) {
-                setWarehouseType(response.data.type);
             };
         } catch (error) {
             console.log("Warehouse error:", error);
@@ -123,21 +120,6 @@ export default function WarehouseAccess() {
                     >
                         {t("Warehouse_Info")}
                     </Typography>
-                    <Button onClick={() => {
-                        switch (warehouseType) {
-                            case "m_warehouse":
-                                navigate('/factory/materials/warehouse/stockin/' + warehouse?.id);
-                                break;
-                            case "warehouse":
-                            // case "main":
-                                navigate('/factory/warehouse/stockin/' + warehouse?.id);
-                                break;
-                            default:
-                                notify.warning(t("warehouse_type_missing"));
-                        }
-                    }}>
-                        {t("operations")}
-                    </Button>
                 </div>
 
                 {warehouse ? (
