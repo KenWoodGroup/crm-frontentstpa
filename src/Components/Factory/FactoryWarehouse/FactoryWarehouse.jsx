@@ -7,6 +7,7 @@ import {
     ChevronLeft,
     ChevronRight,
     EyeIcon,
+    Box,
 } from "lucide-react";
 import WarehouseCreate from "./_components/WarehouseCreate";
 import { WarehouseApi } from "../../../utils/Controllers/WarehouseApi";
@@ -17,13 +18,15 @@ import Loading from "../../UI/Loadings/Loading";
 import WarehouseDelete from "./_components/WarehouseDelete";
 import WarehouseEdit from "./_components/WarehouseEdit";
 import { Button, IconButton, Tooltip } from "@material-tailwind/react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import EmptyData from "../../UI/NoData/EmptyData";
 import { useTranslation } from "react-i18next";
 import ExelLocation from "../../Other/Import/ExelLocation";
 
 export default function FactoryWarehouse() {
     const { t } = useTranslation();
+    const navigate = useNavigate()
+
 
     const [loading, setLoading] = useState(true);
     const [warehouses, setWarehouses] = useState([]);
@@ -74,7 +77,7 @@ export default function FactoryWarehouse() {
                 <h1 className="text-2xl font-semibold">
                     {t("Warehouses")}
                 </h1>
-                <ExelLocation type={'warehouse'}/>
+                <ExelLocation type={'warehouse'} />
             </div>
 
             {warehouses?.length > 0 ? (
@@ -99,6 +102,28 @@ export default function FactoryWarehouse() {
                                         </div>
 
                                         <div className="flex items-center gap-2">
+                                            <Tooltip content={t("View")}>
+                                                <IconButton
+                                                    className="bg-blue-500 hover:bg-blue-400"
+                                                    variant="text"
+                                                    color="white"
+                                                    onClick={() => {
+                                                        switch (w?.type) {
+                                                            case "m_warehouse":
+                                                                navigate('/factory/materials/warehouse/stock/' + w?.id);
+                                                                break;
+                                                            case "warehouse":
+                                                                // case "main":
+                                                                navigate('/factory/warehouse/stock/' + w?.id);
+                                                                break;
+                                                            default:
+                                                                notify.warning(t("warehouse_type_missing"));
+                                                        }
+                                                    }}
+                                                >
+                                                    <Box className="text-[18px]" />
+                                                </IconButton>
+                                            </Tooltip>
                                             <NavLink to={`/factory/warehouse-access/${w?.id}`}>
                                                 <Tooltip content={t("View")}>
                                                     <IconButton

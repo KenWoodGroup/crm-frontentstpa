@@ -109,7 +109,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
     const params = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const initialPage = Number(localStorage.getItem(LS_KEYS.PAGE)) || 1;
+    const initialPage = Number(sessionStorage.getItem(LS_KEYS.PAGE)) || 1;
 
     // pagination
     const [page, setPage] = useState(initialPage);
@@ -133,7 +133,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
 
     const [columns, setColumns] = useState(() => {
         try {
-            const raw = localStorage.getItem(LS_KEYS.COLUMNS);
+            const raw = sessionStorage.getItem(LS_KEYS.COLUMNS);
             return raw ? JSON.parse(raw) : defaultCols;
         } catch (e) {
             return defaultCols;
@@ -218,7 +218,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
     const toggleColumn = (k) => {
         const next = { ...columns, [k]: !columns[k] };
         setColumns(next);
-        localStorage.setItem(LS_KEYS.COLUMNS, JSON.stringify(next));
+        sessionStorage.setItem(LS_KEYS.COLUMNS, JSON.stringify(next));
     };
 
     // locations cache (loaded once)
@@ -283,7 +283,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
 
     // trigger fetch when page or query params change
     useEffect(() => {
-        localStorage.setItem(LS_KEYS.PAGE, String(page));
+        sessionStorage.setItem(LS_KEYS.PAGE, String(page));
         const qp = new URLSearchParams(searchParams.toString());
         qp.set("page", page);
         qp.set("perPage", String(PER_PAGE));
@@ -690,7 +690,7 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                 </div>
 
                 {/* List area */}
-                 <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-300 dark:border-gray-700 shadow-sm transition tablet:max-w-[calc(100vw_-_164px)]">
+                <div className="bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-300 dark:border-gray-700 shadow-sm transition tablet:max-w-[calc(100vw_-_164px)]">
                     {loading ? (
                         <div className="py-10 text-center text-gray-500 dark:text-gray-400">
                             {t("loading")}
@@ -799,9 +799,10 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                 {columns.status && (
                                                     <td className="p-3 text-center text-sm text-gray-700 dark:text-gray-300 border-x border-gray-300 dark:border-gray-700">
                                                         <button
+                                                            disabled={+inv?.total_sum === 0 || loadingEditStatus}
                                                             onClick={() => setEditingStatusInvoice(inv)}
                                                             type="button"
-                                                            className="w-full"
+                                                            className="w-full disabled:cursor-not-allowed disabled:opacity-70"
                                                         >
                                                             {statusBadge(inv.status)}
                                                         </button>
@@ -824,8 +825,9 @@ export default function WarehouseInvoiceHistory({ role = "warehouse", type = "in
                                                     <td className="p-3 text-center text-sm rounded-br-[10px] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700">
                                                         <div className="flex items-center justify-center gap-2">
                                                             <button
+                                                                disabled={+inv?.total_sum === 0}
                                                                 onClick={() => openDetail(inv.id)}
-                                                                className="text-sm px-3 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
+                                                                className={`text-sm px-3 py-1 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition disabled:opacity-50 disabled:cursor-not-allowed`}
                                                             >
                                                                 {t("button.open")}
                                                             </button>
@@ -1184,9 +1186,10 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
         { id: 4, value: "sent", label: "Sent" },
     ];
     const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
-    const statusOptions = invoice?.status === "cancelled" ? statusBase.filter((st) => st.id === 2 || st.id === 4)
-        : invoice?.status === "sent" ? statusBase.filter((st) => st.id === 1)
-            : statusBase?.filter((st) => st.id > org_status_id)
+    const statusOptions = invoice?.status === "cancelled" ? statusBase.filter((st) => st.id === 2)
+        : invoice?.status === "draft" ? statusBase.filter((st) => st.id === 4)
+            : invoice?.status === "sent" ? statusBase?.filter((st) => st.id === 1)
+            : statusBase?.filter((st) => st.id === 3)
     return (
         <div
             onClick={onClose}
@@ -1199,8 +1202,8 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
                     <h3 className="text-lg font-semibold">Edit Status</h3>
                     <div className="ml-auto text-sm text-gray-500">{invoice?.invoice_number}</div>
                 </div>
-                {invoice?.status === "received" ?
-                    <div>{t("returnViaRefund")}</div> :
+                {/* {invoice?.status === "received" ? */}
+                    {/* <div>{t("returnViaRefund")}</div> : */}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <label className="flex flex-col">
@@ -1215,12 +1218,12 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
 
                         </label>
                     </div>
-                }
+                {/* } */}
 
                 <div className="mt-4 flex gap-2 justify-end">
                     <button onClick={onClose} className="px-4 py-2 rounded border">Cancel</button>
-                    {invoice?.status === "received" ?
-                        <noscript></noscript> :
+                    {/* {invoice?.status === "received" ? */}
+                        {/* <noscript></noscript> : */}
                         <button onClick={() => onSave(form)} className={`px-4 py-2 flex items-center gap-2 rounded bg-blue-600 text-white transition-all disabled:opacity-70 ${loading ? "cursor-wait" : "cursor-pointer"}`}>
                             {loading ? (
                                 <>
@@ -1229,7 +1232,7 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
                                 </>
                             ) : <span>{t("save")}</span>}
                         </button>
-                    }
+                    {/* } */}
 
                 </div>
             </div>
