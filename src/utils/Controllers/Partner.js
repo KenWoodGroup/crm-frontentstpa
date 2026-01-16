@@ -6,7 +6,7 @@ class Partner {
         return response;
     }
     static ParentGet = async (data) => {
-        const response = await $api.get(`locations/partner/${data?.id}/page?page=${data?.page}`)
+        const response = await $api.get(`locations/${data?.type}/${data?.id}/page?page=${data?.page}`)
         return response;
     }
     static GetAllPartner = async (id) => {

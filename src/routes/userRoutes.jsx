@@ -35,6 +35,7 @@ import WarehouseInvoiceHistory from "../Components/Warehouse/WareHouseHistory/Wa
 import WareHouseIncome from "../Components/Warehouse/WareHouseIncome/WareHouseIncome";
 import WareHouseOutcome from "../Components/Warehouse/WareHouseOutcome/WareHouseOutcome";
 import WarehouseStockPage from "../Components/Warehouse/WarehouseStock/WarehouseStockPage";
+import MaterialPartner from "../Components/Other/MaterialPartner/MaterialPartner";
 
 export const userRoutes = [
   {
@@ -50,12 +51,12 @@ export const userRoutes = [
   {
     path: "factory/warehouse/stock",
     name: "factory de warehouse stock",
-    element: <WarehouseStockPage key={"factory-stock"} role="factory" productType="product"/>
+    element: <WarehouseStockPage key={"factory-stock"} role="factory" productType="product" />
   },
   {
     path: "factory/materials/warehouse/stock",
     name: "factory materials de warehouse stock",
-    element: <WarehouseStockPage key={"factory-material-stock"} role="factory" productType="material"/>
+    element: <WarehouseStockPage key={"factory-material-stock"} role="factory" productType="material" />
   },
   {
     path: "factory/warehouse/stockin",
@@ -65,12 +66,12 @@ export const userRoutes = [
   {
     path: "factory/materials/warehouse/stockin",
     name: "factory materials de warehouse stockin",
-    element: <WareHouseIncome key={"factory-material"}  role="factory" prd_type="material"/>
+    element: <WareHouseIncome key={"factory-material"} role="factory" prd_type="material" />
   },
   {
     path: "factory/warehouse/stockout",
     name: "factory de warehouse stockout",
-    element: <WareHouseOutcome role="factory" key={"stockout"}/>
+    element: <WareHouseOutcome role="factory" key={"stockout"} />
   },
   {
     path: "factory/materials/warehouse/stockout",
@@ -95,7 +96,7 @@ export const userRoutes = [
   {
     path: "/factory/orders/:invoiceId",
     name: "factory detail history by id",
-    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order"/>
+    element: <WarehouseInvoiceHistory key={"factory-orders"} role="factory" type="order" />
   },
   {
     path: "factory/warehouse/user/:id",
@@ -261,6 +262,11 @@ export const userRoutes = [
     path: "/factory/product/material/:id",
     name: 'Factory product material',
     element: <ProductToMaterial />
+  },
+  {
+    path: "/factory/material/partner",
+    name: 'Factory material partner',
+    element: <MaterialPartner />
   },
 
 

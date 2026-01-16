@@ -149,11 +149,8 @@ export default function FactorySidebar({ data }) {
             id: 20,
             title: t("Warehouses"),
             icon: <Warehouse className="w-7 h-7" />,
-            isMenu: true,
-            items: [
-                { id: 9, path: "/factory/stock", icon: <Blocks className="w-4 h-4" />, label: t("warehouseTitle") },
-                { id: 17, path: "/factory/warehouse", icon: <Warehouse className="w-4 h-4" />, label: t("Warehouses") },
-            ]
+            isMenu: false,
+            path: "/factory/warehouse",
         },
         {
             id: 3,
@@ -193,7 +190,9 @@ export default function FactorySidebar({ data }) {
                         path: "/factory/materials",
                         icon: <Factory className="w-4 h-4" />,
                         label: t("Material")
-                    }]
+                    },
+                    { id: 111, path: "/factory/material/partner", icon: <Users className="w-4 h-4" />, label: t("MaterialPArtner") },
+                    ]
                     : []),
                 { id: 5, path: "/factory/partner", icon: <Users className="w-4 h-4" />, label: t("partner") },
                 { id: 7, path: "/factory/payment-type", icon: <ClipboardType className="w-4 h-4" />, label: t("Payment_type") },
