@@ -22,7 +22,7 @@ class locationInfo {
         return response;
     }
     static GetMainWarehouse = async (id) => {
-        const response = await $api.get(`/location-info/main/${id}`)
+        const response = await $api.get(`/locations/main/${id}`)
         return response;
     }
     static Get = async (id) => {

@@ -571,5 +571,6 @@
     "Uploading...": "Yuklanmoqda...",
     "MainWarehouse": "Asosiy ombor",
     "MaterialWarehouse": "Materiallar ombori",
-    "MaterialPArtner": "Xomashyo xamkori"
+    "inventory_stock_header": "Ombor inventarizatsiyasi",
+    "common.continue": "Davom etish"
 }

@@ -19,6 +19,9 @@ import Factory from "./Components/ProtectedRoutes/Factory";
 import SuperAdmin from "./Components/ProtectedRoutes/SuperAdmin";
 import Manager from "./Components/ProtectedRoutes/Manager";
 import Warehouse from "./Components/ProtectedRoutes/Warehouse";
+import MWarehouseLayout from "./layouts/MWarehouseLayout";
+import Mwarehouse from "./Components/ProtectedRoutes/Mwarehouse";
+import { mWarehouseRoutes } from "./routes/mWarehouseRoutes";
 
 
 // React Query client
@@ -71,6 +74,17 @@ function App() {
               </Warehouse>
             }>
               {warehouseRoutes?.map((r) => {
+                return (
+                  <Route key={r.name} path={r.path} element={r.element} />
+                )
+              })}
+            </Route>
+            <Route element={
+              <Mwarehouse>
+                <MWarehouseLayout />
+              </Mwarehouse>
+            }>
+              {mWarehouseRoutes?.map((r) => {
                 return (
                   <Route key={r.name} path={r.path} element={r.element} />
                 )

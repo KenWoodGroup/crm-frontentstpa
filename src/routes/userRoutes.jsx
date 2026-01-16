@@ -49,32 +49,32 @@ export const userRoutes = [
     element: <FactoryWarehouse />
   },
   {
-    path: "factory/warehouse/stock",
+    path: "factory/warehouse/stock/:deUlId",
     name: "factory de warehouse stock",
     element: <WarehouseStockPage key={"factory-stock"} role="factory" productType="product" />
   },
   {
-    path: "factory/materials/warehouse/stock",
+    path: "factory/materials/warehouse/stock/:deUlId",
     name: "factory materials de warehouse stock",
     element: <WarehouseStockPage key={"factory-material-stock"} role="factory" productType="material" />
   },
   {
-    path: "factory/warehouse/stockin",
+    path: "factory/warehouse/stockin/:deUlId",
     name: "factory de warehouse stockin",
     element: <WareHouseIncome key={"factory-product"} role="factory" />
   },
   {
-    path: "factory/materials/warehouse/stockin",
+    path: "factory/materials/warehouse/stockin/:deUlId",
     name: "factory materials de warehouse stockin",
     element: <WareHouseIncome key={"factory-material"} role="factory" prd_type="material" />
   },
   {
-    path: "factory/warehouse/stockout",
+    path: "factory/warehouse/stockout/:deUlId",
     name: "factory de warehouse stockout",
     element: <WareHouseOutcome role="factory" key={"stockout"} />
   },
   {
-    path: "factory/materials/warehouse/stockout",
+    path: "factory/materials/warehouse/stockout/:deUlId",
     name: "factory materials de warehouse stockout",
     element: <WareHouseOutcome key={"factory-stockout"} role="factory" prd_type="material" />
   },

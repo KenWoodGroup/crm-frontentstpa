@@ -126,13 +126,11 @@ export default function WarehouseAccess() {
                     <Button onClick={() => {
                         switch (warehouseType) {
                             case "m_warehouse":
-                                Cookies.set('de_ul_nesw', warehouse?.id);
-                                navigate('/factory/materials/warehouse/stockin');
+                                navigate('/factory/materials/warehouse/stockin/' + warehouse?.id);
                                 break;
                             case "warehouse":
                             // case "main":
-                                Cookies.set('de_ul_nesw', warehouse?.id);
-                                navigate('/factory/warehouse/stockin');
+                                navigate('/factory/warehouse/stockin/' + warehouse?.id);
                                 break;
                             default:
                                 notify.warning(t("warehouse_type_missing"));

@@ -20,20 +20,32 @@ import Logo from '../../../Images/2025-12-16 11.03.29.jpg'
 import { useTranslation } from "react-i18next";
 import { useNotifyStore } from "../../../store/useNotifyStore";
 
-export default function WarehouseSidebar() {
+export default function WarehouseSidebar({prd_type="product"}) {
     const { t } = useTranslation();
 
     const { unreadCount } = useNotifyStore()
-    const mainLinks = [
+    const mainLinks = prd_type === "material" ? [
+        { id: 1, label: t('dashboard'), path: "materials/warehouse/dashboard", icon: LayoutDashboard },
+        { id: 2, label: t('Order'), path: "materials/warehouse/history", icon: Move },
+    ] :
+    [
         { id: 1, label: t('dashboard'), path: "/warehouse/dashboard", icon: LayoutDashboard },
         { id: 2, label: t('Order'), path: "/warehouse/history", icon: Move },
-    ];
-    const skladSubLinks = [
+    ]
+    
+    const skladSubLinks = prd_type === "material" ? 
+    [
+        { id: 1, label: t('Warehouse'), path: "materials/warehouse/product", icon: Package },
+        { id: 3, label: t('Coming'), path: "materials/warehouse/stockin", icon: PackagePlus },
+        { id: 4, label: t('Shipment'), path: "materials/warehouse/stockout", icon: PackageMinus },
+        { id: 5, label: t("notifies"), path: "materials/warehouse/notifications", icon: SendIcon }
+    ] :
+    [
         { id: 1, label: t('Warehouse'), path: "/warehouse/product", icon: Package },
         { id: 3, label: t('Coming'), path: "/warehouse/stockin", icon: PackagePlus },
         { id: 4, label: t('Shipment'), path: "/warehouse/stockout", icon: PackageMinus },
         { id: 5, label: t("notifies"), path: "/warehouse/notifications", icon: SendIcon }
-    ];
+    ]
 
     // Классы для стилизации
     const menuListClass = `
