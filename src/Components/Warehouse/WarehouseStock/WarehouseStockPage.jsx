@@ -82,6 +82,7 @@ export default function WarehouseStockPage({productType = "product", role = "war
       // CATEGORY PRODUCTS (API)
       if (activeCategory) {
         const res = await Stock.getLocationStocksByChildId(
+
           productType,
           locationId,
           activeCategory,
