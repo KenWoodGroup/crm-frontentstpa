@@ -1,5 +1,5 @@
 // src/Components/Warehouse/WareHousePages/WareHouseIncome.jsx
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Cookies from "js-cookie";
 import Select, { components } from "react-select";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,8 +40,7 @@ import {
     DropletsIcon
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
-import { ProductApi } from "../../../utils/Controllers/ProductApi";
-import { button, input, Menu, MenuHandler, MenuItem, MenuList, select, Spinner, Typography } from "@material-tailwind/react";
+import { Spinner, } from "@material-tailwind/react";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
 import SelectBatchModal from "../WareHouseModals/SelectBatchModal";
@@ -50,19 +49,15 @@ import { InvoicesApi } from "../../../utils/Controllers/invoices";
 import { InvoiceItems } from "../../../utils/Controllers/invoiceItems";
 import { location } from "../../../utils/Controllers/location";
 
-import { NavLink, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Staff } from "../../../utils/Controllers/Staff";
-import CancelInvoiceButton from "../WareHouseOutcome/sectionsWhO/CancelInvoiceButton";
-import { data } from "autoprefixer";
-import { border, style } from "@mui/system";
 import ReturnedInvoiceProcessor from "./sectionsWhI/ReturnedInvoiceProcessor";
 import { useInventory } from "../../../context/InventoryContext";
 import CarrierCreateModal from "../WareHouseModals/CarrierCreateModal";
 import { PriceType } from "../../../utils/Controllers/PriceType";
-import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
-import { ArrowDropDown } from "@mui/icons-material";
 import { locationInfo } from "../../../utils/Controllers/locationInfo";
+import InventoryHeader from "../InventoryHeader/InventoryHeader";
 // Utility: generate simple unique id (no external dep)
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -79,16 +74,12 @@ function useDebounce(value, delay) {
 
 /* ---------- Component ---------- */
 export default function WareHouseIncome({ role = "factory", prd_type = "product" }) {
-    // Ensure you have this import at the top of the file:
-    // import { useTranslation } from 'react-i18next';
-
-    // --- Function section (i18n keys applied) ---
     // user / location
-    const navigate = useNavigate();
-    const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
+    const deUlId = role === "factory" ? useParams().deUlId : null;
+    const userLId = role === "factory" ? deUlId : Cookies.get("ul_nesw");
     const factoryId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw")
     const createdBy = Cookies.get("us_nesw");
-    const [deUlName, setDeUlName] = useState(null);
+    const [deUlName, setDeUlName] = useState("");
 
     // Context (per-mode provider)
     const {
@@ -118,17 +109,6 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
 
     // i18n hook
     const { t } = useTranslation();
-    const skladSubLinks = prd_type === "product" ? [
-        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/stock", icon: Package },
-        { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
-        { id: 4, label: t('Shipment'), path: "/factory/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon },
-    ] : [
-        { id: 1, label: t('Warehouse'), path: "/factory/materials/warehouse/stock", icon: Package },
-        { id: 3, label: t('Coming'), path: "/factory/materials/warehouse/stockin", icon: PackagePlus },
-        { id: 4, label: t('Shipment'), path: "/factory/materials/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: t("notifies"), path: "/factory/materials/warehouse/notifications", icon: SendIcon },
-    ];
 
     // Local UI state
     const [sidebarMode, setSidebarMode] = useState(0); // 0=closed,1=25%,2=33.3%
@@ -836,7 +816,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
     };
 
     // ---------- Utilities ----------
-    const touchBtn = "min-h-[44px] px-4 py-3";
+    const touchBtn = "min-h-[32px] px-4 py-1";
 
     // Restart invoices after success saved last
     function resetAllBaseForNewInvoice() {
@@ -950,74 +930,7 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
 
     return (
         <section className="relative w-full min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-hidden transition-colors duration-300">
-            <div
-                className={`fixed transition-all duration-300 text-[rgb(25_118_210)] top-0 right-0 w-full h-[68px] backdrop-blur-[5px]
-        bg-card-light dark:bg-card-dark shadow text-xl font-semibold z-30 flex items-center pr-8 justify-center
-        ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px] phone:pl-[140px]"} laptop:h-[52px]`}
-            >
-
-                <h2 className="text-text-light dark:text-text-dark text-lg laptop:text-base leading-[16px] font-semibold laptop:leading-[16bpx] line-clamp-2">
-                    {(role === "factory" && deUlName) && <span className="phone:text-sm">{deUlName} <span className="mid:hidden"> | </span></span>}
-                    <span className="mid:hidden">
-                        {!invoiceStarted?.[mode]
-                            ? t("income_header_not_started")
-                            : invoiceMeta?.[mode]?.operation_type === "incoming"
-                                ? t("income_header_incoming")
-                                : invoiceMeta?.[mode]?.operation_type === "transfer_in"
-                                    ? t("income_header_transfer")
-                                    : invoiceMeta?.[mode]?.operation_type === "return_in"
-                                        ? t("income_header_return")
-                                        : invoiceMeta?.[mode]?.operation_type === "return_dis"
-                                            ? t("income_header_return_disposal")
-                                            : t("income_header_unknown")}
-                    </span>
-                </h2>
-
-                {invoiceStarted?.[mode] ? (
-                    <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} appearance={"btn"} id={invoiceId?.[mode]} />
-                ) : (
-                    <span />
-                )}
-                {(!invoiceStarted?.[mode] && role === "factory") ? (
-                    <div className="flex items-center gap-[6px] tablet:gap-1">
-                        {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
-                        <Menu placement="right-start" allowHover offset={15}>
-                            <MenuHandler>
-                                <div className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
-                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
-                                        transition-all duration-300 laptop:p-1 phone:rounded-md">
-                                    <Move className="w-8 h-8 mb-0 phone:w-6 phone:h-6" />
-                                </div>
-                            </MenuHandler>
-
-                            <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300 phone:p-2 phone:gap-1 phone:w-[180px]">
-                                <Typography
-                                    variant="small"
-                                    color="gray"
-                                    className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400 phone:text-xs"
-                                >
-                                    {t('Opt_warehouse')}
-                                </Typography>
-                                {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
-                                    <NavLink key={id} to={`${path}`}>
-                                        <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all phone:text-xs phone:py-2 phone:px-3">
-                                            <Icon className="w-4 h-4" />
-                                            {label}
-                                        </MenuItem>
-                                    </NavLink>
-                                ))}
-                            </MenuList>
-                        </Menu>
-                        <div onClick={() => navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
-                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
-                                        transition-all duration-300 laptop:p-1 phone:rounded-md phone:p-1">
-                            <Home className="w-8 h-8 mb-0 phone:w-6 phone:h-6" />
-                        </div>
-                    </div>
-                ) :
-                    <noscript></noscript>
-                }
-            </div>
+            <InventoryHeader type={"in"} prd_type={prd_type} invoiceStarted={invoiceStarted} role={role} mode={mode} deUlName={deUlName} invoiceId={invoiceId} resetAllBaseForNewInvoice={resetAllBaseForNewInvoice} deUlId={deUlId} operation_type={invoiceMeta?.[mode]?.operation_type}/>
 
             {/* Sidebar */}
             {invoiceStarted?.[mode] &&
@@ -1400,11 +1313,11 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
                                     <button
                                         disabled={createInvoiceLoading}
                                         onClick={startInvoice}
-                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 px-3 py-2 desktop:w-[246px] phone:w-full phone:text-sm phone:py-[2px] phone:px-3 phone:rounded-md phone:font-medium`}
+                                        className={`${touchBtn} flex items-center gap-2 bg-[rgb(25_118_210)] dark:bg-blue-600 text-white rounded hover:opacity-95 px-3 py-2 font-[600] desktop:w-[246px] phone:w-full phone:text-sm phone:py-[2px] phone:px-3 phone:rounded-md phone:font-medium`}
                                         aria-label={t("aria_start_invoice")}
                                     >
                                         {!createInvoiceLoading ? (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                                             </svg>
                                         ) : (
@@ -1763,5 +1676,4 @@ export default function WareHouseIncome({ role = "factory", prd_type = "product"
             <SelectBatchModal isOpen={batchModalOpen} onClose={() => setBatchModalOpen(false)} products={batchProducts} addItemToMixData={addItemToMixDataByBatchModal} />
         </section >
     );
-
 }

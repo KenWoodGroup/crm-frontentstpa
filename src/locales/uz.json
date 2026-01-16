@@ -570,5 +570,7 @@
     "Upload": "Yuklash",
     "Uploading...": "Yuklanmoqda...",
     "MainWarehouse": "Asosiy ombor",
-    "MaterialWarehouse": "Materiallar ombori"
+    "MaterialWarehouse": "Materiallar ombori",
+    "inventory_stock_header": "Ombor inventarizatsiyasi",
+    "common.continue": "Davom etish"
 }

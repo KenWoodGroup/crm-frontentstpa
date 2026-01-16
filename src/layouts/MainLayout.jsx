@@ -12,12 +12,13 @@ import Cookies from "js-cookie";
 
 export default function MainLayout() {
     const [active, setActive] = useState(false);
-    const location = useLocation();
     const FactoryId = Cookies?.get('ul_nesw')
-    const [data, setData] = useState([])
-    const mode = location.pathname.includes("/warehouse/stockout")
-        ? "out" : location.pathname.includes("/warehouse/stockin") ? "in" : "m_other";
-
+    const [data, setData] = useState([]);
+    const location = useLocation();
+    const pathname = location.pathname;
+    const mode = pathname.includes("/warehouse/stockout")
+        ? "out" : pathname.includes("/warehouse/stockin") ? "in" : "m_other";
+    const inventoryHeaderMode = pathname.includes("/warehouse/stock"); 
 
     const GetFactory = async () => {
         try {
@@ -46,7 +47,7 @@ export default function MainLayout() {
                     width: "calc(100% - 100px)",
                 }}
             >
-                {mode === "m_other" ? <AdminHeader sidebarOpen={!active} /> : <noscript></noscript>}
+                {inventoryHeaderMode ?  <noscript></noscript> : <AdminHeader sidebarOpen={!active} />}
                 <FactoryProvider mode={mode}>
                     <InnerGuard>
                         <Outlet context={{ factoryOptions: data }} />

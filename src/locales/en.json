@@ -569,5 +569,7 @@
   "ExelSiped": "Skipped (already exist)",
   "uploadSkipeMaterialSucces": "Successfully Created Materials",
   "MainWarehouse": "Main warehouse",
-  "MaterialWarehouse": "Material warehouse"
+  "MaterialWarehouse": "Material warehouse",
+  "inventory_stock_header": "Inventory Stock",
+  "common.continue": "Continue"
 }

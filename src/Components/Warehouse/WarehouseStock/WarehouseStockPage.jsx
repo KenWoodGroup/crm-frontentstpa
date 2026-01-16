@@ -11,12 +11,13 @@ import { StockList } from "./_components/StockList";
 
 import { Stock } from "../../../utils/Controllers/Stock";
 import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
+import { useParams } from "react-router-dom";
+import InventoryHeader from "../InventoryHeader/InventoryHeader";
+import { location } from "../../../utils/Controllers/location";
 
-export default function WarehouseStockPage({
-  productType = "product",
-  role = "warehouse",
-}) {
-  const locationId = role === "warehouse" ? Cookies.get("ul_nesw") : Cookies.get("de_ul_nesw");
+export default function WarehouseStockPage({productType = "product", role = "warehouse",}) {
+  const deUlId = role === "factory" ? useParams().deUlId : null;
+  const locationId = role === "warehouse" ? Cookies.get("ul_nesw") : deUlId;
   const parentId =
     role === "warehouse"
       ? Cookies.get("usd_nesw")
@@ -33,6 +34,8 @@ export default function WarehouseStockPage({
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [warehouseName, setWarehouseName] = useState("");
 
   /* ================= VIEW MODE ================= */
   const viewMode = useMemo(() => {
@@ -97,6 +100,18 @@ export default function WarehouseStockPage({
     parentId,
   ]);
 
+  /* ================= FETCH WAREHOSE DATA for name itself ================= */
+  const fetchWarehouseData = async () => {
+    try {
+      const res = await location.Get(locationId);
+      setWarehouseName(res?.data?.name || "");
+    }catch{};
+  };
+
+  useEffect(()=> {
+    fetchWarehouseData();
+  },[locationId]);
+
   useEffect(() => {
     fetchStock();
   }, [fetchStock]);
@@ -133,7 +148,7 @@ export default function WarehouseStockPage({
   /* ================= RENDER ================= */
   return (
     <div className="w-full min-h-screen p-6 space-y-6 bg-background-light dark:bg-background-dark">
-
+      {role === "factory" && <InventoryHeader deUlId={deUlId} deUlName={warehouseName}  role={role} type={"stock"} prd_type={productType} invoiceStarted={{stock: false}} mode={"stock"} />}
       {/* ===== HEADER ===== */}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold text-text-light dark:text-text-dark">Ombordagi tovarlar</h1>

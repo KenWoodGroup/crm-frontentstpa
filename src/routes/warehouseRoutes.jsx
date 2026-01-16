@@ -23,11 +23,6 @@ export const warehouseRoutes = [
         element: <WarehouseStockPage productType="product" role="warehouse"/>
     },
     {
-        path: "/warehouse/barcode/create",
-        name: "Warehouse barcode create",
-        element: <WarehouseBarcodeCreate />
-    },
-    {
         path: "/warehouse/stockin",
         name: "Warehouse stock in",
         element: <WareHouseIncome role="warehouse"/>

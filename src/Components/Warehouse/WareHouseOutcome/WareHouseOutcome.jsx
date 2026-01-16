@@ -12,22 +12,15 @@ import {
     ChevronLeft,
     ChevronsRight,
     FolderOpen,
-    Download,
     Search as SearchIcon,
     Barcode as BarcodeIcon,
     Eraser,
     MinusCircle,
     CheckSquare,
     InfinityIcon,
-    PackagePlus,
-    PackageMinus,
-    SendIcon,
-    Move,
-    Home
 } from "lucide-react";
 import { notify } from "../../../utils/toast";
 // import { ProductApi } from "../../../utils/Controllers/ProductApi";
-import { ProductApi } from "../../../utils/Controllers/ProductApi";
 import Spinner from "../../UI/spinner/Spinner";
 import { Stock } from "../../../utils/Controllers/Stock";
 import FreeData from "../../UI/NoData/FreeData";
@@ -39,15 +32,13 @@ import { location } from "../../../utils/Controllers/location";
 
 import OutgoingPanel from "./sectionsWhO/OutgoingPanel";
 import { Staff } from "../../../utils/Controllers/Staff";
-import CancelInvoiceButton from "./sectionsWhO/CancelInvoiceButton";
 import { useInventory } from "../../../context/InventoryContext";
 import { PriceType } from "../../../utils/Controllers/PriceType";
 import { customSelectStyles } from "../WareHouseModals/ThemedReactTagsStyles";
 import Select, { components } from "react-select";
-import { LocalProduct } from "../../../utils/Controllers/LocalProduct";
 import { LocalCategory } from "../../../utils/Controllers/LocalCategory"
-import { Button, Menu, MenuHandler, MenuItem, MenuList, Typography } from "@material-tailwind/react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import InventoryHeader from "../InventoryHeader/InventoryHeader";
 
 // small helper id
 const generateId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -64,23 +55,13 @@ function useDebounce(value, delay) {
 
 export default function WareHouseOutcome({ role = "factory", prd_type = "product" }) {
     // (Place this inside your component function scope)
+    const deUlId = role === "factory" ? useParams().deUlId : null;
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const skladSubLinks = prd_type === "product" ? [
-        { id: 1, label: t('Warehouse'), path: "/factory/warehouse/stock", icon: Package },
-        { id: 3, label: t('Coming'), path: "/factory/warehouse/stockin", icon: PackagePlus },
-        { id: 4, label: t('Shipment'), path: "/factory/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: t("notifies"), path: "/factory/warehouse/notifications", icon: SendIcon },
-    ] : [
-        { id: 1, label: t('Warehouse'), path: "/factory/materials/warehouse/stock", icon: Package },
-        { id: 3, label: t('Coming'), path: "/factory/materials/warehouse/stockin", icon: PackagePlus },
-        { id: 4, label: t('Shipment'), path: "/factory/materials/warehouse/stockout", icon: PackageMinus },
-        { id: 5, label: t("notifies"), path: "/factory/materials/warehouse/notifications", icon: SendIcon },
-    ];
+    
     // user / location
-    const userLId = role === "factory" ? Cookies.get("de_ul_nesw") : Cookies.get("ul_nesw");
+    const userLId = role === "factory" ? deUlId : Cookies.get("ul_nesw");
     const createdBy = Cookies.get("us_nesw");
-    const [deUlName, setDeUlName] = useState(null);
+    const [deUlName, setDeUlName] = useState("");
     const facId = role === "factory" ? Cookies.get("ul_nesw") : Cookies.get("usd_nesw");
     const [saleAccess, setSaleAccess] = useState(false);
 
@@ -244,11 +225,14 @@ export default function WareHouseOutcome({ role = "factory", prd_type = "product
     useEffect(() => {
         if (invoiceStarted?.[mode]) {
             fetchCategories();
+            if(!deUlName) {
+                fetchLocations();
+            }
         } else {
             fetchLocations();
             fetchStaffs();
         }
-    }, [invoiceStarted]);
+    }, [invoiceStarted, deUlName]);
 
     // update invoiceMeta receiver for outgoing: receiver is selectedLocation, sender is current location
     useEffect(() => {
@@ -634,7 +618,7 @@ export default function WareHouseOutcome({ role = "factory", prd_type = "product
         }
     };
 
-    const touchBtn = "min-h-[44px] px-4 py-3";
+    const touchBtn = "min-h-[26px] px-4 py-2";
 
     function resetAllBaseForNewInvoice() {
         resetMode(mode)
@@ -648,90 +632,9 @@ export default function WareHouseOutcome({ role = "factory", prd_type = "product
         setProducts([])
     }
 
-
-
-    // Use this JSX to replace your current return(...)
     return (
         <section className="relative w-full min-h-screen bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark overflow-hidden transition-colors duration-300">
-            <div
-                className={`fixed transition-all duration-300 top-0 right-0 w-full h-[68px] backdrop-blur-[5px] bg-card-light dark:bg-card-dark text-[rgb(25_118_210)] shadow flex items-center pr-8 justify-center ${(invoiceStarted?.[mode] || role === "factory") && "justify-between pl-[190px]"} text-xl font-semibold z-30`}
-            >
-                {!invoiceStarted?.[mode] && role === "factory" && (
-                    <Button
-                        onClick={() => navigate(-1)}
-                        className={`backbtn px-4 py-[5px] rounded-xl transition-all duration-300 `}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width={22} height={22} viewBox="0 0 16 16">
-                            <path
-                                fill="currentColor"
-                                fillRule="evenodd"
-                                d="m2.87 7.75l1.97 1.97a.75.75 0 1 1-1.06 1.06L.53 7.53L0 7l.53-.53l3.25-3.25a.75.75 0 0 1 1.06 1.06L2.87 6.25h9.88a3.25 3.25 0 0 1 0 6.5h-2a.75.75 0 0 1 0-1.5h2a1.75 1.75 0 1 0 0-3.5z"
-                                clipRule="evenodd"
-                            ></path>
-                        </svg>
-                    </Button>
-                )}
-                <h2 className="text-text-light dark:text-text-dark">
-                    {role === "factory" && deUlName + " | "}
-                    {!invoiceStarted?.out && t("out_header_not_started")}
-                    {invoiceStarted?.out &&
-                        (invoiceMeta?.out?.operation_type === "outgoing"
-                            ? t("out_header_selling")
-                            : invoiceMeta?.out?.operation_type === "transfer_out"
-                                ? t("out_header_transfer")
-                                : invoiceMeta?.out?.operation_type === "return_out"
-                                    ? t("out_header_return")
-                                    : invoiceMeta?.out?.operation_type === "disposal"
-                                        ? t("out_header_disposal")
-                                        : t("out_header_unknown"))}
-                </h2>
-
-                {invoiceStarted?.[mode] ? (
-                    <CancelInvoiceButton resetAll={resetAllBaseForNewInvoice} appearance={"btn"} id={invoiceId?.[mode]} />
-                ) : (
-                    <span />
-                )}
-
-                {(!invoiceStarted?.[mode] && role === "factory") ? (
-                    <div className="flex items-center gap-[6px]">
-                        {/* <div className="flex gap-2 cursor-pointer"><Move /> Operations</div> */}
-                        <Menu placement="right-start" allowHover offset={15}>
-                            <MenuHandler>
-                                <div className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
-                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
-                                        transition-all duration-300">
-                                    <Move className="w-8 h-8 mb-0" />
-                                </div>
-                            </MenuHandler>
-
-                            <MenuList className="p-4 w-[220px] translate-x-3 bg-white/95 dark:bg-gray-900 backdrop-blur-md shadow-2xl border border-gray-100 dark:border-gray-700 rounded-xl flex flex-col gap-2 transition-colors duration-300">
-                                <Typography
-                                    variant="small"
-                                    color="gray"
-                                    className="mb-1 font-semibold text-[13px] uppercase tracking-wide text-center dark:text-gray-400"
-                                >
-                                    {t('Opt_warehouse')}
-                                </Typography>
-                                {skladSubLinks.map(({ id, label, path, icon: Icon }) => (
-                                    <NavLink key={id} to={path}>
-                                        <MenuItem className="flex items-center gap-2 rounded-md text-sm hover:bg-[#4DA057]/10 hover:text-[#4DA057] dark:hover:bg-[#4DA057]/20 dark:hover:text-green-400 transition-all">
-                                            <Icon className="w-4 h-4" />
-                                            {label}
-                                        </MenuItem>
-                                    </NavLink>
-                                ))}
-                            </MenuList>
-                        </Menu>
-                        <div onClick={() => navigate(`/factory/warehouse-access/${Cookies.get("de_ul_nesw")}`)} className="flex flex-col items-center justify-center w-full py-2 px-2 rounded-xl cursor-pointer 
-                                        text-gray-700 hover:bg-white/40 hover:text-[#0A9EB3] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#4DA057] 
-                                        transition-all duration-300">
-                            <Home className="w-8 h-8 mb-0" />
-                        </div>
-                    </div>
-                ) :
-                    <noscript></noscript>
-                }
-            </div>
+            <InventoryHeader type={"out"} prd_type={prd_type} invoiceStarted={invoiceStarted} role={role} mode={mode} deUlName={deUlName} invoiceId={invoiceId} resetAllBaseForNewInvoice={resetAllBaseForNewInvoice}  deUlId={deUlId} operation_type={invoiceMeta?.[mode]?.operation_type}/>
 
             {/* Sidebar */}
             {invoiceStarted?.out && (

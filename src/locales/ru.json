@@ -579,5 +579,7 @@
     "ExelSiped": "Пропущено (уже существует)",
     "uploadSkipeMaterialSucces": "Материалы успешно созданы",
     "MainWarehouse": "Основной склад",
-    "MaterialWarehouse": "Материальный склад"
+    "MaterialWarehouse": "Материальный склад",
+    "inventory_stock_header": "Инвентаризация остатков на складе",
+    "common.continue": "Продолжить"
 }
