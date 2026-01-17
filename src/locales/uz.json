@@ -572,5 +572,10 @@
     "MainWarehouse": "Asosiy ombor",
     "MaterialWarehouse": "Materiallar ombori",
     "inventory_stock_header": "Ombor inventarizatsiyasi",
-    "common.continue": "Davom etish"
+    "common.continue": "Davom etish",
+    "inventory.search_hint":"Mahsulotlarni qidiruv yoki kategoriyasi orqali toping",
+    "search.results": "Qidiruv natijalari",
+    "category.selected_products":"Tanlangan kategoriya ichidagi mahsulotlar",
+    "search.all_categories":"Qidiruv: barcha kategoriyalar bo‘yicha",
+    "shipments.received":"Kelib tushgan jo‘natmalar"
 }

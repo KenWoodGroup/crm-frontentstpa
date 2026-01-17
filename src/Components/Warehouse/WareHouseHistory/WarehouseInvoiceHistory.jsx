@@ -1187,7 +1187,7 @@ function EditStatusModal({ invoice, onClose, onSave, loading }) {
     ];
     const org_status_id = statusBase.find((st) => st.value === form.org_status)?.id
     const statusOptions = invoice?.status === "cancelled" ? statusBase.filter((st) => st.id === 2)
-        : invoice?.status === "draft" ? statusBase.filter((st) => st.id === 4)
+        : invoice?.status === "draft" ? statusBase.filter((st) => st.id === 4 || st.id === 3)
             : invoice?.status === "sent" ? statusBase?.filter((st) => st.id === 1)
             : statusBase?.filter((st) => st.id === 3)
     return (

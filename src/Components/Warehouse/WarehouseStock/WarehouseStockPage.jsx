@@ -14,8 +14,10 @@ import { LocalCategory } from "../../../utils/Controllers/LocalCategory";
 import { useParams } from "react-router-dom";
 import InventoryHeader from "../InventoryHeader/InventoryHeader";
 import { location } from "../../../utils/Controllers/location";
+import { useTranslation } from "react-i18next";
 
 export default function WarehouseStockPage({productType = "product", role = "warehouse",}) {
+  const {t} = useTranslation();
   const deUlId = role === "factory" ? useParams().deUlId : null;
   const locationId = role === "warehouse" ? Cookies.get("ul_nesw") : deUlId;
   const parentId =
@@ -62,7 +64,7 @@ export default function WarehouseStockPage({productType = "product", role = "war
 
   /* ================= FETCH STOCK ================= */
   const fetchStock = useCallback(async () => {
-    setLoading(true);
+    if(data.length !== 0) setLoading(true);
     try {
       // GLOBAL SEARCH (API)
       if (debouncedGlobalSearch) {
@@ -152,15 +154,15 @@ export default function WarehouseStockPage({productType = "product", role = "war
       {role === "factory" && <InventoryHeader deUlId={deUlId} deUlName={warehouseName}  role={role} type={"stock"} prd_type={productType} invoiceStarted={{stock: false}} mode={"stock"} />}
       {/* ===== HEADER ===== */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold text-text-light dark:text-text-dark">Ombordagi tovarlar</h1>
+        <h1 className="text-2xl font-bold text-text-light dark:text-text-dark">{t("warehouseTitle")}</h1>
 
         <p className="text-sm opacity-60 text-text-light dark:text-text-dark">
           {viewMode === "HOME" &&
-            "Mahsulotlarni global qidiruv yoki kategoriya orqali toping"}
+            t("inventory.search_hint")}
           {viewMode === "GLOBAL_SEARCH" &&
-            "Global qidiruv natijalari"}
+            t("search.results")}
           {viewMode === "CATEGORY_PRODUCTS" &&
-            "Tanlangan kategoriya ichidagi mahsulotlar"}
+            t("category.selected_products")}
         </p>
       </div>
 
@@ -175,7 +177,7 @@ export default function WarehouseStockPage({productType = "product", role = "war
 
           <p className="text-xs opacity-50 flex items-center gap-1 text-text-light dark:text-text-dark">
             <Search size={12} />
-            Global qidiruv: barcha kategoriyalar bo‘yicha
+            {t("search.all_categories")}
           </p>
         </div>
       )}
@@ -206,7 +208,7 @@ export default function WarehouseStockPage({productType = "product", role = "war
               onChange={setLocalSearch}
               loading={false}
             />
-            <p className="text-xs opacity-50">
+            <p className="text-xs opacity-50 dark:text-text-dark text-text-light">
               Ushbu kategoriya ichida qidirish
             </p>
           </div>

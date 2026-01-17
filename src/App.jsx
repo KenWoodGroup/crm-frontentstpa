@@ -22,6 +22,7 @@ import Warehouse from "./Components/ProtectedRoutes/Warehouse";
 import MWarehouseLayout from "./layouts/MWarehouseLayout";
 import Mwarehouse from "./Components/ProtectedRoutes/Mwarehouse";
 import { mWarehouseRoutes } from "./routes/mWarehouseRoutes";
+import SocketProvider from "./context/SocketProvider";
 
 
 // React Query client
@@ -31,69 +32,70 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <Routes>
-          <Route path="/" element={<AppLayout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route element={
-              <SuperAdmin>
-                <SuperAdminLayout />
-              </SuperAdmin>
-            }>
-              {supperAdminRoutes.map((r) => {
-                return (
-                  <Route key={r.name} path={r.path} element={r.element} />
-                )
-              })}
+        <SocketProvider>
+          <Routes>
+            <Route path="/" element={<AppLayout />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route element={
+                <SuperAdmin>
+                  <SuperAdminLayout />
+                </SuperAdmin>
+              }>
+                {supperAdminRoutes.map((r) => {
+                  return (
+                    <Route key={r.name} path={r.path} element={r.element} />
+                  )
+                })}
+              </Route>
+              <Route element={
+                <Manager>
+                  <ManagerLayout />
+                </Manager>
+              }>
+                {managerRoutes?.map((r) => {
+                  return (
+                    <Route key={r.name} path={r.path} element={r.element} />
+                  )
+                })}
+              </Route>
+              <Route element={
+                <Factory>
+                  <MainLayout />
+                </Factory>
+              }>
+                {userRoutes.map((r) => {
+                  return (
+                    <Route key={r.name} path={r.path} element={r.element} />
+                  )
+                })}
+              </Route>
+              <Route element={
+                <Warehouse>
+                  <WarehouseLayout />
+                </Warehouse>
+              }>
+                {warehouseRoutes?.map((r) => {
+                  return (
+                    <Route key={r.name} path={r.path} element={r.element} />
+                  )
+                })}
+              </Route>
+              <Route element={
+                <Mwarehouse>
+                  <MWarehouseLayout />
+                </Mwarehouse>
+              }>
+                {mWarehouseRoutes?.map((r) => {
+                  return (
+                    <Route key={r.name} path={r.path} element={r.element} />
+                  )
+                })}
+              </Route>
+              <Route path="*" element={<ErrorPage />} />
             </Route>
-            <Route element={
-              <Manager>
-                <ManagerLayout />
-              </Manager>
-            }>
-              {managerRoutes?.map((r) => {
-                return (
-                  <Route key={r.name} path={r.path} element={r.element} />
-                )
-              })}
-            </Route>
-            <Route element={
-              <Factory>
-                <MainLayout />
-              </Factory>
-            }>
-              {userRoutes.map((r) => {
-                return (
-                  <Route key={r.name} path={r.path} element={r.element} />
-                )
-              })}
-            </Route>
-            <Route element={
-              <Warehouse>
-                <WarehouseLayout />
-              </Warehouse>
-            }>
-              {warehouseRoutes?.map((r) => {
-                return (
-                  <Route key={r.name} path={r.path} element={r.element} />
-                )
-              })}
-            </Route>
-            <Route element={
-              <Mwarehouse>
-                <MWarehouseLayout />
-              </Mwarehouse>
-            }>
-              {mWarehouseRoutes?.map((r) => {
-                return (
-                  <Route key={r.name} path={r.path} element={r.element} />
-                )
-              })}
-            </Route>
-            <Route path="*" element={<ErrorPage />} />
-          </Route>
-        </Routes>
-
+          </Routes>
+        </SocketProvider>
       </Router >
       <ToastContainer
         position="top-right"
