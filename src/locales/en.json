@@ -571,5 +571,10 @@
   "MainWarehouse": "Main warehouse",
   "MaterialWarehouse": "Material warehouse",
   "inventory_stock_header": "Inventory Stock",
-  "common.continue": "Continue"
+  "common.continue": "Continue",
+  "inventory.search_hint":"Find products via search or category",
+  "search.results":"Search results",
+  "category.selected_products":"Products in the selected category",
+  "search.all_categories":"Search across all categories",
+  "shipments.received":"Received Shipments"
 }

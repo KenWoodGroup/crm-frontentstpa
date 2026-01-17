@@ -581,5 +581,10 @@
     "MainWarehouse": "Основной склад",
     "MaterialWarehouse": "Материальный склад",
     "inventory_stock_header": "Инвентаризация остатков на складе",
-    "common.continue": "Продолжить"
+    "common.continue": "Продолжить",
+    "inventory.search_hint":"Найдите товары через поиск или категорию",
+    "search.results":"Результаты поиска",
+    "category.selected_products":"Товары в выбранной категории",
+    "search.all_categories":"Поиск по всем категориям",
+    "shipments.received":"Поступившие отправления"
 }

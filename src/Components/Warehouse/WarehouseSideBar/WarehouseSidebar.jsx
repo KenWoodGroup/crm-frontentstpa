@@ -30,7 +30,7 @@ export default function WarehouseSidebar({prd_type="product"}) {
     ] :
     [
         { id: 1, label: t('dashboard'), path: "/warehouse/dashboard", icon: LayoutDashboard },
-        { id: 2, label: t('Order'), path: "/warehouse/history", icon: Move },
+        { id: 2, label: t('operations'), path: "/warehouse/history", icon: Move },
     ]
     
     const skladSubLinks = prd_type === "material" ? 

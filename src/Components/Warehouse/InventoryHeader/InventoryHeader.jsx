@@ -3,10 +3,12 @@ import CancelInvoiceButton from "../WareHouseOutcome/sectionsWhO/CancelInvoiceBu
 import { Home, Move, Package, PackageMinus, PackagePlus, SendIcon } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+// import { useTranslation } from "react-i18next";
 
 
 export default function InventoryHeader({ type, prd_type, invoiceStarted, role, mode, deUlName, invoiceId, resetAllBaseForNewInvoice, deUlId, operation_type }) {
     const { t } = useTranslation();
+
     const navigate = useNavigate();
     const basePath =
         prd_type === "material"

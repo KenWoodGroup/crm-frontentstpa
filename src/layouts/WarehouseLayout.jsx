@@ -34,6 +34,8 @@ import socket from "../utils/Socket";
 import NotifyToast from "../Components/UI/notify/NotifyToast";
 import WarehouseNotifyContainer from "../Components/UI/notify/WarehouseNotifyContainer";
 import toast from "react-hot-toast";
+import { SocketManager } from "../utils/socketManager";
+
 
 export default function WarehouseLayout() {
     const userLid = Cookies.get("ul_nesw");
@@ -52,12 +54,8 @@ export default function WarehouseLayout() {
     };
     useEffect(() => {
         fetchNotify();
-        socket.connect();
-        socket.emit("joinLocation", userLid);
 
-        socket.on("invoiceUpdate", (data) => {
-            console.log(data);
-
+        const handler = (data) => {
             if (data.location_id === userLid) {
                 fetchNotify();
                 toast.custom((t) => (
@@ -69,14 +67,14 @@ export default function WarehouseLayout() {
                         }}
                     />
                 ), { duration: Infinity });
+            }
+        };
 
-            };
-        });
+        SocketManager.on("invoiceNotification", handler);
 
         return () => {
-            socket.off("invoiceUpdate");
-            socket.disconnect();
-        }
+            SocketManager.off("invoiceNotification", handler);
+        };
     }, [userLid]);
 
     return (

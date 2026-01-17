@@ -105,7 +105,7 @@ export function StockRow({ item, role, highlight }) {
 
       {/* FIXED */}
       <div className={`absolute right-4  opacity-60 ${fixed_quantity ? "text-orange-500" : "text-text-light dark:text-text-dark"} `}>
-        {!fixed_quantity ? <Link size={16} /> : <Infinity size={16} />}
+        {fixed_quantity ? <Link size={16} /> : <Infinity size={16} />}
       </div>
     </div>
   );

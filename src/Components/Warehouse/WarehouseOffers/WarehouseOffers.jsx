@@ -188,7 +188,7 @@ export default function ReceivedInvoices() {
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-6 relative">
                     <h1 className="text-2xl font-semibold text-slate-900 relative inline-flex items-center gap-2">
-                        Kelib tushgan jo'natmalar
+                        {t("shipments.received")}
                         {/* Notification badge */}
                         {data?.new > 0 &&
                             <span className="absolute -top-2 -right-6 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
